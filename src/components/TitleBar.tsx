@@ -12,7 +12,7 @@ function TitleBar() {
   )
 
   return (
-    <div className={`bg-zinc-950 flex w-full text-white h-8 justify-between px-2 pt-1 items-center relative stroke-[1.5px] rounded-t-2xl`} data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>
+    <div className={`bg-zinc-950 flex w-full text-white h-8 justify-between px-2 pt-1 items-center relative stroke-[1.5px]`} data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>
         <div className='flex w-20 justify-between'>
           <button onClick={() => {
             appWindow.setAlwaysOnTop(!windowPinned)

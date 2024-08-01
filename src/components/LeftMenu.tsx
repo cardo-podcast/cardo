@@ -9,9 +9,6 @@ function LeftMenu() {
       <Link to='/'>
         HOME
       </Link>
-      <Link to='/search'>
-        SEARCH
-      </Link>
     </div>
   )
 }
