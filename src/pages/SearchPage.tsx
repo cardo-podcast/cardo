@@ -1,23 +1,41 @@
-import { SearchPodcast } from "../SearchAPI/base";
+import { useState } from "react";
+import { PodcastData } from "..";
+import * as icons from "../Icons"
 
 
-function SearchPage() {
-
-  const handleChange = async(term: string) => {
-    if (term.length > 3) {
-      const results = await SearchPodcast(term)
-      console.log(results)
-    }
-  }
+function PodcastPreview ({result}: {result: PodcastData}) {
+  const [imageError, setImageError] = useState(false)
 
   return(
-    <div>
-      <input
-        type="text"
-        className="p-1 bg-slate-600 rounded-lg"
-        onChange={(event) => {handleChange(event.target.value)}}
-        ></input>
+    <div className="flex bg-zinc-800 rounded-md h-20 p-2 justify-between gap-4">
+      {imageError?
+        icons.photo:
+        <img
+        className="bg-zinc-700 h-full aspect-square rounded-md"
+        src={result.coverUrl}
+        onError={() => setImageError(true)}
+        />
+      }
 
+      <div className="flex flex-col text-right">
+        <p>{result.podcastName}</p>
+        <p>{result.artistName}</p>
+      </div>
+    </div>
+  )
+}
+
+function SearchPage({results}: {results: Array<PodcastData>}) {
+
+  return(
+    <div className="w-full h-full p-2 overflow-y-auto flex justify-center">
+      <div className="grid px-2 gap-1 w-[80%]">
+        {
+          results.map(result => {
+            return <PodcastPreview result={result}/>
+          })
+        }
+      </div>
     </div>
   )
 }

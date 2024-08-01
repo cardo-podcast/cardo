@@ -3,6 +3,6 @@
 @tailwind utilities;
 
 
-/* input[type="range"]{
-    -webkit-
-} */
+::-webkit-scrollbar {
+    display: none;
+}

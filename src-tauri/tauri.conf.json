@@ -18,6 +18,10 @@
       },
       "window": {
         "all": true
+      },
+      "http": {
+        "all": true,
+        "scope": ["https://itunes.apple.com/*"]
       }
     },
     "windows": [
