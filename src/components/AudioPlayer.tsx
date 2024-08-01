@@ -1,11 +1,13 @@
 import React, { useRef, useEffect, useState } from "react";
 import { secondsToStr } from "../utils";
+import * as icons from "../Icons"
 
 interface AudioPlayerProps {
   src: string
+  className?: string
 }
 
-function AudioPlayer({ src }: AudioPlayerProps) {
+function AudioPlayer({ src, className='' }: AudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -49,14 +51,16 @@ function AudioPlayer({ src }: AudioPlayerProps) {
   };
 
   return (
-    <div className="flex flex-col h-16 bg-slate-800 text-slate-50 p-2">
-      <div>
+    <div className={`flex flex-col h-16 bg-zinc-950 text-slate-50 p-2 ${className}`}>
+      <div className="flex justify-center">
+
         <button
           className="flex items-center focus:outline-none"
           onClick={handlePlayPause}
         >
-          PLAY
+          {audioRef.current?.paused? icons.play : icons.pause}
         </button>
+
       </div>
       <div className="flex justify-evenly items-center">
         <p>{secondsToStr(currentTime)}</p>
@@ -66,7 +70,7 @@ function AudioPlayer({ src }: AudioPlayerProps) {
           max={duration}
           value={currentTime}
           onChange={handleSeekChange}
-          className="w-full mx-4 h-1 bg-slate-300"
+          className="w-full mx-4 h-1 bg-zinc-300"
         />
         <p>{secondsToStr(duration)}</p>
         </div>
