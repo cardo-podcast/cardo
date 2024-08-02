@@ -6,7 +6,7 @@ import { parseXML } from "../utils";
 import EpisodeCard from "../components/EpisodeCard";
 
 
-function PodcastPreview() {
+function PodcastPreview({play}: {play: (episode?: EpisodeData) => void}) {
   const location = useLocation();
   const [imageError, setImageError] = useState(false)
   const podcast = location.state.podcast as PodcastData
@@ -33,8 +33,8 @@ function PodcastPreview() {
         }
 
         <div className="flex flex-col">
-          <p className="text-lg">{podcast.podcastName}</p>
-          <p>{podcast.artistName}</p>
+          <h1>{podcast.podcastName}</h1>
+          <h2>{podcast.artistName}</h2>
         </div>
       </div>
 
@@ -43,7 +43,10 @@ function PodcastPreview() {
           {
             episodes.map(episode => {
               return (
-                <EpisodeCard episode={episode} podcast={podcast}/>
+                <EpisodeCard episode={episode} podcast={podcast}
+                  play={() => {
+                          play(episode)
+                        }}/>
               )
             })
           }
