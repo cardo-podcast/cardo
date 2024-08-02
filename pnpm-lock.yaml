@@ -17,6 +17,9 @@ dependencies:
   react-router-dom:
     specifier: ^6.25.1
     version: 6.25.1(react-dom@18.2.0)(react@18.2.0)
+  tauri-plugin-sql-api:
+    specifier: github:tauri-apps/tauri-plugin-sql#v1
+    version: github.com/tauri-apps/tauri-plugin-sql/7ae8847ab1f2252e8b6f0fe44af215ac40664fd6
 
 devDependencies:
   '@tauri-apps/cli':
@@ -1821,3 +1824,11 @@ packages:
     engines: {node: '>= 14'}
     hasBin: true
     dev: true
+
+  github.com/tauri-apps/tauri-plugin-sql/7ae8847ab1f2252e8b6f0fe44af215ac40664fd6:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-sql/tar.gz/7ae8847ab1f2252e8b6f0fe44af215ac40664fd6}
+    name: tauri-plugin-sql-api
+    version: 0.0.0
+    dependencies:
+      '@tauri-apps/api': 1.6.0
+    dev: false

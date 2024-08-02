@@ -11,7 +11,7 @@ edition = "2021"
 tauri-build = { version = "1", features = [] }
 
 [dependencies]
-tauri = { version = "1", features = [ "http-all", "shell-open", "window-all"] }
+tauri = { version = "1", features = [ "path-all", "http-all", "shell-open", "window-all"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 mio = {version = "1"}
@@ -19,3 +19,8 @@ mio = {version = "1"}
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!
 custom-protocol = ["tauri/custom-protocol"]
+
+[dependencies.tauri-plugin-sql]
+git = "https://github.com/tauri-apps/plugins-workspace"
+branch = "v1"
+features = ["sqlite"] # or "postgres", or "mysql"

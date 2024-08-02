@@ -22,6 +22,9 @@
       "http": {
         "all": true,
         "scope": ["https://*", "http://*"]
+      },
+      "path": {
+        "all": true
       }
     },
     "windows": [
