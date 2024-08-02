@@ -11,7 +11,7 @@ export interface PodcastData {
 export interface EpisodeData {
   title: string,
   description: string,
-  audioUrl: string,
+  src: string,
   pubDate: Date,
   duration?: number,
   coverUrl?: string

@@ -1,22 +1,37 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, RefObject } from "react";
 import { secondsToStr } from "../utils";
 import * as icons from "../Icons"
+import { EpisodeData } from "..";
 
 interface AudioPlayerProps {
-  src: string
-  className?: string
+  audioRef: RefObject<HTMLAudioElement>
+  className?: string,
 }
 
-function AudioPlayer({ src, className='' }: AudioPlayerProps) {
-  const audioRef = useRef<HTMLAudioElement>(null);
+export function useAudioPlayer() {
+  const ref = useRef<HTMLAudioElement>(null);
+  const [playing, setPlaying] = useState<EpisodeData>()
+
+  const play = (episode: EpisodeData | null = null) => {
+    if (!ref.current) return
+
+    if (episode != null) {
+      setPlaying(episode)
+      ref.current.src = episode.src
+      ref.current.load()
+    }
+
+    ref.current.play()
+  }
+
+  return {ref, play, playing}
+}
+
+
+function AudioPlayer ({ audioRef, className='' }: AudioPlayerProps) {
+  
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.load();
-    }
-  }, [src]);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -50,12 +65,13 @@ function AudioPlayer({ src, className='' }: AudioPlayerProps) {
     }
   };
 
+
   return (
-    <div className={`flex flex-col h-[70px] justify-center bg-zinc-950 text-slate-50 p-2 ${className}`}>
+    <div className={`flex flex-col h-[70px] justify-center bg-zinc-950 text-slate-50 p-2 ${audioRef.current?.src? '': 'hidden'} ${className}`}>
       <div className="flex justify-center">
 
         <button
-          className="flex items-center focus:outline-none"
+          className="flex items-center focus:outline-none hover: hover:text-amber-600 w-8"
           onClick={handlePlayPause}
         >
           {audioRef.current?.paused? icons.play : icons.pause}
@@ -70,12 +86,12 @@ function AudioPlayer({ src, className='' }: AudioPlayerProps) {
           max={duration}
           value={currentTime}
           onChange={handleSeekChange}
-          className="w-full mx-4 h-1 bg-zinc-300"
+          className="w-full mx-4 h-1 bg-zinc-300 accent-amber-600"
         />
         <p>{secondsToStr(duration)}</p>
         </div>
 
-        <audio ref={audioRef} src={src} onLoadedMetadata={handleLoadedMetadata} className="hidden" />
+        <audio ref={audioRef} onLoadedMetadata={handleLoadedMetadata} className="hidden" />
     </div>
   );
 };

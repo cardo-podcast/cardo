@@ -17,7 +17,7 @@ function TitleBar() {
           <button onClick={() => {
             appWindow.setAlwaysOnTop(!windowPinned)
             setWindowPinned(!windowPinned)
-            }} className='hover:text-amber-400'>
+            }} className='hover:text-amber-500 w-5'>
               {windowPinned? icons.unpin: icons.pin}
             </button>
         </div>
@@ -25,16 +25,16 @@ function TitleBar() {
           <h1 data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>Podland</h1>
 
         <div className='flex justify-between gap-1'>
-          <button onClick={() => appWindow.minimize()} className='hover:text-amber-400'>
+          <button onClick={() => appWindow.minimize()} className='hover:text-amber-500 w-5'>
             {icons.minus}
           </button>
           <button onClick={() => {
             appWindow.toggleMaximize()
             setMaximized(!maximized)
-          }} className='hover:text-amber-400'>
+          }} className='hover:text-amber-500 w-5'>
             {maximized? icons.unmaximize: icons.maximize}
           </button>
-          <button onClick={() => appWindow.close()} className='hover:text-red-500'>
+          <button onClick={() => appWindow.close()} className='hover:text-red-500 w-5'>
             {icons.close}
           </button>
         </div>
