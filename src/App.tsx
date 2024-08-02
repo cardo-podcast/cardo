@@ -5,7 +5,7 @@ import TitleBar from "./components/TitleBar";
 import HomePage from "./pages/HomePage";
 import SearchBar from "./components/SearchBar";
 import PodcastPreview from "./pages/PodcastPreview";
-import { addFavorite, loadDB } from "./DB";
+import { loadDB } from "./DB";
 import { useEffect } from "react";
 
 
@@ -13,9 +13,7 @@ const App = () => {
   const {ref:audioRef, play} = useAudioPlayer()
   
   useEffect(()=>{
-    loadDB().then(()=>
-      
-    )
+    loadDB()
   }, [])
 
   return (
