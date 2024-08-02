@@ -4,7 +4,31 @@ import { useEffect, useState } from "react";
 import * as icons from "../Icons"
 import { parseXML } from "../utils";
 import EpisodeCard from "../components/EpisodeCard";
+import { addFavoritePodcast, getFavoritePodcast, getFavoritePodcasts, removeFavoritePodcast } from "../DB";
 
+function FavoriteButton({podcast}: {podcast: PodcastData}) {
+  const [isFav, setIsFav] = useState(false)
+
+  useEffect(()=>{
+    getFavoritePodcast(podcast.feedUrl).then(result => {
+      setIsFav(result !== undefined)
+  })
+  }, [podcast])
+
+  return (
+    <button onClick={async()=>{
+      if (isFav) {
+        await removeFavoritePodcast(podcast.feedUrl)
+        setIsFav(false)
+      }else {
+        await addFavoritePodcast(podcast)
+        setIsFav(true)
+      }
+    }}>
+      {isFav? icons.starFilled: icons.star}
+    </button>
+  )
+}
 
 function PodcastPreview({play}: {play: (episode?: EpisodeData) => void}) {
   const location = useLocation();
@@ -35,15 +59,16 @@ function PodcastPreview({play}: {play: (episode?: EpisodeData) => void}) {
         <div className="flex flex-col">
           <h1>{podcast.podcastName}</h1>
           <h2>{podcast.artistName}</h2>
+          <FavoriteButton podcast={podcast}/>
         </div>
       </div>
 
       <div className="flex-1">
         <div className="grid gap-1">
           {
-            episodes.map(episode => {
+            episodes.map((episode, i) => {
               return (
-                <EpisodeCard episode={episode} podcast={podcast}
+                <EpisodeCard key={i} episode={episode} podcast={podcast}
                   play={() => {
                           play(episode)
                         }}/>

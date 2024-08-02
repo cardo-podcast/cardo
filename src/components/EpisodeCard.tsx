@@ -14,8 +14,7 @@ function EpisodeCard ({episode, podcast, play}: {episode: EpisodeData, podcast: 
       <img
       className="bg-zinc-700 h-16 aspect-square rounded-md"
       src={imageError? podcast.coverUrl :episode.coverUrl}
-      onError={() => {setImageError(true); console.log(episode.title)}}
-      onInvalid={()=>console.log(episode.title)}
+      onError={() => setImageError(true)}
       />
 
       <div className="flex gap-2 flex-col text-right w-full items-end justify-between">
