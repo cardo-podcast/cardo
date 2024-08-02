@@ -21,7 +21,7 @@
       },
       "http": {
         "all": true,
-        "scope": ["https://itunes.apple.com/*"]
+        "scope": ["https://*", "http://*"]
       }
     },
     "windows": [

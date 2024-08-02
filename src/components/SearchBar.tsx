@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { SearchPodcast } from "../SearchAPI/base";
 import { PodcastData } from "..";
-import PodcastPreview from "./PodcastPreview";
+import PodcastCard from "./PodcastCard";
 
 
 function SearchBar () {
@@ -73,8 +73,8 @@ function SearchBar () {
       >
       <div className="grid gap-1 w-full">
         {
-          results.map(result => {
-            return <PodcastPreview result={result}/>
+          results.map((result, i) => {
+            return <PodcastCard key={i} result={result} endSearch={() => setResults([])}/>
           })
         }
       </div>

@@ -4,12 +4,22 @@ import * as icons from "../Icons"
 import { useNavigate } from "react-router-dom"
 
 
-function PodcastPreview ({result}: {result: PodcastData}) {
+function PodcastCard ({result, endSearch}: {result: PodcastData, endSearch: ()=>void}) {
   const [imageError, setImageError] = useState(false)
   const navigate = useNavigate()
 
+
   return(
-    <div className="flex bg-zinc-800 hover:bg-zinc-600 cursor-pointer rounded-md h-20 p-2 justify-between gap-4">
+    <div className="flex bg-zinc-800 hover:bg-zinc-600 cursor-pointer rounded-md h-20 p-2 justify-between gap-4"
+    onClick={() => {
+        endSearch()
+        navigate('/preview', {
+          state: {
+            podcast: result
+          }
+        })
+    }}
+    >
       {imageError?
         icons.photo:
         <img
@@ -27,4 +37,4 @@ function PodcastPreview ({result}: {result: PodcastData}) {
   )
 }
 
-export default PodcastPreview
+export default PodcastCard
