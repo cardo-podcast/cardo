@@ -11,12 +11,12 @@ const App = () => {
   return (
     <div className="bg-zinc-900 w-full h-screen flex flex-col rounded-2xl border-zinc-600 border-[1px] text-zinc-50 overflow-hidden">
       <TitleBar />
-      <div className="flex justify-start w-full overflow-hidden">
+      <div className="flex justify-start w-full h-full overflow-hidden">
         <BrowserRouter>
           <LeftMenu />
           <div className="flex flex-col w-full h-full">
             <SearchBar/>
-            <div className="flex overflow-y-auto">
+            <div className="flex h-full overflow-y-auto">
               <Routes>
                 <Route path='/' element={<HomePage />} />
                 <Route path='/preview' element={<PodcastPreview />} />
