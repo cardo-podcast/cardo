@@ -51,7 +51,7 @@ function AudioPlayer({ src, className='' }: AudioPlayerProps) {
   };
 
   return (
-    <div className={`flex flex-col h-16 bg-zinc-950 text-slate-50 p-2 ${className}`}>
+    <div className={`flex flex-col h-[70px] justify-center bg-zinc-950 text-slate-50 p-2 ${className}`}>
       <div className="flex justify-center">
 
         <button

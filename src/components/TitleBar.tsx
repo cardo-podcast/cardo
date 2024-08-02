@@ -22,7 +22,7 @@ function TitleBar() {
             </button>
         </div>
 
-          <h1>Podland</h1>
+          <h1 data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>Podland</h1>
 
         <div className='flex justify-between gap-1'>
           <button onClick={() => appWindow.minimize()} className='hover:text-amber-400'>
