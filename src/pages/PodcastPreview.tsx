@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import * as icons from "../Icons"
 import { parseXML } from "../utils";
 import EpisodeCard from "../components/EpisodeCard";
-import { addFavoritePodcast, getFavoritePodcast, getFavoritePodcasts, removeFavoritePodcast } from "../DB";
+import { addFavoritePodcast, getFavoritePodcast, removeFavoritePodcast } from "../DB";
 
 function FavoriteButton({podcast}: {podcast: PodcastData}) {
   const [isFav, setIsFav] = useState(false)

@@ -44,7 +44,7 @@ function SearchBar () {
   }, [results]);
 
   return(
-    <div className="relative w-full">
+    <div className="relative w-4/5 mx-auto">
     <form onSubmit={e => {
       e.preventDefault()
       clearTimeout(timeout.current)
@@ -56,7 +56,7 @@ function SearchBar () {
       ref={inputRef}
         type="text"
         placeholder="Search a podcast..."
-        className="py-1 px-2 bg-zinc-700 w-full rounded-md"
+        className="py-1 px-2 bg-zinc-600 w-full rounded-md focus:outline-none"
         onChange={(event) => {handleChange(event.target.value)}}
         onKeyDown={e => {
           if (e.key == 'Escape' || e.key == 'Tab') {
@@ -68,13 +68,13 @@ function SearchBar () {
 
     {
       results.length > 0?
-      (<div className="absolute left-1/2 -translate-x-1/2 top-0 mt-[35px] z-10 max-h-[400px] w-full flex justify-center py-1 px-2 overflow-y-auto bg-zinc-700 rounded-md"
+      (<div className="absolute left-1/2 -translate-x-1/2 top-0 mt-[35px] z-10 max-h-[400px] w-full flex justify-center py-1 px-2 overflow-y-auto bg-zinc-800 rounded-md"
         ref={resultsRef}
       >
       <div className="grid gap-1 w-full">
         {
           results.map((result, i) => {
-            return <PodcastCard key={i} result={result} endSearch={() => setResults([])}/>
+            return <PodcastCard key={i} podcast={result} callback={() => setResults([])}/>
           })
         }
       </div>
