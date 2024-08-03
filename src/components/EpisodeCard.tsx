@@ -13,6 +13,7 @@ function EpisodeCard ({episode, podcast, play}: {episode: EpisodeData, podcast: 
     >
       <img
       className="bg-zinc-700 h-16 aspect-square rounded-md"
+      alt=""
       src={imageError? podcast.coverUrl :episode.coverUrl}
       onError={() => setImageError(true)}
       />

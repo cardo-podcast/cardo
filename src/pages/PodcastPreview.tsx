@@ -4,26 +4,29 @@ import { useEffect, useState } from "react";
 import * as icons from "../Icons"
 import { parseXML } from "../utils";
 import EpisodeCard from "../components/EpisodeCard";
-import { addFavoritePodcast, getFavoritePodcast, removeFavoritePodcast } from "../DB";
+import { useDB } from "../DB";
 
 function FavoriteButton({podcast}: {podcast: PodcastData}) {
   const [isFav, setIsFav] = useState(false)
+  const { favoritePodcasts } = useDB()
 
   useEffect(()=>{
-    getFavoritePodcast(podcast.feedUrl).then(result => {
+    favoritePodcasts.getFavoritePodcast(podcast.feedUrl).then(result => {
       setIsFav(result !== undefined)
   })
-  }, [podcast])
+  }, [favoritePodcasts, podcast.feedUrl])
 
   return (
     <button onClick={async()=>{
       if (isFav) {
-        await removeFavoritePodcast(podcast.feedUrl)
+        console.log(favoritePodcasts)
+        await favoritePodcasts.removeFavoritePodcast(podcast.feedUrl)
         setIsFav(false)
       }else {
-        await addFavoritePodcast(podcast)
+        await favoritePodcasts.addFavoritePodcast(podcast)
         setIsFav(true)
       }
+      favoritePodcasts.reloadFavoritePodcasts()
     }}>
       {isFav? icons.starFilled: icons.star}
     </button>
@@ -52,6 +55,7 @@ function PodcastPreview({play}: {play: (episode?: EpisodeData) => void}) {
           <img
             className="bg-zinc-700 h-40 aspect-square rounded-md"
             src={podcast.coverUrlLarge}
+            alt=""
             onError={() => setImageError(true)}
           />
         }

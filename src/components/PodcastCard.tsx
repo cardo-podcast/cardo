@@ -24,6 +24,7 @@ function PodcastCard ({podcast, callback}: {podcast: PodcastData, callback: ()=>
         icons.photo:
         <img
         className="bg-zinc-700 h-full aspect-square rounded-md"
+        alt=""
         src={podcast.coverUrl}
         onError={() => setImageError(true)}
         />
