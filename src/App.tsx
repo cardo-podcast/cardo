@@ -6,6 +6,7 @@ import HomePage from "./pages/HomePage";
 import SearchBar from "./components/SearchBar";
 import PodcastPreview from "./pages/PodcastPreview";
 import { DBProvider } from "./DB";
+import EpisodePreview from "./pages/EpisodePreview";
 
 
 const App = () => {
@@ -24,6 +25,7 @@ const App = () => {
                 <Routes>
                   <Route path='/' element={<HomePage />} />
                   <Route path='/preview' element={<PodcastPreview play={play} />} />
+                  <Route path='/episode-preview' element={<EpisodePreview play={play} />} />
                 </Routes>
               </div>
               {

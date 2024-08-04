@@ -2,7 +2,7 @@ import { ResponseType, fetch as tauriFetch} from "@tauri-apps/api/http"
 import { EpisodeData, PodcastData } from "."
 import { createDir, exists, readTextFile, removeFile, writeTextFile } from "@tauri-apps/api/fs"
 import { appCacheDir, join } from "@tauri-apps/api/path"
-
+import sanitizeHtml from 'sanitize-html';
 
 export function secondsToStr(seconds: number) {
   const hours = Math.floor(seconds / 3600)
@@ -17,9 +17,7 @@ export function secondsToStr(seconds: number) {
 }
 
 function htmlToText(html: string): string {
-  const tempElement = document.createElement('div');
-  tempElement.innerHTML = html;
-  return tempElement.innerText;
+  return sanitizeHtml(html)
 }
 
 async function downloadXml(url: string): Promise<string> {
@@ -51,7 +49,7 @@ export async function parseXML(url: string, fileDownloaded = false): Promise<Epi
   const result = Array.from(items).map( (item: Element) => {
     const episode: EpisodeData = {
       title: item.querySelector('title')?.textContent ?? '',
-      description: item.querySelector('itunes\\:summary')?.textContent ?? htmlToText(item.querySelector('description')?.textContent ?? ''),
+      description: htmlToText(item.querySelector('description')?.textContent ?? '') ?? item.querySelector('itunes\\:summary')?.textContent,
       src: item.querySelector('enclosure')?.getAttribute('url') ?? '',
       pubDate: new Date(item.querySelector('pubDate')?.textContent ?? 0),
       coverUrl: item.getElementsByTagNameNS('http://www.itunes.com/dtds/podcast-1.0.dtd', 'image')[0]?.getAttribute('href') ?? undefined

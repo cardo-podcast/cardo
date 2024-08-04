@@ -1,20 +1,26 @@
 import { useEffect, useState } from "react"
 import { EpisodeData, PodcastData } from ".."
 import * as icons from "../Icons"
+import { useNavigate } from "react-router-dom"
 
 function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast: PodcastData, play: () => void }) {
   const [imageSrc, setImageSrc] = useState(episode.coverUrl ?? podcast.coverUrl)
   const [imageError, setImageError] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(()=> {
-    setImageSrc((episode.coverUrl ?? podcast.coverUrl))
+    episode.coverUrl = episode.coverUrl ?? podcast.coverUrl
+    setImageSrc(episode.coverUrl)
     setImageError(false)
-  }, [episode.coverUrl, podcast.coverUrl])
+  }, [episode, podcast.coverUrl])
 
   return (
     <div className="flex bg-zinc-800 hover:bg-zinc-600 cursor-pointer rounded-md min-h-20 p-2 justify-between gap-4"
-      onClick={() => {
-      }}
+      onClick={() => navigate('/episode-preview', {
+        state: {
+          episode: episode
+        }
+      })}
     >
       <div className="bg-zinc-700 h-16 aspect-square rounded-md">
         {
