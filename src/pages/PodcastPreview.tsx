@@ -1,9 +1,9 @@
 import { useLocation } from "react-router-dom";
 import { EpisodeData, PodcastData } from "..";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, lazy, SetStateAction, useEffect, useState, Suspense } from "react";
 import * as icons from "../Icons"
 import { getXmlDownloaded, parseXML, removeXmlDownloaded, saveXml } from "../utils";
-import EpisodeCard from "../components/EpisodeCard";
+// import EpisodeCard from "../components/EpisodeCard";
 import { useDB } from "../DB";
 
 function FavoriteButton({ podcast, subscribed, setSubscribed }: { podcast: PodcastData, subscribed: boolean, setSubscribed: Dispatch<SetStateAction<boolean>> }) {
@@ -32,7 +32,8 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
   const podcast = location.state.podcast as PodcastData
   const [episodes, setEpisodes] = useState<EpisodeData[]>([])
   const [subscribed, setSubscribed] = useState(false)
-  const { subscriptions: {getSubscription} } = useDB()
+  const { subscriptions: { getSubscription } } = useDB()
+  const EpisodeCard = lazy(() => import('../components/EpisodeCard'));
 
   useEffect(() => {
     getSubscription(podcast.feedUrl).then(result => {
@@ -44,20 +45,20 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
   }, [getSubscription, podcast.feedUrl])
 
   useEffect(() => {
-    getXmlDownloaded(podcast).then(async(path) => {
+    setEpisodes([])
+    getXmlDownloaded(podcast).then(async (path) => {
       if (path === undefined && subscribed) {
         // in case is subscribed but not downloaded
-          path = await saveXml(podcast)
-        }
+        path = await saveXml(podcast)
+      }
 
       const url = path === undefined ? podcast.feedUrl : path
       parseXML(url, path !== undefined).then(result => {
         setEpisodes(result)
       })
     });
-
-
   }, [podcast, subscribed])
+
 
 
   return (
@@ -77,7 +78,7 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
           <h1>{podcast.podcastName}</h1>
           <h2 className="mb-2">{podcast.artistName}</h2>
           <div className="flex gap-2">
-            <FavoriteButton podcast={podcast} subscribed={subscribed} setSubscribed={setSubscribed}/>
+            <FavoriteButton podcast={podcast} subscribed={subscribed} setSubscribed={setSubscribed} />
             <button onClick={() => {
               parseXML(podcast.feedUrl).then(result => {
                 setEpisodes(result)
@@ -91,16 +92,20 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
 
       <div className="flex-1">
         <div className="grid gap-1">
-          {
-            episodes.map((episode, i) => {
-              return (
-                <EpisodeCard key={i} episode={episode} podcast={podcast}
-                  play={() => {
-                    play(episode)
-                  }} />
-              )
+          <Suspense fallback={
+            Array.from({ length: 10 }).map(()=>{
+              return <div className="bg-zinc-800 h-20 w-full"></div>
             })
-          }
+          }>
+                {episodes.map((episode, i) => (
+                  <EpisodeCard
+                    key={i}
+                    episode={episode}
+                    podcast={podcast}
+                    play={() => play(episode)}
+                  />
+                ))}
+              </Suspense>
         </div>
       </div>
     </div>
