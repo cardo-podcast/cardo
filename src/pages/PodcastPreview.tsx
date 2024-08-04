@@ -1,9 +1,9 @@
 import { useLocation } from "react-router-dom";
 import { EpisodeData, PodcastData } from "..";
-import { Dispatch, lazy, SetStateAction, useEffect, useState, Suspense } from "react";
+import { Dispatch, SetStateAction, Suspense, useEffect, useState } from "react";
 import * as icons from "../Icons"
 import { getXmlDownloaded, parseXML, removeXmlDownloaded, saveXml } from "../utils";
-// import EpisodeCard from "../components/EpisodeCard";
+import EpisodeCard from "../components/EpisodeCard";
 import { useDB } from "../DB";
 
 function FavoriteButton({ podcast, subscribed, setSubscribed }: { podcast: PodcastData, subscribed: boolean, setSubscribed: Dispatch<SetStateAction<boolean>> }) {
@@ -33,7 +33,7 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
   const [episodes, setEpisodes] = useState<EpisodeData[]>([])
   const [subscribed, setSubscribed] = useState(false)
   const { subscriptions: { getSubscription } } = useDB()
-  const EpisodeCard = lazy(() => import('../components/EpisodeCard'));
+
 
   useEffect(() => {
     getSubscription(podcast.feedUrl).then(result => {
@@ -92,20 +92,18 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
 
       <div className="flex-1">
         <div className="grid gap-1">
-          <Suspense fallback={
-            Array.from({ length: 10 }).map(()=>{
-              return <div className="bg-zinc-800 h-20 w-full"></div>
-            })
-          }>
-                {episodes.map((episode, i) => (
-                  <EpisodeCard
-                    key={i}
-                    episode={episode}
-                    podcast={podcast}
-                    play={() => play(episode)}
-                  />
-                ))}
-              </Suspense>
+
+          {episodes.map((episode, i) => (
+            <Suspense fallback={<div className="bg-zinc-800 h-20 w-full" />}>
+              <EpisodeCard
+                key={i}
+                episode={episode}
+                podcast={podcast}
+                play={() => play(episode)}
+              />
+            </Suspense>
+          ))}
+
         </div>
       </div>
     </div>
