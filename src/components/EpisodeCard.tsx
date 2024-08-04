@@ -3,6 +3,7 @@ import { EpisodeData, PodcastData } from ".."
 import * as icons from "../Icons"
 import { useNavigate } from "react-router-dom"
 import { useIntersectionObserver } from "@uidotdev/usehooks"
+import { secondsToStr } from "../utils"
 
 function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast: PodcastData, play: () => void }) {
   const [imageSrc, setImageSrc] = useState(episode.coverUrl ?? podcast.coverUrl)
@@ -45,6 +46,7 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
 
           <div className="flex gap-2 flex-col text-right w-full items-end justify-between">
             <h2 className="">{episode.title}</h2>
+            {episode.duration && <h3>{secondsToStr(episode.duration)}</h3>}
             <button className="w-6 p-[2px] aspect-square flex justify-center items-center hover:text-amber-600 bg-zinc-700 rounded-full"
               onClick={play}
             >
