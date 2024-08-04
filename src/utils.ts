@@ -16,6 +16,13 @@ export function secondsToStr(seconds: number) {
   }
 }
 
+export function strToSeconds(time: string) {
+  const [hours, minutes, seconds] = time.split(':')
+  const r = Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds)
+  console.log(time, r)
+  return r
+}
+
 function htmlToText(html: string): string {
   return sanitizeHtml(html)
 }
@@ -38,13 +45,9 @@ export async function parseXML(url: string, fileDownloaded = false): Promise<Epi
     xmlString = await downloadXml(url)
   }
   
-
   const parser = new DOMParser()
-
   const xml = parser.parseFromString(xmlString, "text/xml")
-
   const items = xml.querySelectorAll('item')
-
 
   const result = Array.from(items).map( (item: Element) => {
     const episode: EpisodeData = {
@@ -52,7 +55,8 @@ export async function parseXML(url: string, fileDownloaded = false): Promise<Epi
       description: htmlToText(item.querySelector('description')?.textContent ?? '') ?? item.querySelector('itunes\\:summary')?.textContent,
       src: item.querySelector('enclosure')?.getAttribute('url') ?? '',
       pubDate: new Date(item.querySelector('pubDate')?.textContent ?? 0),
-      coverUrl: item.getElementsByTagNameNS('http://www.itunes.com/dtds/podcast-1.0.dtd', 'image')[0]?.getAttribute('href') ?? undefined
+      coverUrl: item.getElementsByTagNameNS('http://www.itunes.com/dtds/podcast-1.0.dtd', 'image')[0]?.getAttribute('href') ?? undefined,
+      duration: strToSeconds(item.getElementsByTagNameNS('http://www.itunes.com/dtds/podcast-1.0.dtd', 'duration')[0]?.textContent || '00:00:00'),
     }
     return episode
   })
