@@ -12,6 +12,7 @@ function PodcastPreview ({result}: {result: PodcastData}) {
         icons.photo:
         <img
         className="bg-zinc-700 h-full aspect-square rounded-md"
+        alt=""
         src={result.coverUrl}
         onError={() => setImageError(true)}
         />
