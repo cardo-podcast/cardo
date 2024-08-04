@@ -8,25 +8,25 @@ import { useDB } from "../DB";
 
 function FavoriteButton({podcast}: {podcast: PodcastData}) {
   const [isFav, setIsFav] = useState(false)
-  const { favoritePodcasts } = useDB()
+  const { subscriptions } = useDB()
 
   useEffect(()=>{
-    favoritePodcasts.getFavoritePodcast(podcast.feedUrl).then(result => {
+    subscriptions.getSubscription(podcast.feedUrl).then(result => {
       setIsFav(result !== undefined)
   })
-  }, [favoritePodcasts, podcast.feedUrl])
+  }, [subscriptions, podcast.feedUrl])
 
   return (
     <button onClick={async()=>{
       if (isFav) {
-        console.log(favoritePodcasts)
-        await favoritePodcasts.removeFavoritePodcast(podcast.feedUrl)
+        console.log(subscriptions)
+        await subscriptions.deleteSubscription(podcast.feedUrl)
         setIsFav(false)
       }else {
-        await favoritePodcasts.addFavoritePodcast(podcast)
+        await subscriptions.addSubscription(podcast)
         setIsFav(true)
       }
-      favoritePodcasts.reloadFavoritePodcasts()
+      subscriptions.reloadSubscriptions()
     }}>
       {isFav? icons.starFilled: icons.star}
     </button>
