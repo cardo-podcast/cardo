@@ -3,7 +3,7 @@ import { useDB } from "../DB";
 
 
 function LeftMenu() {
-  const { favoritePodcasts } = useDB()
+  const { subscriptions } = useDB()
   const navigate = useNavigate()
 
   return (
@@ -13,7 +13,7 @@ function LeftMenu() {
       </Link>
       <div className="grid gap-1">
         {
-          favoritePodcasts.favorites.map(fav => {
+          subscriptions.subscriptions.map(fav => {
             return (
               <div className="bg-zinc-600 p-1 rounded-md flex gap-2 justify-between cursor-pointer hover:bg-zinc-500"
               onClick={()=>navigate('/preview', {

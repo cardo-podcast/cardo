@@ -6,49 +6,49 @@ import { createContext, ReactNode, useContext, useEffect, useState } from "react
 
 let db: Database = new Database('');
 
-// Favorite podcasts functions
-const addFavoritePodcast = async(podcast: PodcastData) => {
+// Functions to subscribe podcasts
+const addSubscription = async (podcast: PodcastData) => {
   await db.execute(
-      "INSERT into favorite_podcasts (podcastName, artistName, coverUrl, coverUrlLarge, feedUrl) VALUES ($1, $2, $3, $4, $5)",
-      [podcast.podcastName, podcast.artistName, podcast.coverUrl, podcast.coverUrlLarge, podcast.feedUrl],
-    );
+    "INSERT into subscriptions (podcastName, artistName, coverUrl, coverUrlLarge, feedUrl) VALUES ($1, $2, $3, $4, $5)",
+    [podcast.podcastName, podcast.artistName, podcast.coverUrl, podcast.coverUrlLarge, podcast.feedUrl],
+  );
 }
 
-const getFavoritePodcast = async(feedUrl: string): Promise<PodcastData | undefined> => {
+const getSubscription = async (feedUrl: string): Promise<PodcastData | undefined> => {
   const r: PodcastData[] = await db.select(
-    "SELECT * from favorite_podcasts WHERE feedUrl = $1", [feedUrl]
+    "SELECT * from subscriptions WHERE feedUrl = $1", [feedUrl]
   )
   if (r.length > 0) {
     return r[0]
   }
 }
 
-const removeFavoritePodcast = async (feedUrl: string): Promise<QueryResult | undefined> => {
-  const fav = await getFavoritePodcast(feedUrl)
+const deleteSubscription = async (feedUrl: string): Promise<QueryResult | undefined> => {
+  const fav = await getSubscription(feedUrl)
 
   if (fav === undefined) return
-  
+
   return await db.execute(
-    "DELETE FROM favorite_podcasts WHERE feedUrl = $1",
+    "DELETE FROM subscriptions WHERE feedUrl = $1",
     [feedUrl],
   )
 }
 
-const getFavoritePodcasts = async(): Promise<PodcastData[]> => {
+const getSubscriptions = async (): Promise<PodcastData[]> => {
   const r: PodcastData[] = await db.select(
-    "SELECT * from favorite_podcasts")
-  
-    return r
+    "SELECT * from subscriptions")
+
+  return r
 }
 
 interface DBContextProps {
   db: Database,
-  favoritePodcasts: {
-    favorites: PodcastData[],
-    addFavoritePodcast: (podcast: PodcastData) => Promise<void>,
-    getFavoritePodcast: (feedUrl: string) => Promise<PodcastData | undefined>,
-    removeFavoritePodcast: (feedUrl: string) => Promise<QueryResult | undefined>,
-    reloadFavoritePodcasts: () => Promise<PodcastData[]>,
+  subscriptions: {
+    subscriptions: PodcastData[],
+    addSubscription: (podcast: PodcastData) => Promise<void>,
+    getSubscription: (feedUrl: string) => Promise<PodcastData | undefined>,
+    deleteSubscription: (feedUrl: string) => Promise<QueryResult | undefined>,
+    reloadSubscriptions: () => Promise<PodcastData[]>,
   }
 }
 
@@ -58,45 +58,51 @@ export function useDB(): DBContextProps {
   return useContext(DBContext) as DBContextProps
 }
 
-export function DBProvider({ children }: {children: ReactNode}){
+export function DBProvider({ children }: { children: ReactNode }) {
   const [dbLoaded, setDbLoaded] = useState(false)
-  const [favoritePodcastsList, setFavoritePodcastsList] = useState<PodcastData[]>([]);
+  const [subscriptionsList, setSubscriptionsList] = useState<PodcastData[]>([]);
 
 
-  useEffect(()=>{
+  useEffect(() => {
     // load database
     path.appDataDir().then(
       appDataPath => path.join(appDataPath, "db.sqlite")
     ).then(
       dbPath => Database.load(dbPath)
     ).then(
-      dbLoaded => {db = dbLoaded
-      setDbLoaded(true)
-  })
+      dbLoaded => {
+        db = dbLoaded
+        setDbLoaded(true)
+      })
+    return () => {
+      db.close()
+    }
   }, [])
 
   useEffect(() => {
     if (!dbLoaded) return
 
-    getFavoritePodcasts().then(r => {
-      setFavoritePodcastsList(r)
+    getSubscriptions().then(r => {
+      setSubscriptionsList(r)
     })
   }, [dbLoaded])
 
-  const reloadFavoritePodcasts = async(): Promise<PodcastData[]> => {
-    const fp = await getFavoritePodcasts()
-    setFavoritePodcastsList(fp)
+  const reloadSubscriptions = async (): Promise<PodcastData[]> => {
+    const fp = await getSubscriptions()
+    setSubscriptionsList(fp)
     return fp
   }
 
-  return(
-    <DBContext.Provider value={{db, favoritePodcasts: {
-      favorites: favoritePodcastsList,
-      addFavoritePodcast,
-      getFavoritePodcast,
-      removeFavoritePodcast,
-      reloadFavoritePodcasts
-      }}}>
+  return (
+    <DBContext.Provider value={{
+      db, subscriptions: {
+        subscriptions: subscriptionsList,
+        addSubscription,
+        getSubscription,
+        deleteSubscription,
+        reloadSubscriptions
+      }
+    }}>
       {children}
     </DBContext.Provider>
   )

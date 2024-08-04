@@ -7,8 +7,8 @@ fn main() {
     let migrations = vec![
         Migration {
             version: 1,
-            description: "favorite_podcasts",
-            sql: "CREATE TABLE favorite_podcasts (id INTEGER PRIMARY KEY AUTOINCREMENT,
+            description: "subscriptions",
+            sql: "CREATE TABLE subscriptions (id INTEGER PRIMARY KEY AUTOINCREMENT,
                                                         podcastName TEXT,
                                                         artistName TEXT,
                                                         coverUrl TEXT,
