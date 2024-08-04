@@ -1,11 +1,12 @@
 
 
 export interface PodcastData {
+  id?: number,
   podcastName: string,
   artistName: string,
   coverUrl: string,
   coverUrlLarge: string,
-  feedUrl: string
+  feedUrl: string,
 }
 
 export interface EpisodeData {

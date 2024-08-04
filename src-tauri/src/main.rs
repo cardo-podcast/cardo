@@ -8,7 +8,7 @@ fn main() {
         Migration {
             version: 1,
             description: "subscriptions",
-            sql: "CREATE TABLE subscriptions (id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sql: "CREATE TABLE subscriptions (id INTEGER PRIMARY KEY,
                                                         podcastName TEXT,
                                                         artistName TEXT,
                                                         coverUrl TEXT,

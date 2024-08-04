@@ -25,6 +25,19 @@
       },
       "path": {
         "all": true
+      },
+      "fs": {
+        "all": false,
+        "copyFile": false,
+        "createDir": true,
+        "exists": true,
+        "readDir": false,
+        "readFile": true,
+        "removeDir": false,
+        "removeFile": true,
+        "renameFile": false,
+        "scope": ["$APPCACHE/**"],
+        "writeFile": true
       }
     },
     "windows": [

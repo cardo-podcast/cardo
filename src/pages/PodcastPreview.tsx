@@ -1,50 +1,63 @@
 import { useLocation } from "react-router-dom";
 import { EpisodeData, PodcastData } from "..";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import * as icons from "../Icons"
-import { parseXML } from "../utils";
+import { getXmlDownloaded, parseXML, removeXmlDownloaded, saveXml } from "../utils";
 import EpisodeCard from "../components/EpisodeCard";
 import { useDB } from "../DB";
 
-function FavoriteButton({podcast}: {podcast: PodcastData}) {
-  const [isFav, setIsFav] = useState(false)
+function FavoriteButton({ podcast, subscribed, setSubscribed }: { podcast: PodcastData, subscribed: boolean, setSubscribed: Dispatch<SetStateAction<boolean>> }) {
   const { subscriptions } = useDB()
 
-  useEffect(()=>{
-    subscriptions.getSubscription(podcast.feedUrl).then(result => {
-      setIsFav(result !== undefined)
-  })
-  }, [subscriptions, podcast.feedUrl])
-
   return (
-    <button onClick={async()=>{
-      if (isFav) {
-        console.log(subscriptions)
+    <button onClick={async () => {
+      if (subscribed) {
         await subscriptions.deleteSubscription(podcast.feedUrl)
-        setIsFav(false)
-      }else {
-        await subscriptions.addSubscription(podcast)
-        setIsFav(true)
+        setSubscribed(false)
+        removeXmlDownloaded(podcast)
+      } else {
+        podcast.id = await subscriptions.addSubscription(podcast)
+        setSubscribed(true)
       }
       subscriptions.reloadSubscriptions()
     }}>
-      {isFav? icons.starFilled: icons.star}
+      {subscribed ? icons.starFilled : icons.star}
     </button>
   )
 }
 
-function PodcastPreview({play}: {play: (episode?: EpisodeData) => void}) {
+function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
   const location = useLocation();
   const [imageError, setImageError] = useState(false)
   const podcast = location.state.podcast as PodcastData
   const [episodes, setEpisodes] = useState<EpisodeData[]>([])
+  const [subscribed, setSubscribed] = useState(false)
+  const { subscriptions: {getSubscription} } = useDB()
 
-
-  useEffect(()=>{
-    parseXML(podcast.feedUrl).then(result => {
-      setEpisodes(result)
+  useEffect(() => {
+    getSubscription(podcast.feedUrl).then(result => {
+      setSubscribed(result !== undefined)
+      if (result !== undefined) {
+        setSubscribed(true)
+      }
     })
-  }, [podcast])
+  }, [getSubscription, podcast.feedUrl])
+
+  useEffect(() => {
+    getXmlDownloaded(podcast).then(async(path) => {
+      if (path === undefined && subscribed) {
+        // in case is subscribed but not downloaded
+          path = await saveXml(podcast)
+        }
+
+      const url = path === undefined ? podcast.feedUrl : path
+      parseXML(url, path !== undefined).then(result => {
+        setEpisodes(result)
+      })
+    });
+
+
+  }, [podcast, subscribed])
 
 
   return (
@@ -62,8 +75,17 @@ function PodcastPreview({play}: {play: (episode?: EpisodeData) => void}) {
 
         <div className="flex flex-col">
           <h1>{podcast.podcastName}</h1>
-          <h2>{podcast.artistName}</h2>
-          <FavoriteButton podcast={podcast}/>
+          <h2 className="mb-2">{podcast.artistName}</h2>
+          <div className="flex gap-2">
+            <FavoriteButton podcast={podcast} subscribed={subscribed} setSubscribed={setSubscribed}/>
+            <button onClick={() => {
+              parseXML(podcast.feedUrl).then(result => {
+                setEpisodes(result)
+              })
+            }}>
+              {icons.reload}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -74,8 +96,8 @@ function PodcastPreview({play}: {play: (episode?: EpisodeData) => void}) {
               return (
                 <EpisodeCard key={i} episode={episode} podcast={podcast}
                   play={() => {
-                          play(episode)
-                        }}/>
+                    play(episode)
+                  }} />
               )
             })
           }

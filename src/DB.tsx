@@ -7,11 +7,14 @@ import { createContext, ReactNode, useContext, useEffect, useState } from "react
 let db: Database = new Database('');
 
 // Functions to subscribe podcasts
-const addSubscription = async (podcast: PodcastData) => {
-  await db.execute(
+const addSubscription = async (podcast: PodcastData): Promise<number> => {
+  // returns subscription id on database
+  const r = await db.execute(
     "INSERT into subscriptions (podcastName, artistName, coverUrl, coverUrlLarge, feedUrl) VALUES ($1, $2, $3, $4, $5)",
     [podcast.podcastName, podcast.artistName, podcast.coverUrl, podcast.coverUrlLarge, podcast.feedUrl],
   );
+  
+  return r.lastInsertId
 }
 
 const getSubscription = async (feedUrl: string): Promise<PodcastData | undefined> => {
@@ -45,7 +48,7 @@ interface DBContextProps {
   db: Database,
   subscriptions: {
     subscriptions: PodcastData[],
-    addSubscription: (podcast: PodcastData) => Promise<void>,
+    addSubscription: (podcast: PodcastData) => Promise<number>,
     getSubscription: (feedUrl: string) => Promise<PodcastData | undefined>,
     deleteSubscription: (feedUrl: string) => Promise<QueryResult | undefined>,
     reloadSubscriptions: () => Promise<PodcastData[]>,

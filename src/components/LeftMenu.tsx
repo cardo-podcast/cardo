@@ -13,9 +13,9 @@ function LeftMenu() {
       </Link>
       <div className="grid gap-1">
         {
-          subscriptions.subscriptions.map(fav => {
+          subscriptions.subscriptions.map((fav, i) => {
             return (
-              <div className="bg-zinc-600 p-1 rounded-md flex gap-2 justify-between cursor-pointer hover:bg-zinc-500"
+              <div key={i} className="bg-zinc-600 p-1 rounded-md flex gap-2 justify-between cursor-pointer hover:bg-zinc-500"
               onClick={()=>navigate('/preview', {
                 state: {
                   podcast: fav
