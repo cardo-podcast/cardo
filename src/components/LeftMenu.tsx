@@ -11,6 +11,9 @@ function LeftMenu() {
       <Link to='/'>
         HOME
       </Link>
+      <Link to='/settings'>
+        SETTINGS
+      </Link>
       <div className="grid gap-1">
         {
           subscriptions.subscriptions.map((fav, i) => {

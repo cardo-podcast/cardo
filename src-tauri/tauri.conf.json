@@ -21,7 +21,10 @@
       },
       "http": {
         "all": true,
-        "scope": ["https://*", "http://*"]
+        "scope": [
+          "https://*",
+          "http://*"
+        ]
       },
       "path": {
         "all": true
@@ -36,7 +39,9 @@
         "removeDir": false,
         "removeFile": true,
         "renameFile": false,
-        "scope": ["$APPCACHE/**"],
+        "scope": [
+          "$APPCACHE/**"
+        ],
         "writeFile": true
       }
     },

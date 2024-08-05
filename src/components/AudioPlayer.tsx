@@ -14,7 +14,7 @@ export type AudioPlayerRef = {
 }
 
 
-const AudioPlayer = forwardRef<AudioPlayerRef>(({ className='' }: AudioPlayerProps, ref) => {
+const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(({className=''}, ref) => {
   const [playing, setPlaying] = useState<EpisodeData>()
   const audioRef = useRef<HTMLAudioElement>(null)
   const [currentTime, setCurrentTime] = useState(0);
