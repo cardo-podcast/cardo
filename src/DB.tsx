@@ -1,12 +1,13 @@
 import Database, { QueryResult } from "tauri-plugin-sql-api";
 import { path } from "@tauri-apps/api"
-import { PodcastData } from ".";
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { EpisodeState, PodcastData } from ".";
+import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 
 
 let db: Database = new Database('');
 
-// Functions to subscribe podcasts
+////////////// SUBSCRIPTIONS  //////////////
+
 const addSubscription = async (podcast: PodcastData): Promise<number> => {
   // returns subscription id on database
   const r = await db.execute(
@@ -44,6 +45,42 @@ const getSubscriptions = async (): Promise<PodcastData[]> => {
   return r
 }
 
+
+////////////// EPISODE STATE  //////////////
+
+const getEpisodeState = async (episodeUrl: string): Promise<EpisodeState | undefined> => {
+  const r: EpisodeState[] = await db.select(
+    "SELECT * from episodes_history WHERE episode = $1", [episodeUrl]
+  )
+  if (r.length > 0) {
+    return r[0]
+  }
+}
+
+const updateEpisodeState = async (episodeUrl: string, podcastUrl: string, position: number, total: number) => {
+
+  if (await getEpisodeState(episodeUrl) === undefined) {
+    // create a new entry
+    await db.execute(
+      "INSERT into episodes_history (episode, podcast, position, total, timestamp) VALUES ($1, $2, $3, $4, $5)",
+      [episodeUrl, podcastUrl, position, total, Date.now()],
+    );
+  }else {
+    // update an existent entry
+    await db.execute(
+      `UPDATE episodes_history
+      SET position = $1, timestamp = $2`,
+      [position, Date.now()],
+    );
+  }
+}
+
+
+
+
+
+////////////// DB CONTEXT  //////////////
+
 interface DBContextProps {
   db: Database,
   subscriptions: {
@@ -52,6 +89,10 @@ interface DBContextProps {
     getSubscription: (feedUrl: string) => Promise<PodcastData | undefined>,
     deleteSubscription: (feedUrl: string) => Promise<QueryResult | undefined>,
     reloadSubscriptions: () => Promise<PodcastData[]>,
+  },
+  history: {
+    getEpisodeState: (episodeUrl: string) => Promise<EpisodeState | undefined>,
+    updateEpisodeState: (episodeUrl: string, podcastUrl: string, position: number, total: number) => Promise<void>
   }
 }
 
@@ -104,6 +145,10 @@ export function DBProvider({ children }: { children: ReactNode }) {
         getSubscription,
         deleteSubscription,
         reloadSubscriptions
+      },
+      history : {
+        getEpisodeState,
+        updateEpisodeState
       }
     }}>
       {children}

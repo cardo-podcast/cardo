@@ -5,10 +5,11 @@ import { useLocation } from "react-router-dom"
 
 
 
-function EpisodePreview({ play }: { play: (episode?: EpisodeData) => void }) {
+function EpisodePreview({ play }: { play: (episode?: EpisodeData, podcastUrl?: string) => void}) {
   const [imageError, setImageError] = useState(false)
   const location = useLocation()
   const episode = location.state.episode as EpisodeData
+  const podcastUrl = location.state.podcastUrl as string
 
   return (
     <div className="p-2 w-full flex flex-col">
@@ -27,7 +28,7 @@ function EpisodePreview({ play }: { play: (episode?: EpisodeData) => void }) {
           <h1>{episode.title}</h1>
           <div className="flex gap-2">
             <button className="w-6 p-[2px] aspect-square flex justify-center items-center hover:text-amber-600 bg-zinc-700 rounded-full"
-              onClick={() => play(episode)}
+              onClick={() => play !== undefined && play(episode, podcastUrl)}
             >
               {icons.play}
             </button>

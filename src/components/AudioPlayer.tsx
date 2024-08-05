@@ -1,37 +1,56 @@
-import React, { useRef, useEffect, useState, RefObject } from "react";
+import React, { useRef, useEffect, useState, forwardRef, RefObject, useImperativeHandle } from "react";
 import { secondsToStr } from "../utils";
 import * as icons from "../Icons"
 import { EpisodeData } from "..";
+import { useDB } from "../DB";
+
 
 interface AudioPlayerProps {
-  audioRef: RefObject<HTMLAudioElement>
   className?: string,
 }
 
-export function useAudioPlayer() {
-  const ref = useRef<HTMLAudioElement>(null);
-  const [playing, setPlaying] = useState<EpisodeData>()
-
-  const play = (episode: EpisodeData | null = null) => {
-    if (!ref.current) return
-
-    if (episode != null) {
-      setPlaying(episode)
-      ref.current.src = episode.src
-      ref.current.load()
-    }
-
-    ref.current.play()
-  }
-
-  return {ref, play, playing}
+export type AudioPlayerRef = {
+  play: (episode?: EpisodeData | undefined, podcastUrl?: string) => void
 }
 
 
-function AudioPlayer ({ audioRef, className='' }: AudioPlayerProps) {
-  
+const AudioPlayer = forwardRef<AudioPlayerRef>(({ className='' }: AudioPlayerProps, ref) => {
+  const [playing, setPlaying] = useState<EpisodeData>()
+  const audioRef = useRef<HTMLAudioElement>(null)
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const podcastPlaying = useRef<string>('')
+  const {history: {updateEpisodeState}} = useDB()
+
+
+  useImperativeHandle(ref, () => ({
+    play: (episode?: EpisodeData | undefined, podcastUrl?: string) => {
+      if (audioRef.current == null) return
+  
+      if (episode !== undefined) {
+        setPlaying(episode)
+        podcastPlaying.current = podcastUrl || ''
+  
+        audioRef.current.src = episode.src
+        audioRef.current.load()
+      }
+  
+      audioRef.current.play()
+    }
+  }), [])
+
+  useEffect(()=> {
+    if (audioRef.current == null || playing == null) return
+
+    if (audioRef.current.paused && audioRef.current.currentTime > 0) {
+      updateEpisodeState(playing.src,
+                          podcastPlaying.current,
+                          audioRef.current.currentTime,
+                          playing.duration
+                        )
+    }
+
+  }, [audioRef.current?.paused, updateEpisodeState, playing])
 
   useEffect(() => {
     if (audioRef.current) {
@@ -43,11 +62,11 @@ function AudioPlayer ({ audioRef, className='' }: AudioPlayerProps) {
 
       return () => clearInterval(intervalId);
     }
-  }, []);
+  }, [audioRef]);
 
   const handlePlayPause = () => {
     if (audioRef.current) {
-      audioRef.current.paused ? audioRef.current.play() : audioRef.current.pause();
+      audioRef.current.paused ? audioRef.current.play() : audioRef.current.pause()
     }
   };
 
@@ -94,6 +113,6 @@ function AudioPlayer ({ audioRef, className='' }: AudioPlayerProps) {
         <audio ref={audioRef} onLoadedMetadata={handleLoadedMetadata} className="hidden" />
     </div>
   );
-};
+})
 
 export default AudioPlayer;

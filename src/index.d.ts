@@ -17,3 +17,11 @@ export interface EpisodeData {
   duration: number,
   coverUrl?: string
 }
+
+export interface EpisodeState {
+  podcast: string,
+  episode: string,
+  position: number,
+  total: number,
+  timestamp: number
+}
