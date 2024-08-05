@@ -14,6 +14,6 @@ export interface EpisodeData {
   description: string,
   src: string,
   pubDate: Date,
-  duration?: number,
+  duration: number,
   coverUrl?: string
 }

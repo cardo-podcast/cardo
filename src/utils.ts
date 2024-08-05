@@ -19,7 +19,6 @@ export function secondsToStr(seconds: number) {
 export function strToSeconds(time: string) {
   const [hours, minutes, seconds] = time.split(':')
   const r = Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds)
-  console.log(time, r)
   return r
 }
 
