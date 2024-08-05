@@ -16,6 +16,18 @@ fn main() {
                                                         feedUrl TEXT
                                                         );",
             kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 2,
+            description: "episodes_history",
+            sql: "CREATE TABLE episodes_history (id INTEGER PRIMARY KEY,
+                                                        podcast TEXT,
+                                                        episode TEXT,
+                                                        position TEXT,
+                                                        total TEXT,
+                                                        timestamp INTEGER
+                                                        );",
+            kind: MigrationKind::Up,
         }
     ];
 

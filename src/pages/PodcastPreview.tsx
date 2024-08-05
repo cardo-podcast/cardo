@@ -82,7 +82,7 @@ function SortMenu({criterion, setSortCriterion}:
   )
 }
 
-function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
+function PodcastPreview({ play }: { play: (episode?: EpisodeData, podcast?: string) => void }) {
   const location = useLocation();
   const [imageError, setImageError] = useState(false)
   const podcast = location.state.podcast as PodcastData
@@ -183,7 +183,7 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
                 key={i}
                 episode={episode}
                 podcast={podcast}
-                play={() => play(episode)}
+                play={() =>  play !== undefined && play(episode, podcast.feedUrl)}
               />
             </Suspense>
           ))}

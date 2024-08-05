@@ -1,5 +1,5 @@
 import { Routes, Route, BrowserRouter } from "react-router-dom";
-import AudioPlayer, { useAudioPlayer } from "./components/AudioPlayer";
+import AudioPlayer, { AudioPlayerRef, useAudioPlayer } from "./components/AudioPlayer";
 import LeftMenu from "./components/LeftMenu";
 import TitleBar from "./components/TitleBar";
 import HomePage from "./pages/HomePage";
@@ -7,10 +7,19 @@ import SearchBar from "./components/SearchBar";
 import PodcastPreview from "./pages/PodcastPreview";
 import { DBProvider } from "./DB";
 import EpisodePreview from "./pages/EpisodePreview";
+import { useEffect, useRef } from "react";
 
 
 const App = () => {
-  const { ref: audioRef, play } = useAudioPlayer()
+  const playerRef = useRef<AudioPlayerRef>(null)
+
+  const play = (episode?: EpisodeData | undefined, podcastUrl?: string) => {
+    console.log(playerRef.current)
+    if (playerRef.current !== null) {
+      playerRef.current.play(episode, podcastUrl)
+    }
+  }
+  
 
   return (
     <div className="bg-zinc-900 w-full h-screen flex flex-col rounded-2xl border-zinc-600 border-[1px] text-zinc-50 overflow-hidden">
@@ -28,9 +37,7 @@ const App = () => {
                   <Route path='/episode-preview' element={<EpisodePreview play={play} />} />
                 </Routes>
               </div>
-              {
-                <AudioPlayer audioRef={audioRef} className="w-full min-h-[70px] flex-shrink-0" />
-              }
+              <AudioPlayer ref={playerRef} className="w-full min-h-[70px] flex-shrink-0" />
             </div>
           </BrowserRouter>
         </div>
