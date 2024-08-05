@@ -8,6 +8,7 @@ import PodcastPreview from "./pages/PodcastPreview";
 import { DBProvider } from "./DB";
 import EpisodePreview from "./pages/EpisodePreview";
 import { useEffect, useRef } from "react";
+import Settings from "./pages/Settings";
 
 
 const App = () => {
@@ -19,7 +20,7 @@ const App = () => {
       playerRef.current.play(episode, podcastUrl)
     }
   }
-  
+
 
   return (
     <div className="bg-zinc-900 w-full h-screen flex flex-col rounded-2xl border-zinc-600 border-[1px] text-zinc-50 overflow-hidden">
@@ -35,6 +36,7 @@ const App = () => {
                   <Route path='/' element={<HomePage />} />
                   <Route path='/preview' element={<PodcastPreview play={play} />} />
                   <Route path='/episode-preview' element={<EpisodePreview play={play} />} />
+                  <Route path='/settings' element={<Settings/>} />
                 </Routes>
               </div>
               <AudioPlayer ref={playerRef} className="w-full min-h-[70px] flex-shrink-0" />
