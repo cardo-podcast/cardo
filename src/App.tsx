@@ -23,8 +23,8 @@ const App = () => {
 
   return (
     <div className="bg-zinc-900 w-full h-screen flex flex-col rounded-2xl border-zinc-600 border-[1px] text-zinc-50 overflow-hidden">
-      <TitleBar />
       <DBProvider>
+        <TitleBar />
         <div className="flex justify-start w-full h-full overflow-hidden">
           <BrowserRouter>
             <LeftMenu />
@@ -35,7 +35,7 @@ const App = () => {
                   <Route path='/' element={<HomePage />} />
                   <Route path='/preview' element={<PodcastPreview play={play} />} />
                   <Route path='/episode-preview' element={<EpisodePreview play={play} />} />
-                  <Route path='/settings' element={<Settings/>} />
+                  <Route path='/settings' element={<Settings />} />
                 </Routes>
               </div>
               <AudioPlayer ref={playerRef} className="w-full min-h-[70px] flex-shrink-0" />
