@@ -7,7 +7,7 @@ import SearchBar from "./components/SearchBar";
 import PodcastPreview from "./pages/PodcastPreview";
 import { DBProvider } from "./DB";
 import EpisodePreview from "./pages/EpisodePreview";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import Settings from "./pages/Settings";
 import { EpisodeData } from ".";
 import { SettingsProvider } from "./sync/Settings";
@@ -22,6 +22,12 @@ const App = () => {
     }
   }
 
+  // prevent webview context menu
+  useEffect(()=>{
+    document.addEventListener('contextmenu', event => event.preventDefault());
+
+    return () => document.removeEventListener('contextmenu', event => event.preventDefault());
+  })
 
   return (
     <div className="bg-zinc-900 w-full h-screen flex flex-col rounded-2xl border-zinc-600 border-[1px] text-zinc-50 overflow-hidden">

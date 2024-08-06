@@ -59,7 +59,7 @@ function SearchBar () {
         className="py-1 px-2 bg-zinc-600 w-full rounded-md focus:outline-none"
         onChange={(event) => {handleChange(event.target.value)}}
         onKeyDown={e => {
-          if (e.key == 'Escape' || e.key == 'Tab') {
+          if (e.key === 'Escape' || e.key === 'Tab') {
             setResults([])
           }
         }}
