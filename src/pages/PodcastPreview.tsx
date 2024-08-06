@@ -36,14 +36,17 @@ function SortButton({ criterion, globalCriterion, setGlobalCriterion, children }
 
 
   return (
-    <button onClick={()=>{
+    <button onClick={() => {
       if (globalCriterion.criterion === criterion) {
-        setGlobalCriterion({...globalCriterion,
-                mode: globalCriterion.mode === 'asc' ? 'desc' : 'asc'})
+        setGlobalCriterion({
+          ...globalCriterion,
+          mode: globalCriterion.mode === 'asc' ? 'desc' : 'asc'
+        })
       } else {
         globalCriterion.criterion = criterion
         globalCriterion.criterion = criterion
-        setGlobalCriterion({...globalCriterion,
+        setGlobalCriterion({
+          ...globalCriterion,
           criterion: criterion
         })
       }
@@ -59,8 +62,8 @@ function SortButton({ criterion, globalCriterion, setGlobalCriterion, children }
 }
 
 
-function SortMenu({criterion, setSortCriterion}:
-  {criterion: SortCriterion, setSortCriterion: Dispatch<SetStateAction<SortCriterion>>}) {
+function SortMenu({ criterion, setSortCriterion }:
+  { criterion: SortCriterion, setSortCriterion: Dispatch<SetStateAction<SortCriterion>> }) {
   const [showMenu, setShowMenu] = useState(false)
 
   return (
@@ -89,12 +92,12 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData, podcast?: stri
   const [episodes, setEpisodes] = useState<EpisodeData[]>([])
   const [subscribed, setSubscribed] = useState(false)
   const { subscriptions: { getSubscription } } = useDB()
-  const [sortCriterion, setSortCriterion] = useState<SortCriterion>({criterion:'date', mode:'desc'})
+  const [sortCriterion, setSortCriterion] = useState<SortCriterion>({ criterion: 'date', mode: 'desc' })
 
 
   const sortEpisodes = (unsortedEpisodes = episodes): EpisodeData[] => {
     const applyMode = (a: any, b: any) => {
-      if (sortCriterion.mode === 'asc'){
+      if (sortCriterion.mode === 'asc') {
         return a - b
       } else {
         return b - a
@@ -168,27 +171,22 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData, podcast?: stri
             }}>
               {icons.reload}
             </button>
-            <SortMenu criterion={sortCriterion} setSortCriterion={setSortCriterion}/>
+            <SortMenu criterion={sortCriterion} setSortCriterion={setSortCriterion} />
           </div>
 
         </div>
       </div>
 
-      <div className="flex-1">
-        <div className="grid gap-1">
-
-          {episodes.map((episode, i) => (
-            <Suspense fallback={<div className="bg-zinc-800 h-20 w-full" />}>
-              <EpisodeCard
-                key={i}
-                episode={episode}
-                podcast={podcast}
-                play={() =>  play !== undefined && play(episode, podcast.feedUrl)}
-              />
-            </Suspense>
-          ))}
-
-        </div>
+      <div className="flex-1 grid gap-">
+        {episodes.map((episode, i) => (
+          <Suspense key={i} fallback={<div className="bg-zinc-800 h-20 w-full" />}>
+            <EpisodeCard
+              episode={episode}
+              podcast={podcast}
+              play={() => play !== undefined && play(episode, podcast.feedUrl)}
+            />
+          </Suspense>
+        ))}
       </div>
     </div>
   )
