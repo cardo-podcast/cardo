@@ -56,6 +56,7 @@ export async function parseXML(url: string, fileDownloaded = false): Promise<Epi
       pubDate: new Date(item.querySelector('pubDate')?.textContent ?? 0),
       coverUrl: item.getElementsByTagNameNS('http://www.itunes.com/dtds/podcast-1.0.dtd', 'image')[0]?.getAttribute('href') ?? undefined,
       duration: strToSeconds(item.getElementsByTagNameNS('http://www.itunes.com/dtds/podcast-1.0.dtd', 'duration')[0]?.textContent || '00:00:00'),
+      size: Number(item.querySelector('enclosure')?.getAttribute('length')) ?? 0
     }
     return episode
   })

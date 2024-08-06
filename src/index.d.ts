@@ -15,7 +15,8 @@ export interface EpisodeData {
   src: string,
   pubDate: Date,
   duration: number,
-  coverUrl?: string
+  size: number,
+  coverUrl?: string,
 }
 
 export interface EpisodeState {
