@@ -43,6 +43,9 @@
           "$APPCACHE/**"
         ],
         "writeFile": true
+      },
+      "os": {
+        "all": true
       }
     },
     "windows": [
