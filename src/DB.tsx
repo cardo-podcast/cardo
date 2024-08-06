@@ -1,7 +1,7 @@
 import Database, { QueryResult } from "tauri-plugin-sql-api";
 import { path } from "@tauri-apps/api"
 import { EpisodeState, PodcastData } from ".";
-import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
 
 let db: Database = new Database('');
@@ -57,6 +57,14 @@ const getEpisodeState = async (episodeUrl: string): Promise<EpisodeState | undef
   }
 }
 
+const getEpisodesStates = async (timestamp = 0): Promise<EpisodeState[]> => {
+  const r: EpisodeState[] = await db.select(
+    `SELECT * from episodes_history WHERE timestamp > $1`, [timestamp]
+  )
+
+  return r
+}
+
 const updateEpisodeState = async (episodeUrl: string, podcastUrl: string, position: number, total: number, timestamp?: number) => {
 
   const r = await getEpisodeState(episodeUrl)
@@ -71,7 +79,10 @@ const updateEpisodeState = async (episodeUrl: string, podcastUrl: string, positi
     // update an existent entry
 
     //check if timestamp is newer, otherwise don't update the row
-    if (timestamp !== undefined && timestamp < r.timestamp) return
+    if (timestamp !== undefined && timestamp < r.timestamp) {
+      console.log(episodeUrl, timestamp, r.timestamp)
+      return
+    }
 
     await db.execute(
       `UPDATE episodes_history
@@ -105,12 +116,42 @@ const setSyncKey = async (key: string) => {
     await db.execute(
       `UPDATE misc
       SET value = $1
-      WHERE description = syncKey
+      WHERE description = "syncKey"
       `,
-      ['syncKey', key],
+      [key],
     );
   }
 }
+
+const getLastSync = async (): Promise<number> => {
+  const r: {value: number}[] = await db.select(
+    `SELECT value from misc
+      WHERE description = "lastSync"`,
+  )
+  if (r.length > 0) {
+    return r[0].value
+  } else {
+    return 0
+  }
+}
+
+const setLastSync = async (timestamp: number) => {
+  if (await getLastSync() === 0) {
+    await db.execute(
+      `INSERT into misc (description, value) VALUES ("lastSync", $1)`,
+      [timestamp],
+    );
+  }else {
+    await db.execute(
+      `UPDATE misc
+      SET value = $1
+      WHERE description = "lastSync"
+      `,
+      [timestamp],
+    );
+  }
+}
+
 
 
 ////////////// DB CONTEXT  //////////////
@@ -126,11 +167,14 @@ export interface DBContextProps {
   },
   history: {
     getEpisodeState: (episodeUrl: string) => Promise<EpisodeState | undefined>,
-    updateEpisodeState: (episodeUrl: string, podcastUrl: string, position: number, total: number, timestamp?: number) => Promise<void>
+    updateEpisodeState: (episodeUrl: string, podcastUrl: string, position: number, total: number, timestamp?: number) => Promise<void>,
+    getEpisodesStates: (timestamp?: number) => Promise<EpisodeState[]>
   },
   misc: {
     getSyncKey: () => Promise<string|undefined>,
-    setSyncKey: (key: string) => Promise<void>
+    setSyncKey: (key: string) => Promise<void>,
+    getLastSync: () => Promise<number>,
+    setLastSync: (timestamp: number) => Promise<void>
   }
 }
 
@@ -186,11 +230,14 @@ export function DBProvider({ children }: { children: ReactNode }) {
       },
       history : {
         getEpisodeState,
-        updateEpisodeState
+        updateEpisodeState,
+        getEpisodesStates,
       },
       misc: {
         getSyncKey,
-        setSyncKey
+        setSyncKey,
+        getLastSync,
+        setLastSync
       }
     }}>
       {children}

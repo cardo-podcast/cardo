@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react"
 import { DBContextProps, useDB } from "../DB"
 import { getCreds, removeCreds, saveCreds } from "../utils"
 import * as icons from "../Icons"
+import { EpisodeState } from ".."
 
 
 
@@ -125,9 +126,9 @@ async function login(url: string, getSyncKey: () => Promise<string | undefined>,
 interface GpodderUpdate {
   podcast: string,
   episode: string,
-  timestamp: string,
   position: number,
   total: number,
+  timestamp: string
   action: 'DOWNLOAD' |'PLAY' | 'DELETE' | 'NEW'
 }
 
@@ -135,13 +136,13 @@ async function getNextcloudCreds(syncKey: string): Promise<{server: string, logi
   const creds: any = await getCreds('nextcloud')
 
   const {server, loginName: encryptedLoginName, appPassword: encryptedAppPassword} = creds
-  const loginName = await invoke('decrypt', {encryptedText: encryptedLoginName, base64Key: syncKey})
-  const appPassword = await invoke('decrypt', {encryptedText: encryptedAppPassword, base64Key: syncKey})
+  const loginName: string = await invoke('decrypt', {encryptedText: encryptedLoginName, base64Key: syncKey})
+  const appPassword: string = await invoke('decrypt', {encryptedText: encryptedAppPassword, base64Key: syncKey})
   return {server: server, loginName: loginName, appPassword: appPassword}
 }
 
 
-async function fetchUpdates(server: string, loginName: string, appPassword: string, since?: number): Promise<GpodderUpdate[]> {
+async function pullUpdates(server: string, loginName: string, appPassword: string, since?: number): Promise<GpodderUpdate[]> {
   const url = server + `/index.php/apps/gpoddersync/episode_action?since=${(since === undefined) ? '0' : since?.toString()}`
 
   const r = await http.fetch(url, {
@@ -156,29 +157,68 @@ async function fetchUpdates(server: string, loginName: string, appPassword: stri
   return (r.data as any).actions as GpodderUpdate[]
 }
 
+async function pushUpdates(server: string, loginName: string, appPassword: string, updates: GpodderUpdate[]) {
+  const url = server + `/index.php/apps/gpoddersync/episode_action/create`
+
+  const r = await http.fetch(url, {
+    method: 'POST',
+    responseType: http.ResponseType.JSON,
+    headers: {
+      'OCS-APIRequest': 'true',
+      'Authorization': 'Basic ' + btoa(loginName + ':' + appPassword)
+    },
+    body: {
+      type: 'Json',
+      payload: updates
+    }
+  })
+
+  if (!r.ok) {
+    throw Error('Failed pushing data to nextcloud server')
+  }
+}
 
 async function sync(syncKey: string, db: DBContextProps): Promise<void> {
 
   if (syncKey === '') return
 
   const {server, loginName, appPassword} = await getNextcloudCreds(syncKey)
+  const lastSync = await db.misc.getLastSync()
   
-  const serverUpdates = await fetchUpdates(server, loginName, appPassword)
+  const serverUpdates = await pullUpdates(server, loginName, appPassword, lastSync / 1000 ) // nextcloud server uses seconds
   
-  for (const update of serverUpdates) {
-    const timestamp = new Date(update.timestamp).getTime() //timestamp in epoch format
-    
-    if (update.action !== 'PLAY') continue
-
-    db.history.updateEpisodeState(
-      update.episode,
-      update.podcast,
-      update.position,
-      update.total,
-      timestamp
-    )
+  if (serverUpdates.length > 0){
+    for (const update of serverUpdates) {
+      const timestamp = new Date(update.timestamp + '+00:00').getTime() //timestamp in epoch format (server is in utc ISO format)
+      
+      if (update.action !== 'PLAY') continue
+  
+      await db.history.updateEpisodeState(
+        update.episode,
+        update.podcast,
+        update.position,
+        update.total,
+        timestamp
+      )
+    }
   }
 
+
+  const localUpdates = await db.history.getEpisodesStates(lastSync)
+
+  const gpodderLocalUpdates: GpodderUpdate[] = localUpdates.map( update => {
+    const position = Math.floor(update.position)
+    return {
+      ...update,
+      position: position,
+      started: position,
+      total: Math.floor(update.total),
+      action: 'PLAY',
+      timestamp: (new Date(update.timestamp)).toISOString().split('.')[0]
+    }
+  })
+
+  await pushUpdates(server, loginName, appPassword, gpodderLocalUpdates)
 }
 
 enum SyncStatus {
@@ -202,8 +242,8 @@ export function SyncButton() {
 
     try{
       await sync(await db.misc.getSyncKey() || '', db)
-
-      setStatus(SyncStatus.Standby)
+      await db.misc.setLastSync(Date.now())
+      setStatus(SyncStatus.Ok)
     }catch (e) {
       setError(e as string)
       setStatus(SyncStatus.Error)
@@ -212,7 +252,7 @@ export function SyncButton() {
 
 
   return (
-    <button className={`w-5 hover:text-amber-400 ${status === SyncStatus.Synchronizing && 'animate-[spin_2s_linear_infinite_reverse]'}`}
+    <button className={`w-5 hover:text-amber-400 outline-none ${status === SyncStatus.Synchronizing && 'animate-[spin_2s_linear_infinite_reverse]'}`}
     onClick={performSync} title={error}
     >
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-refresh">
