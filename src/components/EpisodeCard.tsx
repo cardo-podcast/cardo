@@ -5,13 +5,14 @@ import { useNavigate } from "react-router-dom"
 import { useIntersectionObserver } from "@uidotdev/usehooks"
 import { secondsToStr } from "../utils"
 import { useDB } from "../DB"
+import ProgressBar from "./ProgressBar"
 
 function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast: PodcastData, play: () => void }) {
   const [imageSrc, setImageSrc] = useState(episode.coverUrl ?? podcast.coverUrl)
   const [imageError, setImageError] = useState(false)
   const navigate = useNavigate()
-  const {history: {getEpisodeState}} = useDB()
-  const [episodeState, setEpisodeState] = useState(0)
+  const { history: { getEpisodeState } } = useDB()
+  const [reprState, setReprState] = useState({ position: 0, total: episode.duration, complete: false })
   const [ref, entry] = useIntersectionObserver({
     threshold: 0,
     root: null,
@@ -19,6 +20,8 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
   });
 
   useEffect(() => {
+    if (!entry?.isIntersecting) return
+    
     // set cover
     episode.coverUrl = episode.coverUrl ?? podcast.coverUrl
     setImageSrc(episode.coverUrl)
@@ -27,13 +30,13 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
     // update reproduction state
     getEpisodeState(episode.src).then(state => {
       if (state === undefined) return
-      
-      setEpisodeState(Math.floor(state.position / state.total * 100))
+
+      setReprState({ position: state.position, total: state.total, complete:  state.position === state.total})
     })
-  }, [episode, podcast.coverUrl, getEpisodeState])
+  }, [entry?.isIntersecting, episode, podcast.coverUrl, getEpisodeState])
 
   return (
-    <div ref={ref} className="flex bg-zinc-800 hover:bg-zinc-600 cursor-pointer rounded-md min-h-20 p-2 justify-between gap-4"
+    <div ref={ref} className={`flex ${reprState.complete? 'text-zinc-500': ''} hover:bg-zinc-800 cursor-pointer rounded-md min-h-20 p-2 justify-between gap-4`}
       onClick={() => navigate('/episode-preview', {
         state: {
           episode: episode,
@@ -43,7 +46,7 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
     >
       {entry?.isIntersecting &&
         <>
-          <div className="bg-zinc-700 h-16 aspect-square rounded-md">
+          <div className="h-16 aspect-square rounded-md">
             {
               imageError ?
                 icons.photo :
@@ -58,15 +61,22 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
 
           <div className="flex gap-2 flex-col text-right w-full items-end justify-between">
             <h2 className="">{episode.title}</h2>
-            {episode.duration && <h3>{secondsToStr(episode.duration)}: {episodeState}%</h3>}
-            <button className="w-6 p-[2px] aspect-square flex justify-center items-center hover:text-amber-600 bg-zinc-700 rounded-full"
-              onClick={e => {
-                e.stopPropagation()
-                play()
-              }}
-            >
-              {icons.play}
-            </button>
+            <div className="flex w-full gap-2 justify-end">
+              {
+                (reprState.position === 0 ||
+                reprState.complete) ?
+                secondsToStr(reprState.total):
+                <ProgressBar position={reprState.position} total={reprState.total} />
+              }
+              <button className="w-7 p-[2px] aspect-square flex justify-center items-center hover:text-amber-600 border-2 border-zinc-600 rounded-full"
+                onClick={e => {
+                  e.stopPropagation()
+                  play()
+                }}
+              >
+                {icons.play}
+              </button>
+            </div>
           </div>
         </>
       }
