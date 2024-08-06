@@ -43,7 +43,7 @@ const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(({className=''}
   
       audioRef.current.play()
     }
-  }), [])
+  }), [getEpisodeState])
 
   useEffect(()=> {
     if (audioRef.current == null || playing == null) return

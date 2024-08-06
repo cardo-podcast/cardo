@@ -177,7 +177,7 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData, podcast?: stri
         </div>
       </div>
 
-      <div className="flex-1 grid gap-">
+      <div className="flex-1 grid gap-1">
         {episodes.map((episode, i) => (
           <Suspense key={i} fallback={<div className="bg-zinc-800 h-20 w-full" />}>
             <EpisodeCard
