@@ -57,22 +57,28 @@ const getEpisodeState = async (episodeUrl: string): Promise<EpisodeState | undef
   }
 }
 
-const updateEpisodeState = async (episodeUrl: string, podcastUrl: string, position: number, total: number) => {
+const updateEpisodeState = async (episodeUrl: string, podcastUrl: string, position: number, total: number, timestamp?: number) => {
 
-  if (await getEpisodeState(episodeUrl) === undefined) {
+  const r = await getEpisodeState(episodeUrl)
+
+  if (r === undefined) {
     // create a new entry
     await db.execute(
       "INSERT into episodes_history (episode, podcast, position, total, timestamp) VALUES ($1, $2, $3, $4, $5)",
-      [episodeUrl, podcastUrl, position, total, Date.now()],
+      [episodeUrl, podcastUrl, position, total, timestamp ?? Date.now()],
     );
   }else {
     // update an existent entry
+
+    //check if timestamp is newer, otherwise don't update the row
+    if (timestamp !== undefined && timestamp < r.timestamp) return
+
     await db.execute(
       `UPDATE episodes_history
       SET position = $1, timestamp = $2
       WHERE episode = $3
       `,
-      [position, Date.now(), episodeUrl],
+      [position, timestamp ?? Date.now(), episodeUrl],
     );
   }
 }
@@ -109,7 +115,7 @@ const setSyncKey = async (key: string) => {
 
 ////////////// DB CONTEXT  //////////////
 
-interface DBContextProps {
+export interface DBContextProps {
   db: Database,
   subscriptions: {
     subscriptions: PodcastData[],
@@ -120,7 +126,7 @@ interface DBContextProps {
   },
   history: {
     getEpisodeState: (episodeUrl: string) => Promise<EpisodeState | undefined>,
-    updateEpisodeState: (episodeUrl: string, podcastUrl: string, position: number, total: number) => Promise<void>
+    updateEpisodeState: (episodeUrl: string, podcastUrl: string, position: number, total: number, timestamp?: number) => Promise<void>
   },
   misc: {
     getSyncKey: () => Promise<string|undefined>,

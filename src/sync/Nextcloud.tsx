@@ -1,6 +1,6 @@
 import { app, http, invoke, shell } from "@tauri-apps/api"
 import { useEffect, useRef, useState } from "react"
-import { useDB } from "../DB"
+import { DBContextProps, useDB } from "../DB"
 import { getCreds, removeCreds, saveCreds } from "../utils"
 import * as icons from "../Icons"
 
@@ -128,7 +128,7 @@ interface GpodderUpdate {
   timestamp: string,
   position: number,
   total: number,
-  action: string
+  action: 'DOWNLOAD' |'PLAY' | 'DELETE' | 'NEW'
 }
 
 async function getNextcloudCreds(syncKey: string): Promise<{server: string, loginName: string, appPassword: string}> {
@@ -157,15 +157,27 @@ async function fetchUpdates(server: string, loginName: string, appPassword: stri
 }
 
 
-async function sync(syncKey: string): Promise<void> {
+async function sync(syncKey: string, db: DBContextProps): Promise<void> {
 
-  if (syncKey === '') return {ok: false, error: 'Error retrieving creds key'}
+  if (syncKey === '') return
 
   const {server, loginName, appPassword} = await getNextcloudCreds(syncKey)
   
   const serverUpdates = await fetchUpdates(server, loginName, appPassword)
   
-  console.log(serverUpdates)
+  for (const update of serverUpdates) {
+    const timestamp = new Date(update.timestamp).getTime() //timestamp in epoch format
+    
+    if (update.action !== 'PLAY') continue
+
+    db.history.updateEpisodeState(
+      update.episode,
+      update.podcast,
+      update.position,
+      update.total,
+      timestamp
+    )
+  }
 
 }
 
@@ -179,7 +191,7 @@ enum SyncStatus {
 export function SyncButton() {
   const [status, setStatus] = useState<SyncStatus>(SyncStatus.Standby)
   const [error, setError] = useState('')
-  const {misc: {getSyncKey}} = useDB()
+  const db = useDB()
 
 
   const performSync = async() => {
@@ -189,7 +201,7 @@ export function SyncButton() {
     setStatus(SyncStatus.Synchronizing)
 
     try{
-      await sync(await getSyncKey() || '')
+      await sync(await db.misc.getSyncKey() || '', db)
 
       setStatus(SyncStatus.Standby)
     }catch (e) {
