@@ -69,14 +69,42 @@ const updateEpisodeState = async (episodeUrl: string, podcastUrl: string, positi
     // update an existent entry
     await db.execute(
       `UPDATE episodes_history
-      SET position = $1, timestamp = $2`,
-      [position, Date.now()],
+      SET position = $1, timestamp = $2
+      WHERE episode = $3
+      `,
+      [position, Date.now(), episodeUrl],
     );
   }
 }
 
+////////////// MISC //////////////   
 
+const getSyncKey = async (): Promise<string | undefined> => {
+  const r: {value: string}[] = await db.select(
+    `SELECT value from misc
+      WHERE description = "syncKey"`,
+  )
+  if (r.length > 0) {
+    return r[0].value
+  }
+}
 
+const setSyncKey = async (key: string) => {
+  if (await getSyncKey() === undefined) {
+    await db.execute(
+      `INSERT into misc (description, value) VALUES ("syncKey", $1)`,
+      [key],
+    );
+  }else {
+    await db.execute(
+      `UPDATE misc
+      SET value = $1
+      WHERE description = syncKey
+      `,
+      ['syncKey', key],
+    );
+  }
+}
 
 
 ////////////// DB CONTEXT  //////////////
@@ -93,6 +121,10 @@ interface DBContextProps {
   history: {
     getEpisodeState: (episodeUrl: string) => Promise<EpisodeState | undefined>,
     updateEpisodeState: (episodeUrl: string, podcastUrl: string, position: number, total: number) => Promise<void>
+  },
+  misc: {
+    getSyncKey: () => Promise<string|undefined>,
+    setSyncKey: (key: string) => Promise<void>
   }
 }
 
@@ -149,6 +181,10 @@ export function DBProvider({ children }: { children: ReactNode }) {
       history : {
         getEpisodeState,
         updateEpisodeState
+      },
+      misc: {
+        getSyncKey,
+        setSyncKey
       }
     }}>
       {children}

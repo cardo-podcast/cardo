@@ -7,7 +7,7 @@ import SearchBar from "./components/SearchBar";
 import PodcastPreview from "./pages/PodcastPreview";
 import { DBProvider } from "./DB";
 import EpisodePreview from "./pages/EpisodePreview";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import Settings from "./pages/Settings";
 
 
@@ -15,7 +15,6 @@ const App = () => {
   const playerRef = useRef<AudioPlayerRef>(null)
 
   const play = (episode?: EpisodeData | undefined, podcastUrl?: string) => {
-    console.log(playerRef.current)
     if (playerRef.current !== null) {
       playerRef.current.play(episode, podcastUrl)
     }

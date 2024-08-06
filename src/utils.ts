@@ -1,4 +1,4 @@
-import { ResponseType, fetch as tauriFetch} from "@tauri-apps/api/http"
+import { ResponseType, fetch as tauriFetch } from "@tauri-apps/api/http"
 import { EpisodeData, PodcastData } from "."
 import { createDir, exists, readTextFile, removeFile, writeTextFile } from "@tauri-apps/api/fs"
 import { appCacheDir, join } from "@tauri-apps/api/path"
@@ -10,7 +10,7 @@ export function secondsToStr(seconds: number) {
   const secondsStr = Math.floor(seconds % 60).toString().padStart(2, '0')
 
   if (hours > 0) {
-    return `${hours}:${minutes.toString().padStart(2, '0')}:${secondsStr}` 
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${secondsStr}`
   } else {
     return `${minutes}:${secondsStr}`
   }
@@ -35,7 +35,7 @@ async function downloadXml(url: string): Promise<string> {
 }
 
 export async function parseXML(url: string, fileDownloaded = false): Promise<EpisodeData[]> {
-  
+
   let xmlString = ''
 
   if (fileDownloaded) {
@@ -43,12 +43,12 @@ export async function parseXML(url: string, fileDownloaded = false): Promise<Epi
   } else {
     xmlString = await downloadXml(url)
   }
-  
+
   const parser = new DOMParser()
   const xml = parser.parseFromString(xmlString, "text/xml")
   const items = xml.querySelectorAll('item')
 
-  const result = Array.from(items).map( (item: Element) => {
+  const result = Array.from(items).map((item: Element) => {
     const episode: EpisodeData = {
       title: item.querySelector('title')?.textContent ?? '',
       description: htmlToText(item.querySelector('description')?.textContent ?? '') ?? item.querySelector('itunes\\:summary')?.textContent,
@@ -69,7 +69,7 @@ export async function getXmlDownloaded(podcast: PodcastData) {
   const localXmlPath = await join(await appCacheDir(), 'Downloaded Feeds', podcast.id.toString() + '.xml');
   const fileExists = await exists(localXmlPath);
 
-  return fileExists? localXmlPath : undefined;
+  return fileExists ? localXmlPath : undefined;
 }
 
 export async function saveXml(podcast: PodcastData) {
@@ -97,4 +97,54 @@ export async function removeXmlDownloaded(podcast: PodcastData) {
   if (localXmlPath !== undefined) {
     await removeFile(localXmlPath)
   }
+}
+
+
+export async function getAllCreds(): Promise<any | undefined> {
+
+  const file = await join(await appCacheDir(), 'creds.json');
+
+  if (!await exists(file)) return
+
+  try{
+    const data = JSON.parse(await readTextFile(file))
+    return data
+  }catch{
+    return {}
+  }
+
+}
+
+export async function getCreds(name: string): Promise<unknown | undefined> {
+  const creds = await getAllCreds()
+  return creds[name] || undefined
+}
+
+export async function saveCreds(name: string, value: any) {
+  const file = await join(await appCacheDir(), 'creds.json');
+
+  let data: any;
+  if (! await exists(file)) {
+    data = {}
+  } else {
+    data = await getAllCreds()
+  }
+
+  data[name] = value
+
+  await writeTextFile(file, JSON.stringify(data))
+}
+
+export async function removeCreds(name: string) {
+  const file = await join(await appCacheDir(), 'creds.json');
+
+  let data: any;
+  if (! await exists(file)) {
+    return
+  }
+
+  data = await getAllCreds()
+  delete data[name]
+
+  await writeTextFile(file, JSON.stringify(data))
 }
