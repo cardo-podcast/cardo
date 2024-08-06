@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 import { EpisodeData, PodcastData } from ".."
 import * as icons from "../Icons"
 import { useNavigate } from "react-router-dom"
@@ -9,6 +9,38 @@ import ProgressBar from "./ProgressBar"
 import { useSettings } from "../sync/Settings"
 
 
+function ContextMenu({ episode, podcast, X, Y, show, setShow }:
+                          { episode: EpisodeData, podcast: PodcastData, X: number, Y: number, show: boolean,
+                              setShow: Dispatch<SetStateAction<{ show: boolean, X: number, Y: number }>> }) {
+  const contextRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!show) return
+      event.preventDefault()
+      event.stopPropagation()
+      if (contextRef.current && !contextRef.current.contains(event.target as Node)) {
+        setShow({show: false, X: 0, Y: 0})
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  });
+
+  return (
+    <div ref={contextRef} className={`w-20 h-20 text-sm bg-zinc-400 absolute ${show ? '' : 'hidden'}`}
+      style={{ top: `${Y}px`, left: `${X}px` }}
+    >
+      CONTEXT
+    </div>
+  )
+}
+
+
 function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast: PodcastData, play: () => void }) {
   const [imageSrc, setImageSrc] = useState(episode.coverUrl ?? podcast.coverUrl)
   const [imageError, setImageError] = useState(false)
@@ -17,6 +49,7 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
   const { globals: { locale } } = useSettings()
   const [reprState, setReprState] = useState({ position: 0, total: episode.duration, complete: false })
   const [date, setDate] = useState('')
+  const [showContext, setShowContext] = useState({ show: false, X: 0, Y: 0 })
   const [ref, entry] = useIntersectionObserver({
     threshold: 0,
     root: null,
@@ -56,13 +89,26 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
 
   return (
     <div ref={ref} className={`flex ${reprState.complete ? 'text-zinc-500' : ''} hover:bg-zinc-800 cursor-pointer rounded-md min-h-20 p-2 justify-between gap-4`}
-      onClick={() => navigate('/episode-preview', {
-        state: {
-          episode: episode,
-          podcastUrl: podcast.feedUrl
-        }
-      })}
+      onClick={() => {
+        if (showContext) return
+        
+        navigate('/episode-preview', {
+          state: {
+            episode: episode,
+            podcastUrl: podcast.feedUrl
+          }
+        })
+      }}
+      onContextMenu={e => {
+        e.preventDefault()
+        setShowContext({
+          show: true,
+          X: e.pageX,
+          Y: e.pageY
+        })
+      }}
     >
+      <ContextMenu episode={episode} podcast={podcast} X={showContext.X} Y={showContext.Y} show={showContext.show} setShow={setShowContext} />
       {entry?.isIntersecting &&
         <>
           <div className="h-16 aspect-square rounded-md">
@@ -79,7 +125,7 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
           </div>
 
           <div className="flex flex-col text-right w-full items-end justify-between">
-            <p className="text-sm w-full text-left">{date} - {Math.round(episode.size / 1000000)}MB </p>
+            <p className="text-sm w-full text-left">{date} - {Math.round(episode.size / 1000000)} MB </p>
             <h2 className="mb-2">{episode.title}</h2>
             <div className="flex w-full gap-2 justify-end">
               {
