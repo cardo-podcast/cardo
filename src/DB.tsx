@@ -79,17 +79,15 @@ const updateEpisodeState = async (episodeUrl: string, podcastUrl: string, positi
     // update an existent entry
 
     //check if timestamp is newer, otherwise don't update the row
-    if (timestamp !== undefined && timestamp < r.timestamp) {
-      console.log(episodeUrl, timestamp, r.timestamp)
-      return
-    }
+    if (timestamp !== undefined && timestamp < r.timestamp) return
+
 
     await db.execute(
       `UPDATE episodes_history
       SET position = $1, timestamp = $2
       WHERE episode = $3
       `,
-      [position, timestamp ?? Date.now(), episodeUrl],
+      [Math.floor(position), timestamp ?? Date.now(), episodeUrl],
     );
   }
 }
