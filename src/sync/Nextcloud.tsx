@@ -2,6 +2,7 @@ import { http, invoke, shell } from "@tauri-apps/api"
 import { useEffect, useRef, useState } from "react"
 import { useDB } from "../DB"
 import { getCreds, removeCreds, saveCreds } from "../utils"
+import * as icons from "../Icons"
 
 
 
@@ -25,10 +26,10 @@ export function NextcloudSettings() {
       <div className="flex flex-col gap-1 items-center">
         <h1 className="text-lg">Your are loged in</h1>
         <button className="bg-amber-600 w-fit px-4 hover:bg-amber-700 rounded-md p-1"
-        onClick={async() => {
-          removeCreds('nextcloud')
-          setLoggedIn(false)
-        }}
+          onClick={async () => {
+            removeCreds('nextcloud')
+            setLoggedIn(false)
+          }}
         >
           LOG OUT
         </button>
@@ -119,4 +120,28 @@ async function login(url: string, getSyncKey: () => Promise<string | undefined>,
     clearInterval(interval)
   }, 1000)
   return interval
+}
+
+export function SyncButton() {
+  enum Status {
+    Standby = 0,
+    Syncing = 1,
+    Ok = 2,
+    Error = 3
+  }
+  const [status, setStatus] = useState<Status>(Status.Standby)
+
+  
+
+
+  return (
+    <button className={`w-5 hover:text-amber-400 ${status === Status.Syncing && 'animate-[spin_2s_linear_infinite_reverse]'}`}>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-refresh">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
+        <circle cx="12" cy="12" r="2" fill={status === Status.Error ? 'red' : status === Status.Ok && 'green'} stroke="none" />
+        <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
+      </svg>
+    </button>
+  )
 }
