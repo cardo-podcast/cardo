@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, forwardRef, RefObject, useImperativeHandle } from "react";
+import React, { useRef, useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { secondsToStr } from "../utils";
 import * as icons from "../Icons"
 import { EpisodeData } from "..";
@@ -20,11 +20,11 @@ const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(({className=''}
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const podcastPlaying = useRef<string>('')
-  const {history: {updateEpisodeState}} = useDB()
+  const {history: {updateEpisodeState, getEpisodeState}} = useDB()
 
 
   useImperativeHandle(ref, () => ({
-    play: (episode?: EpisodeData | undefined, podcastUrl?: string) => {
+    play: async(episode?: EpisodeData | undefined, podcastUrl?: string) => {
       if (audioRef.current == null) return
   
       if (episode !== undefined) {
@@ -33,6 +33,12 @@ const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(({className=''}
   
         audioRef.current.src = episode.src
         audioRef.current.load()
+
+        const previousState = await getEpisodeState(episode?.src)
+
+        if (previousState !== undefined && previousState.position < previousState.total) {
+            audioRef.current.currentTime = previousState.position
+        }
       }
   
       audioRef.current.play()

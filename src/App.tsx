@@ -1,5 +1,5 @@
 import { Routes, Route, BrowserRouter } from "react-router-dom";
-import AudioPlayer, { AudioPlayerRef, useAudioPlayer } from "./components/AudioPlayer";
+import AudioPlayer, { AudioPlayerRef } from "./components/AudioPlayer";
 import LeftMenu from "./components/LeftMenu";
 import TitleBar from "./components/TitleBar";
 import HomePage from "./pages/HomePage";
@@ -9,6 +9,7 @@ import { DBProvider } from "./DB";
 import EpisodePreview from "./pages/EpisodePreview";
 import { useRef } from "react";
 import Settings from "./pages/Settings";
+import { EpisodeData } from ".";
 
 
 const App = () => {

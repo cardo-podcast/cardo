@@ -60,7 +60,10 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
             <h2 className="">{episode.title}</h2>
             {episode.duration && <h3>{secondsToStr(episode.duration)}: {episodeState}%</h3>}
             <button className="w-6 p-[2px] aspect-square flex justify-center items-center hover:text-amber-600 bg-zinc-700 rounded-full"
-              onClick={play}
+              onClick={e => {
+                e.stopPropagation()
+                play()
+              }}
             >
               {icons.play}
             </button>

@@ -1,9 +1,7 @@
-import { app, http, invoke, shell } from "@tauri-apps/api"
+import { http, invoke, shell } from "@tauri-apps/api"
 import { useEffect, useRef, useState } from "react"
 import { DBContextProps, useDB } from "../DB"
 import { getCreds, removeCreds, saveCreds } from "../utils"
-import * as icons from "../Icons"
-import { EpisodeState } from ".."
 
 
 
@@ -207,12 +205,11 @@ async function sync(syncKey: string, db: DBContextProps): Promise<void> {
   const localUpdates = await db.history.getEpisodesStates(lastSync)
 
   const gpodderLocalUpdates: GpodderUpdate[] = localUpdates.map( update => {
-    const position = Math.floor(update.position)
     return {
       ...update,
-      position: position,
-      started: position,
-      total: Math.floor(update.total),
+      position: update.position,
+      started: update.position,
+      total: update.total,
       action: 'PLAY',
       timestamp: (new Date(update.timestamp)).toISOString().split('.')[0]
     }

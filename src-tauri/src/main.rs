@@ -87,8 +87,8 @@ fn main() {
             sql: "CREATE TABLE episodes_history (id INTEGER PRIMARY KEY,
                                                         podcast TEXT,
                                                         episode TEXT,
-                                                        position TEXT,
-                                                        total TEXT,
+                                                        position INTEGER,
+                                                        total INTEGER,
                                                         timestamp INTEGER
                                                         );",
             kind: MigrationKind::Up,
