@@ -115,7 +115,7 @@ export async function getAllCreds(): Promise<any | undefined> {
 
 }
 
-export async function getCreds(name: string): Promise<unknown | undefined> {
+export async function getCreds(name: string): Promise<any | undefined> {
   const creds = await getAllCreds()
   return creds[name] || undefined
 }

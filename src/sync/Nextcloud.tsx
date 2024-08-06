@@ -1,4 +1,4 @@
-import { http, invoke, shell } from "@tauri-apps/api"
+import { app, http, invoke, shell } from "@tauri-apps/api"
 import { useEffect, useRef, useState } from "react"
 import { useDB } from "../DB"
 import { getCreds, removeCreds, saveCreds } from "../utils"
@@ -122,24 +122,91 @@ async function login(url: string, getSyncKey: () => Promise<string | undefined>,
   return interval
 }
 
-export function SyncButton() {
-  enum Status {
-    Standby = 0,
-    Syncing = 1,
-    Ok = 2,
-    Error = 3
-  }
-  const [status, setStatus] = useState<Status>(Status.Standby)
+interface GpodderUpdate {
+  podcast: string,
+  episode: string,
+  timestamp: string,
+  position: number,
+  total: number,
+  action: string
+}
 
+async function getNextcloudCreds(syncKey: string): Promise<{server: string, loginName: string, appPassword: string}> {
+  const creds: any = await getCreds('nextcloud')
+
+  const {server, loginName: encryptedLoginName, appPassword: encryptedAppPassword} = creds
+  const loginName = await invoke('decrypt', {encryptedText: encryptedLoginName, base64Key: syncKey})
+  const appPassword = await invoke('decrypt', {encryptedText: encryptedAppPassword, base64Key: syncKey})
+  return {server: server, loginName: loginName, appPassword: appPassword}
+}
+
+
+async function fetchUpdates(server: string, loginName: string, appPassword: string, since?: number): Promise<GpodderUpdate[]> {
+  const url = server + `/index.php/apps/gpoddersync/episode_action?since=${(since === undefined) ? '0' : since?.toString()}`
+
+  const r = await http.fetch(url, {
+    method: 'GET',
+    responseType: http.ResponseType.JSON,
+    headers: {
+      'OCS-APIRequest': 'true',
+      'Authorization': 'Basic ' + btoa(loginName + ':' + appPassword)
+    }
+  })
+
+  return (r.data as any).actions as GpodderUpdate[]
+}
+
+
+async function sync(syncKey: string): Promise<void> {
+
+  if (syncKey === '') return {ok: false, error: 'Error retrieving creds key'}
+
+  const {server, loginName, appPassword} = await getNextcloudCreds(syncKey)
   
+  const serverUpdates = await fetchUpdates(server, loginName, appPassword)
+  
+  console.log(serverUpdates)
+
+}
+
+enum SyncStatus {
+  Standby,
+  Synchronizing,
+  Ok,
+  Error
+}
+
+export function SyncButton() {
+  const [status, setStatus] = useState<SyncStatus>(SyncStatus.Standby)
+  const [error, setError] = useState('')
+  const {misc: {getSyncKey}} = useDB()
+
+
+  const performSync = async() => {
+    if (status === SyncStatus.Synchronizing) return
+
+    setError('')
+    setStatus(SyncStatus.Synchronizing)
+
+    try{
+      await sync(await getSyncKey() || '')
+
+      setStatus(SyncStatus.Standby)
+    }catch (e) {
+      setError(e as string)
+      setStatus(SyncStatus.Error)
+    }
+  }
 
 
   return (
-    <button className={`w-5 hover:text-amber-400 ${status === Status.Syncing && 'animate-[spin_2s_linear_infinite_reverse]'}`}>
+    <button className={`w-5 hover:text-amber-400 ${status === SyncStatus.Synchronizing && 'animate-[spin_2s_linear_infinite_reverse]'}`}
+    onClick={performSync} title={error}
+    >
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-refresh">
         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
         <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
-        <circle cx="12" cy="12" r="2" fill={status === Status.Error ? 'red' : status === Status.Ok && 'green'} stroke="none" />
+        <circle cx="12" cy="12" r="2" fill={status === SyncStatus.Error ? 'red' : status === SyncStatus.Ok ? 'green' : 'none'} stroke="none" />
         <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
       </svg>
     </button>
