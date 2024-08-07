@@ -51,9 +51,13 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
 
     // update reproduction state
     getEpisodeState(episode.src).then(state => {
-      if (state === undefined) return
+      if (state !== undefined) {
+        setReprState({ position: state.position, total: state.total, complete: state.position === state.total })
+      } else {
+        // render a not played episode
+        setReprState({ position: 0, total: episode.duration, complete: false })
+      }
 
-      setReprState({ position: state.position, total: state.total, complete: state.position === state.total })
     })
   }, [entry?.isIntersecting, episode, podcast.coverUrl, getEpisodeState, locale])
 
