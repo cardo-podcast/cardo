@@ -1,4 +1,4 @@
-import { ReactNode, RefObject, useEffect, useRef, useState } from "react";
+import { ReactNode, RefObject, useEffect, useState } from "react";
 
 
 interface ContextProps {
@@ -7,59 +7,50 @@ interface ContextProps {
   y?: number
 }
 
+export function ContextMenu({ target, children }:
+  { target: RefObject<HTMLDivElement>, children: ReactNode }) {
 
-export function useContextMenu() {
-  const contextRef = useRef<HTMLDivElement>(null)
-  const targetRef = useRef<HTMLDivElement>(null)
   const [contextProps, setContextProps] = useState<ContextProps>({ show: false })
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-
-      if (!contextProps.show) return
-
-      // click outside CONTEXT MENU
-      if (contextRef.current && !contextRef.current.contains(event.target as Node)) {
-        setContextProps({ show: false })
-        event.stopPropagation()
-      }
-    }
-
     const handleContext = (event: MouseEvent) => {
-      // rigth click inside TARGET
-      if (targetRef.current && targetRef.current.contains(event.target as Node)) {
+      if (!target.current) return
+
+      // rigth click inside target will display this context menu
+      if (target.current.contains(event.target as Node)) {
         event.preventDefault()
-        setContextProps({show: true, x: event.pageX, y:event.pageY})
+        setContextProps({ show: true, x: event.pageX, y: event.pageY })
       } else {
         setContextProps({ show: false })
       }
 
     }
 
-
-    document.addEventListener('click', handleClickOutside, true) // true captures onClick calls on other elements
     document.addEventListener('contextmenu', handleContext)
     return () => {
-      document.removeEventListener('click', handleClickOutside, true)
       document.removeEventListener('contextmenu', handleContext)
     }
   })
 
-  return {contextRef, targetRef, contextProps}
-
-}
-
-
-
-
-export function ContextMenu({ contextRef, contextProps, children }:
-                                { contextRef: RefObject<HTMLDivElement>, contextProps: ContextProps, children: ReactNode}) {
-
   return (
-    <div ref={contextRef} className={`absolute ${contextProps.show ? '' : 'hidden'}`}
-      style={{ top: `${contextProps.y}px`, left: `${contextProps.x}px` }}
-    >
-      {children}
+      <div className={`w-screen h-screen absolute z-30 top-0 left-0
+                          ${contextProps.show ? '' : 'hidden'}`}
+        onClick={e => {
+          setContextProps({show: false})
+          e.stopPropagation()
+      }}
+      onContextMenu={e => {
+        setContextProps({show: false})
+        e.stopPropagation()
+        e.preventDefault()
+    }}
+      
+      >
+      <div className={`absolute z-40 overflow-hidden ${contextProps.show ? '' : 'hidden'}`}
+        style={{ top: `${contextProps.y}px`, left: `${contextProps.x}px` }}
+      >
+        {children}
+      </div>
     </div>
   )
 }

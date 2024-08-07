@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { EpisodeData, PodcastData } from ".."
 import * as icons from "../Icons"
 import { useNavigate } from "react-router-dom"
@@ -7,7 +7,7 @@ import { secondsToStr } from "../utils"
 import { useDB } from "../DB"
 import ProgressBar from "./ProgressBar"
 import { useSettings } from "../sync/Settings"
-import { ContextMenu, useContextMenu } from "./ContextMenu"
+import { ContextMenu } from "./ContextMenu"
 
 
 
@@ -17,16 +17,16 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
   const [imageSrc, setImageSrc] = useState(episode.coverUrl ?? podcast.coverUrl)
   const [imageError, setImageError] = useState(false)
   const navigate = useNavigate()
-  const { history: { getEpisodeState } } = useDB()
+  const { history: { getEpisodeState, updateEpisodeState } } = useDB()
   const { globals: { locale } } = useSettings()
   const [reprState, setReprState] = useState({ position: 0, total: episode.duration, complete: false })
   const [date, setDate] = useState('')
+  const contextMenuTarget = useRef<HTMLDivElement>(null)
   const [ref, entry] = useIntersectionObserver({
     threshold: 0,
     root: null,
     rootMargin: "0px",
   });
-  const { contextRef, targetRef, contextProps } = useContextMenu()
 
   useEffect(() => {
     if (!entry?.isIntersecting) return
@@ -60,8 +60,8 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
 
 
   return (
-    <div ref={targetRef}>
-      <div ref={ref} className={`flex ${reprState.complete ? 'text-zinc-500' : ''} hover:bg-zinc-800 cursor-pointer rounded-md min-h-20 p-2 justify-between gap-4`}
+    <div ref={contextMenuTarget}>
+      <div ref={ref} className={`flex ${reprState.complete ? 'text-zinc-500' : ''} hover:bg-zinc-800 cursor-default rounded-md min-h-20 p-2 justify-between gap-4`}
         onClick={() => {
           navigate('/episode-preview', {
             state: {
@@ -71,11 +71,29 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
           })
         }}
       >
-        <ContextMenu contextRef={contextRef} contextProps={contextProps}>
-          <div className="bg-zinc-400 p-2 w-28 rounded-md">
-            TEST
+
+        <ContextMenu target={contextMenuTarget}>
+          <div className="bg-zinc-700 max-w-60 text-zinc-300 p-2 rounded-md">
+            <p className="mb-2 truncate text-xs text-zinc-400">{episode.title}</p>
+            <button className="w-full text-left text-sm hover:text-zinc-50"
+              onClick={() => {
+                console.log('HEY')
+                if (reprState.complete) {
+                  updateEpisodeState(episode.src, podcast.feedUrl,
+                    0, episode.duration)
+                    setReprState({complete: false, position:0, total:episode.duration})
+                } else {
+                  updateEpisodeState(episode.src, podcast.feedUrl,
+                    episode.duration, episode.duration)
+                    setReprState({complete: true, position:episode.duration, total:episode.duration})
+                }
+              }
+              }>
+              Mark as {reprState.complete ? 'not played' : 'played'}
+            </button>
           </div>
         </ContextMenu>
+
         {entry?.isIntersecting &&
           <>
             <div className="h-16 aspect-square rounded-md">
