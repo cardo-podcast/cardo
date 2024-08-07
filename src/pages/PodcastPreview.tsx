@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { EpisodeData, PodcastData } from "..";
-import { Dispatch, ReactNode, SetStateAction, Suspense, useEffect, useState } from "react";
+import { Dispatch, ReactNode, SetStateAction, Suspense, useCallback, useEffect, useState } from "react";
 import * as icons from "../Icons"
 import { getXmlDownloaded, parseXML, removeXmlDownloaded, saveXml } from "../utils";
 import EpisodeCard from "../components/EpisodeCard";
@@ -95,7 +95,7 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData, podcast?: stri
   const [sortCriterion, setSortCriterion] = useState<SortCriterion>({ criterion: 'date', mode: 'desc' })
 
 
-  const sortEpisodes = (unsortedEpisodes = episodes): EpisodeData[] => {
+  const sortEpisodes = useCallback((unsortedEpisodes = episodes): EpisodeData[] => {
     const applyMode = (a: any, b: any) => {
       if (sortCriterion.mode === 'asc') {
         return a - b
@@ -114,9 +114,9 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData, podcast?: stri
         break
     }
     return sortedEpisodes
-  }
+  }, [episodes, sortCriterion])
 
-  useEffect(() => setEpisodes(sortEpisodes()), [sortCriterion])
+  useEffect(() => setEpisodes(sortEpisodes()), [sortCriterion, sortEpisodes])
 
 
   useEffect(() => {
