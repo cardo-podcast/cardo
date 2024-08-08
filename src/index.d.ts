@@ -1,3 +1,4 @@
+import { PodcastSettings } from "./Settings"
 
 
 export interface PodcastData {
@@ -25,4 +26,20 @@ export interface EpisodeState {
   position: number,
   total: number,
   timestamp: number
+}
+
+
+//// SETTINGS ////
+
+export interface Settings {
+  globals: {
+    locale: string
+  }
+  podcasts: {
+    [feedUrl: string] : PodcastSettings
+  },
+
+  // methods
+  getPodcastSettings: (feedUrl: string) => PodcastSettings
+  setPodcastSettings: (feedUrl: string, podcastSettings: PodcastSettings) => void
 }
