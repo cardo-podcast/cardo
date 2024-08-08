@@ -10,7 +10,7 @@ import EpisodePreview from "./pages/EpisodePreview";
 import { useEffect, useRef } from "react";
 import Settings from "./pages/Settings";
 import { EpisodeData } from ".";
-import { SettingsProvider } from "./sync/Settings";
+import { SettingsProvider } from "./Settings";
 
 
 const App = () => {

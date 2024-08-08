@@ -5,6 +5,9 @@ import * as icons from "../Icons"
 import { getXmlDownloaded, parseXML, removeXmlDownloaded, saveXml } from "../utils";
 import EpisodeCard from "../components/EpisodeCard";
 import { useDB } from "../DB";
+import { Switch, SwitchState } from "../components/Inputs";
+import { useSettings } from "../Settings";
+
 
 function FavoriteButton({ podcast, subscribed, setSubscribed }: { podcast: PodcastData, subscribed: boolean, setSubscribed: Dispatch<SetStateAction<boolean>> }) {
   const { subscriptions } = useDB()
@@ -85,6 +88,41 @@ function SortMenu({ criterion, setSortCriterion }:
   )
 }
 
+
+function FilterMenu({podcast}: {podcast: PodcastData}) {
+  const [showMenu, setShowMenu] = useState(false)
+  const [played, setPlayed] = useState(SwitchState.None)
+  const settings = useSettings()
+
+  useEffect(()=>{
+    const storedSettings = settings.getPodcastSettings(podcast.feedUrl)
+
+    setPlayed(storedSettings.filter.played)
+  }, [])
+
+
+  useEffect(() => {
+    const newSettings = settings.getPodcastSettings(podcast.feedUrl)
+    newSettings.filter.played = played
+
+    settings.setPodcastSettings(podcast.feedUrl, newSettings)
+  }, [played])
+
+  return (
+    <div className={`flex justify-center gap-2 rounded-md ${showMenu && 'bg-zinc-700'}`}>
+      <button className="" onClick={() => setShowMenu(!showMenu)}>
+        {icons.filter}
+      </button>
+      {showMenu &&
+        <div className="flex">
+          <Switch state={played} setState={setPlayed} labels={['Played', 'Not played']}/>
+        </div>
+      }
+    </div>
+  )
+}
+
+
 function PodcastPreview({ play }: { play: (episode?: EpisodeData, podcast?: string) => void }) {
   const location = useLocation();
   const [imageError, setImageError] = useState(false)
@@ -116,7 +154,7 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData, podcast?: stri
     return sortedEpisodes
   }, [episodes, sortCriterion])
 
-  useEffect(() => setEpisodes(sortEpisodes()), [sortCriterion, sortEpisodes])
+  useEffect(() => setEpisodes(sortEpisodes()), [sortCriterion])
 
 
   useEffect(() => {
@@ -142,8 +180,6 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData, podcast?: stri
       })
     });
   }, [podcast, subscribed])
-
-
 
   return (
     <div className="p-2 w-full flex flex-col">
@@ -172,6 +208,7 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData, podcast?: stri
               {icons.reload}
             </button>
             <SortMenu criterion={sortCriterion} setSortCriterion={setSortCriterion} />
+            <FilterMenu podcast={podcast}/>
           </div>
 
         </div>

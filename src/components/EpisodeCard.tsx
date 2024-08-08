@@ -6,7 +6,7 @@ import { useIntersectionObserver } from "@uidotdev/usehooks"
 import { secondsToStr } from "../utils"
 import { useDB } from "../DB"
 import ProgressBar from "./ProgressBar"
-import { useSettings } from "../sync/Settings"
+import { useSettings } from "../Settings"
 import { ContextMenu } from "./ContextMenu"
 
 
