@@ -11,7 +11,7 @@ import { useEffect, useRef } from "react";
 import Settings from "./pages/Settings";
 import { EpisodeData } from ".";
 import { SettingsProvider } from "./Settings";
-import QueuePage, { QueueProvider } from "./pages/QueuePage";
+import QueuePage from "./pages/QueuePage";
 
 
 const App = () => {
@@ -34,27 +34,25 @@ const App = () => {
     <div className="bg-zinc-900 w-full h-screen flex flex-col rounded-2xl border-zinc-600 border-[1px] text-zinc-50 overflow-hidden">
       <SettingsProvider>
         <DBProvider>
-          <QueueProvider>
-            <TitleBar />
-            <div className="flex justify-start w-full h-full overflow-hidden">
-              <BrowserRouter>
-                <LeftMenu />
-                <div className="flex flex-col w-full h-full">
-                  <SearchBar />
-                  <div className="flex h-full overflow-y-auto">
-                    <Routes>
-                      <Route path='/' element={<HomePage />} />
-                      <Route path='/preview' element={<PodcastPreview play={play} />} />
-                      <Route path='/episode-preview' element={<EpisodePreview play={play} />} />
-                      <Route path='/settings' element={<Settings />} />
-                      <Route path='/queue' element={<QueuePage />} />
-                    </Routes>
-                  </div>
-                  <AudioPlayer ref={playerRef} className="w-full min-h-[70px] flex-shrink-0" />
+          <TitleBar />
+          <div className="flex justify-start w-full h-full overflow-hidden">
+            <BrowserRouter>
+              <LeftMenu />
+              <div className="flex flex-col w-full h-full">
+                <SearchBar />
+                <div className="flex h-full overflow-y-auto">
+                  <Routes>
+                    <Route path='/' element={<HomePage />} />
+                    <Route path='/preview' element={<PodcastPreview play={play} />} />
+                    <Route path='/episode-preview' element={<EpisodePreview play={play} />} />
+                    <Route path='/settings' element={<Settings />} />
+                    <Route path='/queue' element={<QueuePage />} />
+                  </Routes>
                 </div>
-              </BrowserRouter>
-            </div>
-          </QueueProvider>
+                <AudioPlayer ref={playerRef} className="w-full min-h-[70px] flex-shrink-0" />
+              </div>
+            </BrowserRouter>
+          </div>
         </DBProvider>
       </SettingsProvider>
     </div>
