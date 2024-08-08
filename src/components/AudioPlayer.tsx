@@ -10,7 +10,7 @@ interface AudioPlayerProps {
 }
 
 export type AudioPlayerRef = {
-  play: (episode?: EpisodeData | undefined, podcastUrl?: string) => void
+  play: (episode?: EpisodeData | undefined) => void
 }
 
 
@@ -19,17 +19,15 @@ const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(({className=''}
   const audioRef = useRef<HTMLAudioElement>(null)
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const podcastPlaying = useRef<string>('')
   const {history: {updateEpisodeState, getEpisodeState}} = useDB()
 
 
   useImperativeHandle(ref, () => ({
-    play: async(episode?: EpisodeData | undefined, podcastUrl?: string) => {
+    play: async(episode?: EpisodeData | undefined) => {
       if (audioRef.current == null) return
   
       if (episode !== undefined) {
         setPlaying(episode)
-        podcastPlaying.current = podcastUrl || ''
   
         audioRef.current.src = episode.src
         audioRef.current.load()
@@ -50,7 +48,7 @@ const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(({className=''}
 
     if (audioRef.current.paused && audioRef.current.currentTime > 0) {
       updateEpisodeState(playing.src,
-                          podcastPlaying.current,
+                          playing.podcastUrl,
                           audioRef.current.currentTime,
                           playing.duration
                         )

@@ -123,7 +123,7 @@ function FilterMenu({podcast}: {podcast: PodcastData}) {
 }
 
 
-function PodcastPreview({ play }: { play: (episode?: EpisodeData, podcast?: string) => void }) {
+function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
   const location = useLocation();
   const [imageError, setImageError] = useState(false)
   const podcast = location.state.podcast as PodcastData
@@ -214,13 +214,12 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData, podcast?: stri
         </div>
       </div>
 
-      <div className="flex-1 grid gap-1">
+      <div className="grid gap-1 content-start">
         {episodes.map((episode, i) => (
           <Suspense key={i} fallback={<div className="bg-zinc-800 h-20 w-full" />}>
             <EpisodeCard
               episode={episode}
-              podcast={podcast}
-              play={() => play !== undefined && play(episode, podcast.feedUrl)}
+              play={() => play !== undefined && play(episode)}
             />
           </Suspense>
         ))}

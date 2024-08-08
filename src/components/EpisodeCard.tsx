@@ -9,6 +9,7 @@ import ProgressBar from "./ProgressBar"
 import { useSettings } from "../Settings"
 import { ContextMenu } from "./ContextMenu"
 import { SwitchState } from "./Inputs"
+import { useQueue  } from "../pages/QueuePage"
 
 
 
@@ -27,6 +28,8 @@ function EpisodeCard({ episode, play }: { episode: EpisodeData, play: () => void
 
   const [filtered, setFiltered] = useState(false)
   const podcastSettings = useSettings().getPodcastSettings(episode.podcastUrl)
+
+  const queue = useQueue()
   
   const [ref, entry] = useIntersectionObserver({
     threshold: 0,
@@ -106,6 +109,17 @@ function EpisodeCard({ episode, play }: { episode: EpisodeData, play: () => void
               }
               }>
               Mark as {reprState.complete ? 'not played' : 'played'}
+            </button>
+            <button className="w-full text-left text-sm hover:text-zinc-50"
+            onClick={()=>{
+              if (queue.queue.includes(episode)) {
+                queue.remove(episode)
+              } else {
+                queue.add(episode)
+              }
+            }}
+            >
+              {queue.queue.includes(episode) ? 'Remove from Queue' : 'Add to queue'}
             </button>
           </div>
         </ContextMenu>
