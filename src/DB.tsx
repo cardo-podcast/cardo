@@ -1,12 +1,12 @@
 import Database, { QueryResult } from "tauri-plugin-sql-api";
 import { path } from "@tauri-apps/api"
-import { EpisodeState, PodcastData } from ".";
+import { EpisodeData, EpisodeState, PodcastData } from ".";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
 
 let db: Database = new Database('');
 
-////////////// SUBSCRIPTIONS  //////////////
+// #region SUBSCRIPTIONS
 
 const addSubscription = async (podcast: PodcastData): Promise<number> => {
   // returns subscription id on database
@@ -14,7 +14,7 @@ const addSubscription = async (podcast: PodcastData): Promise<number> => {
     "INSERT into subscriptions (podcastName, artistName, coverUrl, coverUrlLarge, feedUrl) VALUES ($1, $2, $3, $4, $5)",
     [podcast.podcastName, podcast.artistName, podcast.coverUrl, podcast.coverUrlLarge, podcast.feedUrl],
   );
-  
+
   return r.lastInsertId
 }
 
@@ -28,10 +28,6 @@ const getSubscription = async (feedUrl: string): Promise<PodcastData | undefined
 }
 
 const deleteSubscription = async (feedUrl: string): Promise<QueryResult | undefined> => {
-  const fav = await getSubscription(feedUrl)
-
-  if (fav === undefined) return
-
   return await db.execute(
     "DELETE FROM subscriptions WHERE feedUrl = $1",
     [feedUrl],
@@ -45,8 +41,8 @@ const getSubscriptions = async (): Promise<PodcastData[]> => {
   return r
 }
 
-
-////////////// EPISODE STATE  //////////////
+// #endregion
+// #region EPISODE STATE
 
 const getEpisodeState = async (episodeUrl: string): Promise<EpisodeState | undefined> => {
   const r: EpisodeState[] = await db.select(
@@ -75,7 +71,7 @@ const updateEpisodeState = async (episodeUrl: string, podcastUrl: string, positi
       "INSERT into episodes_history (episode, podcast, position, total, timestamp) VALUES ($1, $2, $3, $4, $5)",
       [episodeUrl, podcastUrl, position, total, timestamp ?? Date.now()],
     );
-  }else {
+  } else {
     // update an existent entry
 
     //check if timestamp is newer, otherwise don't update the row
@@ -92,10 +88,11 @@ const updateEpisodeState = async (episodeUrl: string, podcastUrl: string, positi
   }
 }
 
-////////////// MISC //////////////   
+// #endregion
+// #region MISC
 
 const getSyncKey = async (): Promise<string | undefined> => {
-  const r: {value: string}[] = await db.select(
+  const r: { value: string }[] = await db.select(
     `SELECT value from misc
       WHERE description = "syncKey"`,
   )
@@ -110,7 +107,7 @@ const setSyncKey = async (key: string) => {
       `INSERT into misc (description, value) VALUES ("syncKey", $1)`,
       [key],
     );
-  }else {
+  } else {
     await db.execute(
       `UPDATE misc
       SET value = $1
@@ -122,7 +119,7 @@ const setSyncKey = async (key: string) => {
 }
 
 const getLastSync = async (): Promise<number> => {
-  const r: {value: number}[] = await db.select(
+  const r: { value: number }[] = await db.select(
     `SELECT value from misc
       WHERE description = "lastSync"`,
   )
@@ -139,7 +136,7 @@ const setLastSync = async (timestamp: number) => {
       `INSERT into misc (description, value) VALUES ("lastSync", $1)`,
       [timestamp],
     );
-  }else {
+  } else {
     await db.execute(
       `UPDATE misc
       SET value = $1
@@ -150,41 +147,146 @@ const setLastSync = async (timestamp: number) => {
   }
 }
 
+// #endregion
+// #region QUEUE
 
+export type Queue = ReturnType<typeof initQueue>
 
-////////////// DB CONTEXT  //////////////
+function initQueue() {
+  const [queue, setQueue] = useState<EpisodeData[]>([])
 
-export interface DBContextProps {
-  db: Database,
-  subscriptions: {
-    subscriptions: PodcastData[],
-    addSubscription: (podcast: PodcastData) => Promise<number>,
-    getSubscription: (feedUrl: string) => Promise<PodcastData | undefined>,
-    deleteSubscription: (feedUrl: string) => Promise<QueryResult | undefined>,
-    reloadSubscriptions: () => Promise<PodcastData[]>,
-  },
-  history: {
-    getEpisodeState: (episodeUrl: string) => Promise<EpisodeState | undefined>,
-    updateEpisodeState: (episodeUrl: string, podcastUrl: string, position: number, total: number, timestamp?: number) => Promise<void>,
-    getEpisodesStates: (timestamp?: number) => Promise<EpisodeState[]>
-  },
-  misc: {
-    getSyncKey: () => Promise<string|undefined>,
-    setSyncKey: (key: string) => Promise<void>,
-    getLastSync: () => Promise<number>,
-    setLastSync: (timestamp: number) => Promise<void>
+  const render = async() => {
+    const rows = await getAll()
+
+    setQueue(rows.map(row => ({
+      ...row,
+      pubDate: new Date(row.pubDate)
+    })
+
+    )
+  )
   }
+
+  const orderPositions = async () => {
+    // orders elements in queue from 1 to lenght without gaps
+    await db.execute(`
+              WITH NumberedRows AS (
+                    SELECT
+                        id,
+                        ROW_NUMBER() OVER (ORDER BY queuePosition) AS row_num
+                    FROM
+                        queue
+                )
+              UPDATE queue
+              SET queuePosition = (
+                  SELECT row_num
+                  FROM NumberedRows
+                  WHERE NumberedRows.id = queue.id
+              );`)
+  }
+  
+  const add = async (episode: EpisodeData, order: number = 0) => {
+    /*
+      order:
+        0: first on queue
+        -1: last on queue
+    */
+  
+    let queuePosition: number;
+  
+    const queueLenght: number[] = await db.select(
+      "SELECT MAX(queuePosition) FROM queue") // [queueLenght]
+  
+    if (order < 0) {
+  
+      queuePosition = queueLenght[0] + 2 - order // -1 is last element, -2...
+    } else if (order === 0) {
+      queuePosition = 0
+    } else {
+      queuePosition = order - 0.5 // if this order has already an element this element is inserted before
+    }
+  
+    if (queuePosition < 0 || queuePosition > queueLenght[0] + 1) {
+      throw new Error(`Error in queue position, ${queuePosition} is not between ${0} and ${queueLenght[0]}`)
+    }
+  
+    await db.execute(
+      "INSERT into queue (queuePosition, title, description, src, pubDate, duration, size, podcastUrl, coverUrl) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+      [queuePosition, episode.title, episode.description, episode.src, episode.pubDate.getTime(), episode.duration, episode.size, episode.podcastUrl, episode.coverUrl || ''],
+    );
+
+    await orderPositions()
+    await render()
+  }
+  
+  const get = async (episodeSrc: string): Promise<EpisodeData | undefined> => {
+    const r: EpisodeData[] = await db.select(
+      "SELECT * from queue WHERE src = $1", [episodeSrc]
+    )
+    if (r.length > 0) {
+      return r[0]
+    }
+  }
+  
+  const remove = async (episodeSrc: string): Promise<QueryResult | undefined> => {
+    const r = await db.execute(
+      "DELETE FROM queue WHERE src = $1",
+      [episodeSrc],
+    )
+    await render()
+    return r
+  }
+  
+  const getAll = async (): Promise<EpisodeData[]> => {
+    const r: EpisodeData[] = await db.select(
+      "SELECT * from queue ORDER BY queuePosition")
+  
+    return r
+  }
+
+  const reorder = async(from: number, to: number) => {
+    await db.execute(`
+      UPDATE queue
+      SET queuePosition = $2
+      WHERE queuePosition = $1
+      `, [from, to-0.5])
+
+      await orderPositions()
+      await render()
+    
+  }
+
+  const getNext = async(actualSrc: string) => {
+    const r: EpisodeData[] = await db.select(
+      `SELECT * from queue WHERE queuePosition > (
+          SELECT queuePosition FROM queue
+          WHERE src = $1
+      )`, [actualSrc]
+    )
+
+    return r
+  }
+  return { queue, add, remove, getNext, reorder, get, render }
 }
 
-const DBContext = createContext<DBContextProps | undefined>(undefined);
+// #endregion
 
-export function useDB(): DBContextProps {
-  return useContext(DBContext) as DBContextProps
+
+
+// #region DB PROVIDER
+
+export type DB = ReturnType<typeof initDB>
+
+const DBContext = createContext<DB | undefined>(undefined);
+
+export function useDB(): DB {
+  return useContext(DBContext) as DB
 }
 
-export function DBProvider({ children }: { children: ReactNode }) {
+function initDB() {
   const [dbLoaded, setDbLoaded] = useState(false)
   const [subscriptionsList, setSubscriptionsList] = useState<PodcastData[]>([]);
+  const queue = initQueue()
 
 
   useEffect(() => {
@@ -206,6 +308,8 @@ export function DBProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!dbLoaded) return
 
+    queue.render()
+
     getSubscriptions().then(r => {
       setSubscriptionsList(r)
     })
@@ -217,29 +321,39 @@ export function DBProvider({ children }: { children: ReactNode }) {
     return fp
   }
 
+  return {
+    db, subscriptions: {
+      subscriptions: subscriptionsList,
+      addSubscription,
+      getSubscription,
+      deleteSubscription,
+      reloadSubscriptions
+    },
+    history: {
+      getEpisodeState,
+      updateEpisodeState,
+      getEpisodesStates,
+    },
+    misc: {
+      getSyncKey,
+      setSyncKey,
+      getLastSync,
+      setLastSync
+    },
+    queue
+  }
+}
+
+export function DBProvider({ children }: { children: ReactNode }) {
+  const dbManager = initDB()
+
+
   return (
-    <DBContext.Provider value={{
-      db, subscriptions: {
-        subscriptions: subscriptionsList,
-        addSubscription,
-        getSubscription,
-        deleteSubscription,
-        reloadSubscriptions
-      },
-      history : {
-        getEpisodeState,
-        updateEpisodeState,
-        getEpisodesStates,
-      },
-      misc: {
-        getSyncKey,
-        setSyncKey,
-        getLastSync,
-        setLastSync
-      }
-    }}>
+    <DBContext.Provider value={dbManager}>
       {children}
     </DBContext.Provider>
   )
 
 }
+
+// #endregion

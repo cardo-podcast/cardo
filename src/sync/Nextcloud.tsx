@@ -1,6 +1,6 @@
 import { http, invoke, shell } from "@tauri-apps/api"
 import { useEffect, useRef, useState } from "react"
-import { DBContextProps, useDB } from "../DB"
+import { DB, useDB } from "../DB"
 import { getCreds, removeCreds, saveCreds } from "../utils"
 
 
@@ -176,7 +176,7 @@ async function pushUpdates(server: string, loginName: string, appPassword: strin
   }
 }
 
-async function sync(syncKey: string, db: DBContextProps): Promise<void> {
+async function sync(syncKey: string, db: DB): Promise<void> {
 
   if (syncKey === '') return
 

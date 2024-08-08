@@ -9,7 +9,6 @@ import ProgressBar from "./ProgressBar"
 import { useSettings } from "../Settings"
 import { ContextMenu } from "./ContextMenu"
 import { SwitchState } from "./Inputs"
-import { useQueue  } from "../pages/QueuePage"
 
 
 
@@ -29,7 +28,9 @@ function EpisodeCard({ episode, play }: { episode: EpisodeData, play: () => void
   const [filtered, setFiltered] = useState(false)
   const podcastSettings = useSettings().getPodcastSettings(episode.podcastUrl)
 
-  const queue = useQueue()
+  const {queue} = useDB()
+  const [inQueue, setInqueue] = useState(queue.queue.map(ep => ep.src).includes(episode.src))
+
   
   const [ref, entry] = useIntersectionObserver({
     threshold: 0,
@@ -111,15 +112,17 @@ function EpisodeCard({ episode, play }: { episode: EpisodeData, play: () => void
               Mark as {reprState.complete ? 'not played' : 'played'}
             </button>
             <button className="w-full text-left text-sm hover:text-zinc-50"
-            onClick={()=>{
-              if (queue.queue.includes(episode)) {
-                queue.remove(episode)
+            onClick={async()=>{
+              if (inQueue) {
+                await queue.remove(episode.src)
+                setInqueue(false)
               } else {
-                queue.add(episode)
+                await queue.add(episode)
+                setInqueue(true)
               }
             }}
             >
-              {queue.queue.includes(episode) ? 'Remove from Queue' : 'Add to queue'}
+              {inQueue ? 'Remove from Queue' : 'Add to queue'}
             </button>
           </div>
         </ContextMenu>

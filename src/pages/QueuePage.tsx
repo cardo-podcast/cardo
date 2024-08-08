@@ -1,49 +1,10 @@
-import { createContext, ReactNode, Suspense, useContext, useState } from "react"
-import { EpisodeData } from ".."
+import { Suspense } from "react"
 import EpisodeCard from "../components/EpisodeCard"
+import { useDB } from "../DB"
 
-export type Queue = ReturnType<typeof initQueue>
-
-function initQueue() {
-  const [queue, setQueue] = useState<EpisodeData[]>([])
-
-  const add = (item: EpisodeData) => {
-    setQueue([...queue, item])
-  }
-
-  const remove = (item: EpisodeData) => {
-    const newQueue = [...queue]
-    const index = newQueue.indexOf(item)
-    newQueue.splice(index)
-    setQueue(newQueue)
-  }
-
-  const next = () => {
-    const newQueue = queue.slice(1)
-    setQueue(newQueue)
-    return newQueue[0]
-  }
-
-  return { queue, setQueue, add, remove, next }
-}
-
-const QueueContext = createContext<Queue | undefined>(undefined)
-export const useQueue = (): Queue => {
-  return useContext(QueueContext) as Queue
-}
-
-export function QueueProvider({ children }: { children: ReactNode }) {
-  const queue = initQueue()
-
-  return (
-    <QueueContext.Provider value={queue}>
-      {children}
-    </QueueContext.Provider>
-  )
-}
 
 export default function QueuePage() {
-  const queue = useQueue()
+  const { queue } = useDB()
 
 
   return (

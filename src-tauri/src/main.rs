@@ -101,6 +101,22 @@ fn main() {
                                         value TEXT
                                                     );",
             kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 4,
+            description: "queue",
+            sql: "CREATE TABLE queue (id INTEGER PRIMARY KEY,
+                                        queuePosition INTEGER,
+                                        title TEXT,
+                                        description TEXT,
+                                        src TEXT,
+                                        pubDate INTEGER,
+                                        duration TEXT,
+                                        size TEXT,
+                                        podcastUrl TEXT,
+                                        coverUrl TEXT
+                                                    );",
+            kind: MigrationKind::Up,
         }
     ];
 
