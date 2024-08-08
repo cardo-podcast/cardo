@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { EpisodeData, PodcastData } from ".."
+import { EpisodeData } from ".."
 import * as icons from "../Icons"
 import { useNavigate } from "react-router-dom"
 import { useIntersectionObserver } from "@uidotdev/usehooks"
@@ -14,17 +14,20 @@ import { SwitchState } from "./Inputs"
 
 
 
-function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast: PodcastData, play: () => void }) {
-  const [imageSrc, setImageSrc] = useState(episode.coverUrl ?? podcast.coverUrl)
+function EpisodeCard({ episode, play }: { episode: EpisodeData, play: () => void }) {
   const [imageError, setImageError] = useState(false)
-  const navigate = useNavigate()
+
   const { history: { getEpisodeState, updateEpisodeState } } = useDB()
-  const { globals: { locale } } = useSettings()
   const [reprState, setReprState] = useState({ position: 0, total: episode.duration, complete: false })
+
+  const navigate = useNavigate()
+  const { globals: { locale } } = useSettings()
   const [date, setDate] = useState('')
   const contextMenuTarget = useRef<HTMLDivElement>(null)
+
   const [filtered, setFiltered] = useState(false)
-  const podcastSettings = useSettings().getPodcastSettings(podcast.feedUrl)
+  const podcastSettings = useSettings().getPodcastSettings(episode.podcastUrl)
+  
   const [ref, entry] = useIntersectionObserver({
     threshold: 0,
     root: null,
@@ -33,11 +36,6 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
 
   useEffect(() => {
     if (!entry?.isIntersecting) return
-
-    // set cover
-    episode.coverUrl = episode.coverUrl ?? podcast.coverUrl
-    setImageSrc(episode.coverUrl)
-    setImageError(false)
 
     // set print date
     const episodeYear = episode.pubDate.getFullYear()
@@ -62,11 +60,10 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
       }
 
     })
-  }, [entry?.isIntersecting, episode, podcast.coverUrl, getEpisodeState, locale])
+  }, [entry?.isIntersecting, episode, getEpisodeState, locale])
 
   useEffect(() => {
     const xor = (setting: SwitchState, state: boolean) => {
-      console.log(episode.title, setting, state)
       return (setting === SwitchState.True && !state) ||
               (setting === SwitchState.False && state)
     }
@@ -86,7 +83,7 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
           navigate('/episode-preview', {
             state: {
               episode: episode,
-              podcastUrl: podcast.feedUrl
+              podcastUrl: episode.podcastUrl
             }
           })
         }}
@@ -97,13 +94,12 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
             <p className="mb-2 truncate text-xs text-zinc-400">{episode.title}</p>
             <button className="w-full text-left text-sm hover:text-zinc-50"
               onClick={() => {
-                console.log('HEY')
                 if (reprState.complete) {
-                  updateEpisodeState(episode.src, podcast.feedUrl,
+                  updateEpisodeState(episode.src, episode.podcastUrl,
                     0, episode.duration)
                     setReprState({complete: false, position:0, total:episode.duration})
                 } else {
-                  updateEpisodeState(episode.src, podcast.feedUrl,
+                  updateEpisodeState(episode.src, episode.podcastUrl,
                     episode.duration, episode.duration)
                     setReprState({complete: true, position:episode.duration, total:episode.duration})
                 }
@@ -123,7 +119,7 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
                   <img
                     className="rounded-md"
                     alt=""
-                    src={imageSrc}
+                    src={episode.coverUrl}
                     onError={() => setImageError(true)}
                   />
               }
