@@ -17,6 +17,7 @@ export interface EpisodeData {
   pubDate: Date,
   duration: number,
   size: number,
+  podcastUrl: string
   coverUrl?: string,
 }
 

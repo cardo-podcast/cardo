@@ -47,6 +47,8 @@ export async function parseXML(url: string, fileDownloaded = false): Promise<Epi
   const parser = new DOMParser()
   const xml = parser.parseFromString(xmlString, "text/xml")
   const items = xml.querySelectorAll('item')
+  const channel = xml.querySelector('channel')
+  const podcastCover = channel?.querySelector('image')?.querySelector('url')?.textContent ?? ''
 
   const result = Array.from(items).map((item: Element) => {
     const episode: EpisodeData = {
@@ -54,9 +56,10 @@ export async function parseXML(url: string, fileDownloaded = false): Promise<Epi
       description: htmlToText(item.querySelector('description')?.textContent ?? '') ?? item.querySelector('itunes\\:summary')?.textContent,
       src: item.querySelector('enclosure')?.getAttribute('url') ?? '',
       pubDate: new Date(item.querySelector('pubDate')?.textContent ?? 0),
-      coverUrl: item.getElementsByTagNameNS('http://www.itunes.com/dtds/podcast-1.0.dtd', 'image')[0]?.getAttribute('href') ?? undefined,
+      coverUrl: item.getElementsByTagNameNS('http://www.itunes.com/dtds/podcast-1.0.dtd', 'image')[0]?.getAttribute('href') ?? podcastCover,
       duration: strToSeconds(item.getElementsByTagNameNS('http://www.itunes.com/dtds/podcast-1.0.dtd', 'duration')[0]?.textContent || '00:00:00'),
-      size: Number(item.querySelector('enclosure')?.getAttribute('length')) ?? 0
+      size: Number(item.querySelector('enclosure')?.getAttribute('length')) ?? 0,
+      podcastUrl: url
     }
     return episode
   })
