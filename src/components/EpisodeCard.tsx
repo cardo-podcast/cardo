@@ -8,6 +8,7 @@ import { useDB } from "../DB"
 import ProgressBar from "./ProgressBar"
 import { useSettings } from "../Settings"
 import { ContextMenu } from "./ContextMenu"
+import { SwitchState } from "./Inputs"
 
 
 
@@ -22,6 +23,8 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
   const [reprState, setReprState] = useState({ position: 0, total: episode.duration, complete: false })
   const [date, setDate] = useState('')
   const contextMenuTarget = useRef<HTMLDivElement>(null)
+  const [filtered, setFiltered] = useState(false)
+  const podcastSettings = useSettings().getPodcastSettings(podcast.feedUrl)
   const [ref, entry] = useIntersectionObserver({
     threshold: 0,
     root: null,
@@ -61,6 +64,19 @@ function EpisodeCard({ episode, podcast, play }: { episode: EpisodeData, podcast
     })
   }, [entry?.isIntersecting, episode, podcast.coverUrl, getEpisodeState, locale])
 
+  useEffect(() => {
+    const xor = (setting: SwitchState, state: boolean) => {
+      console.log(episode.title, setting, state)
+      return (setting === SwitchState.True && !state) ||
+              (setting === SwitchState.False && state)
+    }
+
+    setFiltered(xor(podcastSettings.filter.played, reprState.complete))
+
+  }, [reprState, podcastSettings.filter.played])
+
+
+  if (filtered) return <></>
 
 
   return (
