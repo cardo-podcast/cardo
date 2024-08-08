@@ -115,7 +115,7 @@ function FilterMenu({podcast}: {podcast: PodcastData}) {
       </button>
       {showMenu &&
         <div className="flex">
-          <Switch state={played} setState={setPlayed} labels={['Played', 'Not played']}/>
+          <Switch state={played} setState={setPlayed} labels={['Not played', 'Played']}/>
         </div>
       }
     </div>
