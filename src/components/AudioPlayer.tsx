@@ -15,15 +15,15 @@ export type AudioPlayerRef = {
 }
 
 
-const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(({className=''}, ref) => {
+const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(({ className = '' }, ref) => {
   const [playing, setPlaying] = useState<EpisodeData>()
   const audioRef = useRef<HTMLAudioElement>(null)
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const {history: {updateEpisodeState, getEpisodeState}} = useDB()
+  const { history: { updateEpisodeState, getEpisodeState } } = useDB()
   const queue = useQueue()
 
-  const play = async(episode?: EpisodeData | undefined) => {
+  const play = async (episode?: EpisodeData | undefined) => {
     if (audioRef.current == null) return
 
     if (episode !== undefined) {
@@ -35,7 +35,7 @@ const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(({className=''}
       const previousState = await getEpisodeState(episode?.src)
 
       if (previousState !== undefined && previousState.position < previousState.total) {
-          audioRef.current.currentTime = previousState.position
+        audioRef.current.currentTime = previousState.position
       }
     }
 
@@ -44,26 +44,26 @@ const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(({className=''}
 
   useImperativeHandle(ref, () => ({
     play: play
-  }), [getEpisodeState])
+  }), [playing])
 
-  useEffect(()=> {
+  useEffect(() => {
     if (audioRef.current == null || playing == null) return
 
     if (audioRef.current.paused && audioRef.current.currentTime > 0) {
       updateEpisodeState(playing.src,
-                          playing.podcastUrl,
-                          audioRef.current.currentTime,
-                          playing.duration
-                        )
+        playing.podcastUrl,
+        audioRef.current.currentTime,
+        playing.duration
+      )
     }
 
   }, [audioRef.current?.paused, updateEpisodeState, playing])
 
   useEffect(() => {
-    if (!playing || !audioRef.current?.ended ) return 
+    if (!playing || !audioRef.current?.ended) return
 
     play(queue.next(playing.src))
-    
+
   }, [audioRef.current?.ended])
 
   useEffect(() => {
@@ -100,32 +100,44 @@ const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(({className=''}
 
 
   return (
-    <div className={`flex flex-col h-[70px] justify-center bg-zinc-950 text-slate-50 p-2 ${audioRef.current?.src? '': 'hidden'} ${className}`}>
-      <div className="flex justify-center">
-
-        <button
-          className="flex items-center focus:outline-none hover: hover:text-amber-600 w-8"
-          onClick={handlePlayPause}
-        >
-          {audioRef.current?.paused? icons.play : icons.pause}
-        </button>
-
-      </div>
-      <div className="flex justify-evenly items-center">
-        <p>{secondsToStr(currentTime)}</p>
-        <input
-          type="range"
-          min="0"
-          max={duration}
-          value={currentTime}
-          onChange={handleSeekChange}
-          className="w-full mx-4 h-1 bg-zinc-300 accent-amber-600"
+    <div className={`flex bg-zinc-950 text-slate-50 p-2 gap-3 ${audioRef.current?.src ? '' : 'hidden'} ${className}`}>
+      {playing &&
+        <img
+          className="bg-zinc-700 h-full aspect-square rounded-md"
+          src={playing.coverUrl}
+          alt=''
         />
-        <p>{secondsToStr(duration)}</p>
+      }
+
+      <div className={`flex flex-col justify-center w-full`}>
+        {playing && <p className="text-sm">{playing.title}</p>}
+        <div className="flex justify-center">
+
+          <button
+            className="flex items-center focus:outline-none hover: hover:text-amber-600 w-8"
+            onClick={handlePlayPause}
+          >
+            {audioRef.current?.paused ? icons.play : icons.pause}
+          </button>
+
+        </div>
+        <div className="flex justify-evenly items-center">
+          <p>{secondsToStr(currentTime)}</p>
+          <input
+            type="range"
+            min="0"
+            max={duration}
+            value={currentTime}
+            onChange={handleSeekChange}
+            className="w-full mx-4 h-1 bg-zinc-300 accent-amber-600"
+          />
+          <p>{secondsToStr(duration)}</p>
         </div>
 
         <audio ref={audioRef} onLoadedMetadata={handleLoadedMetadata} className="hidden" />
+      </div>
     </div>
+
   );
 })
 
