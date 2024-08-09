@@ -7,15 +7,20 @@ import SearchBar from "./components/SearchBar";
 import PodcastPreview from "./pages/PodcastPreview";
 import { DBProvider } from "./DB";
 import EpisodePreview from "./pages/EpisodePreview";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Settings from "./pages/Settings";
 import { EpisodeData } from ".";
 import { SettingsProvider } from "./Settings";
-import QueuePage from "./pages/QueuePage";
-
+import QueuePage, { QueueProvider } from "./pages/QueuePage";
+import { appWindow } from "@tauri-apps/api/window";
 
 const App = () => {
   const playerRef = useRef<AudioPlayerRef>(null)
+  const [isMaximized, setIsMaximized] = useState(false)
+
+  appWindow.onResized(async()=> {
+    setIsMaximized(await appWindow.isMaximized())
+  })
 
   const play = (episode?: EpisodeData | undefined) => {
     if (playerRef.current !== null) {
@@ -31,28 +36,31 @@ const App = () => {
   })
 
   return (
-    <div className="bg-zinc-900 w-full h-screen flex flex-col rounded-2xl border-zinc-600 border-[1px] text-zinc-50 overflow-hidden">
+    <div className={`bg-zinc-900 w-full h-screen flex flex-col border-zinc-600 border-[1px]
+                        text-zinc-50 overflow-hidden ${isMaximized? '' : 'rounded-lg'}`}>
       <SettingsProvider>
         <DBProvider>
-          <TitleBar />
-          <div className="flex justify-start w-full h-full overflow-hidden">
-            <BrowserRouter>
-              <LeftMenu />
-              <div className="flex flex-col w-full h-full">
-                <SearchBar />
-                <div className="flex h-full overflow-y-auto">
-                  <Routes>
-                    <Route path='/' element={<HomePage />} />
-                    <Route path='/preview' element={<PodcastPreview play={play} />} />
-                    <Route path='/episode-preview' element={<EpisodePreview play={play} />} />
-                    <Route path='/settings' element={<Settings />} />
-                    <Route path='/queue' element={<QueuePage />} />
-                  </Routes>
+          <QueueProvider>
+            <TitleBar />
+            <div className="flex justify-start w-full h-full overflow-hidden">
+              <BrowserRouter>
+                <LeftMenu />
+                <div className="flex flex-col w-full h-full">
+                  <SearchBar />
+                  <div className="flex h-full overflow-y-auto">
+                    <Routes>
+                      <Route path='/' element={<HomePage />} />
+                      <Route path='/preview' element={<PodcastPreview play={play} />} />
+                      <Route path='/episode-preview' element={<EpisodePreview play={play} />} />
+                      <Route path='/settings' element={<Settings />} />
+                      <Route path='/queue' element={<QueuePage play={play} />} />
+                    </Routes>
+                  </div>
                 </div>
-                <AudioPlayer ref={playerRef} className="w-full min-h-[70px] flex-shrink-0" />
-              </div>
-            </BrowserRouter>
-          </div>
+              </BrowserRouter>
+            </div>
+            <AudioPlayer ref={playerRef} className="w-full h-28 flex-shrink-0" />
+          </QueueProvider>
         </DBProvider>
       </SettingsProvider>
     </div>

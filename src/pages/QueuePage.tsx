@@ -17,7 +17,7 @@ export default function QueuePage() {
           <Suspense key={i} fallback={<div className="bg-zinc-800 h-20 w-full" />}>
             <EpisodeCard
               episode={episode}
-              play={() => console.log('PLAY FROM QUEUE')}
+              play={() => play(episode)}
             />
           </Suspense>
         ))}
