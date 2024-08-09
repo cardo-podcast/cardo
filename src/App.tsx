@@ -47,7 +47,7 @@ const App = () => {
                       <Route path='/preview' element={<PodcastPreview play={play} />} />
                       <Route path='/episode-preview' element={<EpisodePreview play={play} />} />
                       <Route path='/settings' element={<Settings />} />
-                      <Route path='/queue' element={<QueuePage />} />
+                      <Route path='/queue' element={<QueuePage play={play}/>} />
                     </Routes>
                   </div>
                   <AudioPlayer ref={playerRef} className="w-full min-h-[70px] flex-shrink-0" />
