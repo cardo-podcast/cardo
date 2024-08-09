@@ -3,6 +3,7 @@ import { secondsToStr } from "../utils";
 import * as icons from "../Icons"
 import { EpisodeData } from "..";
 import { useDB } from "../DB";
+import { useQueue } from "../pages/QueuePage"
 
 
 interface AudioPlayerProps {
@@ -20,27 +21,29 @@ const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(({className=''}
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const {history: {updateEpisodeState, getEpisodeState}} = useDB()
+  const queue = useQueue()
 
+  const play = async(episode?: EpisodeData | undefined) => {
+    if (audioRef.current == null) return
+
+    if (episode !== undefined) {
+      setPlaying(episode)
+
+      audioRef.current.src = episode.src
+      audioRef.current.load()
+
+      const previousState = await getEpisodeState(episode?.src)
+
+      if (previousState !== undefined && previousState.position < previousState.total) {
+          audioRef.current.currentTime = previousState.position
+      }
+    }
+
+    audioRef.current.play()
+  }
 
   useImperativeHandle(ref, () => ({
-    play: async(episode?: EpisodeData | undefined) => {
-      if (audioRef.current == null) return
-  
-      if (episode !== undefined) {
-        setPlaying(episode)
-  
-        audioRef.current.src = episode.src
-        audioRef.current.load()
-
-        const previousState = await getEpisodeState(episode?.src)
-
-        if (previousState !== undefined && previousState.position < previousState.total) {
-            audioRef.current.currentTime = previousState.position
-        }
-      }
-  
-      audioRef.current.play()
-    }
+    play: play
   }), [getEpisodeState])
 
   useEffect(()=> {
@@ -55,6 +58,13 @@ const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(({className=''}
     }
 
   }, [audioRef.current?.paused, updateEpisodeState, playing])
+
+  useEffect(() => {
+    if (!playing || !audioRef.current?.ended ) return 
+
+    play(queue.next(playing.src))
+    
+  }, [audioRef.current?.ended])
 
   useEffect(() => {
     if (audioRef.current) {

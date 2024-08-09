@@ -1,11 +1,51 @@
-import { createContext, ReactNode, Suspense, useContext, useState } from "react"
+import { createContext, ReactNode, Suspense, useContext, useEffect, useRef, useState } from "react"
 import { EpisodeData } from ".."
 import EpisodeCard from "../components/EpisodeCard"
+import { appDataDir, join } from "@tauri-apps/api/path"
+import { exists, readTextFile, writeTextFile } from "@tauri-apps/api/fs"
 
 export type Queue = ReturnType<typeof initQueue>
 
 function initQueue() {
   const [queue, setQueue] = useState<EpisodeData[]>([])
+  const filePath = useRef('')
+
+  useEffect(() => {
+    load()
+  }, [])
+
+  useEffect(() => {
+    save()
+  }, [queue])
+
+  const load = async () => {
+    if (filePath.current) return
+
+    filePath.current = await join(
+      await appDataDir(),
+      'queue.json'
+    )
+
+    if (!await exists(filePath.current)) {
+      return // if no file don't update the queue
+    }
+
+    const loadedQueue = JSON.parse(await readTextFile(filePath.current))
+
+    setQueue(loadedQueue.map((episode: EpisodeData) => ({
+      ...episode,
+      pubDate: new Date(episode.pubDate)
+    })))
+  }
+
+  const save = async () => {
+    if (!filePath.current) return
+
+    await writeTextFile(
+      filePath.current,
+      JSON.stringify(queue)
+    )
+  }
 
   const add = (item: EpisodeData) => {
     setQueue([...queue, item])
@@ -18,13 +58,14 @@ function initQueue() {
     setQueue(newQueue)
   }
 
-  const next = () => {
-    const newQueue = queue.slice(1)
-    setQueue(newQueue)
-    return newQueue[0]
+  const next = (playingUrl: string) => {
+    const nextIndex = queue.findIndex(episode => episode.src == playingUrl) + 1
+
+
+    return queue[nextIndex]
   }
 
-  return { queue, setQueue, add, remove, next }
+  return { queue, setQueue, add, remove, next, save }
 }
 
 const QueueContext = createContext<Queue | undefined>(undefined)
@@ -42,7 +83,7 @@ export function QueueProvider({ children }: { children: ReactNode }) {
   )
 }
 
-export default function QueuePage() {
+export default function QueuePage({ play }: { play: (episode?: EpisodeData) => void }) {
   const queue = useQueue()
 
 
@@ -56,7 +97,7 @@ export default function QueuePage() {
           <Suspense key={i} fallback={<div className="bg-zinc-800 h-20 w-full" />}>
             <EpisodeCard
               episode={episode}
-              play={() => console.log('PLAY FROM QUEUE')}
+              play={() => play(episode)}
             />
           </Suspense>
         ))}
