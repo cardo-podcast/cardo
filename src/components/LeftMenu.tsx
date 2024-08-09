@@ -7,33 +7,36 @@ function LeftMenu() {
   const navigate = useNavigate()
 
   return (
-    <div className="bg-zinc-800 w-56 h-full flex flex-col rounded-md p-2">
-      <Link to='/'>
-        HOME
-      </Link>
-      <Link to='/settings'>
-        SETTINGS
-      </Link>
-      <Link to='/queue'>
-        QUEUE
-      </Link>
-      <div className="grid gap-1">
+    <div className="bg-zinc-800 w-56 h-full flex flex-col rounded-md p-2 gap-6">
+      <div className="flex flex-col gap-1">
+        <Link to='/'>
+          HOME
+        </Link>
+        <Link to='/settings'>
+          SETTINGS
+        </Link>
+        <Link to='/queue'>
+          QUEUE
+        </Link>
+      </div>
+
+      <div className="flex flex-col gap-1 overflow-y-auto">
         {
           subscriptions.subscriptions.map((fav, i) => {
             return (
               <div key={i} className="bg-zinc-600 p-1 rounded-md flex gap-2 justify-between cursor-pointer hover:bg-zinc-500"
-              onClick={()=>navigate('/preview', {
-                state: {
-                  podcast: fav
-                }
-              })}
+                onClick={() => navigate('/preview', {
+                  state: {
+                    podcast: fav
+                  }
+                })}
               >
                 <img
                   className="bg-zinc-700 h-10 aspect-square rounded-md"
                   src={fav.coverUrl}
                   alt=''
-                  />
-                <p className="text-right text-sm">{fav.podcastName}</p>
+                />
+                <p className=" h-10 text-sm w-full truncate">{fav.podcastName}</p>
               </div>
             )
           }
