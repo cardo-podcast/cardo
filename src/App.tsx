@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import Settings from "./pages/Settings";
 import { EpisodeData } from ".";
 import { SettingsProvider } from "./Settings";
-import QueuePage, { QueueProvider } from "./pages/QueuePage";
+import QueuePage from "./pages/QueuePage";
 import { appWindow } from "@tauri-apps/api/window";
 
 const App = () => {
@@ -40,7 +40,6 @@ const App = () => {
                         text-zinc-50 overflow-hidden ${isMaximized? '' : 'rounded-lg'}`}>
       <SettingsProvider>
         <DBProvider>
-          <QueueProvider>
             <TitleBar />
             <div className="flex justify-start w-full h-full overflow-hidden">
               <BrowserRouter>
@@ -60,7 +59,6 @@ const App = () => {
               </BrowserRouter>
             </div>
             <AudioPlayer ref={playerRef} className="w-full h-28 flex-shrink-0" />
-          </QueueProvider>
         </DBProvider>
       </SettingsProvider>
     </div>

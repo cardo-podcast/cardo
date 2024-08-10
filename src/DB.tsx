@@ -153,120 +153,121 @@ const setLastSync = async (timestamp: number) => {
 export type Queue = ReturnType<typeof initQueue>
 
 function initQueue() {
-  const [queue, setQueue] = useState<EpisodeData[]>([])
+  const [queue, setQueue] = useState<EpisodeData[]>([]) // list of queue sqlite id's
 
-  const render = async() => {
-    const rows = await getAll()
+  useEffect(() => {
+    updateOrder(queue.map(episode => episode.id || 0 ))
+  }, [queue])
 
-    setQueue(rows.map(row => ({
-      ...row,
-      pubDate: new Date(row.pubDate)
-    })
+  const load = async() => {
+    // load queue from sqlite db
+    const loadedQueue = await getAll()
+    console.log(loadedQueue)
+    const order = await readOrder()
 
-    )
-  )
+    loadedQueue.sort((a, b) => order.indexOf(a.id || 0) - order.indexOf(b.id || 0))
+
+    console.log(loadedQueue)
+
+    setQueue(loadedQueue.map(episode => ({
+      ...episode,
+      pubDate: new Date(episode.pubDate)
+    })))
   }
 
-  const orderPositions = async () => {
-    // orders elements in queue from 1 to lenght without gaps
+  const readOrder = async(): Promise<number[]> => {
+    const query: { value: string }[] = await db.select(`
+      SELECT value FROM misc
+      WHERE description = 'queueOrder'
+      `)
+
+      return query.length > 0 ? JSON.parse(query[0].value) : []
+  }
+
+  const updateOrder = async (newOrder: number[]) => {
     await db.execute(`
-              WITH NumberedRows AS (
-                    SELECT
-                        id,
-                        ROW_NUMBER() OVER (ORDER BY queuePosition) AS row_num
-                    FROM
-                        queue
-                )
-              UPDATE queue
-              SET queuePosition = (
-                  SELECT row_num
-                  FROM NumberedRows
-                  WHERE NumberedRows.id = queue.id
-              );`)
+      -- Try to update
+      UPDATE misc
+      SET value = $1
+      WHERE description = 'queueOrder';
+
+      -- If not exist insert the row
+      INSERT INTO misc (description, value)
+      SELECT 'queueOrder', $1
+      WHERE NOT EXISTS (SELECT 1 FROM misc WHERE description = 'queueOrder');
+      `, [JSON.stringify(newOrder)])
   }
-  
-  const add = async (episode: EpisodeData, order: number = 0) => {
-    /*
-      order:
-        0: first on queue
-        -1: last on queue
-    */
-  
-    let queuePosition: number;
-  
-    const queueLenght: number[] = await db.select(
-      "SELECT MAX(queuePosition) FROM queue") // [queueLenght]
-  
-    if (order < 0) {
-  
-      queuePosition = queueLenght[0] + 2 - order // -1 is last element, -2...
-    } else if (order === 0) {
-      queuePosition = 0
-    } else {
-      queuePosition = order - 0.5 // if this order has already an element this element is inserted before
+
+  const unshift = async (episode: EpisodeData) => {
+    const id = await insertOnDb(episode)
+
+    if (id !== undefined) { // episode appended to queue
+      setQueue([{...episode, id: id}, ...queue])
     }
-  
-    if (queuePosition < 0 || queuePosition > queueLenght[0] + 1) {
-      throw new Error(`Error in queue position, ${queuePosition} is not between ${0} and ${queueLenght[0]}`)
+  }
+
+  const push = async (episode: EpisodeData) => {
+    const id = await insertOnDb(episode)
+
+    if (id !== undefined) { // episode appended to queue
+      setQueue([...queue, {...episode, id: id}])
     }
-  
-    await db.execute(
-      "INSERT into queue (queuePosition, title, description, src, pubDate, duration, size, podcastUrl, coverUrl) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-      [queuePosition, episode.title, episode.description, episode.src, episode.pubDate.getTime(), episode.duration, episode.size, episode.podcastUrl, episode.coverUrl || ''],
+  }
+
+  const insertOnDb = async (episode: EpisodeData): Promise<number | undefined> => {
+    // returns id in sql table if item is appended
+
+    if (includes(episode.src)) {
+      // only add episode if not is in queue yet
+      return
+    }
+
+    const query = await db.execute(
+      "INSERT into queue (title, description, src, pubDate, duration, size, podcastUrl, coverUrl) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+      [episode.title, episode.description, episode.src, episode.pubDate.getTime(), episode.duration, episode.size, episode.podcastUrl, episode.coverUrl || ''],
     );
 
-    await orderPositions()
-    await render()
+    return query.lastInsertId
   }
-  
-  const get = async (episodeSrc: string): Promise<EpisodeData | undefined> => {
-    const r: EpisodeData[] = await db.select(
-      "SELECT * from queue WHERE src = $1", [episodeSrc]
+
+  const indexOf = (episodeSrc: string) => {
+    return queue.findIndex(episode => episode.src == episodeSrc)
+  }
+
+  const includes = (episodeSrc: string) => {
+    return indexOf(episodeSrc) > 1
+  }
+
+
+  const next = (episode: EpisodeData) => {
+    const nextIndex = queue.findIndex(ep => ep.id == episode.id) + 1
+    return queue[nextIndex]
+  }
+
+  const remove = async (episodeSrc: string) => {
+    // delete from queue
+    const newQueue = [...queue]
+    newQueue.splice(indexOf(episodeSrc))
+
+    setQueue(
+      newQueue
     )
-    if (r.length > 0) {
-      return r[0]
-    }
-  }
-  
-  const remove = async (episodeSrc: string): Promise<QueryResult | undefined> => {
-    const r = await db.execute(
+
+    await db.execute(
       "DELETE FROM queue WHERE src = $1",
       [episodeSrc],
     )
-    await render()
-    return r
   }
-  
+
   const getAll = async (): Promise<EpisodeData[]> => {
     const r: EpisodeData[] = await db.select(
-      "SELECT * from queue ORDER BY queuePosition")
-  
-    return r
-  }
-
-  const reorder = async(from: number, to: number) => {
-    await db.execute(`
-      UPDATE queue
-      SET queuePosition = $2
-      WHERE queuePosition = $1
-      `, [from, to-0.5])
-
-      await orderPositions()
-      await render()
-    
-  }
-
-  const getNext = async(actualSrc: string) => {
-    const r: EpisodeData[] = await db.select(
-      `SELECT * from queue WHERE queuePosition > (
-          SELECT queuePosition FROM queue
-          WHERE src = $1
-      )`, [actualSrc]
-    )
+      "SELECT * from queue")
 
     return r
   }
-  return { queue, add, remove, getNext, reorder, get, render }
+
+
+  return { queue, load, includes, push, unshift, remove, next }
 }
 
 // #endregion
@@ -308,7 +309,7 @@ function initDB() {
   useEffect(() => {
     if (!dbLoaded) return
 
-    queue.render()
+    queue.load()
 
     getSubscriptions().then(r => {
       setSubscriptionsList(r)

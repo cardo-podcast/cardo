@@ -29,7 +29,7 @@ function EpisodeCard({ episode, play }: { episode: EpisodeData, play: () => void
   const podcastSettings = useSettings().getPodcastSettings(episode.podcastUrl)
 
   const {queue} = useDB()
-  const [inQueue, setInqueue] = useState(queue.queue.map(ep => ep.src).includes(episode.src))
+  const [inQueue, setInqueue] = useState(queue.includes(episode.src))
 
   
   const [ref, entry] = useIntersectionObserver({
@@ -117,7 +117,7 @@ function EpisodeCard({ episode, play }: { episode: EpisodeData, play: () => void
                 await queue.remove(episode.src)
                 setInqueue(false)
               } else {
-                await queue.add(episode)
+                await queue.push(episode)
                 setInqueue(true)
               }
             }}
