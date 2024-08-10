@@ -50,6 +50,20 @@ export async function parseXML(url: string, fileDownloaded = false): Promise<Epi
   const channel = xml.querySelector('channel')
   const podcastCover = channel?.querySelector('image')?.querySelector('url')?.textContent ?? ''
 
+  const parseDuration = (duration: string | null): number => {
+    if (!duration) return 0
+
+    const durationNumber = Number(duration)
+    
+    if (Number.isNaN(durationNumber)) {
+      // format comes in '00:00:00'
+      return strToSeconds(duration)
+    } else {
+      // format comes in seconds
+      return durationNumber
+    }
+  }
+
   const result = Array.from(items).map((item: Element) => {
     const episode: EpisodeData = {
       title: item.querySelector('title')?.textContent ?? '',
@@ -57,7 +71,7 @@ export async function parseXML(url: string, fileDownloaded = false): Promise<Epi
       src: item.querySelector('enclosure')?.getAttribute('url') ?? '',
       pubDate: new Date(item.querySelector('pubDate')?.textContent ?? 0),
       coverUrl: item.getElementsByTagNameNS('http://www.itunes.com/dtds/podcast-1.0.dtd', 'image')[0]?.getAttribute('href') ?? podcastCover,
-      duration: strToSeconds(item.getElementsByTagNameNS('http://www.itunes.com/dtds/podcast-1.0.dtd', 'duration')[0]?.textContent || '00:00:00'),
+      duration: parseDuration(item.getElementsByTagNameNS('http://www.itunes.com/dtds/podcast-1.0.dtd', 'duration')[0]?.textContent),
       size: Number(item.querySelector('enclosure')?.getAttribute('length')) ?? 0,
       podcastUrl: url
     }
