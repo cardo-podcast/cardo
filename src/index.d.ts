@@ -19,6 +19,7 @@ export interface EpisodeData {
   size: number,
   podcastUrl: string
   coverUrl?: string,
+  id?: number
 }
 
 export interface EpisodeState {

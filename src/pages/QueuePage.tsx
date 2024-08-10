@@ -1,9 +1,10 @@
 import { Suspense } from "react"
 import EpisodeCard from "../components/EpisodeCard"
 import { useDB } from "../DB"
+import { EpisodeData } from ".."
 
 
-export default function QueuePage() {
+export default function QueuePage({ play }: { play: (episode?: EpisodeData) => void }) {
   const { queue } = useDB()
 
 
@@ -13,13 +14,15 @@ export default function QueuePage() {
         <h1>QUEUE</h1>
       </div>
       <div className="grid gap-1 content-start">
-        {queue.queue.map((episode, i) => (
-          <Suspense key={i} fallback={<div className="bg-zinc-800 h-20 w-full" />}>
-            <EpisodeCard
-              episode={episode}
-              play={() => play(episode)}
-            />
-          </Suspense>
+        {queue.queue.map(episode => (
+          <div key={episode.id}>
+            <Suspense fallback={<div className="bg-zinc-800 h-20 w-full" />}>
+              <EpisodeCard
+                episode={episode}
+                play={() => play(episode)}
+              />
+            </Suspense>
+          </div>
         ))}
       </div>
     </div>

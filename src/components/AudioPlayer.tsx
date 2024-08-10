@@ -3,7 +3,6 @@ import { secondsToStr } from "../utils";
 import * as icons from "../Icons"
 import { EpisodeData } from "..";
 import { useDB } from "../DB";
-import { useQueue } from "../pages/QueuePage"
 
 
 interface AudioPlayerProps {
@@ -20,8 +19,7 @@ const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(({ className = 
   const audioRef = useRef<HTMLAudioElement>(null)
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const { history: { updateEpisodeState, getEpisodeState } } = useDB()
-  const queue = useQueue()
+  const { history: { updateEpisodeState, getEpisodeState }, queue } = useDB()
 
   const play = async (episode?: EpisodeData | undefined) => {
     if (audioRef.current == null) return
@@ -62,7 +60,7 @@ const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(({ className = 
   useEffect(() => {
     if (!playing || !audioRef.current?.ended) return
 
-    play(queue.next(playing.src))
+    play(queue.next(playing))
 
   }, [audioRef.current?.ended])
 

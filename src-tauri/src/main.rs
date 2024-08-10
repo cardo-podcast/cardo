@@ -106,7 +106,6 @@ fn main() {
             version: 4,
             description: "queue",
             sql: "CREATE TABLE queue (id INTEGER PRIMARY KEY,
-                                        queuePosition INTEGER,
                                         title TEXT,
                                         description TEXT,
                                         src TEXT,
