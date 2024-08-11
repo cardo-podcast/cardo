@@ -7,6 +7,7 @@ import EpisodeCard from "../components/EpisodeCard";
 import { useDB } from "../DB";
 import { Switch } from "../components/Inputs";
 import { usePodcastSettings } from "../Settings";
+import { useTranslation } from "react-i18next";
 
 
 function FavoriteButton({ podcast, subscribed, setSubscribed }: { podcast: PodcastData, subscribed: boolean, setSubscribed: Dispatch<SetStateAction<boolean>> }) {
@@ -54,7 +55,7 @@ function SortButton({ criterion, globalCriterion, setGlobalCriterion, children }
         })
       }
     }}
-      className={`flex items-center gap-[2px] px-1 text-sm rounded-md hover:bg-zinc-600 ${globalCriterion.criterion === criterion && 'text-amber-500'}`}
+      className={`flex items-center uppercase gap-[2px] px-1 text-sm rounded-md hover:bg-zinc-600 ${globalCriterion.criterion === criterion && 'text-amber-500'}`}
     >
       {children}
       <div className="w-4 h-4 justify-center flex">
@@ -68,6 +69,7 @@ function SortButton({ criterion, globalCriterion, setGlobalCriterion, children }
 function SortMenu({ criterion, setSortCriterion }:
   { criterion: SortCriterion, setSortCriterion: Dispatch<SetStateAction<SortCriterion>> }) {
   const [showMenu, setShowMenu] = useState(false)
+  const { t } = useTranslation();
 
   return (
     <div className={`flex justify-center gap-2 rounded-md ${showMenu && 'bg-zinc-700'}`}>
@@ -77,10 +79,10 @@ function SortMenu({ criterion, setSortCriterion }:
       {showMenu &&
         <div className="flex">
           <SortButton criterion="date" globalCriterion={criterion} setGlobalCriterion={setSortCriterion}>
-            DATE
+            {t('date')}
           </SortButton>
           <SortButton criterion="duration" globalCriterion={criterion} setGlobalCriterion={setSortCriterion}>
-            DURATION
+            {t('duration')}
           </SortButton>
         </div>
       }
@@ -93,6 +95,7 @@ function FilterMenu({podcast}: {podcast: PodcastData}) {
   const [showMenu, setShowMenu] = useState(false)
   const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcast.feedUrl)
   const [played, setPlayed] = useState(podcastSettings.filter.played)
+  const { t } = useTranslation();
 
 
   useEffect(() => {
@@ -107,7 +110,7 @@ function FilterMenu({podcast}: {podcast: PodcastData}) {
       </button>
       {showMenu &&
         <div className="flex">
-          <Switch state={played} setState={setPlayed} labels={['Not played', 'Played']}/>
+          <Switch state={played} setState={setPlayed} labels={[t('not_played'), t('played')]}/>
         </div>
       }
     </div>
@@ -124,6 +127,7 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
   const { subscriptions: { getSubscription } } = useDB()
   const [sortCriterion, setSortCriterion] = useState<SortCriterion>({ criterion: 'date', mode: 'desc' })
   const [podcastSettings, ] = usePodcastSettings(podcast.feedUrl)
+  
 
   const sortEpisodes = useCallback((unsortedEpisodes = episodes): EpisodeData[] => {
     const applyMode = (a: any, b: any) => {

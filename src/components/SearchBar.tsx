@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { SearchPodcast } from "../SearchAPI/base";
 import { PodcastData } from "..";
 import PodcastCard from "./PodcastCard";
+import { useTranslation } from "react-i18next";
 
 
 function SearchBar () {
@@ -9,6 +10,7 @@ function SearchBar () {
   const timeout = useRef(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
+  const {t} = useTranslation()
 
   const searchOnline = async(term: string) => {
     return await SearchPodcast(term)
@@ -55,7 +57,7 @@ function SearchBar () {
       <input
       ref={inputRef}
         type="text"
-        placeholder="Search a podcast..."
+        placeholder={t('search_placeholder')}
         className="py-1 px-2 bg-zinc-600 w-full rounded-md focus:outline-none"
         onChange={(event) => {handleChange(event.target.value)}}
         onKeyDown={e => {

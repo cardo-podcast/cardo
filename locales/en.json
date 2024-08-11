@@ -1,0 +1,14 @@
+{
+    "home": "home",
+    "settings": "settings",
+    "queue": "queue",
+    "search_placeholder": "Search a podcast...",
+    "played": "played",
+    "not_played": "not played",
+    "mark_played": "mark as played",
+    "mark_not_played": "mark as not played",
+    "remove_queue": "Remove from Queue",
+    "add_queue": "Add to queue",
+    "date": "date",
+    "duration": "duration"
+}

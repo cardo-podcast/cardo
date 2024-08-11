@@ -11,6 +11,7 @@ import { ContextMenu } from "./ContextMenu"
 import { SwitchState } from "./Inputs"
 import {useSortable} from '@dnd-kit/sortable';
 import {CSS} from '@dnd-kit/utilities';
+import { useTranslation } from "react-i18next"
 
 export function SortEpisodeGrip({id, children}: {id: number, children: ReactNode}) {
   const {
@@ -56,6 +57,8 @@ function EpisodeCard({ episode, play, className='', noLazyLoad=false, filter=und
 
   const {queue} = useDB()
   const [inQueue, setInqueue] = useState(queue.includes(episode.src))
+
+  const { t } = useTranslation();
 
   
   const [ref, entry] = useIntersectionObserver({
@@ -117,7 +120,7 @@ function EpisodeCard({ episode, play, className='', noLazyLoad=false, filter=und
         }}
       >
         <ContextMenu target={contextMenuTarget}>
-          <div className="bg-zinc-700 max-w-60 text-zinc-300 p-2 rounded-md">
+          <div className="bg-zinc-700 max-w-60 text-zinc-300 p-2 rounded-md uppercase">
             <p className="mb-2 truncate text-xs text-zinc-400">{episode.title}</p>
             <button className="w-full text-left text-sm hover:text-zinc-50"
               onClick={() => {
@@ -132,7 +135,7 @@ function EpisodeCard({ episode, play, className='', noLazyLoad=false, filter=und
                 }
               }
               }>
-              Mark as {reprState.complete ? 'not played' : 'played'}
+              {t(reprState.complete ? 'mark_not_played' : 'mark_played')}
             </button>
             <button className="w-full text-left text-sm hover:text-zinc-50"
             onClick={async()=>{
@@ -145,7 +148,7 @@ function EpisodeCard({ episode, play, className='', noLazyLoad=false, filter=und
               }
             }}
             >
-              {inQueue ? 'Remove from Queue' : 'Add to queue'}
+              {t(inQueue ? 'remove_queue' : 'add_queue')}
             </button>
           </div>
         </ContextMenu>

@@ -1,9 +1,10 @@
 import { os } from "@tauri-apps/api"
-import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useRef, useState } from "react"
+import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react"
 import { appConfigDir, join } from "@tauri-apps/api/path"
-import { exists, readTextFile, writeTextFile } from "@tauri-apps/api/fs"
+import { readTextFile, writeTextFile } from "@tauri-apps/api/fs"
 import { Settings } from "."
 import { SwitchState } from "./components/Inputs"
+import i18next from "i18next"
 
 
 export class FilterCriterion {
@@ -46,7 +47,6 @@ export function usePodcastSettings(feedUrl: string): [PodcastSettings, typeof up
     setPodcastSettingsState(readSettings())
   }, [settings])
 
-
   const updatePodcastSettings = (newPodcastSettings: any) => {
     const newSettings = {...settings}
 
@@ -69,10 +69,14 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   let settingsFile = useRef('');
 
   const [settings, setSettings] = useState<Settings>({
-    globals: {locale: 'en-US'},
+    globals: {locale: 'en-US', language: 'en'},
     podcasts: {}
   })
   
+  useEffect(() => {
+    i18next.changeLanguage(settings.globals.language)
+  }, [settings.globals.language])
+
   const [loaded, setLoaded] = useState(false)
 
   const updateSettings = (newSettings: any) => {
@@ -101,7 +105,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   const setOSInfo = async() => {
     const locale: string = await os.locale() || 'en-US'
-    updateSettings({globals: {...settings.globals, locale: locale}})
+
+    settings.globals.locale = locale
+    settings.globals.language = locale.split('-')[0]
+
+    updateSettings(settings)
   }
 
   const init = async() => {

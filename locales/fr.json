@@ -1,0 +1,14 @@
+{
+  "home": "maison",
+  "settings": "param\u00e8tres",
+  "queue": "file d'attente",
+  "search_placeholder": "Rechercher un podcast...",
+  "played": "jou\u00e9",
+  "not_played": "pas jou\u00e9",
+  "mark_played": "marquer comme jou\u00e9",
+  "mark_not_played": "marquer comme non jou\u00e9",
+  "remove_queue": "Supprimer de la file d'attente",
+  "add_queue": "Ajouter \u00e0 la file d'attente",
+  "date": "date",
+  "duration": "dur\u00e9e"
+}
