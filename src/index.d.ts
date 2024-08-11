@@ -39,9 +39,5 @@ export interface Settings {
   }
   podcasts: {
     [feedUrl: string] : PodcastSettings
-  },
-
-  // methods
-  getPodcastSettings: (feedUrl: string) => PodcastSettings
-  setPodcastSettings: (feedUrl: string, podcastSettings: PodcastSettings) => void
+  }
 }
