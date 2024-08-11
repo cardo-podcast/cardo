@@ -50,11 +50,9 @@ function EpisodeCard({ episode, play, className='', noLazyLoad=false, filter=und
   const [reprState, setReprState] = useState({ position: 0, total: episode.duration, complete: false })
 
   const navigate = useNavigate()
-  const { globals: { locale } } = useSettings()
+  const [{ globals: { locale } },] = useSettings()
   const [date, setDate] = useState('')
   const contextMenuTarget = useRef<HTMLDivElement>(null)
-
-  const [filtered, setFiltered] = useState(false)
 
   const {queue} = useDB()
   const [inQueue, setInqueue] = useState(queue.includes(episode.src))
@@ -95,20 +93,14 @@ function EpisodeCard({ episode, play, className='', noLazyLoad=false, filter=und
     })
   }, [entry?.isIntersecting, noLazyLoad, episode, getEpisodeState, locale])
 
-  useEffect(() => {
-    if (filter === undefined) return
 
-    const xor = (setting: SwitchState, state: boolean) => {
-      return (setting === SwitchState.True && !state) ||
-              (setting === SwitchState.False && state)
-    }
-
-    setFiltered(xor(filter.played, reprState.complete))
-
-  }, [reprState, filter])
+  const xor = (setting: SwitchState, state: boolean) => {
+    return (setting === SwitchState.True && !state) ||
+            (setting === SwitchState.False && state)
+  }
 
 
-  if (filtered) return <></>
+  if (entry?.isIntersecting && filter && xor(filter.played, reprState.complete)) return <></>
 
 
   return (
