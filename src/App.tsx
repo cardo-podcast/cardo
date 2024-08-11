@@ -14,6 +14,7 @@ import { SettingsProvider } from "./Settings";
 import QueuePage from "./pages/QueuePage";
 import { appWindow } from "@tauri-apps/api/window";
 
+
 const App = () => {
   const playerRef = useRef<AudioPlayerRef>(null)
   const [isMaximized, setIsMaximized] = useState(false)

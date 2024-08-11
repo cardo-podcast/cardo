@@ -1,22 +1,23 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useDB } from "../DB";
-
+import { useTranslation } from "react-i18next";
 
 function LeftMenu() {
   const { subscriptions } = useDB()
   const navigate = useNavigate()
+  const { t } = useTranslation();
 
   return (
     <div className="bg-zinc-800 w-56 h-full flex flex-col rounded-md p-2 gap-6">
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 uppercase">
         <Link to='/'>
-          HOME
+          {t('home')}
         </Link>
         <Link to='/settings'>
-          SETTINGS
+          {t('settings')}
         </Link>
         <Link to='/queue'>
-          QUEUE
+          {t('queue')}
         </Link>
       </div>
 

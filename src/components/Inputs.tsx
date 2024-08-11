@@ -14,7 +14,7 @@ export function Switch({ state, setState, labels}: { state: SwitchState,
                                                       }) {
 
   return (
-    <div className="flex gap-2 items-center">
+    <div className="flex gap-2 items-center uppercase text-sm">
       <p>{labels[0]}</p>
       <div className="bg-zinc-300 h-5 rounded-md overflow-hidden flex">
         <input type="radio" name="toggle" checked={state === SwitchState.False} onChange={() => setState(SwitchState.False)}

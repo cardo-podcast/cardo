@@ -1,0 +1,14 @@
+{
+  "home": "inicio",
+  "settings": "ajustes",
+  "queue": "cola",
+  "search_placeholder": "Buscar un podcast...",
+  "played": "jug\u00f3",
+  "not_played": "no reproducido",
+  "mark_played": "Marcar como reproducido",
+  "mark_not_played": "Marcar como no reproducido",
+  "remove_queue": "Quitar de la cola",
+  "add_queue": "A\u00f1adir a la cola",
+  "date": "fecha",
+  "duration": "duraci\u00f3n"
+}

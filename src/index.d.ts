@@ -35,7 +35,8 @@ export interface EpisodeState {
 
 export interface Settings {
   globals: {
-    locale: string
+    locale: string,
+    language: string
   }
   podcasts: {
     [feedUrl: string] : PodcastSettings
