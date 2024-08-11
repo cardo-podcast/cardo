@@ -156,18 +156,15 @@ function initQueue() {
   const [queue, setQueue] = useState<EpisodeData[]>([]) // list of queue sqlite id's
 
   useEffect(() => {
-    updateOrder(queue.map(episode => episode.id || 0 ))
+    updateOrder(queue.map(episode => episode.id))
   }, [queue])
 
   const load = async() => {
     // load queue from sqlite db
     const loadedQueue = await getAll()
-    console.log(loadedQueue)
     const order = await readOrder()
 
-    loadedQueue.sort((a, b) => order.indexOf(a.id || 0) - order.indexOf(b.id || 0))
-
-    console.log(loadedQueue)
+    loadedQueue.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id))
 
     setQueue(loadedQueue.map(episode => ({
       ...episode,
@@ -266,8 +263,18 @@ function initQueue() {
     return r
   }
 
+  const move = (from: number, to: number) => {
 
-  return { queue, load, includes, push, unshift, remove, next }
+    const newQueue = [...queue]
+    const fromElement = newQueue.splice(from, 1)
+
+    newQueue.splice(to, 0, fromElement[0])
+
+    setQueue(newQueue)
+  }
+
+
+  return { queue, load, includes, push, unshift, remove, next, move }
 }
 
 // #endregion

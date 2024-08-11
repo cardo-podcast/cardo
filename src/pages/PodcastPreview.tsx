@@ -131,6 +131,7 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
   const [subscribed, setSubscribed] = useState(false)
   const { subscriptions: { getSubscription } } = useDB()
   const [sortCriterion, setSortCriterion] = useState<SortCriterion>({ criterion: 'date', mode: 'desc' })
+  const podcastSettings = useSettings().getPodcastSettings(podcast.feedUrl)
 
 
   const sortEpisodes = useCallback((unsortedEpisodes = episodes): EpisodeData[] => {
@@ -220,6 +221,8 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
             <EpisodeCard
               episode={episode}
               play={() => play !== undefined && play(episode)}
+              className="hover:bg-zinc-800 rounded-md"
+              filter={podcastSettings.filter}
             />
           </Suspense>
         ))}
