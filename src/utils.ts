@@ -64,8 +64,9 @@ export async function parseXML(url: string, fileDownloaded = false): Promise<Epi
     }
   }
 
-  const result = Array.from(items).map((item: Element) => {
+  const result = Array.from(items).map((item: Element, i) => {
     const episode: EpisodeData = {
+      id: i, //
       title: item.querySelector('title')?.textContent ?? '',
       description: htmlToText(item.querySelector('description')?.textContent ?? '') ?? item.querySelector('itunes\\:summary')?.textContent,
       src: item.querySelector('enclosure')?.getAttribute('url') ?? '',

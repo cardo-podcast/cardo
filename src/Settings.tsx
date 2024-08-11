@@ -81,7 +81,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   const setOSInfo = async() => {
     const locale: string = await os.locale() || 'en-US'
-    setSettings({...settings, globals: {...settings.globals, locale: locale}})
+    updateSettings({...settings, globals: {...settings.globals, locale: locale}})
   }
 
   const init = async() => {
@@ -89,11 +89,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     const settingsDir = await appConfigDir()
     settingsFile = await join(settingsDir, 'config.json')
 
-    // read settings from file
-    await updateSettings(await readSettingsFromFile())
-
     // reload os info
     await setOSInfo()
+
+    // read settings from file
+    await updateSettings(await readSettingsFromFile())
   }
 
   useEffect(()=>{

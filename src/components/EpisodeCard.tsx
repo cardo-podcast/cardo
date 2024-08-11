@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { ReactNode, useEffect, useRef, useState } from "react"
 import { EpisodeData } from ".."
 import * as icons from "../Icons"
 import { useNavigate } from "react-router-dom"
@@ -6,15 +6,44 @@ import { useIntersectionObserver } from "@uidotdev/usehooks"
 import { secondsToStr } from "../utils"
 import { useDB } from "../DB"
 import ProgressBar from "./ProgressBar"
-import { useSettings } from "../Settings"
+import { FilterCriterion, useSettings } from "../Settings"
 import { ContextMenu } from "./ContextMenu"
 import { SwitchState } from "./Inputs"
+import {useSortable} from '@dnd-kit/sortable';
+import {CSS} from '@dnd-kit/utilities';
+
+export function SortEpisodeGrip({id, children}: {id: number, children: ReactNode}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({id: id});
+  
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+  
+  return (
+    <div className="flex cursor-default hover:bg-zinc-800 rounded-md" style={style} {...attributes}>
+      <div ref={setNodeRef} className="flex items-center" {...listeners}>
+        <div className={`w-6 ${isDragging? 'cursor-grabbing': 'cursor-grab'}`}>
+          {icons.grip}
+        </div>
+      </div>
+      {children}
+    </div>
+  );
+}
 
 
 
 
-
-function EpisodeCard({ episode, play }: { episode: EpisodeData, play: () => void }) {
+function EpisodeCard({ episode, play, className='', noLazyLoad=false, filter=undefined }:
+    { episode: EpisodeData, play: () => void , className?: string, noLazyLoad?: boolean, filter?: FilterCriterion | undefined}) {
   const [imageError, setImageError] = useState(false)
 
   const { history: { getEpisodeState, updateEpisodeState } } = useDB()
@@ -26,7 +55,6 @@ function EpisodeCard({ episode, play }: { episode: EpisodeData, play: () => void
   const contextMenuTarget = useRef<HTMLDivElement>(null)
 
   const [filtered, setFiltered] = useState(false)
-  const podcastSettings = useSettings().getPodcastSettings(episode.podcastUrl)
 
   const {queue} = useDB()
   const [inQueue, setInqueue] = useState(queue.includes(episode.src))
@@ -38,8 +66,9 @@ function EpisodeCard({ episode, play }: { episode: EpisodeData, play: () => void
     rootMargin: "0px",
   });
 
+
   useEffect(() => {
-    if (!entry?.isIntersecting) return
+    if (!entry?.isIntersecting && !noLazyLoad) return
 
     // set print date
     const episodeYear = episode.pubDate.getFullYear()
@@ -64,25 +93,28 @@ function EpisodeCard({ episode, play }: { episode: EpisodeData, play: () => void
       }
 
     })
-  }, [entry?.isIntersecting, episode, getEpisodeState, locale])
+  }, [entry?.isIntersecting, noLazyLoad, episode, getEpisodeState, locale])
 
   useEffect(() => {
+    if (filter === undefined) return
+
     const xor = (setting: SwitchState, state: boolean) => {
       return (setting === SwitchState.True && !state) ||
               (setting === SwitchState.False && state)
     }
 
-    setFiltered(xor(podcastSettings.filter.played, reprState.complete))
+    setFiltered(xor(filter.played, reprState.complete))
 
-  }, [reprState, podcastSettings.filter.played])
+  }, [reprState, filter])
 
 
   if (filtered) return <></>
 
 
   return (
-    <div ref={contextMenuTarget}>
-      <div ref={ref} className={`flex ${reprState.complete ? 'text-zinc-500' : ''} hover:bg-zinc-800 cursor-default rounded-md min-h-20 p-2 justify-between gap-4`}
+    <div ref={contextMenuTarget} className="w-full">
+      <div ref={ref} className={`flex ${reprState.complete ? 'text-zinc-500' : ''} cursor-default min-h-20
+                                p-2 justify-between gap-4 ${className}`}
         onClick={() => {
           navigate('/episode-preview', {
             state: {
@@ -92,7 +124,6 @@ function EpisodeCard({ episode, play }: { episode: EpisodeData, play: () => void
           })
         }}
       >
-
         <ContextMenu target={contextMenuTarget}>
           <div className="bg-zinc-700 max-w-60 text-zinc-300 p-2 rounded-md">
             <p className="mb-2 truncate text-xs text-zinc-400">{episode.title}</p>
@@ -127,7 +158,7 @@ function EpisodeCard({ episode, play }: { episode: EpisodeData, play: () => void
           </div>
         </ContextMenu>
 
-        {entry?.isIntersecting &&
+        {(entry?.isIntersecting || noLazyLoad) &&
           <>
             <div className="h-16 aspect-square rounded-md">
               {
@@ -143,7 +174,7 @@ function EpisodeCard({ episode, play }: { episode: EpisodeData, play: () => void
             </div>
 
             <div className="flex flex-col text-right w-full items-end justify-between">
-              <p className="text-sm w-full text-left">{date} - {Math.round(episode.size / 1000000)} MB </p>
+              <p className={`text-sm w-full ${reprState.complete ? 'text-zinc-500' : 'text-zinc-400'}`}>{date} - {Math.round(episode.size / 1000000)} MB </p>
               <h2 className="mb-2">{episode.title}</h2>
               <div className="flex w-full gap-2 justify-end">
                 {
