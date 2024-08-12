@@ -232,7 +232,7 @@ function initQueue() {
   }
 
   const includes = (episodeSrc: string) => {
-    return indexOf(episodeSrc) > 1
+    return indexOf(episodeSrc) > -1
   }
 
 
@@ -244,7 +244,8 @@ function initQueue() {
   const remove = async (episodeSrc: string) => {
     // delete from queue
     const newQueue = [...queue]
-    newQueue.splice(indexOf(episodeSrc))
+    newQueue.splice(indexOf(episodeSrc), 1)
+    console.log(newQueue)
 
     setQueue(
       newQueue
