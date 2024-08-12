@@ -2,7 +2,7 @@ from deep_translator import GoogleTranslator
 import json
 import os
 
-LOCALE_FOLDER = '../locales'
+LOCALE_FOLDER = '..resources/translations'
 SRC = 'en'
 DEST = ['es', 'fr', 'de']
 

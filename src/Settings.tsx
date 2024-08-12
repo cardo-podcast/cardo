@@ -4,7 +4,7 @@ import { appConfigDir, join } from "@tauri-apps/api/path"
 import { readTextFile, writeTextFile } from "@tauri-apps/api/fs"
 import { Settings } from "."
 import { SwitchState } from "./components/Inputs"
-import i18next from "i18next"
+import { changeLanguage } from "./translations"
 
 
 export class FilterCriterion {
@@ -74,7 +74,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   })
   
   useEffect(() => {
-    i18next.changeLanguage(settings.globals.language)
+      changeLanguage(settings.globals.language)
   }, [settings.globals.language])
 
   const [loaded, setLoaded] = useState(false)
