@@ -171,7 +171,7 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
       }
 
       const url = path === undefined ? podcast.feedUrl : path
-      parseXML(url, path !== undefined, podcast.coverUrl).then(result => {
+      parseXML(url, path !== undefined).then(result => {
         setEpisodes(sortEpisodes(result))
       })
     });
@@ -197,7 +197,7 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
           <div className="flex gap-2">
             <FavoriteButton podcast={podcast} subscribed={subscribed} setSubscribed={setSubscribed} />
             <button onClick={() => {
-              parseXML(podcast.feedUrl, false, podcast.coverUrl).then(result => {
+              parseXML(podcast.feedUrl, false).then(result => {
                 setEpisodes(result)
               })
             }}>

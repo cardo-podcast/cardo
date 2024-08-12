@@ -36,7 +36,15 @@ async function downloadXml(url: string): Promise<string> {
   return response.data as string
 }
 
-export async function parseXML(url: string, fileDownloaded = false, podcastCover=''): Promise<EpisodeData[]> {
+function getItunesTag(item: Element, tag: string) {
+  return item.getElementsByTagNameNS('http://www.itunes.com/dtds/podcast-1.0.dtd', tag)[0]
+}
+
+export async function parseXML(url: string, fileDownloaded = false): Promise<EpisodeData[]> {
+  /*
+  url: link to web resource or to xml file in cache
+  fileDownloaded: file is in cache
+  */
 
   let xmlString = ''
 
@@ -64,6 +72,8 @@ export async function parseXML(url: string, fileDownloaded = false, podcastCover
     }
   }
 
+  const podcastDetails = parsePodcastDetails(xml)
+
   const result = Array.from(items).map((item: Element, i) => {
     const episode: EpisodeData = {
       id: i, //
@@ -71,15 +81,33 @@ export async function parseXML(url: string, fileDownloaded = false, podcastCover
       description: htmlToText(item.querySelector('description')?.textContent ?? '') ?? item.querySelector('itunes\\:summary')?.textContent,
       src: item.querySelector('enclosure')?.getAttribute('url') ?? '',
       pubDate: new Date(item.querySelector('pubDate')?.textContent ?? 0),
-      coverUrl: item.getElementsByTagNameNS('http://www.itunes.com/dtds/podcast-1.0.dtd', 'image')[0]?.getAttribute('href') ?? podcastCover,
-      duration: parseDuration(item.getElementsByTagNameNS('http://www.itunes.com/dtds/podcast-1.0.dtd', 'duration')[0]?.textContent),
+      coverUrl: getItunesTag(item, 'image')?.getAttribute('href') ?? podcastDetails.coverUrl,
+      duration: parseDuration(getItunesTag(item, 'duration')?.textContent),
       size: Number(item.querySelector('enclosure')?.getAttribute('length')) ?? 0,
-      podcastUrl: url
+      podcastUrl: podcastDetails.feedUrl
     }
     return episode
   })
 
   return result
+}
+
+export function parsePodcastDetails(xml: Document) {
+  const channel = xml.querySelector('channel')
+
+  if (channel == null) return {podcastName:'', artistName: '', coverUrl: '', coverUrlLarge: '', feedUrl: ''}
+
+  const coverUrl = channel.querySelector('image')?.getAttribute('href') ?? channel.querySelector('image')?.querySelector('url')?.textContent ?? ''
+
+  const podcast: PodcastData = {
+    podcastName: channel?.querySelector('title')?.textContent ?? '',
+    artistName: getItunesTag(channel, 'author').textContent ?? '',
+    coverUrl: coverUrl,
+    coverUrlLarge: coverUrl,
+    feedUrl: channel.querySelector('link[rel="self"]')?.getAttribute('href') ?? ''
+  }
+
+  return podcast
 }
 
 export async function getXmlDownloaded(podcast: PodcastData) {
