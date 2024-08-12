@@ -30,20 +30,12 @@
         "all": true
       },
       "fs": {
-        "all": false,
-        "copyFile": false,
-        "createDir": true,
-        "exists": true,
-        "readDir": false,
-        "readFile": true,
-        "removeDir": false,
-        "removeFile": true,
-        "renameFile": false,
+        "all": true,
         "scope": [
           "$APPCACHE/**",
-          "$APPCONFIG/**"
-        ],
-        "writeFile": true
+          "$APPCONFIG/**",
+          "$RESOURCE/**"
+        ]
       },
       "os": {
         "all": true
@@ -71,7 +63,8 @@
         "icons/128x128@2x.png",
         "icons/icon.icns",
         "icons/icon.ico"
-      ]
+      ],
+      "resources": ["../resources/**"]
     }
   }
 }
