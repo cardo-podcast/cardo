@@ -52,7 +52,7 @@ const App = () => {
                 <SearchBar />
                 <div className="flex h-full overflow-y-auto">
                   <Routes>
-                    <Route path='/' element={<HomePage />} />
+                    <Route path='/' element={<HomePage play={play} />} />
                     <Route path='/preview' element={<PodcastPreview play={play} />} />
                     <Route path='/episode-preview' element={<EpisodePreview play={play} />} />
                     <Route path='/settings' element={<Settings />} />
