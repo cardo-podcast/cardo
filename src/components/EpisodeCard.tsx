@@ -165,6 +165,7 @@ function EpisodeCard({ episode, play, className='', noLazyLoad=false, filter=und
                     onClick={onImageClick}
                     alt=""
                     src={episode.coverUrl}
+                    title={onImageClick !== undefined ? t('open_podcast') + ' ' + episode.podcast?.podcastName: ''}
                     onError={() => setImageError(true)}
                   />
               }

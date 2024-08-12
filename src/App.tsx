@@ -13,6 +13,8 @@ import { EpisodeData } from ".";
 import { SettingsProvider } from "./Settings";
 import QueuePage from "./pages/QueuePage";
 import { appWindow } from "@tauri-apps/api/window";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const App = () => {
@@ -41,9 +43,10 @@ const App = () => {
                         text-zinc-50 overflow-hidden ${isMaximized ? '' : 'rounded-lg'}`}>
       <SettingsProvider>
         <DBProvider>
-          <TitleBar />
-          <div className="flex justify-start w-full h-full overflow-hidden">
-            <BrowserRouter>
+          <BrowserRouter>
+            <TitleBar />
+            <ToastContainer />
+            <div className="flex justify-start w-full h-full overflow-hidden">
               <LeftMenu />
               <div className="flex flex-col w-full h-full">
                 <SearchBar />
@@ -57,8 +60,8 @@ const App = () => {
                   </Routes>
                 </div>
               </div>
-            </BrowserRouter>
-          </div>
+            </div>
+          </BrowserRouter>
           <AudioPlayer ref={playerRef} className="w-full h-28 flex-shrink-0" />
         </DBProvider>
       </SettingsProvider>

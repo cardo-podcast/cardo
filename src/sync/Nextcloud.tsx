@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from "react"
 import { DB, useDB } from "../DB"
 import { getCreds, removeCreds, saveCreds } from "../utils"
 import { useTranslation } from "react-i18next"
-
+import { useNavigate } from "react-router-dom"
+import { toast } from 'react-toastify';
 
 
 export function NextcloudSettings() {
@@ -231,9 +232,36 @@ export function SyncButton() {
   const [status, setStatus] = useState<SyncStatus>(SyncStatus.Standby)
   const [error, setError] = useState('')
   const db = useDB()
+  const [loggedIn, setLoggedIn] = useState(false)
+  const navigate = useNavigate()
+  const {t} = useTranslation()
+
+
+  useEffect(() => {
+    getCreds('nextcloud').then(r => {
+      setLoggedIn(r !== undefined)
+    })
+
+  }, [])
 
 
   const performSync = async() => {
+
+    if (!loggedIn) {
+      toast.info(t('not_logged_sync'), {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        });
+      navigate('/settings')
+      return
+    }
+
     if (status === SyncStatus.Synchronizing) return
 
     setError('')
@@ -252,7 +280,7 @@ export function SyncButton() {
 
   return (
     <button className={`w-6 hover:text-amber-400 outline-none ${status === SyncStatus.Synchronizing && 'animate-[spin_2s_linear_infinite_reverse]'}`}
-    onClick={performSync} title={error}
+    onClick={performSync} title={error == '' ? t('sync'): error}
     >
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-refresh">
         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
