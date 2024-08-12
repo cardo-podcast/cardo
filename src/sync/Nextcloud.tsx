@@ -2,6 +2,7 @@ import { http, invoke, shell } from "@tauri-apps/api"
 import { useEffect, useRef, useState } from "react"
 import { DB, useDB } from "../DB"
 import { getCreds, removeCreds, saveCreds } from "../utils"
+import { useTranslation } from "react-i18next"
 
 
 
@@ -11,6 +12,7 @@ export function NextcloudSettings() {
   const { misc: { getSyncKey, setSyncKey } } = useDB()
   const [error, setError] = useState('')
   const [loggedIn, setLoggedIn] = useState(false)
+  const {t} = useTranslation()
 
   useEffect(() => {
     getCreds('nextcloud').then(r => {
@@ -22,22 +24,22 @@ export function NextcloudSettings() {
 
   if (loggedIn) {
     return (
-      <div className="flex flex-col gap-1 items-center">
-        <h1 className="text-lg">Your are loged in</h1>
-        <button className="bg-amber-600 w-fit px-4 hover:bg-amber-700 rounded-md p-1"
+      <div className="flex gap-2 items-center">
+        <h1 className="text-lg">{t('logged_in')}</h1>
+        <button className="uppercase bg-amber-600 w-fit px-4 hover:bg-amber-700 rounded-md p-1"
           onClick={async () => {
             removeCreds('nextcloud')
             setLoggedIn(false)
           }}
         >
-          LOG OUT
+          {t('log_out')}
         </button>
       </div>
     )
   }
 
   return (
-    <form className="flex flex-col gap-1 items-center" onSubmit={async (e) => {
+    <form className="flex flex-col gap-2 items-center" onSubmit={async (e) => {
       e.preventDefault()
       if (urlRef.current) {
         try {
@@ -50,12 +52,12 @@ export function NextcloudSettings() {
     }}>
       <input
         type="text"
-        className="py-1 px-2 bg-zinc-600 w-full rounded-md focus:outline-none"
+        className="py-1 px-2 bg-zinc-800 placeholder-zinc-500 text-zinc-400 w-full rounded-md focus:outline-none"
         ref={urlRef}
-        placeholder="NEXTCLOUD SERVER URL"
+        placeholder={t('nextcloud_server_url')}
       />
-      <button className="bg-amber-600 w-fit px-4 hover:bg-amber-700 rounded-md p-1">
-        CONNECT
+      <button className="uppercase bg-amber-600 w-fit px-4 hover:bg-amber-700 rounded-md p-1">
+        {t('connect')}
       </button>
       {error !== '' && <p className="text-red-700 font-bold">{error}</p>}
     </form>

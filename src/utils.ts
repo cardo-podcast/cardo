@@ -9,6 +9,8 @@ export function secondsToStr(seconds: number) {
   const minutes = Math.floor(seconds / 60) - hours * 60
   const secondsStr = Math.floor(seconds % 60).toString().padStart(2, '0')
 
+  if (Number.isNaN(seconds)) return ''
+
   if (hours > 0) {
     return `${hours}:${minutes.toString().padStart(2, '0')}:${secondsStr}`
   } else {
@@ -34,7 +36,7 @@ async function downloadXml(url: string): Promise<string> {
   return response.data as string
 }
 
-export async function parseXML(url: string, fileDownloaded = false): Promise<EpisodeData[]> {
+export async function parseXML(url: string, fileDownloaded = false, podcastCover=''): Promise<EpisodeData[]> {
 
   let xmlString = ''
 
@@ -47,8 +49,6 @@ export async function parseXML(url: string, fileDownloaded = false): Promise<Epi
   const parser = new DOMParser()
   const xml = parser.parseFromString(xmlString, "text/xml")
   const items = xml.querySelectorAll('item')
-  const channel = xml.querySelector('channel')
-  const podcastCover = channel?.querySelector('image')?.querySelector('url')?.textContent ?? ''
 
   const parseDuration = (duration: string | null): number => {
     if (!duration) return 0

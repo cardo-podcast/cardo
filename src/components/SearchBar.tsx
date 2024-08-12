@@ -58,7 +58,7 @@ function SearchBar () {
       ref={inputRef}
         type="text"
         placeholder={t('search_placeholder')}
-        className="py-1 px-2 bg-zinc-600 w-full rounded-md focus:outline-none"
+        className="py-1 px-2 bg-zinc-800 placeholder-zinc-500 text-zinc-400 w-full rounded-md focus:outline-none"
         onChange={(event) => {handleChange(event.target.value)}}
         onKeyDown={e => {
           if (e.key === 'Escape' || e.key === 'Tab') {
@@ -70,7 +70,7 @@ function SearchBar () {
 
     {
       results.length > 0?
-      (<div className="absolute left-1/2 -translate-x-1/2 top-0 mt-[35px] z-10 max-h-[400px] w-full flex justify-center py-1 px-2 overflow-y-auto bg-zinc-800 rounded-md"
+      (<div className="absolute left-1/2 -translate-x-1/2 top-0 mt-[35px] z-10 max-h-[400px] w-full flex justify-center py-1 px-2 overflow-y-auto bg-zinc-900 border-2 border-zinc-800 rounded-md"
         ref={resultsRef}
       >
       <div className="grid gap-1 w-full">
