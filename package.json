@@ -20,6 +20,7 @@
     "react-dom": "^18.2.0",
     "react-i18next": "^15.0.1",
     "react-router-dom": "^6.25.1",
+    "react-toastify": "^10.0.5",
     "sanitize-html": "^2.13.0",
     "tauri-plugin-sql-api": "github:tauri-apps/tauri-plugin-sql#v1"
   },
