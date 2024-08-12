@@ -72,7 +72,7 @@ export async function parseXML(url: string, fileDownloaded = false): Promise<Epi
     }
   }
 
-  const podcastDetails = parsePodcastDetails(xml)
+  const podcastDetails = await parsePodcastDetails(xml)
 
   const result = Array.from(items).map((item: Element, i) => {
     const episode: EpisodeData = {
@@ -92,7 +92,18 @@ export async function parseXML(url: string, fileDownloaded = false): Promise<Epi
   return result
 }
 
-export function parsePodcastDetails(xml: Document) {
+export async function parsePodcastDetails(xml: Document | string) {
+  /*
+  xml:  string -> url to download xml
+        Document -> parsed downloaded xml
+  */
+
+  if (typeof xml === "string") {
+    const xmlString = await downloadXml(xml)
+    const parser = new DOMParser()
+    xml = parser.parseFromString(xmlString, "text/xml")
+  }
+
   const channel = xml.querySelector('channel')
 
   if (channel == null) return {podcastName:'', artistName: '', coverUrl: '', coverUrlLarge: '', feedUrl: ''}
