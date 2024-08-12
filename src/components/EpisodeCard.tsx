@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef, useState } from "react"
+import { MouseEventHandler, ReactNode, useEffect, useRef, useState } from "react"
 import { EpisodeData } from ".."
 import * as icons from "../Icons"
 import { useNavigate } from "react-router-dom"
@@ -43,8 +43,9 @@ export function SortEpisodeGrip({id, children}: {id: number, children: ReactNode
 
 
 
-function EpisodeCard({ episode, play, className='', noLazyLoad=false, filter=undefined }:
-    { episode: EpisodeData, play: () => void , className?: string, noLazyLoad?: boolean, filter?: FilterCriterion | undefined}) {
+function EpisodeCard({ episode, play, className='', noLazyLoad=false, filter=undefined, onImageClick=undefined}:
+    { episode: EpisodeData, play: () => void , className?: string,
+      noLazyLoad?: boolean, filter?: FilterCriterion | undefined, onImageClick?: MouseEventHandler<HTMLImageElement>}) {
   const [imageError, setImageError] = useState(false)
 
   const { history: { getEpisodeState, updateEpisodeState } } = useDB()
@@ -160,7 +161,8 @@ function EpisodeCard({ episode, play, className='', noLazyLoad=false, filter=und
                 imageError ?
                   icons.photo :
                   <img
-                    className="rounded-md"
+                    className={`rounded-md ${onImageClick !== undefined ? 'cursor-pointer': ''}`}
+                    onClick={onImageClick}
                     alt=""
                     src={episode.coverUrl}
                     onError={() => setImageError(true)}
