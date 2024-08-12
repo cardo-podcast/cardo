@@ -1,21 +1,22 @@
 import { secondsToStr } from "../utils";
 
 
-const ProgressBar = ({ position, total }: { position: number, total: number }) => {
+const ProgressBar = ({ position, total, showTime=true, className }:
+              { position: number, total: number, showTime?: boolean, className?: {div?: string, bar?: string, innerBar?: string} }) => {
   const progressStyle = {
     width: `${(position / total) * 100}%`,
   };
 
   return (
-    <div className="flex w-full items-center gap-1 text-sm">
-      <p>{secondsToStr(position)}</p>
-      <div className="w-full bg-zinc-600 h-1 rounded">
+    <div className={"flex w-full items-center gap-1 text-sm " + className?.div}>
+      {showTime && <p>{secondsToStr(position)}</p>}
+      <div className={"w-full h-full bg-zinc-600 " + className?.bar}>
         <div
-          className="bg-amber-500 rounded h-full"
+          className={"bg-amber-500 h-full" + className?.innerBar}
         style={progressStyle}
         />
       </div>
-      <p>{secondsToStr(total)}</p>
+      {showTime && <p>{secondsToStr(total)}</p>}
     </div>
 
   );

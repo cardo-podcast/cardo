@@ -114,8 +114,7 @@ function EpisodeCard({ episode, play, className='', noLazyLoad=false, filter=und
         onClick={() => {
           navigate('/episode-preview', {
             state: {
-              episode: episode,
-              podcastUrl: episode.podcastUrl
+              episode: episode
             }
           })
         }}
@@ -179,7 +178,7 @@ function EpisodeCard({ episode, play, className='', noLazyLoad=false, filter=und
                   (reprState.position === 0 ||
                     reprState.complete) ?
                     secondsToStr(reprState.total) :
-                    <ProgressBar position={reprState.position} total={reprState.total} />
+                    <ProgressBar position={reprState.position} total={reprState.total} className={{div: 'h-1', bar: 'rounded', innerBar: 'rounded'}}/>
                 }
                 <button className="w-7 p-[2px] aspect-square flex justify-center items-center hover:text-amber-600 border-2 border-zinc-600 rounded-full"
                   onClick={e => {
