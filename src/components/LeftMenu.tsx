@@ -8,8 +8,8 @@ function LeftMenu() {
   const { t } = useTranslation();
 
   return (
-    <div className="bg-zinc-800 w-56 h-full flex flex-col rounded-md p-2 gap-6">
-      <div className="flex flex-col gap-1 uppercase">
+    <div className="bg-zinc-900 border-r-2 border-zinc-800 mr-1 w-56 h-full flex flex-col p-3 pt-4">
+      <div className="flex flex-col gap-1 uppercase mb-6">
         <Link to='/'>
           {t('home')}
         </Link>
@@ -21,11 +21,12 @@ function LeftMenu() {
         </Link>
       </div>
 
+      <h1 className="uppercase mb-2">{t('subscriptions')}</h1>
       <div className="flex flex-col gap-1 overflow-y-auto">
         {
           subscriptions.subscriptions.map((fav, i) => {
             return (
-              <div key={i} className="bg-zinc-600 p-1 rounded-md flex gap-2 justify-between cursor-pointer hover:bg-zinc-500"
+              <div key={i} className="p-1 rounded-md flex gap-2 justify-between cursor-pointer hover:bg-zinc-500"
                 onClick={() => navigate('/preview', {
                   state: {
                     podcast: fav
@@ -33,7 +34,7 @@ function LeftMenu() {
                 })}
               >
                 <img
-                  className="bg-zinc-700 h-10 aspect-square rounded-md"
+                  className="h-10 bg-zinc-700 aspect-square rounded-md"
                   src={fav.coverUrl}
                   alt=''
                 />

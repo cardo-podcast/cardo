@@ -2,9 +2,9 @@ from deep_translator import GoogleTranslator
 import json
 import os
 
-LOCALE_FOLDER = '..resources/translations'
-SRC = 'en'
-DEST = ['es', 'fr', 'de']
+LOCALE_FOLDER = '../resources/translations'
+SRC = 'es'
+DEST = ['en']
 
 
 
@@ -28,5 +28,5 @@ for destLang in DEST:
         if not key in dest.keys():
             dest[key] = translate(value, src=SRC, dest=destLang)
 
-    with open(destFile, 'w') as f:
-        dest = json.dump(dest, f, indent=2)
+    with open(destFile, 'w', encoding='utf-8') as f:
+        dest = json.dump(dest, f, indent=2, ensure_ascii=False)

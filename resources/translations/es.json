@@ -8,7 +8,13 @@
   "mark_played": "Marcar como reproducido",
   "mark_not_played": "Marcar como no reproducido",
   "remove_queue": "Quitar de la cola",
-  "add_queue": "A\u00f1adir a la cola",
+  "add_queue": "Añadir a la cola",
   "date": "fecha",
-  "duration": "duraci\u00f3n"
+  "duration": "duración",
+  "logged_in": "Ya has iniciado sesion",
+  "nextcloud_server_url": "URL del servidor Nextcloud",
+  "connect": "conectar",
+  "log_out": "cerrar sesion",
+  "sync": "sincronizacion",
+  "subscriptions": "subscripciones"
 }
