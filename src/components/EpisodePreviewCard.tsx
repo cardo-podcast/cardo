@@ -15,7 +15,7 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData }
   const navigate = useNavigate()
   const [position, setPosition] = useState(0)
   const { history: {getEpisodeState} } = useDB()
-  const { play } = usePlayer()
+  const { play, playing, position: playingPosition } = usePlayer()
 
   useEffect(() => {
     getEpisodeState(episode.src).then(
@@ -44,7 +44,10 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData }
             onError={() => setImageError(true)}
           />
       }
-      <ProgressBar position={position} total={episode.duration} showTime={false} className={{div: "h-[5px]"}}/>
+      <ProgressBar position={playing?.src == episode.src? playingPosition: position}
+                  total={episode.duration}
+                  showTime={false}
+                  className={{div: "h-[5px]"}}/>
       <button className="absolute bottom-2 right-2 bg-amber-500 w-8 p-[2px] aspect-square flex justify-center items-center hover:text-amber-600 border-2 border-amber-600 rounded-full"
                   onClick={e => {
                     e.stopPropagation()
