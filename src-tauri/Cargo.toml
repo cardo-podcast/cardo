@@ -18,6 +18,7 @@ mio = {version = "1"}
 aes-gcm = "0.10"
 base64 = "0.22"
 rand = "0.8.5"
+tauri-plugin-context-menu = { git = "https://github.com/c2r0b/tauri-plugin-context-menu", branch = "main" }
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!
