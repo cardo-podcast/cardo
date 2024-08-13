@@ -210,7 +210,6 @@ function PodcastPreview() {
           <Suspense key={i} fallback={<div className="bg-zinc-800 h-20 w-full" />}>
             <EpisodeCard
               episode={episode}
-              play={() => playerRef.current && playerRef.current.play(episode)}
               className="hover:bg-zinc-800 rounded-md"
               filter={podcastSettings.filter}
             />

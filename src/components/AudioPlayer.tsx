@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, RefObject, createContext, ReactNode, useContext, Dispatch, SetStateAction } from "react";
+import React, { useRef, useEffect, useState, RefObject, createContext, ReactNode, useContext, Dispatch, SetStateAction, useCallback } from "react";
 import { secondsToStr } from "../utils";
 import * as icons from "../Icons"
 import { EpisodeData } from "..";
@@ -23,41 +23,66 @@ export const usePlayer = () => useContext(PlayerContext) as AudioPlayerRef
 export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playing, setPlaying] = useState<EpisodeData>()
-  const { history: { getEpisodeState } } = useDB()
+  const {dbLoaded, history: { getEpisodeState, getLastPlayed, setLastPlaying } } = useDB()
   const [position, setPosition] = useState(0);
-  const {history: {updateEpisodeState}} = useDB()
+  const { history: { updateEpisodeState } } = useDB()
+
+
+  const loadLastPlayed = async () => {
+    if (audioRef.current == null) return
+
+    const lastPlayed = await getLastPlayed()
+    if (lastPlayed) {
+      load(lastPlayed)
+    }
+  }
+
+  useEffect(() => {
+    if (dbLoaded){
+      loadLastPlayed()
+    }
+  }, [dbLoaded])
+
+  const load = async (episode: EpisodeData) => {
+    if (audioRef.current == null) return
+
+    setPlaying(episode)
+    audioRef.current.src = episode.src
+    audioRef.current.load()
+
+    const previousState = await getEpisodeState(episode?.src)
+
+    if (previousState !== undefined && previousState.position < previousState.total) {
+      audioRef.current.currentTime = previousState.position
+      setPosition(previousState.position)
+    }
+  }
 
   const play = async (episode?: EpisodeData | undefined) => {
     if (audioRef.current == null) return
 
     if (episode !== undefined) {
-      setPlaying(episode)
-
-      audioRef.current.src = episode.src
-      audioRef.current.load()
-
-      const previousState = await getEpisodeState(episode?.src)
-
-      if (previousState !== undefined && previousState.position < previousState.total) {
-        audioRef.current.currentTime = previousState.position
-        setPosition(previousState.position)
-      }
+      load(episode)
     }
 
     audioRef.current.play()
   }
 
-    const onExit = async() => {
-      // save state if closing without pause
-      if (audioRef.current == null || playing == null) return
-      if (!audioRef.current.paused && audioRef.current.currentTime > 0) {
-        await updateEpisodeState(playing.src,
-          playing.podcastUrl,
-          audioRef.current.currentTime,
-          playing.duration
-        )
-      }
+  const onExit = useCallback(async () => {
+    // save state if closing without pause
+    if (audioRef.current == null || playing == null) return
+
+    // save the opened episode to load it when opening app again
+    await setLastPlaying(playing)
+
+    if (!audioRef.current.paused && audioRef.current.currentTime > 0) {
+      await updateEpisodeState(playing.src,
+        playing.podcastUrl,
+        audioRef.current.currentTime,
+        playing.duration
+      )
     }
+  }, [playing])
 
   return (
     <PlayerContext.Provider value={{

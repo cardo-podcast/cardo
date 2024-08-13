@@ -36,7 +36,7 @@ function HomePage() {
       <div ref={scrollRef} className="flex gap-1 overflow-x-auto pr-72 scroll-smooth">
         {
           queue.queue.map(episode => (
-            <EpisodePreviewCard episode={episode} />
+            <EpisodePreviewCard key={episode.id} episode={episode} />
           ))
         }
       </div>
