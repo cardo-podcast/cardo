@@ -9,11 +9,11 @@ import ProgressBar from "./ProgressBar"
 import { FilterCriterion, useSettings } from "../Settings"
 import { ContextMenu } from "./ContextMenu"
 import { SwitchState } from "./Inputs"
-import {useSortable} from '@dnd-kit/sortable';
-import {CSS} from '@dnd-kit/utilities';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from "react-i18next"
 
-export function SortEpisodeGrip({id, children}: {id: number, children: ReactNode}) {
+export function SortEpisodeGrip({ id, children }: { id: number, children: ReactNode }) {
   const {
     attributes,
     listeners,
@@ -21,17 +21,17 @@ export function SortEpisodeGrip({id, children}: {id: number, children: ReactNode
     transform,
     transition,
     isDragging
-  } = useSortable({id: id});
-  
+  } = useSortable({ id: id });
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
-  
+
   return (
     <div className="flex cursor-default hover:bg-zinc-800 rounded-md" style={style} {...attributes}>
       <div ref={setNodeRef} className="flex items-center" {...listeners}>
-        <div className={`w-6 ${isDragging? 'cursor-grabbing': 'cursor-grab'}`}>
+        <div className={`w-6 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}>
           {icons.grip}
         </div>
       </div>
@@ -43,9 +43,11 @@ export function SortEpisodeGrip({id, children}: {id: number, children: ReactNode
 
 
 
-function EpisodeCard({ episode, play, className='', noLazyLoad=false, filter=undefined, onImageClick=undefined}:
-    { episode: EpisodeData, play: () => void , className?: string,
-      noLazyLoad?: boolean, filter?: FilterCriterion | undefined, onImageClick?: MouseEventHandler<HTMLImageElement>}) {
+function EpisodeCard({ episode, play, className = '', noLazyLoad = false, filter = undefined, onImageClick = undefined }:
+  {
+    episode: EpisodeData, play: () => void, className?: string,
+    noLazyLoad?: boolean, filter?: FilterCriterion | undefined, onImageClick?: MouseEventHandler<HTMLImageElement>
+  }) {
   const [imageError, setImageError] = useState(false)
 
   const { history: { getEpisodeState, updateEpisodeState } } = useDB()
@@ -56,12 +58,12 @@ function EpisodeCard({ episode, play, className='', noLazyLoad=false, filter=und
   const [date, setDate] = useState('')
   const contextMenuTarget = useRef<HTMLDivElement>(null)
 
-  const {queue} = useDB()
+  const { queue } = useDB()
   const [inQueue, setInqueue] = useState(queue.includes(episode.src))
 
   const { t } = useTranslation();
 
-  
+
   const [ref, entry] = useIntersectionObserver({
     threshold: 0,
     root: null,
@@ -100,7 +102,7 @@ function EpisodeCard({ episode, play, className='', noLazyLoad=false, filter=und
 
   const xor = (setting: SwitchState, state: boolean) => {
     return (setting === SwitchState.True && !state) ||
-            (setting === SwitchState.False && state)
+      (setting === SwitchState.False && state)
   }
 
 
@@ -127,26 +129,26 @@ function EpisodeCard({ episode, play, className='', noLazyLoad=false, filter=und
                 if (reprState.complete) {
                   updateEpisodeState(episode.src, episode.podcastUrl,
                     0, episode.duration)
-                    setReprState({complete: false, position:0, total:episode.duration})
+                  setReprState({ complete: false, position: 0, total: episode.duration })
                 } else {
                   updateEpisodeState(episode.src, episode.podcastUrl,
                     episode.duration, episode.duration)
-                    setReprState({complete: true, position:episode.duration, total:episode.duration})
+                  setReprState({ complete: true, position: episode.duration, total: episode.duration })
                 }
               }
               }>
               {t(reprState.complete ? 'mark_not_played' : 'mark_played')}
             </button>
             <button className="w-full text-left text-sm hover:text-zinc-50"
-            onClick={async()=>{
-              if (inQueue) {
-                await queue.remove(episode.src)
-                setInqueue(false)
-              } else {
-                await queue.push(episode)
-                setInqueue(true)
-              }
-            }}
+              onClick={async () => {
+                if (inQueue) {
+                  await queue.remove(episode.src)
+                  setInqueue(false)
+                } else {
+                  await queue.push(episode)
+                  setInqueue(true)
+                }
+              }}
             >
               {t(inQueue ? 'remove_queue' : 'add_queue')}
             </button>
@@ -160,34 +162,36 @@ function EpisodeCard({ episode, play, className='', noLazyLoad=false, filter=und
                 imageError ?
                   icons.photo :
                   <img
-                    className={`rounded-md ${onImageClick !== undefined ? 'cursor-pointer': ''}`}
+                    className={`rounded-md ${onImageClick !== undefined ? 'cursor-pointer' : ''}`}
                     onClick={onImageClick}
                     alt=""
                     src={episode.coverUrl}
-                    title={onImageClick !== undefined ? t('open_podcast') + ' ' + episode.podcast?.podcastName: ''}
+                    title={onImageClick !== undefined ? t('open_podcast') + ' ' + episode.podcast?.podcastName : ''}
                     onError={() => setImageError(true)}
                   />
               }
             </div>
 
             <div className="flex flex-col text-right w-full items-end justify-between">
-              <p className={`text-sm w-full ${reprState.complete ? 'text-zinc-500' : 'text-zinc-400'}`}>{date} - {Math.round(episode.size / 1000000)} MB </p>
               <h2 className="mb-2">{episode.title}</h2>
-              <div className="flex w-full gap-2 justify-end">
-                {
-                  (reprState.position === 0 ||
-                    reprState.complete) ?
-                    secondsToStr(reprState.total) :
-                    <ProgressBar position={reprState.position} total={reprState.total} className={{div: 'h-1', bar: 'rounded', innerBar: 'rounded'}}/>
-                }
-                <button className="w-7 p-[2px] aspect-square flex justify-center items-center hover:text-amber-600 border-2 border-zinc-600 rounded-full"
-                  onClick={e => {
-                    e.stopPropagation()
-                    play()
-                  }}
-                >
-                  {icons.play}
-                </button>
+              <div className="flex w-full items-center justify-between">
+                <p className={`text-sm ${reprState.complete ? 'text-zinc-500' : 'text-zinc-400'}`}>{date} - {Math.round(episode.size / 1000000)} MB </p>
+                <div className="flex gap-2 items-center">
+                  {
+                    (reprState.position === 0 ||
+                      reprState.complete) ?
+                      secondsToStr(reprState.total) :
+                      <ProgressBar position={reprState.position} total={reprState.total} className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }} />
+                  }
+                  <button className="w-7 p-[2px] aspect-square flex justify-center items-center hover:text-amber-600 border-2 border-zinc-600 rounded-full"
+                    onClick={e => {
+                      e.stopPropagation()
+                      play()
+                    }}
+                  >
+                    {icons.play}
+                  </button>
+                </div>
               </div>
             </div>
           </>
