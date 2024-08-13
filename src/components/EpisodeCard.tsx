@@ -173,25 +173,23 @@ function EpisodeCard({ episode, play, className = '', noLazyLoad = false, filter
             </div>
 
             <div className="flex flex-col text-right w-full items-end justify-between">
+              <p className={`text-sm ${reprState.complete ? 'text-zinc-500' : 'text-zinc-400'}`}>{date} - {Math.round(episode.size / 1000000)} MB </p>
               <h2 className="mb-2">{episode.title}</h2>
-              <div className="flex w-full items-center justify-between">
-                <p className={`text-sm ${reprState.complete ? 'text-zinc-500' : 'text-zinc-400'}`}>{date} - {Math.round(episode.size / 1000000)} MB </p>
-                <div className="flex gap-2 items-center">
-                  {
-                    (reprState.position === 0 ||
-                      reprState.complete) ?
-                      secondsToStr(reprState.total) :
-                      <ProgressBar position={reprState.position} total={reprState.total} className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }} />
-                  }
-                  <button className="w-7 p-[2px] aspect-square flex justify-center items-center hover:text-amber-600 border-2 border-zinc-600 rounded-full"
-                    onClick={e => {
-                      e.stopPropagation()
-                      play()
-                    }}
-                  >
-                    {icons.play}
-                  </button>
-                </div>
+              <div className="flex w-full gap-2 items-center justify-end">
+                {
+                  (reprState.position === 0 ||
+                    reprState.complete) ?
+                    secondsToStr(reprState.total) :
+                    <ProgressBar position={reprState.position} total={reprState.total} className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }} />
+                }
+                <button className="w-7 p-[2px] aspect-square flex justify-center items-center hover:text-amber-600 border-2 border-zinc-600 rounded-full"
+                  onClick={e => {
+                    e.stopPropagation()
+                    play()
+                  }}
+                >
+                  {icons.play}
+                </button>
               </div>
             </div>
           </>

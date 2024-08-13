@@ -55,10 +55,16 @@ const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(({ className = 
       )
     }
 
-  }, [audioRef.current?.paused, updateEpisodeState, playing])
+  }, [audioRef.current?.paused, playing])
 
   useEffect(() => {
     if (!playing || !audioRef.current?.ended) return
+
+    updateEpisodeState(playing.src,
+      playing.podcastUrl,
+      playing.duration,
+      playing.duration
+    )
 
     play(queue.next(playing))
 
