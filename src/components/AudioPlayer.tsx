@@ -6,16 +6,13 @@ import { useDB } from "../DB";
 import { useNavigate } from "react-router-dom";
 
 
-interface AudioPlayerProps {
-  className?: string,
-}
-
 export type AudioPlayerRef = {
   audioRef: RefObject<HTMLAudioElement>
   play: (episode?: EpisodeData | undefined) => void
   playing: EpisodeData | undefined,
   position: number,
   setPosition: Dispatch<SetStateAction<number>>
+  onExit: () => Promise<void>
 }
 
 
@@ -23,11 +20,12 @@ const PlayerContext = createContext<AudioPlayerRef | undefined>(undefined)
 
 export const usePlayer = () => useContext(PlayerContext) as AudioPlayerRef
 
-export function AudioPlayerProvider({children}: {children: ReactNode}){
+export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playing, setPlaying] = useState<EpisodeData>()
   const { history: { getEpisodeState } } = useDB()
   const [position, setPosition] = useState(0);
+  const {history: {updateEpisodeState}} = useDB()
 
   const play = async (episode?: EpisodeData | undefined) => {
     if (audioRef.current == null) return
@@ -49,13 +47,26 @@ export function AudioPlayerProvider({children}: {children: ReactNode}){
     audioRef.current.play()
   }
 
-  return(
+    const onExit = async() => {
+      // save state if closing without pause
+      if (audioRef.current == null || playing == null) return
+      if (!audioRef.current.paused && audioRef.current.currentTime > 0) {
+        await updateEpisodeState(playing.src,
+          playing.podcastUrl,
+          audioRef.current.currentTime,
+          playing.duration
+        )
+      }
+    }
+
+  return (
     <PlayerContext.Provider value={{
       audioRef,
       play,
       playing,
       position,
-      setPosition
+      setPosition,
+      onExit
     }}>
       {children}
     </PlayerContext.Provider>
@@ -66,7 +77,7 @@ export function AudioPlayerProvider({children}: {children: ReactNode}){
 function AudioPlayer({ className = '' }) {
   const [duration, setDuration] = useState(0);
   const { history: { updateEpisodeState }, queue } = useDB()
-  const {audioRef, play, playing, position, setPosition} = usePlayer()
+  const { audioRef, play, playing, position, setPosition } = usePlayer()
   const navigate = useNavigate()
 
   useEffect(() => {
