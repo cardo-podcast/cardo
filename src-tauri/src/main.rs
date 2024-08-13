@@ -77,7 +77,7 @@ fn main() {
                                                         artistName TEXT,
                                                         coverUrl TEXT,
                                                         coverUrlLarge TEXT,
-                                                        feedUrl TEXT
+                                                        feedUrl TEXT UNIQUE
                                                         );",
             kind: MigrationKind::Up,
         },
@@ -86,7 +86,7 @@ fn main() {
             description: "episodes_history",
             sql: "CREATE TABLE episodes_history (id INTEGER PRIMARY KEY,
                                                         podcast TEXT,
-                                                        episode TEXT,
+                                                        episode TEXT UNIQUE,
                                                         position INTEGER,
                                                         total INTEGER,
                                                         timestamp INTEGER
@@ -97,7 +97,7 @@ fn main() {
             version: 3,
             description: "misc",
             sql: "CREATE TABLE misc (id INTEGER PRIMARY KEY,
-                                        description TEXT,
+                                        description TEXT UNIQUE,
                                         value TEXT
                                                     );",
             kind: MigrationKind::Up,
@@ -108,7 +108,7 @@ fn main() {
             sql: "CREATE TABLE queue (id INTEGER PRIMARY KEY,
                                         title TEXT,
                                         description TEXT,
-                                        src TEXT,
+                                        src TEXT UNIQUE,
                                         pubDate INTEGER,
                                         duration INTEGER,
                                         size INTEGER,
