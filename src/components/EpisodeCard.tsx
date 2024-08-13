@@ -63,7 +63,7 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, filter = und
   const [inQueue, setInqueue] = useState(queue.includes(episode.src))
 
   const { t } = useTranslation();
-  const { play } = usePlayer()
+  const { play, playing, position: playingPosition } = usePlayer()
 
 
   const [ref, entry] = useIntersectionObserver({
@@ -182,7 +182,9 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, filter = und
                   (reprState.position === 0 ||
                     reprState.complete) ?
                     secondsToStr(reprState.total) :
-                    <ProgressBar position={reprState.position} total={reprState.total} className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }} />
+                    <ProgressBar position={playing?.src == episode.src? playingPosition: reprState.position}
+                                total={reprState.total}
+                                className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }} />
                 }
                 <button className="w-7 p-[2px] aspect-square flex justify-center items-center hover:text-amber-600 border-2 border-zinc-600 rounded-full"
                   onClick={e => {

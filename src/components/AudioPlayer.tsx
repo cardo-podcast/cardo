@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, forwardRef, useImperativeHandle, RefObject, createContext, ReactNode, useContext } from "react";
+import React, { useRef, useEffect, useState, forwardRef, useImperativeHandle, RefObject, createContext, ReactNode, useContext, Dispatch, SetStateAction } from "react";
 import { secondsToStr } from "../utils";
 import * as icons from "../Icons"
 import { EpisodeData } from "..";
@@ -12,7 +12,9 @@ interface AudioPlayerProps {
 export type AudioPlayerRef = {
   audioRef: RefObject<HTMLAudioElement>
   play: (episode?: EpisodeData | undefined) => void
-  playing: EpisodeData | undefined
+  playing: EpisodeData | undefined,
+  position: number,
+  setPosition: Dispatch<SetStateAction<number>>
 }
 
 
@@ -24,6 +26,7 @@ export function AudioPlayerProvider({children}: {children: ReactNode}){
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playing, setPlaying] = useState<EpisodeData>()
   const { history: { getEpisodeState } } = useDB()
+  const [position, setPosition] = useState(0);
 
   const play = async (episode?: EpisodeData | undefined) => {
     if (audioRef.current == null) return
@@ -48,7 +51,9 @@ export function AudioPlayerProvider({children}: {children: ReactNode}){
     <PlayerContext.Provider value={{
       audioRef,
       play,
-      playing
+      playing,
+      position,
+      setPosition
     }}>
       {children}
     </PlayerContext.Provider>
@@ -57,10 +62,9 @@ export function AudioPlayerProvider({children}: {children: ReactNode}){
 
 
 function AudioPlayer({ className = '' }) {
-  const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const { history: { updateEpisodeState }, queue } = useDB()
-  const {audioRef, play, playing} = usePlayer()
+  const {audioRef, play, playing, position, setPosition} = usePlayer()
 
 
   useEffect(() => {
@@ -93,7 +97,7 @@ function AudioPlayer({ className = '' }) {
     if (audioRef.current) {
       const intervalId = setInterval(() => {
         if (audioRef.current) {
-          setCurrentTime(audioRef.current.currentTime);
+          setPosition(audioRef.current.currentTime);
         }
       }, 1000);
 
@@ -111,7 +115,7 @@ function AudioPlayer({ className = '' }) {
     if (audioRef.current) {
       const newTime = Number(event.target.value);
       audioRef.current.currentTime = newTime;
-      setCurrentTime(newTime);
+      setPosition(newTime);
     }
   };
 
@@ -145,12 +149,12 @@ function AudioPlayer({ className = '' }) {
 
         </div>
         <div className="flex justify-evenly items-center">
-          <p>{secondsToStr(currentTime)}</p>
+          <p>{secondsToStr(position)}</p>
           <input
             type="range"
             min="0"
             max={duration}
-            value={currentTime}
+            value={position}
             onChange={handleSeekChange}
             className="w-full mx-4 h-1 bg-zinc-300 accent-amber-600"
           />
