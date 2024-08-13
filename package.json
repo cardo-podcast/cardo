@@ -22,6 +22,7 @@
     "react-router-dom": "^6.25.1",
     "react-toastify": "^10.0.5",
     "sanitize-html": "^2.13.0",
+    "tauri-plugin-context-menu": "^0.8.0",
     "tauri-plugin-sql-api": "github:tauri-apps/tauri-plugin-sql#v1"
   },
   "devDependencies": {

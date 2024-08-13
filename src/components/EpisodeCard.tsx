@@ -7,12 +7,12 @@ import { secondsToStr } from "../utils"
 import { useDB } from "../DB"
 import ProgressBar from "./ProgressBar"
 import { FilterCriterion, useSettings } from "../Settings"
-import { ContextMenu } from "./ContextMenu"
 import { SwitchState } from "./Inputs"
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from "react-i18next"
 import { usePlayer } from "./AudioPlayer"
+import { showMenu } from "tauri-plugin-context-menu";
 
 export function SortEpisodeGrip({ id, children }: { id: number, children: ReactNode }) {
   const {
@@ -122,12 +122,12 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, filter = und
             }
           })
         }}
-      >
-        <ContextMenu target={contextMenuTarget}>
-          <div className="bg-zinc-700 max-w-60 text-zinc-300 p-2 rounded-md uppercase">
-            <p className="mb-2 truncate text-xs text-zinc-400">{episode.title}</p>
-            <button className="w-full text-left text-sm hover:text-zinc-50"
-              onClick={() => {
+        onContextMenu={() => {
+          showMenu({
+            items: [
+            {
+              label: t(reprState.complete ? 'mark_not_played' : 'mark_played'),
+              event: () => {
                 if (reprState.complete) {
                   updateEpisodeState(episode.src, episode.podcastUrl,
                     0, episode.duration)
@@ -138,11 +138,10 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, filter = und
                   setReprState({ complete: true, position: episode.duration, total: episode.duration })
                 }
               }
-              }>
-              {t(reprState.complete ? 'mark_not_played' : 'mark_played')}
-            </button>
-            <button className="w-full text-left text-sm hover:text-zinc-50"
-              onClick={async () => {
+            },
+            {
+              label: t(inQueue ? 'remove_queue' : 'add_queue'),
+              event: async () => {
                 if (inQueue) {
                   await queue.remove(episode.src)
                   setInqueue(false)
@@ -150,12 +149,12 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, filter = und
                   await queue.push(episode)
                   setInqueue(true)
                 }
-              }}
-            >
-              {t(inQueue ? 'remove_queue' : 'add_queue')}
-            </button>
-          </div>
-        </ContextMenu>
+              }
+            }
+            ]
+          });
+        }}
+      >
 
         {(entry?.isIntersecting || noLazyLoad) &&
           <>
@@ -182,9 +181,9 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, filter = und
                   (reprState.position === 0 ||
                     reprState.complete) ?
                     secondsToStr(reprState.total) :
-                    <ProgressBar position={playing?.src == episode.src? playingPosition: reprState.position}
-                                total={reprState.total}
-                                className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }} />
+                    <ProgressBar position={playing?.src == episode.src ? playingPosition : reprState.position}
+                      total={reprState.total}
+                      className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }} />
                 }
                 <button className="w-7 p-[2px] aspect-square flex justify-center items-center hover:text-amber-600 border-2 border-zinc-600 rounded-full"
                   onClick={e => {
