@@ -5,14 +5,14 @@ import { getCreds, removeCreds, saveCreds } from "../utils"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { toast } from 'react-toastify';
+import { EpisodeState } from ".."
 
 
 export function NextcloudSettings() {
   const urlRef = useRef<HTMLInputElement>(null)
   const interval = useRef(0)
-  const { misc: { getSyncKey, setSyncKey } } = useDB()
+  const { sync: { getSyncKey, setSyncKey, loggedInSync: loggedIn, setLoggedInSync: setLoggedIn } } = useDB()
   const [error, setError] = useState('')
-  const [loggedIn, setLoggedIn] = useState(false)
   const {t} = useTranslation()
 
   useEffect(() => {
@@ -179,22 +179,23 @@ async function pushUpdates(server: string, loginName: string, appPassword: strin
   }
 }
 
-async function sync(syncKey: string, db: DB): Promise<void> {
+type updateEpisodeStateType = (episodeUrl: string, podcastUrl: string, position: number, total: number, timestamp?: number) => Promise<void>
+async function sync(syncKey: string, updateEpisodeState: updateEpisodeStateType,
+                    getLastSync: () => Promise<number>, getEpisodesStates: (timestamp?: number) => Promise<EpisodeState[]>) {
 
   if (syncKey === '') return
 
   const {server, loginName, appPassword} = await getNextcloudCreds(syncKey)
-  const lastSync = await db.misc.getLastSync()
+  const lastSync = await getLastSync()
   
   const serverUpdates = await pullUpdates(server, loginName, appPassword, lastSync / 1000 ) // nextcloud server uses seconds
   
   if (serverUpdates.length > 0){
     for (const update of serverUpdates) {
       const timestamp = new Date(update.timestamp + '+00:00').getTime() //timestamp in epoch format (server is in utc ISO format)
-      
       if (update.action !== 'PLAY') continue
   
-      await db.history.updateEpisodeState(
+      await updateEpisodeState(
         update.episode,
         update.podcast,
         update.position,
@@ -205,7 +206,7 @@ async function sync(syncKey: string, db: DB): Promise<void> {
   }
 
 
-  const localUpdates = await db.history.getEpisodesStates(lastSync)
+  const localUpdates = await getEpisodesStates(lastSync)
 
   const gpodderLocalUpdates: GpodderUpdate[] = localUpdates.map( update => {
     return {
@@ -231,8 +232,8 @@ enum SyncStatus {
 export function SyncButton() {
   const [status, setStatus] = useState<SyncStatus>(SyncStatus.Standby)
   const [error, setError] = useState('')
-  const db = useDB()
-  const [loggedIn, setLoggedIn] = useState(false)
+  const { sync: {getSyncKey, setLastSync, getLastSync, loggedInSync: loggedIn, setLoggedInSync: setLoggedIn},
+          history: {updateEpisodeState, getEpisodesStates} } = useDB()
   const navigate = useNavigate()
   const {t} = useTranslation()
 
@@ -268,8 +269,12 @@ export function SyncButton() {
     setStatus(SyncStatus.Synchronizing)
 
     try{
-      await sync(await db.misc.getSyncKey() || '', db)
-      await db.misc.setLastSync(Date.now())
+      const key = await getSyncKey()
+      if (!key){
+        throw 'Error obtaining cipher key, please log-in again on Nextcloud'
+      }
+      await sync(key, updateEpisodeState, getLastSync, getEpisodesStates)
+      await setLastSync(Date.now())
       setStatus(SyncStatus.Ok)
     }catch (e) {
       setError(e as string)

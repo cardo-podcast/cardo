@@ -63,29 +63,15 @@ const getEpisodesStates = async (timestamp = 0): Promise<EpisodeState[]> => {
 
 const updateEpisodeState = async (episodeUrl: string, podcastUrl: string, position: number, total: number, timestamp?: number) => {
 
-  const r = await getEpisodeState(episodeUrl)
+  await db.execute(
+    `INSERT into episodes_history (episode, podcast, position, total, timestamp)
+      VALUES ($1, $2, $3, $4, $5)
+      ON CONFLICT (episode) DO UPDATE
+      SET position = $3, timestamp = $5
+      WHERE episode = $1 AND timestamp < $5`,
+    [episodeUrl, podcastUrl, position, total, timestamp ?? Date.now()],
+  );
 
-  if (r === undefined) {
-    // create a new entry
-    await db.execute(
-      "INSERT into episodes_history (episode, podcast, position, total, timestamp) VALUES ($1, $2, $3, $4, $5)",
-      [episodeUrl, podcastUrl, position, total, timestamp ?? Date.now()],
-    );
-  } else {
-    // update an existent entry
-
-    //check if timestamp is newer, otherwise don't update the row
-    if (timestamp !== undefined && timestamp < r.timestamp) return
-
-
-    await db.execute(
-      `UPDATE episodes_history
-      SET position = $1, timestamp = $2
-      WHERE episode = $3
-      `,
-      [Math.floor(position), timestamp ?? Date.now(), episodeUrl],
-    );
-  }
 }
 
 // #endregion
@@ -102,20 +88,15 @@ const getSyncKey = async (): Promise<string | undefined> => {
 }
 
 const setSyncKey = async (key: string) => {
-  if (await getSyncKey() === undefined) {
-    await db.execute(
-      `INSERT into misc (description, value) VALUES ("syncKey", $1)`,
-      [key],
-    );
-  } else {
-    await db.execute(
-      `UPDATE misc
-      SET value = $1
-      WHERE description = "syncKey"
-      `,
-      [key],
-    );
-  }
+  await db.execute(
+    `INSERT into misc (description, value)
+    VALUES ("syncKey", $1)
+    ON CONFLICT (description) DO UPDATE
+    SET value = $1
+    WHERE description = "syncKey"
+    `,
+    [key],
+  )
 }
 
 const getLastSync = async (): Promise<number> => {
@@ -131,20 +112,17 @@ const getLastSync = async (): Promise<number> => {
 }
 
 const setLastSync = async (timestamp: number) => {
-  if (await getLastSync() === 0) {
-    await db.execute(
-      `INSERT into misc (description, value) VALUES ("lastSync", $1)`,
-      [timestamp],
-    );
-  } else {
-    await db.execute(
-      `UPDATE misc
-      SET value = $1
-      WHERE description = "lastSync"
-      `,
-      [timestamp],
-    );
-  }
+
+  await db.execute(
+    `INSERT into misc (description, value)
+    VALUES ("lastSync", $1)
+    ON CONFLICT (description) DO UPDATE
+    SET value = $1
+    WHERE description = "lastSync"
+    `,
+    [timestamp],
+  )
+
 }
 
 // #endregion
@@ -182,17 +160,15 @@ function initQueue() {
   }
 
   const updateOrder = async (newOrder: number[]) => {
-    await db.execute(`
-      -- Try to update
-      UPDATE misc
+    await db.execute(
+      `INSERT into misc (description, value)
+      VALUES ('queueOrder', $1)
+      ON CONFLICT (description) DO UPDATE
       SET value = $1
-      WHERE description = 'queueOrder';
-
-      -- If not exist insert the row
-      INSERT INTO misc (description, value)
-      SELECT 'queueOrder', $1
-      WHERE NOT EXISTS (SELECT 1 FROM misc WHERE description = 'queueOrder');
-      `, [JSON.stringify(newOrder)])
+      WHERE description = 'queueOrder'
+      `,
+      [JSON.stringify(newOrder)],
+    )
   }
 
   const unshift = async (episode: EpisodeData) => {
@@ -281,13 +257,14 @@ function initQueue() {
 // #region SUBSCRIPTIONS_EPISODES
 
 const saveSubscriptionsEpisodes = async (episodes: EpisodeData[]) => {
+  const sortedEpisodes = [...episodes]
 
-  episodes.sort((a, b) => a.pubDate.getTime() - b.pubDate.getTime())
+  sortedEpisodes.sort((a, b) => a.pubDate.getTime() - b.pubDate.getTime())
 
   //
-  const placeholders = episodes.map((_, i) => `($${i * 8 + 1}, $${i * 8 + 2}, $${i * 8 + 3}, $${i * 8 + 4}, $${i * 8 + 5}, $${i * 8 + 6}, $${i * 8 + 7}, $${i * 8 + 8})`).join(', ');
+  const placeholders = sortedEpisodes.map((_, i) => `($${i * 8 + 1}, $${i * 8 + 2}, $${i * 8 + 3}, $${i * 8 + 4}, $${i * 8 + 5}, $${i * 8 + 6}, $${i * 8 + 7}, $${i * 8 + 8})`).join(', ');
 
-  const values = episodes.flatMap(episode => [
+  const values = sortedEpisodes.flatMap(episode => [
     episode.title,
     episode.description,
     episode.src,
@@ -343,6 +320,7 @@ export function useDB(): DB {
 
 function initDB() {
   const [dbLoaded, setDbLoaded] = useState(false)
+  const [loggedInSync, setLoggedInSync] = useState(false)
   const [subscriptionsList, setSubscriptionsList] = useState<PodcastData[]>([]);
   const queue = initQueue()
 
@@ -392,11 +370,13 @@ function initDB() {
       updateEpisodeState,
       getEpisodesStates,
     },
-    misc: {
+    sync: {
       getSyncKey,
       setSyncKey,
       getLastSync,
-      setLastSync
+      setLastSync,
+      loggedInSync,
+      setLoggedInSync
     },
     queue,
     subscriptionsEpisodes: {

@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { EpisodeData, PodcastData } from "..";
-import { Dispatch, ReactNode, SetStateAction, Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { Dispatch, ReactNode, SetStateAction, Suspense, useCallback, useEffect, useState } from "react";
 import * as icons from "../Icons"
 import { parseXML } from "../utils";
 import EpisodeCard from "../components/EpisodeCard";
@@ -103,7 +103,6 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
   const [imageError, setImageError] = useState(false)
   const podcast = location.state.podcast as PodcastData
   const [episodes, setEpisodes] = useState<EpisodeData[]>([])
-  const loadedEpisodes = useMemo()
   const [subscribed, setSubscribed] = useState(false)
   const { subscriptions: { getSubscription, deleteSubscription, addSubscription, reloadSubscriptions },
     subscriptionsEpisodes: { getAllSubscriptionsEpisodes, deleteSubscriptionEpisodes, saveSubscriptionsEpisodes } } = useDB()
