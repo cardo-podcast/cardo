@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, forwardRef, useImperativeHandle } from "react";
+import React, { useRef, useEffect, useState, forwardRef, useImperativeHandle, RefObject, createContext, ReactNode, useContext } from "react";
 import { secondsToStr } from "../utils";
 import * as icons from "../Icons"
 import { EpisodeData } from "..";
@@ -10,16 +10,20 @@ interface AudioPlayerProps {
 }
 
 export type AudioPlayerRef = {
+  audioRef: RefObject<HTMLAudioElement>
   play: (episode?: EpisodeData | undefined) => void
+  playing: EpisodeData | undefined
 }
 
 
-const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(({ className = '' }, ref) => {
-  const [playing, setPlaying] = useState<EpisodeData>()
+const PlayerContext = createContext<AudioPlayerRef | undefined>(undefined)
+
+export const usePlayer = () => useContext(PlayerContext) as AudioPlayerRef
+
+export function AudioPlayerProvider({children}: {children: ReactNode}){
   const audioRef = useRef<HTMLAudioElement>(null)
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const { history: { updateEpisodeState, getEpisodeState }, queue } = useDB()
+  const [playing, setPlaying] = useState<EpisodeData>()
+  const { history: { getEpisodeState } } = useDB()
 
   const play = async (episode?: EpisodeData | undefined) => {
     if (audioRef.current == null) return
@@ -40,9 +44,24 @@ const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(({ className = 
     audioRef.current.play()
   }
 
-  useImperativeHandle(ref, () => ({
-    play: play
-  }), [playing])
+  return(
+    <PlayerContext.Provider value={{
+      audioRef,
+      play,
+      playing
+    }}>
+      {children}
+    </PlayerContext.Provider>
+  )
+}
+
+
+function AudioPlayer({ className = '' }) {
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const { history: { updateEpisodeState }, queue } = useDB()
+  const {audioRef, play, playing} = usePlayer()
+
 
   useEffect(() => {
     if (audioRef.current == null || playing == null) return
@@ -143,6 +162,6 @@ const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(({ className = 
     </div>
 
   );
-})
+}
 
 export default AudioPlayer;

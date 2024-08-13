@@ -98,7 +98,7 @@ function FilterMenu({ podcast }: { podcast: PodcastData }) {
 }
 
 
-function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
+function PodcastPreview() {
   const location = useLocation();
   const [imageError, setImageError] = useState(false)
   const podcast = location.state.podcast as PodcastData
@@ -210,7 +210,7 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
           <Suspense key={i} fallback={<div className="bg-zinc-800 h-20 w-full" />}>
             <EpisodeCard
               episode={episode}
-              play={() => play !== undefined && play(episode)}
+              play={() => playerRef.current && playerRef.current.play(episode)}
               className="hover:bg-zinc-800 rounded-md"
               filter={podcastSettings.filter}
             />

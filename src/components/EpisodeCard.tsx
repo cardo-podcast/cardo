@@ -12,6 +12,7 @@ import { SwitchState } from "./Inputs"
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from "react-i18next"
+import { usePlayer } from "./AudioPlayer"
 
 export function SortEpisodeGrip({ id, children }: { id: number, children: ReactNode }) {
   const {
@@ -43,10 +44,10 @@ export function SortEpisodeGrip({ id, children }: { id: number, children: ReactN
 
 
 
-function EpisodeCard({ episode, play, className = '', noLazyLoad = false, filter = undefined, onImageClick = undefined }:
+function EpisodeCard({ episode, className = '', noLazyLoad = false, filter = undefined, onImageClick = undefined }:
   {
-    episode: EpisodeData, play: () => void, className?: string,
-    noLazyLoad?: boolean, filter?: FilterCriterion | undefined, onImageClick?: MouseEventHandler<HTMLImageElement>
+    episode: EpisodeData, className?: string, noLazyLoad?: boolean,
+    filter?: FilterCriterion | undefined, onImageClick?: MouseEventHandler<HTMLImageElement>
   }) {
   const [imageError, setImageError] = useState(false)
 
@@ -62,6 +63,7 @@ function EpisodeCard({ episode, play, className = '', noLazyLoad = false, filter
   const [inQueue, setInqueue] = useState(queue.includes(episode.src))
 
   const { t } = useTranslation();
+  const { play } = usePlayer()
 
 
   const [ref, entry] = useIntersectionObserver({
@@ -185,7 +187,7 @@ function EpisodeCard({ episode, play, className = '', noLazyLoad = false, filter
                 <button className="w-7 p-[2px] aspect-square flex justify-center items-center hover:text-amber-600 border-2 border-zinc-600 rounded-full"
                   onClick={e => {
                     e.stopPropagation()
-                    play()
+                    play(episode)
                   }}
                 >
                   {icons.play}

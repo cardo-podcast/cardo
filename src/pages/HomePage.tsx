@@ -3,10 +3,9 @@ import EpisodePreviewCard from "../components/EpisodePreviewCard";
 import { useDB } from "../DB";
 import * as icons from "../Icons"
 import { useTranslation } from "react-i18next";
-import { EpisodeData } from "..";
 
 
-function HomePage({ play }: { play: (episode?: EpisodeData) => void }) {
+function HomePage() {
   const { queue } = useDB()
   const scrollRef = useRef<HTMLDivElement>(null)
   const {t} = useTranslation()
@@ -37,7 +36,7 @@ function HomePage({ play }: { play: (episode?: EpisodeData) => void }) {
       <div ref={scrollRef} className="flex gap-1 overflow-x-auto pr-72 scroll-smooth">
         {
           queue.queue.map(episode => (
-            <EpisodePreviewCard episode={episode} play={() => play(episode)}/>
+            <EpisodePreviewCard episode={episode} />
           ))
         }
       </div>
