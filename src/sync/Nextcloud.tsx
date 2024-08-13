@@ -1,6 +1,6 @@
 import { http, invoke, shell } from "@tauri-apps/api"
 import { useEffect, useRef, useState } from "react"
-import { DB, useDB } from "../DB"
+import { useDB } from "../DB"
 import { getCreds, removeCreds, saveCreds } from "../utils"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"

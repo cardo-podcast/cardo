@@ -1,7 +1,7 @@
 import Database, { QueryResult } from "tauri-plugin-sql-api";
 import { path } from "@tauri-apps/api"
 import { EpisodeData, EpisodeState, PodcastData } from ".";
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react";
 
 
 let db: Database = new Database('');
@@ -125,6 +125,35 @@ const setLastSync = async (timestamp: number) => {
 
 }
 
+const getLastPlayed = async (): Promise<EpisodeData | undefined> => {
+  const r: { value: string }[] = await db.select(
+    `SELECT value from misc
+      WHERE description = "lastPlaying"`,
+  )
+  if (r.length > 0) {
+    const parsedEpisode: EpisodeData = JSON.parse(r[0].value)
+
+    return {
+      ...parsedEpisode,
+      pubDate: new Date(parsedEpisode.pubDate)
+    }
+  }
+}
+
+const setLastPlaying = async (playingEpisode: EpisodeData) => {
+
+  await db.execute(
+    `INSERT into misc (description, value)
+    VALUES ("lastPlaying", $1)
+    ON CONFLICT (description) DO UPDATE
+    SET value = $1
+    WHERE description = "lastPlaying"
+    `,
+    [JSON.stringify(playingEpisode)],
+  )
+
+}
+
 // #endregion
 // #region QUEUE
 
@@ -132,9 +161,12 @@ export type Queue = ReturnType<typeof initQueue>
 
 function initQueue() {
   const [queue, setQueue] = useState<EpisodeData[]>([]) // list of queue sqlite id's
+  const queueLoaded = useRef(false)
 
   useEffect(() => {
-    updateOrder(queue.map(episode => episode.id))
+    if (queueLoaded.current) { // supress uggly db not loaded error on mounting
+      updateOrder(queue.map(episode => episode.id))
+    }
   }, [queue])
 
   const load = async () => {
@@ -148,6 +180,8 @@ function initQueue() {
       ...episode,
       pubDate: new Date(episode.pubDate)
     })))
+
+    queueLoaded.current = true
   }
 
   const readOrder = async (): Promise<number[]> => {
@@ -369,6 +403,8 @@ function initDB() {
       getEpisodeState,
       updateEpisodeState,
       getEpisodesStates,
+      getLastPlayed,
+      setLastPlaying
     },
     sync: {
       getSyncKey,
@@ -383,7 +419,8 @@ function initDB() {
       saveSubscriptionsEpisodes,
       deleteSubscriptionEpisodes,
       getAllSubscriptionsEpisodes,
-    }
+    },
+    dbLoaded
   }
 }
 

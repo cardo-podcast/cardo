@@ -1,5 +1,5 @@
 import { Routes, Route, BrowserRouter } from "react-router-dom";
-import AudioPlayer, { AudioPlayerProvider, AudioPlayerRef } from "./components/AudioPlayer";
+import AudioPlayer, { AudioPlayerProvider } from "./components/AudioPlayer";
 import LeftMenu from "./components/LeftMenu";
 import TitleBar from "./components/TitleBar";
 import HomePage from "./pages/HomePage";
@@ -7,7 +7,7 @@ import SearchBar from "./components/SearchBar";
 import PodcastPreview from "./pages/PodcastPreview";
 import { DBProvider } from "./DB";
 import EpisodePreview from "./pages/EpisodePreview";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Settings from "./pages/Settings";
 import { SettingsProvider } from "./Settings";
 import QueuePage from "./pages/QueuePage";
@@ -17,7 +17,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 
 const App = () => {
-  const playerRef = useRef<AudioPlayerRef>(null)
   const [isMaximized, setIsMaximized] = useState(false)
 
   appWindow.onResized(async () => {

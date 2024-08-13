@@ -7,8 +7,6 @@ const ProgressBar = ({ position, total, showTime=true, className }:
     width: `${(position / total) * 100}%`,
   };
 
-  console.log(progressStyle)
-
   return (
     <div className={"flex w-full items-center gap-1 text-sm " + className?.div}>
       {showTime && <p>{secondsToStr(position)}</p>}
