@@ -2,33 +2,13 @@ import { useLocation } from "react-router-dom";
 import { EpisodeData, PodcastData } from "..";
 import { Dispatch, ReactNode, SetStateAction, Suspense, useCallback, useEffect, useState } from "react";
 import * as icons from "../Icons"
-import { getXmlDownloaded, parseXML, removeXmlDownloaded, saveXml } from "../utils";
+import { parseXML } from "../utils";
 import EpisodeCard from "../components/EpisodeCard";
 import { useDB } from "../DB";
 import { Switch } from "../components/Inputs";
 import { usePodcastSettings } from "../Settings";
 import { useTranslation } from "react-i18next";
 
-
-function FavoriteButton({ podcast, subscribed, setSubscribed }: { podcast: PodcastData, subscribed: boolean, setSubscribed: Dispatch<SetStateAction<boolean>> }) {
-  const { subscriptions } = useDB()
-
-  return (
-    <button onClick={async () => {
-      if (subscribed) {
-        await subscriptions.deleteSubscription(podcast.feedUrl)
-        setSubscribed(false)
-        removeXmlDownloaded(podcast)
-      } else {
-        podcast.id = await subscriptions.addSubscription(podcast)
-        setSubscribed(true)
-      }
-      subscriptions.reloadSubscriptions()
-    }}>
-      {subscribed ? icons.starFilled : icons.star}
-    </button>
-  )
-}
 
 type SortCriterion = {
   criterion: string,
@@ -91,7 +71,7 @@ function SortMenu({ criterion, setSortCriterion }:
 }
 
 
-function FilterMenu({podcast}: {podcast: PodcastData}) {
+function FilterMenu({ podcast }: { podcast: PodcastData }) {
   const [showMenu, setShowMenu] = useState(false)
   const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcast.feedUrl)
   const [played, setPlayed] = useState(podcastSettings.filter.played)
@@ -110,7 +90,7 @@ function FilterMenu({podcast}: {podcast: PodcastData}) {
       </button>
       {showMenu &&
         <div className="flex">
-          <Switch state={played} setState={setPlayed} labels={[t('not_played'), t('played')]}/>
+          <Switch state={played} setState={setPlayed} labels={[t('not_played'), t('played')]} />
         </div>
       }
     </div>
@@ -124,10 +104,11 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
   const podcast = location.state.podcast as PodcastData
   const [episodes, setEpisodes] = useState<EpisodeData[]>([])
   const [subscribed, setSubscribed] = useState(false)
-  const { subscriptions: { getSubscription } } = useDB()
+  const { subscriptions: { getSubscription, deleteSubscription, addSubscription, reloadSubscriptions },
+    subscriptionsEpisodes: { getAllSubscriptionsEpisodes, deleteSubscriptionEpisodes, saveSubscriptionsEpisodes } } = useDB()
   const [sortCriterion, setSortCriterion] = useState<SortCriterion>({ criterion: 'date', mode: 'desc' })
-  const [podcastSettings, ] = usePodcastSettings(podcast.feedUrl)
-  
+  const [podcastSettings,] = usePodcastSettings(podcast.feedUrl)
+
 
   const sortEpisodes = useCallback((unsortedEpisodes = episodes): EpisodeData[] => {
     const applyMode = (a: any, b: any) => {
@@ -152,30 +133,31 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
 
   useEffect(() => setEpisodes(sortEpisodes()), [sortCriterion])
 
-
-  useEffect(() => {
-    getSubscription(podcast.feedUrl).then(result => {
-      setSubscribed(result !== undefined)
-      if (result !== undefined) {
-        setSubscribed(true)
-      }
-    })
-  }, [getSubscription, podcast.feedUrl])
-
-  useEffect(() => {
+  const loadEpisodes = async () => {
     setEpisodes([])
-    getXmlDownloaded(podcast).then(async (path) => {
-      if (path === undefined && subscribed) {
-        // in case is subscribed but not downloaded
-        path = await saveXml(podcast)
-      }
+    const isSubscribed = await getSubscription(podcast.feedUrl) !== undefined
+    setSubscribed(isSubscribed)
 
-      const url = path === undefined ? podcast.feedUrl : path
-      parseXML(url, path !== undefined).then(result => {
-        setEpisodes(sortEpisodes(result))
-      })
-    });
-  }, [podcast, subscribed])
+    let episodes;
+    if (isSubscribed) {
+      episodes = await getAllSubscriptionsEpisodes(podcast.feedUrl)
+      if (!episodes.length) {
+        episodes = await parseXML(podcast.feedUrl)
+        saveSubscriptionsEpisodes(episodes)
+      }
+    } else {
+      episodes = await parseXML(podcast.feedUrl)
+    }
+
+    setEpisodes(sortEpisodes(episodes))
+
+  }
+
+  useEffect(() => {
+    loadEpisodes()
+
+  }, [podcast.feedUrl])
+
 
   return (
     <div className="p-2 w-full flex flex-col">
@@ -195,16 +177,30 @@ function PodcastPreview({ play }: { play: (episode?: EpisodeData) => void }) {
           <h2 className="mb-2">{podcast.artistName}</h2>
 
           <div className="flex gap-2">
-            <FavoriteButton podcast={podcast} subscribed={subscribed} setSubscribed={setSubscribed} />
-            <button onClick={() => {
-              parseXML(podcast.feedUrl, false).then(result => {
-                setEpisodes(result)
-              })
+            <button onClick={async () => {
+              if (subscribed) {
+                await deleteSubscription(podcast.feedUrl)
+                setSubscribed(false)
+                await deleteSubscriptionEpisodes(podcast.feedUrl)
+              } else {
+                podcast.id = await addSubscription(podcast)
+                setSubscribed(true)
+                await saveSubscriptionsEpisodes(episodes)
+              }
+              reloadSubscriptions()
             }}>
+              {subscribed ? icons.starFilled : icons.star}
+            </button>
+            <button onClick={async () => {
+              const fetchedEpisodes = await parseXML(podcast.feedUrl)
+              setEpisodes(sortEpisodes(fetchedEpisodes))
+              saveSubscriptionsEpisodes(fetchedEpisodes)
+            }
+            }>
               {icons.reload}
             </button>
             <SortMenu criterion={sortCriterion} setSortCriterion={setSortCriterion} />
-            <FilterMenu podcast={podcast}/>
+            <FilterMenu podcast={podcast} />
           </div>
 
         </div>

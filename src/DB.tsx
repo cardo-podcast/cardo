@@ -159,7 +159,7 @@ function initQueue() {
     updateOrder(queue.map(episode => episode.id))
   }, [queue])
 
-  const load = async() => {
+  const load = async () => {
     // load queue from sqlite db
     const loadedQueue = await getAll()
     const order = await readOrder()
@@ -172,13 +172,13 @@ function initQueue() {
     })))
   }
 
-  const readOrder = async(): Promise<number[]> => {
+  const readOrder = async (): Promise<number[]> => {
     const query: { value: string }[] = await db.select(`
       SELECT value FROM misc
       WHERE description = 'queueOrder'
       `)
 
-      return query.length > 0 ? JSON.parse(query[0].value) : []
+    return query.length > 0 ? JSON.parse(query[0].value) : []
   }
 
   const updateOrder = async (newOrder: number[]) => {
@@ -199,7 +199,7 @@ function initQueue() {
     const id = await insertOnDb(episode)
 
     if (id !== undefined) { // episode appended to queue
-      setQueue([{...episode, id: id}, ...queue])
+      setQueue([{ ...episode, id: id }, ...queue])
     }
   }
 
@@ -207,7 +207,7 @@ function initQueue() {
     const id = await insertOnDb(episode)
 
     if (id !== undefined) { // episode appended to queue
-      setQueue([...queue, {...episode, id: id}])
+      setQueue([...queue, { ...episode, id: id }])
     }
   }
 
@@ -245,7 +245,6 @@ function initQueue() {
     // delete from queue
     const newQueue = [...queue]
     newQueue.splice(indexOf(episodeSrc), 1)
-    console.log(newQueue)
 
     setQueue(
       newQueue
@@ -279,8 +278,58 @@ function initQueue() {
 }
 
 // #endregion
+// #region SUBSCRIPTIONS_EPISODES
 
+const saveSubscriptionsEpisodes = async (episodes: EpisodeData[]) => {
 
+  episodes.sort((a, b) => a.pubDate.getTime() - b.pubDate.getTime())
+
+  //
+  const placeholders = episodes.map((_, i) => `($${i * 8 + 1}, $${i * 8 + 2}, $${i * 8 + 3}, $${i * 8 + 4}, $${i * 8 + 5}, $${i * 8 + 6}, $${i * 8 + 7}, $${i * 8 + 8})`).join(', ');
+
+  const values = episodes.flatMap(episode => [
+    episode.title,
+    episode.description,
+    episode.src,
+    episode.pubDate.getTime(),
+    episode.duration,
+    episode.size,
+    episode.podcastUrl,
+    episode.coverUrl || ''
+  ]);
+
+  const query = `
+    INSERT INTO subscriptions_episodes (title, description, src, pubDate, duration, size, podcastUrl, coverUrl) 
+    VALUES ${placeholders} 
+    ON CONFLICT (src) DO NOTHING
+`;
+
+  await db.execute(query, values);
+
+}
+
+const deleteSubscriptionEpisodes = async (podcastUrl: string) => {
+  await db.execute(
+    "DELETE FROM subscriptions_episodes WHERE podcastUrl = $1",
+    [podcastUrl],
+  )
+}
+
+const getAllSubscriptionsEpisodes = async (podcastUrl?: string): Promise<EpisodeData[]> => {
+  const query = podcastUrl ?
+    'SELECT * FROM subscriptions_episodes WHERE podcastUrl = $1' :
+    'SELECT * FROM subscriptions_episodes'
+
+  const r: EpisodeData[] = await db.select(query, [podcastUrl])
+
+  return r.map(episode => ({
+    ...episode,
+    pubDate: new Date(episode.pubDate)
+  }))
+
+}
+
+// #endregion
 
 // #region DB PROVIDER
 
@@ -349,7 +398,12 @@ function initDB() {
       getLastSync,
       setLastSync
     },
-    queue
+    queue,
+    subscriptionsEpisodes: {
+      saveSubscriptionsEpisodes,
+      deleteSubscriptionEpisodes,
+      getAllSubscriptionsEpisodes,
+    }
   }
 }
 

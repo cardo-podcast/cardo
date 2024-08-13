@@ -1,6 +1,6 @@
 import { ResponseType, fetch as tauriFetch } from "@tauri-apps/api/http"
 import { EpisodeData, PodcastData } from "."
-import { createDir, exists, readTextFile, removeFile, writeTextFile } from "@tauri-apps/api/fs"
+import { exists, readTextFile, writeTextFile } from "@tauri-apps/api/fs"
 import { appCacheDir, join } from "@tauri-apps/api/path"
 import sanitizeHtml from 'sanitize-html';
 
@@ -40,19 +40,8 @@ function getItunesTag(item: Element, tag: string) {
   return item.getElementsByTagNameNS('http://www.itunes.com/dtds/podcast-1.0.dtd', tag)[0]
 }
 
-export async function parseXML(url: string, fileDownloaded = false): Promise<EpisodeData[]> {
-  /*
-  url: link to web resource or to xml file in cache
-  fileDownloaded: file is in cache
-  */
-
-  let xmlString = ''
-
-  if (fileDownloaded) {
-    xmlString = await readTextFile(url)
-  } else {
-    xmlString = await downloadXml(url)
-  }
+export async function parseXML(url: string): Promise<EpisodeData[]> {
+  const xmlString = await downloadXml(url)
 
   const parser = new DOMParser()
   const xml = parser.parseFromString(xmlString, "text/xml")
@@ -120,43 +109,6 @@ export async function parsePodcastDetails(xml: Document | string) {
 
   return podcast
 }
-
-export async function getXmlDownloaded(podcast: PodcastData) {
-  if (podcast.id === undefined) return
-
-  const localXmlPath = await join(await appCacheDir(), 'Downloaded Feeds', podcast.id.toString() + '.xml');
-  const fileExists = await exists(localXmlPath);
-
-  return fileExists ? localXmlPath : undefined;
-}
-
-export async function saveXml(podcast: PodcastData) {
-  if (podcast.id === undefined) return
-
-  const feedDir = await join(await appCacheDir(), 'Downloaded Feeds');
-
-  if (!await exists(feedDir)) {
-    await createDir(feedDir)
-  }
-
-  const localXmlPath = await join(feedDir, podcast.id.toString() + '.xml')
-  const xml = await downloadXml(podcast.feedUrl)
-
-  writeTextFile(localXmlPath, xml)
-
-  return localXmlPath
-}
-
-export async function removeXmlDownloaded(podcast: PodcastData) {
-  if (podcast.id === undefined) return
-
-  const localXmlPath = await getXmlDownloaded(podcast)
-
-  if (localXmlPath !== undefined) {
-    await removeFile(localXmlPath)
-  }
-}
-
 
 export async function getAllCreds(): Promise<any | undefined> {
 
