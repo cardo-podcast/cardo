@@ -1,4 +1,3 @@
-import { Suspense, useEffect } from "react"
 import EpisodeCard, { SortEpisodeGrip } from "../components/EpisodeCard"
 import { useDB } from "../DB"
 import { EpisodeData } from ".."
@@ -6,9 +5,10 @@ import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext } from '@dnd-kit/sortable';
 import { parsePodcastDetails } from "../utils";
 import { useNavigate } from "react-router-dom";
+import { Suspense, useEffect } from "react";
 
 
-export default function QueuePage({ play }: { play: (episode?: EpisodeData) => void }) {
+export default function QueuePage() {
   const { queue: {queue, move} } = useDB()
   const navigate = useNavigate()
   const {subscriptions: {getSubscription}} = useDB()
@@ -59,7 +59,6 @@ export default function QueuePage({ play }: { play: (episode?: EpisodeData) => v
                 <Suspense fallback={<div className="bg-zinc-800 h-20 w-full" />}>
                   <EpisodeCard
                     episode={episode}
-                    play={() => play(episode)}
                     noLazyLoad={true}
                     onImageClick={(e) => {
                       e.stopPropagation()

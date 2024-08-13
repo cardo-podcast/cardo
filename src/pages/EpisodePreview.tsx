@@ -1,11 +1,10 @@
-import { useState } from "react"
+import {  useState } from "react"
 import * as icons from "../Icons"
 import { EpisodeData } from ".."
 import { useLocation } from "react-router-dom"
 
 
-
-function EpisodePreview({ play }: { play: (episode?: EpisodeData) => void}) {
+function EpisodePreview() {
   const [imageError, setImageError] = useState(false)
   const location = useLocation()
   const episode = location.state.episode as EpisodeData
@@ -27,7 +26,7 @@ function EpisodePreview({ play }: { play: (episode?: EpisodeData) => void}) {
           <h1>{episode.title}</h1>
           <div className="flex gap-2">
             <button className="w-6 p-[2px] aspect-square flex justify-center items-center hover:text-amber-600 bg-zinc-700 rounded-full"
-              onClick={() => play !== undefined && play(episode)}
+              onClick={() => playerRef.current && playerRef.current.play(episode)}
             >
               {icons.play}
             </button>

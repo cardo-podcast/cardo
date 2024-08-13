@@ -6,14 +6,16 @@ import * as icons from "../Icons"
 import { useNavigate } from "react-router-dom";
 import ProgressBar from "./ProgressBar";
 import { useDB } from "../DB";
+import { usePlayer } from "./AudioPlayer";
 
 
 
-export default function EpisodePreviewCard({ episode, play }: { episode: EpisodeData, play: () => void }) {
+export default function EpisodePreviewCard({ episode }: { episode: EpisodeData }) {
   const [imageError, setImageError] = useState(false)
   const navigate = useNavigate()
   const [position, setPosition] = useState(0)
   const { history: {getEpisodeState} } = useDB()
+  const { play } = usePlayer()
 
   useEffect(() => {
     getEpisodeState(episode.src).then(
@@ -46,7 +48,7 @@ export default function EpisodePreviewCard({ episode, play }: { episode: Episode
       <button className="absolute bottom-2 right-2 bg-amber-500 w-8 p-[2px] aspect-square flex justify-center items-center hover:text-amber-600 border-2 border-amber-600 rounded-full"
                   onClick={e => {
                     e.stopPropagation()
-                    play()
+                    play(episode)
                   }}
                 >
                   {icons.play}
