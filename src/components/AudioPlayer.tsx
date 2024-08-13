@@ -1,8 +1,9 @@
-import React, { useRef, useEffect, useState, forwardRef, useImperativeHandle, RefObject, createContext, ReactNode, useContext, Dispatch, SetStateAction } from "react";
+import React, { useRef, useEffect, useState, RefObject, createContext, ReactNode, useContext, Dispatch, SetStateAction } from "react";
 import { secondsToStr } from "../utils";
 import * as icons from "../Icons"
 import { EpisodeData } from "..";
 import { useDB } from "../DB";
+import { useNavigate } from "react-router-dom";
 
 
 interface AudioPlayerProps {
@@ -41,6 +42,7 @@ export function AudioPlayerProvider({children}: {children: ReactNode}){
 
       if (previousState !== undefined && previousState.position < previousState.total) {
         audioRef.current.currentTime = previousState.position
+        setPosition(previousState.position)
       }
     }
 
@@ -65,7 +67,7 @@ function AudioPlayer({ className = '' }) {
   const [duration, setDuration] = useState(0);
   const { history: { updateEpisodeState }, queue } = useDB()
   const {audioRef, play, playing, position, setPosition} = usePlayer()
-
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (audioRef.current == null || playing == null) return
@@ -130,9 +132,16 @@ function AudioPlayer({ className = '' }) {
     <div className={`flex bg-zinc-950 text-slate-50 p-2 gap-3 ${audioRef.current?.src ? '' : 'hidden'} ${className}`}>
       {playing &&
         <img
-          className="bg-zinc-700 h-full aspect-square rounded-md"
+          className="bg-zinc-700 h-full aspect-square rounded-md cursor-pointer"
           src={playing.coverUrl}
           alt=''
+          onClick={() => {
+            navigate('/episode-preview', {
+              state: {
+                episode: playing
+              }
+            })
+          }}
         />
       }
 

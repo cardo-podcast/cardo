@@ -34,10 +34,10 @@ const App = () => {
   return (
     <div className={`bg-zinc-900 w-full h-screen flex flex-col border-zinc-600 border-[1px]
                         text-zinc-50 overflow-hidden ${isMaximized ? '' : 'rounded-lg'}`}>
-      <SettingsProvider>
-        <DBProvider>
-          <AudioPlayerProvider>
-            <BrowserRouter>
+      <BrowserRouter>
+        <SettingsProvider>
+          <DBProvider>
+            <AudioPlayerProvider>
               <TitleBar />
               <ToastContainer />
               <div className="flex justify-start w-full h-full overflow-hidden">
@@ -55,11 +55,11 @@ const App = () => {
                   </div>
                 </div>
               </div>
-            </BrowserRouter>
-            <AudioPlayer className="w-full h-28 flex-shrink-0" />
-          </AudioPlayerProvider>
-        </DBProvider>
-      </SettingsProvider>
+              <AudioPlayer className="w-full h-28 flex-shrink-0" />
+            </AudioPlayerProvider>
+          </DBProvider>
+        </SettingsProvider>
+      </BrowserRouter>
     </div>
   );
 };
