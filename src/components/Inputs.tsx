@@ -1,3 +1,4 @@
+import { useState } from "react"
 
 
 
@@ -8,10 +9,11 @@ export enum SwitchState {
 }
 
 
-export function Switch({ state, setState, labels}: { state: SwitchState,
-                                                      setState: (state: SwitchState) => void,
-                                                      labels: [string, string]
-                                                      }) {
+export function Switch({ state, setState, labels }: {
+  state: SwitchState,
+  setState: (state: SwitchState) => void,
+  labels: [string, string]
+}) {
 
   return (
     <div className="flex gap-2 items-center uppercase text-sm">
@@ -25,6 +27,26 @@ export function Switch({ state, setState, labels}: { state: SwitchState,
           className="w-5 h-full appearance-none checked:bg-green-500" />
       </div>
       <p>{labels[1]}</p>
+    </div>
+  )
+}
+
+export function Checkbox({ onChange, defaultChecked = false }: { onChange: (value: boolean) => void, defaultChecked?: boolean }) {
+
+
+  return (
+    <div className="relative inline-flex items-center cursor-pointer">
+      <input
+        type="checkbox"
+        className="hidden peer"
+        defaultChecked={defaultChecked}
+        onChange={(e) => {
+          onChange(Boolean(e.target.checked))
+        }}
+      />
+      <span className="text-transparent peer-checked:text-zinc-900 text-lg font-bold flex justify-center items-center h-5 w-5 text-center bg-zinc-200 transition duration-100 ease-in-out rounded-md m-1">
+        ✓
+      </span>
     </div>
   )
 }

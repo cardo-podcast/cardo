@@ -6,14 +6,16 @@ import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { toast } from 'react-toastify';
 import { EpisodeState } from ".."
+import { Checkbox } from "../components/Inputs"
+import { useSettings } from "../Settings"
 
 
 export function NextcloudSettings() {
   const urlRef = useRef<HTMLInputElement>(null)
   const interval = useRef(0)
   const { sync: { getSyncKey, setSyncKey, loggedInSync: loggedIn, setLoggedInSync: setLoggedIn } } = useDB()
-  const [error, setError] = useState('')
-  const {t} = useTranslation()
+  const { t } = useTranslation()
+  const [{ sync: syncSettings }, updateSettings] = useSettings()
 
   useEffect(() => {
     getCreds('nextcloud').then(r => {
@@ -25,43 +27,74 @@ export function NextcloudSettings() {
 
   if (loggedIn) {
     return (
-      <div className="flex gap-2 items-center">
-        <h1 className="text-lg">{t('logged_in')}</h1>
-        <button className="uppercase bg-amber-600 w-fit px-4 hover:bg-amber-700 rounded-md p-1"
-          onClick={async () => {
-            removeCreds('nextcloud')
-            setLoggedIn(false)
-          }}
-        >
-          {t('log_out')}
-        </button>
+      <div className="flex flex-col gap-3 p-1">
+        <div className="flex gap-2 items-center">
+          <h1 className="text-lg">{t('logged_in')}:</h1>
+          <button className="uppercase bg-amber-600 w-fit px-4 hover:bg-amber-700 rounded-md p-1"
+            onClick={async () => {
+              removeCreds('nextcloud')
+              setLoggedIn(false)
+            }}
+          >
+            {t('log_out')}
+          </button>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <h1>{t('automatic_sync')}:</h1>
+          <div className="flex gap-3">
+            <label className="w-fit flex gap-1">
+              {t('when_opening_app')}:
+              <Checkbox defaultChecked={syncSettings.syncAfterAppStart}
+                onChange={(value) => updateSettings({ sync: { syncAfterAppStart: value } })} />
+            </label>
+            <label className="w-fit flex gap-1">
+              {t('when_closing_app')}:
+              <Checkbox defaultChecked={syncSettings.syncBeforeAppClose}
+                onChange={(value) => updateSettings({ sync: { syncBeforeAppClose: value } })} />
+            </label>
+          </div>
+        </div>
       </div>
     )
   }
 
   return (
-    <form className="flex flex-col gap-2 items-center" onSubmit={async (e) => {
-      e.preventDefault()
-      if (urlRef.current) {
-        try {
-          interval.current = await login(urlRef.current.value, getSyncKey, setSyncKey, () => setLoggedIn(true))
-          setError('')
-        } catch (e) {
-          setError('Error: ' + (e as Error).message)
+    <div className="flex flex-col gap-2 p-1">
+      <form className="flex flex-col gap-2 items-center" onSubmit={async (e) => {
+        e.preventDefault()
+        if (urlRef.current) {
+          try {
+            interval.current = await login(urlRef.current.value, getSyncKey, setSyncKey, () => setLoggedIn(true))
+          } catch (e) {
+            toast.error((e as Error).message, {
+              position: "top-center",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "dark",
+            });
+          }
         }
-      }
-    }}>
-      <input
-        type="text"
-        className="py-1 px-2 bg-zinc-800 placeholder-zinc-500 text-zinc-400 w-full rounded-md focus:outline-none"
-        ref={urlRef}
-        placeholder={t('nextcloud_server_url')}
-      />
-      <button className="uppercase bg-amber-600 w-fit px-4 hover:bg-amber-700 rounded-md p-1">
-        {t('connect')}
-      </button>
-      {error !== '' && <p className="text-red-700 font-bold">{error}</p>}
-    </form>
+      }}>
+        <label className="w-full flex gap-1 flex-col">
+          {t('nextcloud_server_url')}
+          <input
+            type="text"
+            className="py-1 px-2 bg-zinc-800 placeholder-zinc-500 text-zinc-400 rounded-md focus:outline-none"
+            ref={urlRef}
+            placeholder={t('nextcloud_server_url_example')}
+          />
+        </label>
+
+        <button className="uppercase bg-amber-600 w-fit px-4 hover:bg-amber-700 rounded-md p-1">
+          {t('connect')}
+        </button>
+      </form>
+    </div>
   )
 }
 
@@ -130,16 +163,16 @@ interface GpodderUpdate {
   position: number,
   total: number,
   timestamp: string
-  action: 'DOWNLOAD' |'PLAY' | 'DELETE' | 'NEW'
+  action: 'DOWNLOAD' | 'PLAY' | 'DELETE' | 'NEW'
 }
 
-async function getNextcloudCreds(syncKey: string): Promise<{server: string, loginName: string, appPassword: string}> {
+async function getNextcloudCreds(syncKey: string): Promise<{ server: string, loginName: string, appPassword: string }> {
   const creds: any = await getCreds('nextcloud')
 
-  const {server, loginName: encryptedLoginName, appPassword: encryptedAppPassword} = creds
-  const loginName: string = await invoke('decrypt', {encryptedText: encryptedLoginName, base64Key: syncKey})
-  const appPassword: string = await invoke('decrypt', {encryptedText: encryptedAppPassword, base64Key: syncKey})
-  return {server: server, loginName: loginName, appPassword: appPassword}
+  const { server, loginName: encryptedLoginName, appPassword: encryptedAppPassword } = creds
+  const loginName: string = await invoke('decrypt', { encryptedText: encryptedLoginName, base64Key: syncKey })
+  const appPassword: string = await invoke('decrypt', { encryptedText: encryptedAppPassword, base64Key: syncKey })
+  return { server: server, loginName: loginName, appPassword: appPassword }
 }
 
 
@@ -181,20 +214,20 @@ async function pushUpdates(server: string, loginName: string, appPassword: strin
 
 type updateEpisodeStateType = (episodeUrl: string, podcastUrl: string, position: number, total: number, timestamp?: number) => Promise<void>
 async function sync(syncKey: string, updateEpisodeState: updateEpisodeStateType,
-                    getLastSync: () => Promise<number>, getEpisodesStates: (timestamp?: number) => Promise<EpisodeState[]>) {
+  getLastSync: () => Promise<number>, getEpisodesStates: (timestamp?: number) => Promise<EpisodeState[]>) {
 
   if (syncKey === '') return
 
-  const {server, loginName, appPassword} = await getNextcloudCreds(syncKey)
+  const { server, loginName, appPassword } = await getNextcloudCreds(syncKey)
   const lastSync = await getLastSync()
-  
-  const serverUpdates = await pullUpdates(server, loginName, appPassword, lastSync / 1000 ) // nextcloud server uses seconds
-  
-  if (serverUpdates.length > 0){
+
+  const serverUpdates = await pullUpdates(server, loginName, appPassword, lastSync / 1000) // nextcloud server uses seconds
+
+  if (serverUpdates.length > 0) {
     for (const update of serverUpdates) {
       const timestamp = new Date(update.timestamp + '+00:00').getTime() //timestamp in epoch format (server is in utc ISO format)
       if (update.action !== 'PLAY') continue
-  
+
       await updateEpisodeState(
         update.episode,
         update.podcast,
@@ -208,7 +241,7 @@ async function sync(syncKey: string, updateEpisodeState: updateEpisodeStateType,
 
   const localUpdates = await getEpisodesStates(lastSync)
 
-  const gpodderLocalUpdates: GpodderUpdate[] = localUpdates.map( update => {
+  const gpodderLocalUpdates: GpodderUpdate[] = localUpdates.map(update => {
     return {
       ...update,
       position: update.position,
@@ -229,24 +262,34 @@ enum SyncStatus {
   Error
 }
 
-export function SyncButton() {
+
+export function useSyncButton() {
   const [status, setStatus] = useState<SyncStatus>(SyncStatus.Standby)
   const [error, setError] = useState('')
-  const { sync: {getSyncKey, setLastSync, getLastSync, loggedInSync: loggedIn, setLoggedInSync: setLoggedIn},
-          history: {updateEpisodeState, getEpisodesStates} } = useDB()
+  const { sync: { getSyncKey, setLastSync, getLastSync, loggedInSync: loggedIn, setLoggedInSync: setLoggedIn },
+    history: { updateEpisodeState, getEpisodesStates } } = useDB()
   const navigate = useNavigate()
-  const {t} = useTranslation()
+  const [{ sync: syncSettings }, _] = useSettings()
+  const { t } = useTranslation()
 
+
+  const load = async () => {
+    const creds = await getCreds('nextcloud')
+    setLoggedIn(creds !== undefined)
+  }
 
   useEffect(() => {
-    getCreds('nextcloud').then(r => {
-      setLoggedIn(r !== undefined)
-    })
-
+    load()
   }, [])
 
+  useEffect(() => {
+    if (loggedIn && syncSettings.syncAfterAppStart) {
+      performSync()
+    }
+  }, [loggedIn])
 
-  const performSync = async() => {
+
+  const performSync = async () => {
 
     if (!loggedIn) {
       toast.info(t('not_logged_sync'), {
@@ -258,7 +301,7 @@ export function SyncButton() {
         draggable: true,
         progress: undefined,
         theme: "dark",
-        });
+      });
       navigate('/settings')
       return
     }
@@ -268,24 +311,32 @@ export function SyncButton() {
     setError('')
     setStatus(SyncStatus.Synchronizing)
 
-    try{
+    try {
       const key = await getSyncKey()
-      if (!key){
+      if (!key) {
         throw 'Error obtaining cipher key, please log-in again on Nextcloud'
       }
       await sync(key, updateEpisodeState, getLastSync, getEpisodesStates)
       await setLastSync(Date.now())
       setStatus(SyncStatus.Ok)
-    }catch (e) {
+    } catch (e) {
       setError(e as string)
       setStatus(SyncStatus.Error)
     }
   }
 
+  return { status, error, performSync }
+}
+
+
+export function SyncButton() {
+  const { t } = useTranslation()
+  const { status, error, performSync } = useSyncButton()
+
 
   return (
     <button className={`w-6 hover:text-amber-400 outline-none ${status === SyncStatus.Synchronizing && 'animate-[spin_2s_linear_infinite_reverse]'}`}
-    onClick={performSync} title={error == '' ? t('sync'): error}
+      onClick={performSync} title={error == '' ? t('sync') : error}
     >
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-refresh">
         <path stroke="none" d="M0 0h24v24H0z" fill="none" />

@@ -12,7 +12,7 @@
   "date": "Fecha",
   "duration": "Duración",
   "logged_in": "Ya has iniciado sesion",
-  "nextcloud_server_url": "URL del servidor Nextcloud",
+  "nextcloud_server_url_example": "https://nextcloud.example.com",
   "connect": "Conectar",
   "log_out": "Cerrar sesion",
   "sync": "Sincronizacion",
@@ -23,5 +23,9 @@
   "remaining_time": "tiempo restante",
   "hours": "horas",
   "hour": "hora",
-  "minutes": "minutos"
+  "minutes": "minutos",
+  "nextcloud_server_url": "URL del servidor Nextcloud",
+  "automatic_sync": "Sincronizar automáticamente",
+  "when_opening_app": "Tras abrir la aplicación",
+  "when_closing_app": "Antes de cerrar la aplicación"
 }

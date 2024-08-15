@@ -33,7 +33,7 @@ function HomePage() {
           {icons.arrowRight}
         </button>
 
-      <div ref={scrollRef} className="flex gap-1 overflow-x-auto pr-72 scroll-smooth">
+      <div ref={scrollRef} className="flex gap-2 overflow-x-auto pr-72 scroll-smooth">
         {
           queue.queue.map(episode => (
             <EpisodePreviewCard key={episode.id} episode={episode} />
