@@ -16,6 +16,7 @@
     "@tauri-apps/api": "^1.6.0",
     "@uidotdev/usehooks": "^2.4.1",
     "i18next": "^23.12.2",
+    "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-i18next": "^15.0.1",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.6.0",
+    "@types/lodash": "^4.17.7",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@types/sanitize-html": "^2.11.0",

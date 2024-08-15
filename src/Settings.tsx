@@ -2,9 +2,10 @@ import { os } from "@tauri-apps/api"
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react"
 import { appConfigDir, join } from "@tauri-apps/api/path"
 import { readTextFile, writeTextFile } from "@tauri-apps/api/fs"
-import { Settings } from "."
+import { RecursivePartial, Settings } from "."
 import { SwitchState } from "./components/Inputs"
 import { changeLanguage } from "./translations"
+import { merge } from "lodash"
 
 
 export class FilterCriterion {
@@ -28,9 +29,10 @@ export class PodcastSettings {
 }
 
 
-const SettingsContext = createContext<[Settings, (newSettings: any) => void] | undefined>(undefined)
+const SettingsContext = createContext<[Settings, (newSettings: RecursivePartial<Settings>) => void] | undefined>(undefined)
 
-export function useSettings(): [Settings, (newSettings: any) => void] {
+
+export function useSettings(): [Settings, (newSettings: RecursivePartial<Settings>) => void] {
   return useContext(SettingsContext) as [Settings, (newSettings: any) => void]
 }
 
@@ -70,7 +72,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   const [settings, setSettings] = useState<Settings>({
     globals: {locale: 'en-US', language: 'en'},
-    podcasts: {}
+    podcasts: {},
+    sync: {
+      syncAfterAppStart: false,
+      syncBeforeAppClose: false
+    }
   })
   
   useEffect(() => {
@@ -79,8 +85,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   const [loaded, setLoaded] = useState(false)
 
-  const updateSettings = (newSettings: any) => {
-    setSettings({...settings, ...newSettings})
+  const updateSettings = (newSettings: RecursivePartial<Settings>) => {
+    let settingsClone = {...settings}
+    merge(settingsClone, newSettings)
+    
+    setSettings(settingsClone)
   }
 
   useEffect(() => {

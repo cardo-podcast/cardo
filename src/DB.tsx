@@ -69,7 +69,7 @@ const updateEpisodeState = async (episodeUrl: string, podcastUrl: string, positi
       ON CONFLICT (episode) DO UPDATE
       SET position = $3, timestamp = $5
       WHERE episode = $1 AND timestamp < $5`,
-    [episodeUrl, podcastUrl, Math.min(position, total), total, timestamp ?? Date.now()],
+    [episodeUrl, podcastUrl, Math.min(Math.floor(position), total), total, timestamp ?? Date.now()],
   );
 
 }
