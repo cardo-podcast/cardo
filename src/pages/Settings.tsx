@@ -8,8 +8,8 @@ function Settings() {
 
   return(
     <div className="p-2 w-full flex flex-col gap-2">
-      <div className=" py-4flex flex-col gap-1 border-zinc-700 border-2 p-2 rounded-md">
-      <h1 className="uppercase border-b-2 border-zinc-700 mb-2">{t('sync')}</h1>
+      <div className=" py-4flex flex-col gap-1 border-zinc-800 border-[2px] p-2 rounded-md">
+      <h1 className="uppercase border-b-2 border-zinc-800 mb-2">{t('sync')}</h1>
         <p className="pb-2">NEXTCLOUD GPODDER</p>
         <NextcloudSettings/>
       </div>

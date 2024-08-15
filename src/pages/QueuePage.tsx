@@ -3,15 +3,18 @@ import { useDB } from "../DB"
 import { EpisodeData } from ".."
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext } from '@dnd-kit/sortable';
-import { parsePodcastDetails } from "../utils";
+import { capitalize, parsePodcastDetails } from "../utils";
 import { useNavigate } from "react-router-dom";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 
 export default function QueuePage() {
   const { queue: {queue, move} } = useDB()
   const navigate = useNavigate()
   const {subscriptions: {getSubscription}} = useDB()
+  const {t} = useTranslation()
+  const [queueInfo, setQueueInfo] = useState('')
 
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -41,25 +44,38 @@ export default function QueuePage() {
     queue.map(episode => {
       fetchPodcastData(episode)
     })
+
+    //sum items and total time
+    const items = queue.length
+    let time = 0
+    queue.map(episode => time += episode.duration)
+
+    console.log(time)
+    const hours = Math.floor(time / 3600)
+    const minutes = Math.round((time - (hours * 3600)) / 60)
+
+    setQueueInfo(`${items} ${t('episodes')} · ${capitalize(t('remaining_time'))}: ${hours} ${hours > 1 ? t('hours'): t('hour')} ${minutes} ${t('minutes')}`)
   }, [queue])
 
 
   return (
     <div className="p-2 w-full flex flex-col">
-      <div className='flex justify-center items-center w-full gap-3 bg-zinc-800 rounded-md mb-2 min-h-28'>
-        <h1>QUEUE</h1>
+      <div className='flex flex-col p-2  w-full border-b-[1px] border-zinc-800'>
+        <h1 className="uppercase">{t('queue')}</h1>
+        <h2 className="text-zinc-500 text-sm">{queueInfo}</h2>
       </div>
       <DndContext
       onDragEnd={handleDragEnd}
       >
         <SortableContext items={queue.map(episode => episode.id)}>
-          <div className="grid gap-1 content-start">
+          <div className="grid content-start">
             {queue.map(episode => (
               <SortEpisodeGrip key={episode.id} id={episode.id}>
                 <Suspense fallback={<div className="bg-zinc-800 h-20 w-full" />}>
                   <EpisodeCard
                     episode={episode}
                     noLazyLoad={true}
+                    className="hover:bg-zinc-800 border-b-[1px] border-zinc-800"
                     onImageClick={(e) => {
                       e.stopPropagation()
                       navigate('/preview', {

@@ -61,7 +61,7 @@ function EpisodePreview() {
 
   return (
     <div className="p-2 w-full flex flex-col">
-      <div className='flex justify-left w-full gap-3 bg-zinc-800 rounded-md mb-2 p-2'>
+      <div className='flex justify-left w-full gap-3 mb-2 p-2 pb-3 border-b-2 border-zinc-800'>
         {imageError ?
           icons.photo :
           <img
@@ -101,7 +101,7 @@ function EpisodePreview() {
           </div>
         </div>
       </div>
-      <div className="bg-zinc-800 rounded-md p-3 whitespace-pre-line"
+      <div className="rounded-md p-3 whitespace-pre-line"
         dangerouslySetInnerHTML={{ __html: episode.description }} />
     </div>
   )

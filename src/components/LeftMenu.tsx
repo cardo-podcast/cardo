@@ -8,7 +8,7 @@ function LeftMenu() {
   const { t } = useTranslation();
 
   return (
-    <div className="bg-zinc-900 border-r-2 border-zinc-800 mr-1 w-56 h-full flex flex-col p-3 pt-4">
+    <div className="bg-zinc-900 border-r-2 border-zinc-800 w-56 h-full flex flex-col p-3 pt-4">
       <div className="flex flex-col gap-1 uppercase mb-6">
         <Link to='/'>
           {t('home')}
