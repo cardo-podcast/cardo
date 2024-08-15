@@ -16,5 +16,12 @@
   "connect": "connect",
   "log_out": "log out",
   "sync": "synchronization",
-  "subscriptions": "subscriptions"
+  "subscriptions": "subscriptions",
+  "open_podcast": "Open the podcast",
+  "not_logged_sync": "Before synchronizing you have to log in to Nextcloud",
+  "episodes": "episodes",
+  "remaining_time": "remaining time",
+  "hours": "hours",
+  "hour": "hour",
+  "minutes": "minutes"
 }

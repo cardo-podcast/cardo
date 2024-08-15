@@ -158,3 +158,7 @@ export async function removeCreds(name: string) {
 
   await writeTextFile(file, JSON.stringify(data))
 }
+
+export function capitalize(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}

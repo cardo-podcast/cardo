@@ -17,7 +17,7 @@ function HomePage() {
   }
 
   return (
-    <div className="flex flex-col p-2 w-full h-fit fixed">
+    <div className="flex flex-col p-2 w-full h-fit relative">
       <h1 className="mb-2 uppercase">{t('queue')}</h1>
 
         <button

@@ -18,5 +18,10 @@
   "sync": "Sincronizacion",
   "subscriptions": "Subscripciones",
   "open_podcast": "Abrir el podcast",
-  "not_logged_sync": "Antes de sincronizar tienes que iniciar sesión en Nextcloud"
+  "not_logged_sync": "Antes de sincronizar tienes que iniciar sesión en Nextcloud",
+  "episodes": "episodios",
+  "remaining_time": "tiempo restante",
+  "hours": "horas",
+  "hour": "hora",
+  "minutes": "minutos"
 }

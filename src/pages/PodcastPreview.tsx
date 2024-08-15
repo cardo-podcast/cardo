@@ -160,7 +160,7 @@ function PodcastPreview() {
 
   return (
     <div className="p-2 w-full flex flex-col">
-      <div className='flex justify-left w-full gap-3 bg-zinc-800 rounded-md mb-2'>
+      <div className='flex justify-left w-full gap-3 pb-3 border-b-[3px] border-zinc-800'>
         {imageError ?
           icons.photo :
           <img
@@ -205,12 +205,12 @@ function PodcastPreview() {
         </div>
       </div>
 
-      <div className="grid gap-1 content-start">
+      <div className="grid content-start">
         {episodes.map((episode, i) => (
           <Suspense key={i} fallback={<div className="bg-zinc-800 h-20 w-full" />}>
             <EpisodeCard
               episode={episode}
-              className="hover:bg-zinc-800 rounded-md"
+              className="hover:bg-zinc-800 border-b-[1px] border-zinc-800"
               filter={podcastSettings.filter}
             />
           </Suspense>

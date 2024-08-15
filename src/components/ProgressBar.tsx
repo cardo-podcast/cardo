@@ -10,7 +10,7 @@ const ProgressBar = ({ position, total, showTime=true, className }:
   return (
     <div className={"flex w-full items-center gap-1 text-sm " + className?.div}>
       {showTime && <p>{secondsToStr(position)}</p>}
-      <div className={"w-full h-full bg-zinc-600 " + className?.bar}>
+      <div className={"w-full h-full bg-zinc-700 " + className?.bar}>
         <div
           className={"bg-amber-500 h-full " + className?.innerBar}
         style={progressStyle}
