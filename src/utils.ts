@@ -2,7 +2,6 @@ import { ResponseType, fetch as tauriFetch } from "@tauri-apps/api/http"
 import { EpisodeData, PodcastData } from "."
 import { exists, readTextFile, writeTextFile } from "@tauri-apps/api/fs"
 import { appCacheDir, join } from "@tauri-apps/api/path"
-import sanitizeHtml from 'sanitize-html';
 
 export function secondsToStr(seconds: number) {
   const hours = Math.floor(seconds / 3600)
@@ -24,10 +23,6 @@ export function strToSeconds(time: string) {
   return r
 }
 
-function htmlToText(html: string): string {
-  return sanitizeHtml(html)
-}
-
 async function downloadXml(url: string): Promise<string> {
   const response = await tauriFetch(url, {
     method: 'GET',
@@ -41,8 +36,11 @@ function getItunesTag(item: Element, tag: string) {
 }
 
 export async function parseXML(url: string): Promise<EpisodeData[]> {
-  const xmlString = await downloadXml(url)
+  // dynamic import of sanitize module, to reduce bundle size
+  const module = await import('sanitize-html');
+  const sanitizeHtml = module.default;
 
+  const xmlString = await downloadXml(url)
   const parser = new DOMParser()
   const xml = parser.parseFromString(xmlString, "text/xml")
   const items = xml.querySelectorAll('item')
@@ -63,11 +61,11 @@ export async function parseXML(url: string): Promise<EpisodeData[]> {
 
   const podcastDetails = await parsePodcastDetails(xml)
 
-  const result = Array.from(items).map((item: Element, i) => {
+  const result = await Promise.all(Array.from(items).map(async(item: Element, i) => {
     const episode: EpisodeData = {
       id: i, //
       title: item.querySelector('title')?.textContent ?? '',
-      description: htmlToText(item.querySelector('description')?.textContent ?? '') ?? item.querySelector('itunes\\:summary')?.textContent,
+      description: await sanitizeHtml(item.querySelector('description')?.textContent ?? '') ?? item.querySelector('itunes\\:summary')?.textContent,
       src: item.querySelector('enclosure')?.getAttribute('url') ?? '',
       pubDate: new Date(item.querySelector('pubDate')?.textContent ?? 0),
       coverUrl: getItunesTag(item, 'image')?.getAttribute('href') ?? podcastDetails.coverUrl,
@@ -76,7 +74,7 @@ export async function parseXML(url: string): Promise<EpisodeData[]> {
       podcastUrl: podcastDetails.feedUrl
     }
     return episode
-  })
+  }))
 
   return result
 }

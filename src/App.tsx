@@ -1,16 +1,16 @@
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import AudioPlayer, { AudioPlayerProvider } from "./components/AudioPlayer";
 import LeftMenu from "./components/LeftMenu";
 import TitleBar from "./components/TitleBar";
 import HomePage from "./pages/HomePage";
 import SearchBar from "./components/SearchBar";
-import PodcastPreview from "./pages/PodcastPreview";
+const PodcastPreview = lazy(() => import('./pages/PodcastPreview'));
 import { DBProvider } from "./DB";
-import EpisodePreview from "./pages/EpisodePreview";
-import { useEffect, useState } from "react";
-import Settings from "./pages/Settings";
+const EpisodePreview = lazy(() => import('./pages/EpisodePreview'));
+const Settings = lazy(() => import('./pages/Settings'));
 import { SettingsProvider } from "./Settings";
-import QueuePage from "./pages/QueuePage";
+const QueuePage = lazy(() => import('./pages/QueuePage'));
 import { appWindow } from "@tauri-apps/api/window";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
@@ -44,6 +44,7 @@ const App = () => {
                 <div className="flex flex-col w-full h-ful">
                   <SearchBar />
                   <div className="flex h-full overflow-y-auto">
+                    <Suspense>
                     <Routes>
                       <Route path='/' element={<HomePage />} />
                       <Route path='/preview' element={<PodcastPreview />} />
@@ -51,6 +52,7 @@ const App = () => {
                       <Route path='/settings' element={<Settings />} />
                       <Route path='/queue' element={<QueuePage />} />
                     </Routes>
+                    </Suspense>
                   </div>
                 </div>
               </div>

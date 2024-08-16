@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import EpisodePreviewCard from "../components/EpisodePreviewCard";
 import { useDB } from "../DB";
-import * as icons from "../Icons"
 import { useTranslation } from "react-i18next";
 import EpisodeOverview from "../components/EpisodeOverview";
 import { EpisodeData } from "..";
@@ -20,7 +19,7 @@ function HomePage() {
 
   const loadNewEpisodes = async () => {
     const minDate = Date.now() - (24 * 3600 * 1000 * numberOfDaysInNews)
-    const episodes = await getAllSubscriptionsEpisodes(minDate)
+    const episodes = await getAllSubscriptionsEpisodes({pubdate_gt: minDate})
 
     const filteredEpisodes: EpisodeData[] = []
 
