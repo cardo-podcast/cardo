@@ -139,7 +139,7 @@ function PodcastPreview() {
 
     let episodes;
     if (isSubscribed) {
-      episodes = await getAllSubscriptionsEpisodes(podcast.feedUrl)
+      episodes = await getAllSubscriptionsEpisodes({podcastUrl: podcast.feedUrl})
       if (!episodes.length) {
         episodes = await parseXML(podcast.feedUrl)
         saveSubscriptionsEpisodes(episodes)

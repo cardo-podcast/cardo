@@ -5,7 +5,7 @@ import { readTextFile, writeTextFile } from "@tauri-apps/api/fs"
 import { RecursivePartial, Settings } from "."
 import { SwitchState } from "./components/Inputs"
 import { changeLanguage } from "./translations"
-import { merge } from "lodash"
+import merge from "lodash/merge"
 
 
 export class FilterCriterion {
