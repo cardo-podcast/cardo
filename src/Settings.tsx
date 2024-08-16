@@ -76,6 +76,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     sync: {
       syncAfterAppStart: false,
       syncBeforeAppClose: false
+    },
+    general: {
+      numberOfDaysInNews: 15,
+      fetchSubscriptionsAtStartup: true
     }
   })
   

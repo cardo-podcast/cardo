@@ -27,5 +27,9 @@
   "nextcloud_server_url_example": "https://nextcloud.example.com",
   "automatic_sync": "Automatically sync",
   "when_opening_app": "After opening the application",
-  "when_closing_app": "Before closing the application"
+  "when_closing_app": "Before closing the application",
+  "number_days_news": "See last {{n}} days on news",
+  "general": "General",
+  "fetch_subscriptions_startup": "Update subscription feeds at startup",
+  "news": "News"
 }

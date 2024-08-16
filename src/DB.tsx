@@ -326,12 +326,15 @@ const deleteSubscriptionEpisodes = async (podcastUrl: string) => {
   )
 }
 
-const getAllSubscriptionsEpisodes = async (podcastUrl?: string): Promise<EpisodeData[]> => {
-  const query = podcastUrl ?
-    'SELECT * FROM subscriptions_episodes WHERE podcastUrl = $1' :
-    'SELECT * FROM subscriptions_episodes'
+const getAllSubscriptionsEpisodes = async (pubdate_gt = 0, podcastUrl?: string): Promise<EpisodeData[]> => {
 
-  const r: EpisodeData[] = await db.select(query, [podcastUrl])
+  let query = 'SELECT * FROM subscriptions_episodes WHERE pubDate > $1'
+
+  if (podcastUrl) {
+    query += ' AND podcastUrl = $2'
+  }
+
+  const r: EpisodeData[] = await db.select(query, [pubdate_gt, podcastUrl])
 
   return r.map(episode => ({
     ...episode,

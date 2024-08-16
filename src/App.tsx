@@ -41,7 +41,7 @@ const App = () => {
               <ToastContainer />
               <div className="flex justify-start w-full h-full overflow-hidden">
                 <LeftMenu />
-                <div className="flex flex-col w-full h-full">
+                <div className="flex flex-col w-full h-ful">
                   <SearchBar />
                   <div className="flex h-full overflow-y-auto">
                     <Routes>
