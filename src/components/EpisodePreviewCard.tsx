@@ -25,7 +25,7 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData }
 
 
   return (
-    <div className="flex flex-col w-32 flex-shrink-0 rounded-md hover:p-1 cursor-default">
+    <div className="flex flex-col w-24 flex-shrink-0 rounded-md hover:p-1 cursor-default transition-all duration-100">
       <div className='flex flex-col rounded-md overflow-hidden relative'>
       {
         imageError ?
@@ -48,7 +48,7 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData }
                   total={episode.duration}
                   showTime={false}
                   className={{div: "h-[5px]"}}/>
-      <button className="absolute bottom-2 right-2 bg-amber-500 w-8 p-[2px] aspect-square flex justify-center items-center hover:text-amber-600 border-2 border-amber-600 rounded-full"
+      <button className="absolute bottom-2 right-2 bg-amber-500 w-8 p-[3px] aspect-square flex justify-center items-center hover:p-0 border-2 border-amber-600 rounded-full"
                   onClick={e => {
                     e.stopPropagation()
                     play(episode)
@@ -57,7 +57,7 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData }
                   {icons.play}
                 </button>
       </div>
-      <h1 className="text-sm line-clamp-2">{episode.title}</h1>
+      <h1 className="text-sm line-clamp-2" title={episode.title}>{episode.title}</h1>
     </div>
   )
 }

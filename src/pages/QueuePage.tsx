@@ -50,7 +50,6 @@ export default function QueuePage() {
     let time = 0
     queue.map(episode => time += episode.duration)
 
-    console.log(time)
     const hours = Math.floor(time / 3600)
     const minutes = Math.round((time - (hours * 3600)) / 60)
 

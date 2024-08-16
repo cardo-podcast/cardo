@@ -29,7 +29,7 @@ export function NextcloudSettings() {
     return (
       <div className="flex flex-col gap-3 p-1">
         <div className="flex gap-2 items-center">
-          <h1 className="text-lg">{t('logged_in')}:</h1>
+          <p className="text-lg">{t('logged_in')}:</p>
           <button className="uppercase bg-amber-600 w-fit px-4 hover:bg-amber-700 rounded-md p-1"
             onClick={async () => {
               removeCreds('nextcloud')
@@ -41,7 +41,7 @@ export function NextcloudSettings() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <h1>{t('automatic_sync')}:</h1>
+          <h2 className="uppercase">{t('automatic_sync')}</h2>
           <div className="flex gap-3">
             <label className="w-fit flex gap-1">
               {t('when_opening_app')}:

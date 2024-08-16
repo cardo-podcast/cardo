@@ -1,45 +1,77 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import EpisodePreviewCard from "../components/EpisodePreviewCard";
 import { useDB } from "../DB";
 import * as icons from "../Icons"
 import { useTranslation } from "react-i18next";
+import EpisodeOverview from "../components/EpisodeOverview";
+import { EpisodeData } from "..";
+import { useSettings } from "../Settings";
 
 
 function HomePage() {
-  const { queue } = useDB()
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const {t} = useTranslation()
+  const { queue,
+    subscriptionsEpisodes: { getAllSubscriptionsEpisodes },
+    history: { getEpisodeState },
+    dbLoaded } = useDB()
+  const { t } = useTranslation()
+  const [newEpisodes, setNewEpisodes] = useState<EpisodeData[]>([])
+  const [{ general: { numberOfDaysInNews } }, _] = useSettings()
 
-  const manageScroll = (value: number) => {
-    if (!scrollRef.current) return
 
-    scrollRef.current.scrollLeft += value
+  const loadNewEpisodes = async () => {
+    const minDate = Date.now() - (24 * 3600 * 1000 * numberOfDaysInNews)
+    const episodes = await getAllSubscriptionsEpisodes(minDate)
+
+    const filteredEpisodes: EpisodeData[] = []
+
+    // filter completed episodes
+    for (const episode of episodes) {
+      const state = await getEpisodeState(episode.src)
+      if (!state || state?.position < state?.total) {
+        filteredEpisodes.push(episode)
+      }
+    }
+
+    // sort newer -> older
+    filteredEpisodes.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime())
+
+    setNewEpisodes(filteredEpisodes)
   }
 
+  useEffect(
+    () => {
+      if (!dbLoaded) return
+
+      loadNewEpisodes()
+    }, [dbLoaded])
+
   return (
-    <div className="flex flex-col p-2 w-full h-fit relative">
-      <h1 className="mb-2 uppercase">{t('queue')}</h1>
-
-        <button
-          className="fixed z-10 top-[115px] bg-amber-500 w-12 rounded-r-full h-28 opacity-0 hover:opacity-100 transition-opacity duration-200"
-          onClick={() => manageScroll(-200)}
-        >
-          {icons.arrowLeft}
-        </button>
-        <button
-          className="fixed z-10 top-[115px] bg-amber-500 w-12 rounded-l-full h-28 opacity-0 hover:opacity-100 transition-opacity duration-200 right-0"
-          onClick={() => manageScroll(200)}
-        >
-          {icons.arrowRight}
-        </button>
-
-      <div ref={scrollRef} className="flex gap-2 overflow-x-auto pr-72 scroll-smooth">
-        {
-          queue.queue.map(episode => (
-            <EpisodePreviewCard key={episode.id} episode={episode} />
-          ))
-        }
+    <div className="flex flex-col p-2 w-full h-fit gap-3 mt-1">
+      <div>
+        <h1 className="mb-1 uppercase">{t('queue')}</h1>
+        <EpisodeOverview>
+          {
+            queue.queue.map(episode => (
+              <EpisodePreviewCard key={episode.id} episode={episode} />
+            ))
+          }
+        </EpisodeOverview>
       </div>
+
+      {
+        numberOfDaysInNews > 0 &&
+
+        <div>
+          <h1 className="mb-1 uppercase">{t('news')}</h1>
+          <EpisodeOverview>
+            {
+              newEpisodes.map(episode => (
+                <EpisodePreviewCard key={episode.id} episode={episode} />
+              ))
+            }
+          </EpisodeOverview>
+        </div>
+      }
 
     </div>
   )

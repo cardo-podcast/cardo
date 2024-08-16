@@ -27,5 +27,9 @@
   "nextcloud_server_url": "URL del servidor Nextcloud",
   "automatic_sync": "Sincronizar automáticamente",
   "when_opening_app": "Tras abrir la aplicación",
-  "when_closing_app": "Antes de cerrar la aplicación"
+  "when_closing_app": "Antes de cerrar la aplicación",
+  "general": "General",
+  "fetch_subscriptions_startup": "Actualizar feeds de las subscripciones al inicio",
+  "number_days_news": "Ver los ultimos {{n}} dias en novedades",
+  "news": "Novedades"
 }

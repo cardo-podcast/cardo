@@ -45,6 +45,10 @@ export interface Settings {
   sync: {
     syncAfterAppStart: boolean,
     syncBeforeAppClose: boolean
+  },
+  general: {
+    numberOfDaysInNews: number,
+    fetchSubscriptionsAtStartup: boolean
   }
 }
 
