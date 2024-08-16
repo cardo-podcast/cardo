@@ -46,7 +46,7 @@ export default function EpisodeOverview({ children }: { children: ReactNode }) {
         </>
       }
 
-      <div ref={scrollRef} className="flex gap-2 overflow-x-auto scroll-smooth pr-52">
+      <div ref={scrollRef} className="flex gap-2 overflow-x-auto scroll-smooth">
         {children}
       </div>
 

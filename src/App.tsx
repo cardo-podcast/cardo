@@ -41,17 +41,17 @@ const App = () => {
               <ToastContainer />
               <div className="flex justify-start w-full h-full overflow-hidden">
                 <LeftMenu />
-                <div className="flex flex-col w-full h-ful">
+                <div className="flex flex-col overflow-y-hidden w-full h-full">
                   <SearchBar />
                   <div className="flex h-full overflow-y-auto">
                     <Suspense>
-                    <Routes>
-                      <Route path='/' element={<HomePage />} />
-                      <Route path='/preview' element={<PodcastPreview />} />
-                      <Route path='/episode-preview' element={<EpisodePreview />} />
-                      <Route path='/settings' element={<Settings />} />
-                      <Route path='/queue' element={<QueuePage />} />
-                    </Routes>
+                      <Routes>
+                        <Route path='/' element={<HomePage />} />
+                        <Route path='/preview' element={<PodcastPreview />} />
+                        <Route path='/episode-preview' element={<EpisodePreview />} />
+                        <Route path='/settings' element={<Settings />} />
+                        <Route path='/queue' element={<QueuePage />} />
+                      </Routes>
                     </Suspense>
                   </div>
                 </div>
