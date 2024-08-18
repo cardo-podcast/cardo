@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import EpisodePreviewCard from "../components/EpisodePreviewCard";
 import { useDB } from "../DB";
 import { useTranslation } from "react-i18next";

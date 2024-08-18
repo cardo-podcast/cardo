@@ -23,6 +23,14 @@ export interface EpisodeData {
   coverUrl?: string,
 }
 
+export interface NewEpisodeData extends EpisodeData{
+  new?: boolean
+}
+
+export interface RawEpisodeData extends EpisodeData{
+  pubDate: number
+}
+
 export interface EpisodeState {
   podcast: string,
   episode: string,
