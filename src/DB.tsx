@@ -2,6 +2,8 @@ import Database, { QueryResult } from "tauri-plugin-sql-api";
 import { path } from "@tauri-apps/api"
 import { EpisodeData, EpisodeState, PodcastData } from ".";
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react";
+import { useSettings } from "./Settings";
+import { parseXML } from "./utils";
 
 
 let db: Database = new Database('');
@@ -315,7 +317,7 @@ const saveSubscriptionsEpisodes = async (episodes: EpisodeData[]) => {
     ON CONFLICT (src) DO NOTHING
 `;
 
-  await db.execute(query, values);
+  return await db.execute(query, values)
 
 }
 
@@ -326,7 +328,7 @@ const deleteSubscriptionEpisodes = async (podcastUrl: string) => {
   )
 }
 
-const getAllSubscriptionsEpisodes = async (options: {pubdate_gt?: number, podcastUrl?: string}): Promise<EpisodeData[]> => {
+const getAllSubscriptionsEpisodes = async (options: { pubdate_gt?: number, podcastUrl?: string }): Promise<EpisodeData[]> => {
 
   let query = 'SELECT * FROM subscriptions_episodes WHERE pubDate > $1'
 
@@ -335,6 +337,24 @@ const getAllSubscriptionsEpisodes = async (options: {pubdate_gt?: number, podcas
   }
 
   const r: EpisodeData[] = await db.select(query, [options.pubdate_gt ?? 0, options.podcastUrl])
+
+  return r.map(episode => ({
+    ...episode,
+    pubDate: new Date(episode.pubDate)
+  }))
+
+}
+
+const loadNewSubscriptionsEpisodes = async (pubdate_gt: number) => {
+  // get all uncompleted episodes since a pubDate
+
+  const r: EpisodeData[] = await db.select(`
+    SELECT subscriptions_episodes.* FROM subscriptions_episodes
+    LEFT JOIN episodes_history ON subscriptions_episodes.src = episodes_history.episode
+    WHERE pubDate > $1
+    AND (episodes_history.position IS NULL
+	  OR episodes_history.position < episodes_history.total)
+    `, [pubdate_gt])
 
   return r.map(episode => ({
     ...episode,
@@ -359,8 +379,32 @@ function initDB() {
   const [dbLoaded, setDbLoaded] = useState(false)
   const [loggedInSync, setLoggedInSync] = useState(false)
   const [subscriptionsList, setSubscriptionsList] = useState<PodcastData[]>([]);
+  const [newEpisodes, setNewEpisodes] = useState<EpisodeData[]>([])
   const queue = initQueue()
+  const [{ general: { numberOfDaysInNews, fetchSubscriptionsAtStartup } }, _] = useSettings()
 
+
+  const loadNewEpisodes = async () => {
+    const minDate = Date.now() - (24 * 3600 * 1000 * numberOfDaysInNews)
+    const episodes = await loadNewSubscriptionsEpisodes(minDate)
+
+    episodes.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime())
+
+    setNewEpisodes(episodes)
+  }
+
+  const updateSubscriptionsFeed = async () => {
+    if (fetchSubscriptionsAtStartup) {
+      for (const subscription of subscriptionsList) {
+        console.log(subscription)
+        const episodes = await parseXML(subscription.feedUrl)
+        const r = await saveSubscriptionsEpisodes(episodes)
+        if (r.rowsAffected > 0) {
+          loadNewEpisodes()
+        }
+      }
+    }
+  }
 
   useEffect(() => {
     // load database
@@ -387,6 +431,17 @@ function initDB() {
       setSubscriptionsList(r)
     })
   }, [dbLoaded])
+
+  useEffect(() => {
+    // extract episodes newer than setting
+    if (dbLoaded) {
+      loadNewEpisodes()
+    }
+  }, [dbLoaded, numberOfDaysInNews])
+
+  useEffect(() => {
+    updateSubscriptionsFeed()
+  }, [subscriptionsList, fetchSubscriptionsAtStartup])
 
   const reloadSubscriptions = async (): Promise<PodcastData[]> => {
     const fp = await getSubscriptions()
@@ -422,6 +477,7 @@ function initDB() {
       saveSubscriptionsEpisodes,
       deleteSubscriptionEpisodes,
       getAllSubscriptionsEpisodes,
+      newEpisodes
     },
     dbLoaded
   }

@@ -1,48 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import EpisodePreviewCard from "../components/EpisodePreviewCard";
 import { useDB } from "../DB";
 import { useTranslation } from "react-i18next";
 import EpisodeOverview from "../components/EpisodeOverview";
-import { EpisodeData } from "..";
-import { useSettings } from "../Settings";
 
 
 function HomePage() {
   const { queue,
-    subscriptionsEpisodes: { getAllSubscriptionsEpisodes },
-    history: { getEpisodeState },
-    dbLoaded } = useDB()
+    subscriptionsEpisodes: { newEpisodes }} = useDB()
   const { t } = useTranslation()
-  const [newEpisodes, setNewEpisodes] = useState<EpisodeData[]>([])
-  const [{ general: { numberOfDaysInNews } }, _] = useSettings()
 
-
-  const loadNewEpisodes = async () => {
-    const minDate = Date.now() - (24 * 3600 * 1000 * numberOfDaysInNews)
-    const episodes = await getAllSubscriptionsEpisodes({pubdate_gt: minDate})
-
-    const filteredEpisodes: EpisodeData[] = []
-
-    // filter completed episodes
-    for (const episode of episodes) {
-      const state = await getEpisodeState(episode.src)
-      if (!state || state?.position < state?.total) {
-        filteredEpisodes.push(episode)
-      }
-    }
-
-    // sort newer -> older
-    filteredEpisodes.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime())
-
-    setNewEpisodes(filteredEpisodes)
-  }
-
-  useEffect(
-    () => {
-      if (!dbLoaded) return
-
-      loadNewEpisodes()
-    }, [dbLoaded])
 
   return (
     <div className="flex flex-col p-2 w-full h-fit gap-3 mt-1">
@@ -58,7 +25,7 @@ function HomePage() {
       </div>
 
       {
-        numberOfDaysInNews > 0 &&
+        newEpisodes.length > 0 &&
 
         <div>
           <h1 className="mb-1 uppercase">{t('news')}</h1>
