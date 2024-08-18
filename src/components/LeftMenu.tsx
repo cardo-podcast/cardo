@@ -1,9 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useDB } from "../DB";
 import { useTranslation } from "react-i18next";
+import * as icons from '../Icons'
 
 function LeftMenu() {
-  const { subscriptions } = useDB()
+  const { subscriptions, subscriptionsEpisodes: {updateSubscriptionsFeed, updatingFeeds} } = useDB()
   const navigate = useNavigate()
   const { t } = useTranslation();
 
@@ -21,7 +22,15 @@ function LeftMenu() {
         </Link>
       </div>
 
-      <h1 className="uppercase mb-2">{t('subscriptions')}</h1>
+      <div className="flex items-center gap-2 mb-2">
+        <h1 className="uppercase">{t('subscriptions')}</h1>
+        <button className={`flex justify-center w-[16px] ${updatingFeeds && 'animate-[spin_1.5s_linear_infinite]'}`}
+        onClick={updateSubscriptionsFeed}
+        title={t('update_subs_feeds')}
+        >
+          {icons.reload}
+        </button>
+      </div>
       <div className="flex flex-col gap-1 overflow-y-auto">
         {
           subscriptions.subscriptions.map((fav, i) => {

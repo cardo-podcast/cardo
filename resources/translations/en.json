@@ -31,5 +31,7 @@
   "number_days_news": "See last {{n}} days on news",
   "general": "General",
   "fetch_subscriptions_startup": "Update subscription feeds at startup",
-  "news": "News"
+  "news": "News",
+  "new": "New",
+  "update_subs_feeds": "Update subscription feeds"
 }

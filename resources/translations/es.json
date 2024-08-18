@@ -31,5 +31,7 @@
   "general": "General",
   "fetch_subscriptions_startup": "Actualizar feeds de las subscripciones al inicio",
   "number_days_news": "Ver los ultimos {{n}} dias en novedades",
-  "news": "Novedades"
+  "news": "Novedades",
+  "new": "Nuevo",
+  "update_subs_feeds": "Actualizar los feeds de las subscripciones"
 }

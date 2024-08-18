@@ -1,6 +1,6 @@
 import Database, { QueryResult } from "tauri-plugin-sql-api";
 import { path } from "@tauri-apps/api"
-import { EpisodeData, EpisodeState, PodcastData } from ".";
+import { EpisodeData, EpisodeState, NewEpisodeData, PodcastData, RawEpisodeData } from ".";
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react";
 import { useSettings } from "./Settings";
 import { parseXML } from "./utils";
@@ -345,10 +345,30 @@ const getAllSubscriptionsEpisodes = async (options: { pubdate_gt?: number, podca
 
 }
 
-const loadNewSubscriptionsEpisodes = async (pubdate_gt: number) => {
-  // get all uncompleted episodes since a pubDate
 
-  const r: EpisodeData[] = await db.select(`
+const loadNewSubscriptionsEpisodes = async (pubdate_gt: number): Promise<NewEpisodeData[]> => {
+  // get all uncompleted episodes since a pubDate  
+
+  // get last feed dowload sync to highlight the new fetched episodes
+  const r: { value: number }[] = await db.select(
+    `SELECT value from misc
+      WHERE description = "lastFeedDownload"`,
+  )
+
+  const lastSync = r[0]?.value ?? 0
+
+  // set current time as last
+  db.execute(`
+      INSERT into misc (description, value)
+      VALUES ('lastFeedDownload', $1)
+      ON CONFLICT (description) DO UPDATE
+      SET value = $1
+      WHERE description = 'lastFeedDownload'
+    `, [Date.now()])
+
+
+  // get all episodes of the database, filter by pubdate
+  const r2: RawEpisodeData[] = await db.select(`
     SELECT subscriptions_episodes.* FROM subscriptions_episodes
     LEFT JOIN episodes_history ON subscriptions_episodes.src = episodes_history.episode
     WHERE pubDate > $1
@@ -356,9 +376,10 @@ const loadNewSubscriptionsEpisodes = async (pubdate_gt: number) => {
 	  OR episodes_history.position < episodes_history.total)
     `, [pubdate_gt])
 
-  return r.map(episode => ({
+  return r2.map(episode => ({
     ...episode,
-    pubDate: new Date(episode.pubDate)
+    pubDate: new Date(episode.pubDate),
+    new: episode.pubDate > lastSync // is new if it's just discovered
   }))
 
 }
@@ -378,8 +399,9 @@ export function useDB(): DB {
 function initDB() {
   const [dbLoaded, setDbLoaded] = useState(false)
   const [loggedInSync, setLoggedInSync] = useState(false)
+  const [updatingFeeds, setUpdatingFeeds] = useState(false)
   const [subscriptionsList, setSubscriptionsList] = useState<PodcastData[]>([]);
-  const [newEpisodes, setNewEpisodes] = useState<EpisodeData[]>([])
+  const [newEpisodes, setNewEpisodes] = useState<NewEpisodeData[]>([])
   const queue = initQueue()
   const [{ general: { numberOfDaysInNews, fetchSubscriptionsAtStartup } }, _] = useSettings()
 
@@ -394,16 +416,15 @@ function initDB() {
   }
 
   const updateSubscriptionsFeed = async () => {
-    if (fetchSubscriptionsAtStartup) {
-      for (const subscription of subscriptionsList) {
-        console.log(subscription)
-        const episodes = await parseXML(subscription.feedUrl)
-        const r = await saveSubscriptionsEpisodes(episodes)
-        if (r.rowsAffected > 0) {
-          loadNewEpisodes()
-        }
+    setUpdatingFeeds(true)
+    for (const subscription of subscriptionsList) {
+      const episodes = await parseXML(subscription.feedUrl)
+      const r = await saveSubscriptionsEpisodes(episodes)
+      if (r.rowsAffected > 0) {
+        loadNewEpisodes()
       }
     }
+    setUpdatingFeeds(false)
   }
 
   useEffect(() => {
@@ -440,7 +461,9 @@ function initDB() {
   }, [dbLoaded, numberOfDaysInNews])
 
   useEffect(() => {
-    updateSubscriptionsFeed()
+    if (fetchSubscriptionsAtStartup) {
+      updateSubscriptionsFeed()
+    }
   }, [subscriptionsList, fetchSubscriptionsAtStartup])
 
   const reloadSubscriptions = async (): Promise<PodcastData[]> => {
@@ -477,7 +500,9 @@ function initDB() {
       saveSubscriptionsEpisodes,
       deleteSubscriptionEpisodes,
       getAllSubscriptionsEpisodes,
-      newEpisodes
+      newEpisodes,
+      updatingFeeds,
+      updateSubscriptionsFeed
     },
     dbLoaded
   }
