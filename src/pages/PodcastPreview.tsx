@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
-import { EpisodeData, PodcastData } from "..";
-import { Dispatch, ReactNode, SetStateAction, Suspense, useCallback, useEffect, useState } from "react";
+import { EpisodeData, PodcastData, SortCriterion } from "..";
+import { ReactNode, Suspense, useEffect, useState } from "react";
 import * as icons from "../Icons"
 import { parseXML } from "../utils";
 import EpisodeCard from "../components/EpisodeCard";
@@ -10,90 +10,36 @@ import { usePodcastSettings } from "../Settings";
 import { useTranslation } from "react-i18next";
 
 
-type SortCriterion = {
-  criterion: string,
-  mode: 'asc' | 'desc'
-}
-
-function SortButton({ criterion, globalCriterion, setGlobalCriterion, children }:
-  { criterion: string, globalCriterion: SortCriterion, setGlobalCriterion: Dispatch<SetStateAction<SortCriterion>>, children: ReactNode }) {
-
+function SortButton({ children, podcastUrl, criterion }: { children: ReactNode, podcastUrl: string, criterion: SortCriterion['criterion'] }) {
+  const [{ sort }, updatePodcastSettings] = usePodcastSettings(podcastUrl)
+  // podcastSettings.sort.criterion
 
   return (
-    <button onClick={() => {
-      if (globalCriterion.criterion === criterion) {
-        setGlobalCriterion({
-          ...globalCriterion,
-          mode: globalCriterion.mode === 'asc' ? 'desc' : 'asc'
-        })
-      } else {
-        globalCriterion.criterion = criterion
-        globalCriterion.criterion = criterion
-        setGlobalCriterion({
-          ...globalCriterion,
-          criterion: criterion
-        })
+    <button
+      className={`bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center w-2/3 rounded-md ${sort.criterion == criterion ? 'text-amber-500' : ''}`}
+      onClick={
+        () => {
+          if (sort.criterion == criterion) {
+            updatePodcastSettings({
+              sort: {
+                criterion,
+                mode: sort.mode == 'asc' ? 'desc' : 'asc'
+              }
+            })
+          } else {
+            updatePodcastSettings({ sort: { criterion } })
+          }
+        }
       }
-    }}
-      className={`flex items-center uppercase gap-[2px] px-1 text-sm rounded-md hover:bg-zinc-600 ${globalCriterion.criterion === criterion && 'text-amber-500'}`}
     >
+      {
+        sort.criterion == criterion &&
+        <div className="w-5 h-5">
+          {sort.mode === 'asc' ? icons.upArrow : icons.downArrow}
+        </div>
+      }
       {children}
-      <div className="w-4 h-4 justify-center flex">
-        {globalCriterion.mode === 'asc' ? icons.upArrow : icons.downArrow}
-      </div>
     </button>
-  )
-}
-
-
-function SortMenu({ criterion, setSortCriterion }:
-  { criterion: SortCriterion, setSortCriterion: Dispatch<SetStateAction<SortCriterion>> }) {
-  const [showMenu, setShowMenu] = useState(false)
-  const { t } = useTranslation();
-
-  return (
-    <div className={`flex justify-center gap-2 rounded-md ${showMenu && 'bg-zinc-700'}`}>
-      <button className="" onClick={() => setShowMenu(!showMenu)}>
-        {icons.sort}
-      </button>
-      {showMenu &&
-        <div className="flex">
-          <SortButton criterion="date" globalCriterion={criterion} setGlobalCriterion={setSortCriterion}>
-            {t('date')}
-          </SortButton>
-          <SortButton criterion="duration" globalCriterion={criterion} setGlobalCriterion={setSortCriterion}>
-            {t('duration')}
-          </SortButton>
-        </div>
-      }
-    </div>
-  )
-}
-
-
-function FilterMenu({ podcast }: { podcast: PodcastData }) {
-  const [showMenu, setShowMenu] = useState(false)
-  const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcast.feedUrl)
-  const [played, setPlayed] = useState(podcastSettings.filter.played)
-  const { t } = useTranslation();
-
-
-  useEffect(() => {
-    podcastSettings.filter.played = played
-    updatePodcastSettings(podcastSettings)
-  }, [played])
-
-  return (
-    <div className={`flex justify-center gap-2 rounded-md ${showMenu && 'bg-zinc-700'}`}>
-      <button className="" onClick={() => setShowMenu(!showMenu)}>
-        {icons.filter}
-      </button>
-      {showMenu &&
-        <div className="flex">
-          <Switch state={played} setState={setPlayed} labels={[t('not_played'), t('played')]} />
-        </div>
-      }
-    </div>
   )
 }
 
@@ -106,11 +52,11 @@ function PodcastPreview() {
   const [subscribed, setSubscribed] = useState(false)
   const { subscriptions: { getSubscription, deleteSubscription, addSubscription, reloadSubscriptions },
     subscriptionsEpisodes: { getAllSubscriptionsEpisodes, deleteSubscriptionEpisodes, saveSubscriptionsEpisodes } } = useDB()
-  const [sortCriterion, setSortCriterion] = useState<SortCriterion>({ criterion: 'date', mode: 'desc' })
-  const [podcastSettings,] = usePodcastSettings(podcast.feedUrl)
+  const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcast.feedUrl)
+  const [tweakMenu, setTweakMenu] = useState<ReactNode>(undefined)
+  const { t } = useTranslation()
 
-
-  const sortEpisodes = useCallback((unsortedEpisodes = episodes): EpisodeData[] => {
+  const sortEpisodes = (unsortedEpisodes: EpisodeData[]) => {
     const applyMode = (a: any, b: any) => {
       if (sortCriterion.mode === 'asc') {
         return a - b
@@ -120,6 +66,8 @@ function PodcastPreview() {
     }
 
     let sortedEpisodes: EpisodeData[] = []
+    const sortCriterion = podcastSettings.sort
+
     switch (sortCriterion.criterion) {
       case 'duration':
         sortedEpisodes = [...unsortedEpisodes].sort((a, b) => applyMode(a.duration, b.duration))
@@ -128,10 +76,9 @@ function PodcastPreview() {
         sortedEpisodes = [...unsortedEpisodes].sort((a, b) => applyMode(a.pubDate, b.pubDate))
         break
     }
-    return sortedEpisodes
-  }, [episodes, sortCriterion])
 
-  useEffect(() => setEpisodes(sortEpisodes()), [sortCriterion])
+    return sortedEpisodes
+  }
 
   const loadEpisodes = async () => {
     const isSubscribed = await getSubscription(podcast.feedUrl) !== undefined
@@ -139,7 +86,7 @@ function PodcastPreview() {
 
     let episodes;
     if (isSubscribed) {
-      episodes = await getAllSubscriptionsEpisodes({podcastUrl: podcast.feedUrl})
+      episodes = await getAllSubscriptionsEpisodes({ podcastUrl: podcast.feedUrl })
       if (!episodes.length) {
         episodes = await parseXML(podcast.feedUrl)
         saveSubscriptionsEpisodes(episodes)
@@ -154,13 +101,33 @@ function PodcastPreview() {
 
   useEffect(() => {
     loadEpisodes()
-
+    setTweakMenu(undefined)
   }, [podcast.feedUrl])
 
 
+  useEffect(() => {
+    setEpisodes(sortEpisodes(episodes))
+  }, [podcastSettings.sort.criterion, podcastSettings.sort.mode])
+
+
   return (
-    <div className="p-2 w-full flex flex-col">
+    <div className="relative p-2 w-full flex flex-col">
       <div className='flex justify-left w-full gap-3 pb-3 border-b-[3px] border-zinc-800'>
+
+        {tweakMenu &&
+          <div className="left-1/2 -translate-x-1/2 absolute w-2/3 top-0 rounded-b-3xl overflow-hidden bg-zinc-900 border-[1px] border-t-0 border-zinc-600 flex flex-col justify-between items-center transition-all duration-200 z-20">
+            <div className="p-2 flex flex-col gap-1 items-center w-full">
+              {tweakMenu}
+            </div>
+
+            <button className="border-t-2 border-zinc-800 p-2 h-5 w-4/5 flex justify-center items-center mt-1"
+              onClick={() => setTweakMenu(undefined)}
+            >
+              <span className="h-6 w-6">{icons.upArrow}</span>
+            </button>
+          </div>
+        }
+
         {imageError ?
           icons.photo :
           <img
@@ -176,7 +143,7 @@ function PodcastPreview() {
           <h2 className="mb-2">{podcast.artistName}</h2>
 
           <div className="flex gap-2">
-            <button onClick={async () => {
+            <button className="hover:text-amber-500" onClick={async () => {
               if (subscribed) {
                 await deleteSubscription(podcast.feedUrl)
                 setSubscribed(false)
@@ -190,7 +157,7 @@ function PodcastPreview() {
             }}>
               {subscribed ? icons.starFilled : icons.star}
             </button>
-            <button onClick={async () => {
+            <button className="hover:text-amber-500" onClick={async () => {
               const fetchedEpisodes = await parseXML(podcast.feedUrl)
               setEpisodes(sortEpisodes(fetchedEpisodes))
               saveSubscriptionsEpisodes(fetchedEpisodes)
@@ -198,12 +165,42 @@ function PodcastPreview() {
             }>
               {icons.reload}
             </button>
-            <SortMenu criterion={sortCriterion} setSortCriterion={setSortCriterion} />
-            <FilterMenu podcast={podcast} />
+
+            <button
+              className="hover:text-amber-500"
+              onClick={() => {
+                setTweakMenu(
+                  <>
+                    <SortButton podcastUrl={podcast.feedUrl} criterion="date">
+                      {t('date')}
+                    </SortButton>
+                    <SortButton podcastUrl={podcast.feedUrl} criterion="duration">
+                      {t('duration')}
+                    </SortButton>
+                  </>
+                )
+              }
+              }>
+              {icons.sort}
+            </button>
+            <button
+              className="hover:text-amber-500"
+              onClick={() => {
+                setTweakMenu(
+                  <>
+                    <Switch initialState={podcastSettings.filter.played} setState={value => {
+                      updatePodcastSettings({ filter: { played: value } })
+                    }} labels={[t('not_played'), t('played')]} />
+                  </>
+                )
+              }
+              }>
+              {icons.filter}
+            </button>
           </div>
 
         </div>
-      </div>
+      </div >
 
       <div className="grid content-start">
         {episodes.map((episode, i) => (
@@ -216,7 +213,7 @@ function PodcastPreview() {
           </Suspense>
         ))}
       </div>
-    </div>
+    </div >
   )
 }
 

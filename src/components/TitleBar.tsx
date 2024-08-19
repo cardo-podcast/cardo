@@ -54,7 +54,7 @@ function TitleBar() {
         <SyncButton />
       </div>
 
-      <h1 data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>Podland</h1>
+      <h1 className="cursor-default" data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>Podland</h1>
 
       <div className='flex justify-between gap-1'>
         <button onClick={() => appWindow.minimize()} className='hover:text-amber-500 w-6'>
