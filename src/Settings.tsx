@@ -2,7 +2,7 @@ import { os } from "@tauri-apps/api"
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react"
 import { appConfigDir, join } from "@tauri-apps/api/path"
 import { readTextFile, writeTextFile } from "@tauri-apps/api/fs"
-import { RecursivePartial, Settings } from "."
+import { RecursivePartial, Settings, SortCriterion } from "."
 import { SwitchState } from "./components/Inputs"
 import { changeLanguage } from "./translations"
 import merge from "lodash/merge"
@@ -18,12 +18,15 @@ export class FilterCriterion {
 
 export class PodcastSettings {
   filter: FilterCriterion
+  sort: SortCriterion
 
   constructor() {
     this.filter = new FilterCriterion()
+    this.sort = { criterion: 'date', mode: 'desc' }
   }
 
   public static isDefault = (settings: PodcastSettings) => {
+
     return JSON.stringify(settings) == JSON.stringify(new PodcastSettings())
   }
 }
@@ -37,32 +40,38 @@ export function useSettings(): [Settings, (newSettings: RecursivePartial<Setting
 }
 
 
-export function usePodcastSettings(feedUrl: string): [PodcastSettings, typeof updatePodcastSettings]{
+export function usePodcastSettings(feedUrl: string): [PodcastSettings, typeof updatePodcastSettings] {
   const [settings, updateSettings] = useSettings()
   const readSettings = () => {
     return settings.podcasts[feedUrl] ?? new PodcastSettings()
   }
 
+
   const [podcastSettings, setPodcastSettingsState] = useState(readSettings())
 
   useEffect(() => {
     setPodcastSettingsState(readSettings())
-  }, [settings])
+  }, [settings, feedUrl])
 
-  const updatePodcastSettings = (newPodcastSettings: any) => {
-    const newSettings = {...settings}
 
-    if (PodcastSettings.isDefault(newPodcastSettings)){
-      // default settings aren't stored
-      delete newSettings.podcasts[feedUrl]
-    }else{
-      newSettings.podcasts[feedUrl] = podcastSettings
+  const updatePodcastSettings = (newPodcastSettings: RecursivePartial<PodcastSettings>) => {
+    const newSettings = { ...settings }
+
+    if (!newSettings.podcasts[feedUrl]) {
+      newSettings.podcasts[feedUrl] = new PodcastSettings()
     }
 
-    updateSettings({podcasts: newSettings.podcasts})
+    merge(newSettings.podcasts[feedUrl], newPodcastSettings)
+
+    if (PodcastSettings.isDefault((newSettings.podcasts[feedUrl]))) {
+      // default settings aren't stored
+      delete newSettings.podcasts[feedUrl]
+    }
+
+    updateSettings({ podcasts: newSettings.podcasts })
   }
 
-  
+
   return [podcastSettings, updatePodcastSettings]
 }
 
@@ -71,7 +80,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   let settingsFile = useRef('');
 
   const [settings, setSettings] = useState<Settings>({
-    globals: {locale: 'en-US', language: 'en'},
+    globals: { locale: 'en-US', language: 'en' },
     podcasts: {},
     sync: {
       syncAfterAppStart: false,
@@ -82,17 +91,17 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       fetchSubscriptionsAtStartup: true
     }
   })
-  
+
   useEffect(() => {
-      changeLanguage(settings.globals.language)
+    changeLanguage(settings.globals.language)
   }, [settings.globals.language])
 
   const [loaded, setLoaded] = useState(false)
 
   const updateSettings = (newSettings: RecursivePartial<Settings>) => {
-    let settingsClone = {...settings}
+    let settingsClone = { ...settings }
     merge(settingsClone, newSettings)
-    
+
     setSettings(settingsClone)
   }
 
@@ -102,7 +111,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     writeSettingsFile(settings) // update jsonwriteSettingsFile(newSettings) // update json
   }, [settings, loaded])
 
-  const readSettingsFromFile = async(): Promise<Settings | undefined> => {
+  const readSettingsFromFile = async (): Promise<Settings | undefined> => {
     try {
       return JSON.parse(await readTextFile(settingsFile.current))
     } catch {
@@ -110,13 +119,13 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const writeSettingsFile = async(newSettings : Settings) => {
+  const writeSettingsFile = async (newSettings: Settings) => {
     if (!settingsFile.current) return
 
     writeTextFile(settingsFile.current, JSON.stringify(newSettings, null, 2))
   }
 
-  const setOSInfo = async() => {
+  const setOSInfo = async () => {
     const locale: string = await os.locale() || 'en-US'
 
     settings.globals.locale = locale
@@ -125,14 +134,14 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     updateSettings(settings)
   }
 
-  const init = async() => {
+  const init = async () => {
     // store settings file path
     const settingsDir = await appConfigDir()
     settingsFile.current = await join(settingsDir, 'config.json')
 
     // read settings from file
     const settingsFromFile = await readSettingsFromFile()
-    if (settingsFromFile && settingsFromFile.globals){
+    if (settingsFromFile && settingsFromFile.globals) {
       updateSettings(settingsFromFile)
     } else {
       // first load write os info (locale)
@@ -142,10 +151,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setLoaded(true)
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     init()
   }, [])
-  
+
   return (
     <SettingsContext.Provider value={[settings, updateSettings]}>
       {children}

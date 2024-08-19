@@ -28,16 +28,16 @@ export default function EpisodeOverview({ children }: { children: ReactNode }) {
         <>
           <div className="fixed z-10 flex items-center h-24">
             <button
-              className="bg-amber-500 w-12 rounded-r-full h-20 opacity-0 peer-hover:opacity-60 hover:opacity-90 transition-opacity duration-200"
+              className="bg-amber-500 w-10 rounded-r-full h-20 opacity-0 peer-hover:opacity-60 hover:opacity-90 transition-opacity duration-200"
               onClick={() => manageScroll(-200)}
             >
               {icons.arrowLeft}
             </button>
           </div>
 
-          <div className="fixed z-10 right-0 flex items-center h-24">
+          <div className="fixed z-10 right-4 flex items-center h-24">
             <button
-              className="bg-amber-500 w-12 rounded-l-full h-20 opacity-0 hover:opacity-90 transition-opacity duration-200"
+              className="bg-amber-500 w-10 rounded-l-full h-20 opacity-0 hover:opacity-90 transition-opacity duration-200"
               onClick={() => manageScroll(200)}
             >
               {icons.arrowRight}

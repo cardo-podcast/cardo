@@ -66,3 +66,8 @@ type RecursivePartial<T> = {
     T[P] extends object | undefined ? RecursivePartial<T[P]> :
     T[P];
 };
+
+export interface SortCriterion {
+  criterion: 'date' | 'duration',
+  mode: 'asc' | 'desc'
+}
