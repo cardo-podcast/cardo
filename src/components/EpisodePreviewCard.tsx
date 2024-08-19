@@ -53,7 +53,7 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
           total={episode.duration}
           showTime={false}
           className={{ div: "h-[5px]" }} />
-        <button className="absolute bottom-2 right-2 bg-amber-500 w-8 p-[3px] aspect-square flex justify-center items-center hover:p-0 border-2 border-amber-600 rounded-full"
+        <button className="absolute bottom-2 right-2 bg-accent-500 w-8 p-[3px] aspect-square flex justify-center items-center hover:p-0 border-2 border-accent-600 rounded-full"
           onClick={e => {
             e.stopPropagation()
             play(episode)
@@ -67,9 +67,9 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
         <div className="flex items-center gap-2 ">
           {
             (episode as NewEpisodeData).new &&
-            <span className="h-2 w-2 rounded-full bg-amber-500" title={t('new')}/>
+            <span className="h-2 w-2 rounded-full bg-accent-500" title={t('new')}/>
           }
-          <h2 className="text-zinc-500 text-sm">
+          <h2 className="text-primary-500 text-sm">
             {
               episode.pubDate.toLocaleDateString(locale, {
                 day: 'numeric',

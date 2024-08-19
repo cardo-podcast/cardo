@@ -29,7 +29,7 @@ export function SortEpisodeGrip({ id, children }: { id: number, children: ReactN
   };
 
   return (
-    <div className="flex cursor-default hover:bg-zinc-800 rounded-md" style={style} {...attributes}>
+    <div className="flex cursor-default hover:bg-primary-800 rounded-md" style={style} {...attributes}>
       <div ref={setNodeRef} className="flex items-center" {...listeners}>
         <div className={`w-6 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}>
           {icons.grip}
@@ -103,7 +103,7 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
 
   return (
     <div ref={contextMenuTarget} className="w-full">
-      <div ref={ref} className={`flex ${reprState.complete ? 'text-zinc-500' : ''} cursor-default min-h-20
+      <div ref={ref} className={`flex ${reprState.complete ? 'text-primary-500' : ''} cursor-default min-h-20
                                 p-2 justify-between gap-4 ${className}`}
         onClick={() => {
           navigate('/episode-preview', {
@@ -115,32 +115,32 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
         onContextMenu={() => {
           showMenu({
             items: [
-            {
-              label: t(reprState.complete ? 'mark_not_played' : 'mark_played'),
-              event: () => {
-                if (reprState.complete) {
-                  updateEpisodeState(episode.src, episode.podcastUrl,
-                    0, episode.duration)
-                  setReprState({ complete: false, position: 0, total: episode.duration })
-                } else {
-                  updateEpisodeState(episode.src, episode.podcastUrl,
-                    episode.duration, episode.duration)
-                  setReprState({ complete: true, position: episode.duration, total: episode.duration })
+              {
+                label: t(reprState.complete ? 'mark_not_played' : 'mark_played'),
+                event: () => {
+                  if (reprState.complete) {
+                    updateEpisodeState(episode.src, episode.podcastUrl,
+                      0, episode.duration)
+                    setReprState({ complete: false, position: 0, total: episode.duration })
+                  } else {
+                    updateEpisodeState(episode.src, episode.podcastUrl,
+                      episode.duration, episode.duration)
+                    setReprState({ complete: true, position: episode.duration, total: episode.duration })
+                  }
+                }
+              },
+              {
+                label: t(inQueue ? 'remove_queue' : 'add_queue'),
+                event: async () => {
+                  if (inQueue) {
+                    await queue.remove(episode.src)
+                    setInqueue(false)
+                  } else {
+                    await queue.push(episode)
+                    setInqueue(true)
+                  }
                 }
               }
-            },
-            {
-              label: t(inQueue ? 'remove_queue' : 'add_queue'),
-              event: async () => {
-                if (inQueue) {
-                  await queue.remove(episode.src)
-                  setInqueue(false)
-                } else {
-                  await queue.push(episode)
-                  setInqueue(true)
-                }
-              }
-            }
             ]
           });
         }}
@@ -164,7 +164,7 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
             </div>
 
             <div className="flex flex-col text-right w-full items-end justify-between">
-              <p className={`text-sm ${reprState.complete ? 'text-zinc-500' : 'text-zinc-400'}`}>{date} - {Math.round(episode.size / 1000000)} MB </p>
+              <p className={`text-sm ${reprState.complete ? 'text-primary-500' : 'text-primary-400'}`}>{date} - {Math.round(episode.size / 1000000)} MB </p>
               <h2 className="mb-2">{episode.title}</h2>
               <div className="flex w-full gap-2 items-center justify-end">
                 {
@@ -175,7 +175,7 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
                       total={reprState.total}
                       className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }} />
                 }
-                <button className="w-7 p-[2px] aspect-square flex justify-center items-center hover:text-amber-600 border-2 border-zinc-600 rounded-full"
+                <button className="w-7 p-[2px] aspect-square flex justify-center items-center hover:text-accent-600 border-2 border-primary-600 rounded-full"
                   onClick={e => {
                     e.stopPropagation()
                     play(episode)

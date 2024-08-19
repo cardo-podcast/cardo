@@ -59,9 +59,9 @@ export default function QueuePage() {
 
   return (
     <div className="p-2 w-full flex flex-col">
-      <div className='flex flex-col p-2  w-full border-b-[1px] border-zinc-800'>
+      <div className='flex flex-col p-2  w-full border-b-[1px] border-primary-800'>
         <h1 className="uppercase">{t('queue')}</h1>
-        <h2 className="text-zinc-500 text-sm">{queueInfo}</h2>
+        <h2 className="text-primary-500 text-sm">{queueInfo}</h2>
       </div>
       <DndContext
       onDragEnd={handleDragEnd}
@@ -70,11 +70,11 @@ export default function QueuePage() {
           <div className="grid content-start">
             {queue.map(episode => (
               <SortEpisodeGrip key={episode.id} id={episode.id}>
-                <Suspense fallback={<div className="bg-zinc-800 h-20 w-full" />}>
+                <Suspense fallback={<div className="bg-primary-800 h-20 w-full" />}>
                   <EpisodeCard
                     episode={episode}
                     noLazyLoad={true}
-                    className="hover:bg-zinc-800 border-b-[1px] border-zinc-800"
+                    className="hover:bg-primary-800 border-b-[1px] border-primary-800"
                     onImageClick={(e) => {
                       e.stopPropagation()
                       navigate('/preview', {
