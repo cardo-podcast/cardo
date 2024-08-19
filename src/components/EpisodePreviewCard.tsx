@@ -30,7 +30,7 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
 
 
   return (
-    <div className="flex flex-col w-24 flex-shrink-0 rounded-md hover:p-1 cursor-default transition-all duration-100 amber-600">
+    <div className="flex flex-col w-24 flex-shrink-0 rounded-md hover:p-1 cursor-pointer transition-all duration-100 amber-600">
       <div className='flex flex-col rounded-md overflow-hidden relative'>
         {
           imageError ?

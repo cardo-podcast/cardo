@@ -2,10 +2,11 @@ import { os } from "@tauri-apps/api"
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react"
 import { appConfigDir, join } from "@tauri-apps/api/path"
 import { readTextFile, writeTextFile } from "@tauri-apps/api/fs"
-import { RecursivePartial, Settings, SortCriterion } from "."
+import { RecursivePartial, Settings, SortCriterion, TailwindColors } from "."
 import { SwitchState } from "./components/Inputs"
 import { changeLanguage } from "./translations"
 import merge from "lodash/merge"
+import colors from "tailwindcss/colors"
 
 
 export class FilterCriterion {
@@ -88,9 +89,32 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     },
     general: {
       numberOfDaysInNews: 15,
-      fetchSubscriptionsAtStartup: true
+      fetchSubscriptionsAtStartup: true,
+      colors: {
+        primary: 'neutral',
+        accent: 'red'
+      }
     }
   })
+
+  // #region Load Colors
+
+  const loadColor = (color: 'primary' | 'accent', twColor: TailwindColors) => {
+
+    for (const tonality of [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950]) {
+      document.documentElement.style.setProperty(`--color-${color}-${tonality}`, (colors as any)[twColor][tonality])
+    }
+  }
+
+  useEffect(() => {
+    loadColor('primary', settings.general.colors.primary)
+  }, [settings.general.colors.primary])
+
+  useEffect(() => {
+    loadColor('accent', settings.general.colors.accent)
+  }, [settings.general.colors.accent])
+
+  // #endregion
 
   useEffect(() => {
     changeLanguage(settings.globals.language)
