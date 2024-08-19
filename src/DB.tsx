@@ -55,6 +55,15 @@ const getEpisodeState = async (episodeUrl: string): Promise<EpisodeState | undef
   }
 }
 
+const getCompletedEpisodes = async () => {
+
+  const playedEpisodes: EpisodeState[] = await db.select(
+    `SELECT episode from episodes_history
+    WHERE position = total`)
+
+    return playedEpisodes.map(episode => episode.episode) //only returns url
+  }
+
 const getEpisodesStates = async (timestamp = 0): Promise<EpisodeState[]> => {
   const r: EpisodeState[] = await db.select(
     `SELECT * from episodes_history WHERE timestamp > $1`, [timestamp]
@@ -485,7 +494,8 @@ function initDB() {
       updateEpisodeState,
       getEpisodesStates,
       getLastPlayed,
-      setLastPlaying
+      setLastPlaying,
+      getCompletedEpisodes
     },
     sync: {
       getSyncKey,

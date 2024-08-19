@@ -5,7 +5,7 @@ import * as icons from "../Icons"
 import { parseXML } from "../utils";
 import EpisodeCard from "../components/EpisodeCard";
 import { useDB } from "../DB";
-import { Switch } from "../components/Inputs";
+import { Switch, SwitchState } from "../components/Inputs";
 import { usePodcastSettings } from "../Settings";
 import { useTranslation } from "react-i18next";
 
@@ -51,6 +51,7 @@ function PodcastPreview() {
   const [episodes, setEpisodes] = useState<EpisodeData[]>([])
   const [subscribed, setSubscribed] = useState(false)
   const { subscriptions: { getSubscription, deleteSubscription, addSubscription, reloadSubscriptions },
+    history: { getCompletedEpisodes },
     subscriptionsEpisodes: { getAllSubscriptionsEpisodes, deleteSubscriptionEpisodes, saveSubscriptionsEpisodes } } = useDB()
   const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcast.feedUrl)
   const [tweakMenu, setTweakMenu] = useState<ReactNode>(undefined)
@@ -95,12 +96,25 @@ function PodcastPreview() {
       episodes = await parseXML(podcast.feedUrl)
     }
 
-    setEpisodes(sortEpisodes(episodes))
+    return sortEpisodes(episodes)
+  }
 
+  const filterEpisodes = async () => {
+    const newEpisodes = await loadEpisodes()
+
+    const completedEpisodes = await getCompletedEpisodes()
+
+    if (podcastSettings.filter.played === SwitchState.True) {
+      setEpisodes(newEpisodes.filter(ep => completedEpisodes.includes(ep.src)))
+    } else if (podcastSettings.filter.played === SwitchState.False) {
+      setEpisodes(newEpisodes.filter(ep => !completedEpisodes.includes(ep.src)))
+    }else {
+      setEpisodes(newEpisodes)
+    }
   }
 
   useEffect(() => {
-    loadEpisodes()
+    loadEpisodes().then(episodes => setEpisodes(episodes))
     setTweakMenu(undefined)
   }, [podcast.feedUrl])
 
@@ -108,6 +122,13 @@ function PodcastPreview() {
   useEffect(() => {
     setEpisodes(sortEpisodes(episodes))
   }, [podcastSettings.sort.criterion, podcastSettings.sort.mode])
+
+
+  useEffect(() => {
+    filterEpisodes()
+
+    // setEpisodes(sortEpisodes(episodes))
+  }, [podcastSettings.filter.played])
 
 
   return (
@@ -208,7 +229,6 @@ function PodcastPreview() {
             <EpisodeCard
               episode={episode}
               className="hover:bg-zinc-800 border-b-[1px] border-zinc-800"
-              filter={podcastSettings.filter}
             />
           </Suspense>
         ))}
