@@ -165,10 +165,10 @@ function AudioPlayer({ className = '' }) {
 
 
   return (
-    <div className={`flex bg-zinc-950 text-slate-50 p-2 gap-3 ${audioRef.current?.src ? '' : 'hidden'} ${className}`}>
+    <div className={`flex bg-primary-950 text-slate-50 p-2 gap-3 ${audioRef.current?.src ? '' : 'hidden'} ${className}`}>
       {playing &&
         <img
-          className="bg-zinc-700 h-full aspect-square rounded-md cursor-pointer"
+          className="bg-primary-700 h-full aspect-square rounded-md cursor-pointer"
           src={playing.coverUrl}
           alt=''
           onClick={() => {
@@ -186,7 +186,7 @@ function AudioPlayer({ className = '' }) {
         <div className="flex justify-center">
 
           <button
-            className="flex items-center focus:outline-none hover: hover:text-amber-600 w-8"
+            className="flex items-center focus:outline-none hover: hover:text-accent-600 w-8"
             onClick={handlePlayPause}
           >
             {audioRef.current?.paused ? icons.play : icons.pause}
@@ -201,7 +201,7 @@ function AudioPlayer({ className = '' }) {
             max={duration}
             value={position}
             onChange={handleSeekChange}
-            className="w-full mx-4 h-1 bg-zinc-300 accent-amber-600"
+            className="w-full mx-4 h-1 bg-primary-300 accent-accent-600"
           />
           <p>{secondsToStr(duration)}</p>
         </div>

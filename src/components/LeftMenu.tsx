@@ -3,13 +3,14 @@ import { useDB } from "../DB";
 import { useTranslation } from "react-i18next";
 import * as icons from '../Icons'
 
+
 function LeftMenu() {
   const { subscriptions, subscriptionsEpisodes: {updateSubscriptionsFeed, updatingFeeds} } = useDB()
   const navigate = useNavigate()
   const { t } = useTranslation();
 
   return (
-    <div className="bg-zinc-900 border-r-2 border-zinc-800 w-56 h-full flex flex-col p-3 pt-4">
+    <div className="bg-primary-900 border-r-2 border-primary-800 w-56 h-full flex flex-col p-3 pt-4">
       <div className="flex flex-col gap-1 uppercase mb-6">
         <Link to='/'>
           {t('home')}
@@ -35,7 +36,7 @@ function LeftMenu() {
         {
           subscriptions.subscriptions.map((fav, i) => {
             return (
-              <div key={i} className="p-1 rounded-md flex gap-2 justify-between cursor-pointer hover:bg-zinc-500"
+              <div key={i} className="p-1 rounded-md flex gap-2 justify-between cursor-pointer hover:bg-primary-500"
                 onClick={() => navigate('/preview', {
                   state: {
                     podcast: fav
@@ -43,7 +44,7 @@ function LeftMenu() {
                 })}
               >
                 <img
-                  className="h-10 bg-zinc-700 aspect-square rounded-md"
+                  className="h-10 bg-primary-700 aspect-square rounded-md"
                   src={fav.coverUrl}
                   alt=''
                 />

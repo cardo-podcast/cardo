@@ -30,7 +30,7 @@ export function NextcloudSettings() {
       <div className="flex flex-col gap-3 p-1">
         <div className="flex gap-2 items-center">
           <p className="text-lg">{t('logged_in')}:</p>
-          <button className="uppercase bg-amber-600 w-fit px-4 hover:bg-amber-700 rounded-md p-1"
+          <button className="uppercase bg-accent-600 w-fit px-4 hover:bg-accent-700 rounded-md p-1"
             onClick={async () => {
               removeCreds('nextcloud')
               setLoggedIn(false)
@@ -84,13 +84,13 @@ export function NextcloudSettings() {
           {t('nextcloud_server_url')}
           <input
             type="text"
-            className="py-1 px-2 bg-zinc-800 placeholder-zinc-500 text-zinc-400 rounded-md focus:outline-none"
+            className="py-1 px-2 bg-primary-800 placeholder-primary-500 text-primary-400 rounded-md focus:outline-none"
             ref={urlRef}
             placeholder={t('nextcloud_server_url_example')}
           />
         </label>
 
-        <button className="uppercase bg-amber-600 w-fit px-4 hover:bg-amber-700 rounded-md p-1">
+        <button className="uppercase bg-accent-600 w-fit px-4 hover:bg-accent-700 rounded-md p-1">
           {t('connect')}
         </button>
       </form>
@@ -335,7 +335,7 @@ export function SyncButton() {
 
 
   return (
-    <button className={`w-6 hover:text-amber-400 outline-none ${status === SyncStatus.Synchronizing && 'animate-[spin_2s_linear_infinite_reverse]'}`}
+    <button className={`w-6 hover:text-accent-400 outline-none ${status === SyncStatus.Synchronizing && 'animate-[spin_2s_linear_infinite_reverse]'}`}
       onClick={performSync} title={error == '' ? t('sync') : error}
     >
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-refresh">

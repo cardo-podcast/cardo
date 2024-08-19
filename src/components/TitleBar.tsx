@@ -43,12 +43,12 @@ function TitleBar() {
   }, [savePlayerStatus]) // reload when dependencies change
 
   return (
-    <div className={`bg-zinc-950 flex w-full text-white h-10 justify-between px-2 pt-1 items-center relative stroke-[1.5px]`} data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>
+    <div className={`bg-primary-950 flex w-full text-white h-10 justify-between px-2 pt-1 items-center relative stroke-[1.5px]`} data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>
       <div className='flex w-12 justify-between'>
         <button onClick={() => {
           appWindow.setAlwaysOnTop(!windowPinned)
           setWindowPinned(!windowPinned)
-        }} className='hover:text-amber-500 w-6'>
+        }} className='hover:text-accent-500 w-6'>
           {windowPinned ? icons.unpin : icons.pin}
         </button>
         <SyncButton />
@@ -57,13 +57,13 @@ function TitleBar() {
       <h1 className="cursor-default" data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>Podland</h1>
 
       <div className='flex justify-between gap-1'>
-        <button onClick={() => appWindow.minimize()} className='hover:text-amber-500 w-6'>
+        <button onClick={() => appWindow.minimize()} className='hover:text-accent-500 w-6'>
           {icons.minus}
         </button>
         <button onClick={() => {
           appWindow.toggleMaximize()
           setMaximized(!maximized)
-        }} className='hover:text-amber-500 w-5'>
+        }} className='hover:text-accent-500 w-5'>
           {maximized ? icons.unmaximize : icons.maximize}
         </button>
         <button onClick={async() => {

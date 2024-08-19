@@ -10,7 +10,7 @@ function PodcastCard ({podcast, callback}: {podcast: PodcastData, callback: ()=>
 
 
   return(
-    <div className="flex hover:bg-zinc-800 cursor-pointer h-20 p-2 justify-between border-b-2 border-zinc-800"
+    <div className="flex hover:bg-primary-800 cursor-pointer h-20 p-2 justify-between border-b-2 border-primary-800"
     onClick={() => {
       callback()
         navigate('/preview', {
@@ -23,7 +23,7 @@ function PodcastCard ({podcast, callback}: {podcast: PodcastData, callback: ()=>
       {imageError?
         icons.photo:
         <img
-        className="bg-zinc-700 h-full aspect-square rounded-md"
+        className="bg-primary-700 h-full aspect-square rounded-md"
         alt=""
         src={podcast.coverUrl}
         onError={() => setImageError(true)}
