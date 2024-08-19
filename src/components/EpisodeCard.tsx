@@ -6,8 +6,7 @@ import { useIntersectionObserver } from "@uidotdev/usehooks"
 import { secondsToStr } from "../utils"
 import { useDB } from "../DB"
 import ProgressBar from "./ProgressBar"
-import { FilterCriterion, useSettings } from "../Settings"
-import { SwitchState } from "./Inputs"
+import { useSettings } from "../Settings"
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from "react-i18next"
@@ -44,10 +43,10 @@ export function SortEpisodeGrip({ id, children }: { id: number, children: ReactN
 
 
 
-function EpisodeCard({ episode, className = '', noLazyLoad = false, filter = undefined, onImageClick = undefined }:
+function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick = undefined }:
   {
     episode: EpisodeData, className?: string, noLazyLoad?: boolean,
-    filter?: FilterCriterion | undefined, onImageClick?: MouseEventHandler<HTMLImageElement>
+    onImageClick?: MouseEventHandler<HTMLImageElement>
   }) {
   const [imageError, setImageError] = useState(false)
 
@@ -100,15 +99,6 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, filter = und
 
     })
   }, [entry?.isIntersecting, noLazyLoad, episode, getEpisodeState, locale])
-
-
-  const xor = (setting: SwitchState, state: boolean) => {
-    return (setting === SwitchState.True && !state) ||
-      (setting === SwitchState.False && state)
-  }
-
-
-  if (entry?.isIntersecting && filter && xor(filter.played, reprState.complete)) return <></>
 
 
   return (
