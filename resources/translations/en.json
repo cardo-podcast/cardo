@@ -33,5 +33,8 @@
   "fetch_subscriptions_startup": "Update subscription feeds at startup",
   "news": "News",
   "new": "New",
-  "update_subs_feeds": "Update subscription feeds"
+  "update_subs_feeds": "Update subscription feeds",
+  "theme": "Issue",
+  "primary": "Primary",
+  "accent": "Accent"
 }
