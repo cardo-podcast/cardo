@@ -84,7 +84,7 @@ export function NextcloudSettings() {
           {t('nextcloud_server_url')}
           <input
             type="text"
-            className="py-1 px-2 bg-primary-8 placeholder-primary0 text-primary-4 rounded-md focus:outline-none"
+            className="py-1 px-2 bg-primary-8 rounded-md focus:outline-none"
             ref={urlRef}
             placeholder={t('nextcloud_server_url_example')}
           />

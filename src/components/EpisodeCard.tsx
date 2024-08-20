@@ -103,7 +103,7 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
 
   return (
     <div ref={contextMenuTarget} className="w-full">
-      <div ref={ref} className={`flex ${reprState.complete ? 'text-primary0' : ''} cursor-default min-h-20
+      <div ref={ref} className={`flex ${reprState.complete ? '0' : ''} cursor-default min-h-20
                                 p-2 justify-between gap-4 ${className}`}
         onClick={() => {
           navigate('/episode-preview', {
@@ -164,7 +164,7 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
             </div>
 
             <div className="flex flex-col text-right w-full items-end justify-between">
-              <p className={`text-sm ${reprState.complete ? 'text-primary0' : 'text-primary-4'}`}>{date} - {Math.round(episode.size / 1000000)} MB </p>
+              <p className={`text-sm ${reprState.complete ? '0' : '-4'}`}>{date} - {Math.round(episode.size / 1000000)} MB </p>
               <h2 className="mb-2">{episode.title}</h2>
               <div className="flex w-full gap-2 items-center justify-end">
                 {

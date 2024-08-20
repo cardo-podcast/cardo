@@ -61,7 +61,7 @@ export default function QueuePage() {
     <div className="p-2 w-full flex flex-col">
       <div className='flex flex-col p-2  w-full border-b-[1px] border-primary-8'>
         <h1 className="uppercase">{t('queue')}</h1>
-        <h2 className="text-primary0 text-sm">{queueInfo}</h2>
+        <h2 className="0 text-sm">{queueInfo}</h2>
       </div>
       <DndContext
       onDragEnd={handleDragEnd}

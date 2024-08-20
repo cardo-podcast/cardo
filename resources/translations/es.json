@@ -35,7 +35,7 @@
   "new": "Nuevo",
   "update_subs_feeds": "Actualizar los feeds de las subscripciones",
   "theme": "Tema",
-  "primary": "Primario",
+  "base": "Base",
   "accent": "Acento",
   "light_theme": "Tema claro",
   "dark_theme": "Tema oscuro"
