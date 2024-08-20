@@ -31,8 +31,8 @@ const App = () => {
   })
 
   return (
-    <div className={`bg-primary-900 w-full h-screen flex flex-col border-primary-600 border-[1px]
-                        text-primary-50 overflow-hidden ${isMaximized ? '' : 'rounded-lg'}`}>
+    <div className={`bg-primary-9 w-full h-screen flex flex-col border-primary-6 border-[1px]
+                        text-primary overflow-hidden ${isMaximized ? '' : 'rounded-lg'}`}>
       <BrowserRouter>
         <SettingsProvider>
           <DBProvider>

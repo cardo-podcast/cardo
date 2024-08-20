@@ -61,11 +61,11 @@ function EpisodePreview() {
 
   return (
     <div className="p-2 w-full flex flex-col">
-      <div className='flex justify-left w-full gap-3 mb-2 p-2 pb-3 border-b-2 border-primary-800'>
+      <div className='flex justify-left w-full gap-3 mb-2 p-2 pb-3 border-b-2 border-primary-8'>
         {imageError ?
           icons.photo :
           <img
-            className="bg-primary-700 h-28 aspect-square rounded-md cursor-pointer"
+            className="bg-primary-7 h-28 aspect-square rounded-md cursor-pointer"
             src={episode.coverUrl}
             alt=""
             onError={() => setImageError(true)}
@@ -82,7 +82,7 @@ function EpisodePreview() {
 
         <div className="flex flex-col gap-2 justify-between p-1 w-full">
           <div className="flex flex-col">
-            <p className='text-sm text-primary-400'>{getDate()} - {Math.round(episode.size / 1000000)} MB </p>
+            <p className='text-sm text-primary-4'>{getDate()} - {Math.round(episode.size / 1000000)} MB </p>
             <h1>{episode.title}</h1>
           </div>
           <div className="flex gap-2 justify-end items-center">
@@ -93,7 +93,7 @@ function EpisodePreview() {
                   total={episode.duration}
                   className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }} />
             }
-            <button className="w-7 p-[2px] aspect-square flex justify-center items-center hover:text-accent-600 bg-primary-700 rounded-full"
+            <button className="w-7 p-[2px] aspect-square flex justify-center items-center hover:text-accent-6 bg-primary-7 rounded-full"
               onClick={() => play(episode)}
             >
               {icons.play}

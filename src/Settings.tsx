@@ -2,7 +2,7 @@ import { os } from "@tauri-apps/api"
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react"
 import { appConfigDir, join } from "@tauri-apps/api/path"
 import { readTextFile, writeTextFile } from "@tauri-apps/api/fs"
-import { RecursivePartial, Settings, SortCriterion, TailwindColors } from "."
+import { RecursivePartial, Settings, SortCriterion, TailwindBaseColor, ThemeColor } from "."
 import { SwitchState } from "./components/Inputs"
 import { changeLanguage } from "./translations"
 import merge from "lodash/merge"
@@ -90,30 +90,57 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     general: {
       numberOfDaysInNews: 15,
       fetchSubscriptionsAtStartup: true,
-      colors: {
-        primary: 'neutral',
-        accent: 'red'
-      }
+    },
+    colors: {
+      primary: 'zinc',
+      accent: 'red'
     }
   })
 
-  // #region Load Colors
+  // #region colors
+  useEffect(() => {
+    loadColor('primary')
+  }, [settings.colors.primary])
 
-  const loadColor = (color: 'primary' | 'accent', twColor: TailwindColors) => {
+  useEffect(() => {
+    loadColor('accent')
+  }, [settings.colors.accent])
 
-    for (const tonality of [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950]) {
-      document.documentElement.style.setProperty(`--color-${color}-${tonality}`, (colors as any)[twColor][tonality])
+  const getColor = (target: keyof Settings['colors']): ThemeColor => {
+    // figure if settings come as a tailwind color of a complete defined theme
+    if (typeof settings.colors[target] === 'string') {
+      // settings refer to a tailwind base color.
+      return {
+        DEFAULT: settings.colors[target] + '-50',
+        1: settings.colors[target] + '-100',
+        2: settings.colors[target] + '-200',
+        3: settings.colors[target] + '-300',
+        4: settings.colors[target] + '-400',
+        5: settings.colors[target] + '-500',
+        6: settings.colors[target] + '-600',
+        7: settings.colors[target] + '-700',
+        8: settings.colors[target] + '-800',
+        9: settings.colors[target] + '-900',
+        10: settings.colors[target] + '-950',
+      }
+    } else {
+      // settings define a complete color palette
+      return settings.colors[target] as unknown as ThemeColor
+
     }
   }
 
-  useEffect(() => {
-    loadColor('primary', settings.general.colors.primary)
-  }, [settings.general.colors.primary])
+  const loadColor = (target: keyof Settings['colors']) => {
+    const color = getColor(target)
 
-  useEffect(() => {
-    loadColor('accent', settings.general.colors.accent)
-  }, [settings.general.colors.accent])
+    const [baseColor, tonality] = (color.DEFAULT as string).split('-')
+    document.documentElement.style.setProperty(`--color-${target}`, (colors as any)[baseColor][tonality])
 
+    for (const i of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) {
+      const [baseColor, tonality] = color[i as keyof ThemeColor].split('-') 
+      document.documentElement.style.setProperty(`--color-${target}-${i}`, (colors as any)[baseColor][tonality])
+    }
+  }
   // #endregion
 
   useEffect(() => {

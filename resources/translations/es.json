@@ -36,5 +36,7 @@
   "update_subs_feeds": "Actualizar los feeds de las subscripciones",
   "theme": "Tema",
   "primary": "Primario",
-  "accent": "Acento"
+  "accent": "Acento",
+  "light_theme": "Tema claro",
+  "dark_theme": "Tema oscuro"
 }

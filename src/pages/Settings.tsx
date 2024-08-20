@@ -3,23 +3,23 @@ import { NextcloudSettings } from "../sync/Nextcloud"
 import { Checkbox } from "../components/Inputs"
 import { useSettings } from "../Settings"
 import { useEffect, useState } from "react"
-import { TailwindColor, TailwindColors } from ".."
+import { ThemeColor, TailwindBaseColor } from ".."
 import { Settings as SettingsItf } from ".."
 
 
-type ColorTarget = keyof SettingsItf['general']['colors']
-type Tonality = keyof TailwindColor
+type ColorTarget = keyof SettingsItf['colors']
+type Tonality = keyof ThemeColor
 
 function ColorSelector({ target, tonality }: { target: ColorTarget, tonality: Tonality }) {
 
-  const [{ general: { colors: colorSettings } }, updateSettings] = useSettings()
+  const [{ colors: colorSettings }, updateSettings] = useSettings()
   const [showSelector, setShowSelector] = useState(false)
-  const [colors, setColors] = useState<TailwindColors[]>(['slate', 'gray', 'zinc', 'neutral', 'stone', 'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'])
+  const [colors, setColors] = useState<TailwindBaseColor[]>(['slate', 'gray', 'zinc', 'neutral', 'stone', 'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'])
 
   useEffect(() => {
     // move color to head
     const newColors = [...colors]
-    const index = colors.indexOf(colorSettings[target])
+    const index = colors.indexOf(colorSettings[target] as TailwindBaseColor)
     const selectedColor = newColors.splice(index, 1, colors[0])[0];
     newColors.splice(0, 1, selectedColor)
     setColors(newColors)
@@ -32,11 +32,11 @@ function ColorSelector({ target, tonality }: { target: ColorTarget, tonality: To
       <button className={`w-16 h-10 rounded-md border-2 border-${colorSettings[target]}-800 bg-${colorSettings[target]}-${tonality}`}
         title={colorSettings[target]}
         onClick={() => setShowSelector(true)}
-        />
+      />
 
       {
         showSelector &&
-        <div className="grid grid-cols-5 absolute z-10 bg-primary-200 gap-1 rounded-md bottom-0 left-0 p-1 min-w-max">
+        <div className="grid grid-cols-5 absolute z-10 bg-primary-2 gap-1 rounded-md bottom-0 left-0 p-1 min-w-max">
           {
             colors.map(
               color => (
@@ -45,10 +45,8 @@ function ColorSelector({ target, tonality }: { target: ColorTarget, tonality: To
                   key={color}
                   onClick={e => {
                     updateSettings({
-                      general: {
-                        colors: {
-                          [target]: color
-                        }
+                      colors: {
+                        [target]: color
                       }
                     })
                     setShowSelector(false)
@@ -67,17 +65,17 @@ function ColorSelector({ target, tonality }: { target: ColorTarget, tonality: To
 
 function Settings() {
   const { t } = useTranslation()
-  const [{ general }, updateSettings] = useSettings()
+  const [{ general, colors: colorSettings }, updateSettings] = useSettings()
 
   return (
     <div className="p-2 w-full flex flex-col gap-2">
-      <div className=" py-4flex flex-col gap-1 border-primary-800 border-[2px] p-2 rounded-md">
-        <h1 className="uppercase border-b-2 border-primary-800 mb-2">{t('sync')}</h1>
+      <div className=" py-4flex flex-col gap-1 border-primary-8 border-[2px] p-2 rounded-md">
+        <h1 className="uppercase border-b-2 border-primary-8 mb-2">{t('sync')}</h1>
         <NextcloudSettings />
       </div>
 
-      <div className=" py-4flex flex-col gap-1 border-primary-800 border-[2px] p-2 rounded-md">
-        <h1 className="uppercase border-b-2 border-primary-800 mb-2">{t('general')}</h1>
+      <div className=" py-4flex flex-col gap-1 border-primary-8 border-[2px] p-2 rounded-md">
+        <h1 className="uppercase border-b-2 border-primary-8 mb-2">{t('general')}</h1>
         <div className="flex flex-col gap-2">
           <label className="w-fit flex gap-1">
             {t('fetch_subscriptions_startup')}:
@@ -89,7 +87,7 @@ function Settings() {
             {t('number_days_news', { n: general.numberOfDaysInNews })}
             <input
               type="text"
-              className="py-1 px-2 bg-primary-800 placeholder-primary-500 text-primary-400 rounded-md focus:outline-none"
+              className="py-1 px-2 bg-primary-8 placeholder-primary0 text-primary-4 rounded-md focus:outline-none"
               value={general.numberOfDaysInNews}
               onChange={e => {
                 const value = Number(e.target.value)

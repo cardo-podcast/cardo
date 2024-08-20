@@ -16,7 +16,7 @@ function SortButton({ children, podcastUrl, criterion }: { children: ReactNode, 
 
   return (
     <button
-      className={`bg-primary-800 hover:bg-primary-700 flex items-center justify-center w-2/3 rounded-md ${sort.criterion == criterion ? 'text-accent-500' : ''}`}
+      className={`bg-primary-8 hover:bg-primary-7 flex items-center justify-center w-2/3 rounded-md ${sort.criterion == criterion ? 'text-accent-5' : ''}`}
       onClick={
         () => {
           if (sort.criterion == criterion) {
@@ -133,15 +133,15 @@ function PodcastPreview() {
 
   return (
     <div className="relative p-2 w-full flex flex-col">
-      <div className='flex justify-left w-full gap-3 pb-3 border-b-[3px] border-primary-800'>
+      <div className='flex justify-left w-full gap-3 pb-3 border-b-[3px] border-primary-8'>
 
         {tweakMenu &&
-          <div className="left-1/2 -translate-x-1/2 absolute w-2/3 top-0 rounded-b-3xl overflow-hidden bg-primary-900 border-[1px] border-t-0 border-primary-600 flex flex-col justify-between items-center transition-all duration-200 z-20">
+          <div className="left-1/2 -translate-x-1/2 absolute w-2/3 top-0 rounded-b-3xl overflow-hidden bg-primary-9 border-[1px] border-t-0 border-primary-6 flex flex-col justify-between items-center transition-all duration-200 z-20">
             <div className="p-2 flex flex-col gap-1 items-center w-full">
               {tweakMenu}
             </div>
 
-            <button className="border-t-2 border-primary-800 p-2 h-5 w-4/5 flex justify-center items-center mt-1"
+            <button className="border-t-2 border-primary-8 p-2 h-5 w-4/5 flex justify-center items-center mt-1"
               onClick={() => setTweakMenu(undefined)}
             >
               <span className="h-6 w-6">{icons.upArrow}</span>
@@ -152,7 +152,7 @@ function PodcastPreview() {
         {imageError ?
           icons.photo :
           <img
-            className="bg-primary-700 h-40 aspect-square rounded-md"
+            className="bg-primary-7 h-40 aspect-square rounded-md"
             src={podcast.coverUrlLarge}
             alt=""
             onError={() => setImageError(true)}
@@ -164,7 +164,7 @@ function PodcastPreview() {
           <h2 className="mb-2">{podcast.artistName}</h2>
 
           <div className="flex gap-2">
-            <button className="hover:text-accent-500" onClick={async () => {
+            <button className="hover:text-accent-5" onClick={async () => {
               if (subscribed) {
                 await deleteSubscription(podcast.feedUrl)
                 setSubscribed(false)
@@ -178,7 +178,7 @@ function PodcastPreview() {
             }}>
               {subscribed ? icons.starFilled : icons.star}
             </button>
-            <button className="hover:text-accent-500" onClick={async () => {
+            <button className="hover:text-accent-5" onClick={async () => {
               const fetchedEpisodes = await parseXML(podcast.feedUrl)
               setEpisodes(sortEpisodes(fetchedEpisodes))
               saveSubscriptionsEpisodes(fetchedEpisodes)
@@ -188,7 +188,7 @@ function PodcastPreview() {
             </button>
 
             <button
-              className="hover:text-accent-500"
+              className="hover:text-accent-5"
               onClick={() => {
                 setTweakMenu(
                   <>
@@ -205,7 +205,7 @@ function PodcastPreview() {
               {icons.sort}
             </button>
             <button
-              className="hover:text-accent-500"
+              className="hover:text-accent-5"
               onClick={() => {
                 setTweakMenu(
                   <>
@@ -225,10 +225,10 @@ function PodcastPreview() {
 
       <div className="grid content-start">
         {episodes.map((episode, i) => (
-          <Suspense key={i} fallback={<div className="bg-primary-800 h-20 w-full" />}>
+          <Suspense key={i} fallback={<div className="bg-primary-8 h-20 w-full" />}>
             <EpisodeCard
               episode={episode}
-              className="hover:bg-primary-800 border-b-[1px] border-primary-800"
+              className="hover:bg-primary-8 border-b-[1px] border-primary-8"
             />
           </Suspense>
         ))}
