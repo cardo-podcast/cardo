@@ -58,7 +58,7 @@ function SearchBar () {
       ref={inputRef}
         type="text"
         placeholder={t('search_placeholder')}
-        className="py-1 px-2 bg-primary-8 placeholder-primary-4 text-primary-4 w-full focus:outline-none"
+        className="py-1 px-2 bg-primary-9 w-full focus:outline-none"
         onChange={(event) => {handleChange(event.target.value)}}
         onKeyDown={e => {
           if (e.key === 'Escape' || e.key === 'Tab') {

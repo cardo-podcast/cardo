@@ -69,7 +69,7 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
             (episode as NewEpisodeData).new &&
             <span className="h-2 w-2 rounded-full bg-accent-5" title={t('new')}/>
           }
-          <h2 className="text-primary0 text-sm">
+          <h2 className="0 text-sm">
             {
               episode.pubDate.toLocaleDateString(locale, {
                 day: 'numeric',

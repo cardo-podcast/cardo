@@ -1,7 +1,7 @@
+@import url("text-auto.css"); /* auto text colors could be overwriten by tailwind more specific classes*/
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 
 ::-webkit-scrollbar {
     display: none;

@@ -32,7 +32,7 @@ const App = () => {
 
   return (
     <div className={`bg-primary-9 w-full h-screen flex flex-col border-primary-6 border-[1px]
-                        text-primary overflow-hidden ${isMaximized ? '' : 'rounded-lg'}`}>
+                         overflow-hidden ${isMaximized ? '' : 'rounded-lg'}`}>
       <BrowserRouter>
         <SettingsProvider>
           <DBProvider>
@@ -43,7 +43,7 @@ const App = () => {
                 <LeftMenu />
                 <div className="flex flex-col overflow-y-hidden w-full h-full">
                   <SearchBar />
-                  <div className="flex h-full overflow-y-auto">
+                  <div className="flex h-full overflow-y-auto border-t-2 border-primary-8">
                     <Suspense>
                       <Routes>
                         <Route path='/' element={<HomePage />} />

@@ -165,7 +165,7 @@ function AudioPlayer({ className = '' }) {
 
 
   return (
-    <div className={`flex bg-primary-10 text-slate-50 p-2 gap-3 ${audioRef.current?.src ? '' : 'hidden'} ${className}`}>
+    <div className={`flex bg-primary-10 border-t-2 border-primary-8 p-2 gap-3 ${audioRef.current?.src ? '' : 'hidden'} ${className}`}>
       {playing &&
         <img
           className="bg-primary-7 h-full aspect-square rounded-md cursor-pointer"

@@ -50,7 +50,7 @@ export function Checkbox({ onChange, defaultChecked = false }: { onChange: (valu
           onChange(Boolean(e.target.checked))
         }}
       />
-      <span className="text-transparent peer-checked:text-primary-9 text-lg font-bold flex justify-center items-center h-5 w-5 text-center bg-primary-2 transition duration-100 ease-in-out rounded-md m-1">
+      <span className="text-transparent peer-checked:text-black bg-white text-lg font-bold flex justify-center items-center h-5 w-5 text-center border-2 border-primary-2 transition duration-100 ease-in-out rounded-md m-1">
         ✓
       </span>
     </div>

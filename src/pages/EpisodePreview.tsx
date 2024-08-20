@@ -82,7 +82,7 @@ function EpisodePreview() {
 
         <div className="flex flex-col gap-2 justify-between p-1 w-full">
           <div className="flex flex-col">
-            <p className='text-sm text-primary-4'>{getDate()} - {Math.round(episode.size / 1000000)} MB </p>
+            <p className='text-sm'>{getDate()} - {Math.round(episode.size / 1000000)} MB </p>
             <h1>{episode.title}</h1>
           </div>
           <div className="flex gap-2 justify-end items-center">

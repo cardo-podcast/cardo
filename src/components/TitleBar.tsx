@@ -43,7 +43,7 @@ function TitleBar() {
   }, [savePlayerStatus]) // reload when dependencies change
 
   return (
-    <div className={`bg-primary-10 flex w-full text-white h-10 justify-between px-2 pt-1 items-center relative stroke-[1.5px]`} data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>
+    <div className={`bg-primary-10 border-b-2 border-primary-8 flex w-full h-10 justify-between px-2 pt-1 items-center relative stroke-[1.5px]`} data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>
       <div className='flex w-12 justify-between'>
         <button onClick={() => {
           appWindow.setAlwaysOnTop(!windowPinned)

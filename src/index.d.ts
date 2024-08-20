@@ -1,6 +1,7 @@
 import { PodcastSettings } from "./Settings"
 import colors from "tailwindcss/colors"
 import { TailwindColor } from "./ThemeConfigurator"
+import { DefaultTheme } from "./DefaultThemes"
 
 
 export interface PodcastData {
@@ -61,8 +62,8 @@ export interface Settings {
     fetchSubscriptionsAtStartup: boolean
   },
   colors: {
-    primary: ThemeColor | TailwindBaseColor,
-    accent: ThemeColor | TailwindBaseColor,
+    primary: ColorTheme | TailwindBaseColor | DefaultTheme,
+    accent: ColorTheme | TailwindBaseColor | DefaultTheme,
   }
 }
 
@@ -81,7 +82,7 @@ export interface SortCriterion {
 
 // #region colors
 
-export interface ThemeColor {
+export interface ColorTheme {
   DEFAULT: TailwindColor
   1: TailwindColor
   2: TailwindColor

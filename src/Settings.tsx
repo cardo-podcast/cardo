@@ -2,11 +2,12 @@ import { os } from "@tauri-apps/api"
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react"
 import { appConfigDir, join } from "@tauri-apps/api/path"
 import { readTextFile, writeTextFile } from "@tauri-apps/api/fs"
-import { RecursivePartial, Settings, SortCriterion, TailwindBaseColor, ThemeColor } from "."
+import { RecursivePartial, Settings, SortCriterion, TailwindBaseColor, ColorTheme } from "."
 import { SwitchState } from "./components/Inputs"
 import { changeLanguage } from "./translations"
 import merge from "lodash/merge"
 import colors from "tailwindcss/colors"
+import { DefaultTheme, DefaultThemes } from "./DefaultThemes"
 
 
 export class FilterCriterion {
@@ -76,6 +77,35 @@ export function usePodcastSettings(feedUrl: string): [PodcastSettings, typeof up
   return [podcastSettings, updatePodcastSettings]
 }
 
+export function getColor(settingsColor: TailwindBaseColor | ColorTheme | DefaultTheme): ColorTheme {
+  // figure if settings come as a tailwind color of a complete defined theme
+  if (typeof settingsColor === 'string') {
+    if (settingsColor in DefaultThemes) {
+      // settings refer to a default theme (that could refer to a default tailwind color)
+      return getColor(DefaultThemes[settingsColor])
+    } else {
+      // settings refer to a tailwind base color.
+      return {
+        DEFAULT: settingsColor + '-50',
+        1: settingsColor + '-100',
+        2: settingsColor + '-200',
+        3: settingsColor + '-300',
+        4: settingsColor + '-400',
+        5: settingsColor + '-500',
+        6: settingsColor + '-600',
+        7: settingsColor + '-700',
+        8: settingsColor + '-800',
+        9: settingsColor + '-900',
+        10: settingsColor + '-950',
+      }
+    }
+  } else {
+    // settings define a complete color palette
+    return settingsColor as unknown as ColorTheme
+
+  }
+}
+
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   let settingsFile = useRef('');
@@ -92,7 +122,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       fetchSubscriptionsAtStartup: true,
     },
     colors: {
-      primary: 'zinc',
+      primary: 'dark',
       accent: 'red'
     }
   })
@@ -106,38 +136,14 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     loadColor('accent')
   }, [settings.colors.accent])
 
-  const getColor = (target: keyof Settings['colors']): ThemeColor => {
-    // figure if settings come as a tailwind color of a complete defined theme
-    if (typeof settings.colors[target] === 'string') {
-      // settings refer to a tailwind base color.
-      return {
-        DEFAULT: settings.colors[target] + '-50',
-        1: settings.colors[target] + '-100',
-        2: settings.colors[target] + '-200',
-        3: settings.colors[target] + '-300',
-        4: settings.colors[target] + '-400',
-        5: settings.colors[target] + '-500',
-        6: settings.colors[target] + '-600',
-        7: settings.colors[target] + '-700',
-        8: settings.colors[target] + '-800',
-        9: settings.colors[target] + '-900',
-        10: settings.colors[target] + '-950',
-      }
-    } else {
-      // settings define a complete color palette
-      return settings.colors[target] as unknown as ThemeColor
-
-    }
-  }
-
   const loadColor = (target: keyof Settings['colors']) => {
-    const color = getColor(target)
+    const color = getColor(settings.colors[target])
 
     const [baseColor, tonality] = (color.DEFAULT as string).split('-')
     document.documentElement.style.setProperty(`--color-${target}`, (colors as any)[baseColor][tonality])
 
     for (const i of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) {
-      const [baseColor, tonality] = color[i as keyof ThemeColor].split('-') 
+      const [baseColor, tonality] = color[i as keyof ColorTheme].split('-')
       document.documentElement.style.setProperty(`--color-${target}-${i}`, (colors as any)[baseColor][tonality])
     }
   }

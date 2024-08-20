@@ -38,5 +38,6 @@
   "primary": "Primary",
   "accent": "Accent",
   "light_theme": "Clear theme",
-  "dark_theme": "Dark theme"
+  "dark_theme": "Dark theme",
+  "base": "Base"
 }

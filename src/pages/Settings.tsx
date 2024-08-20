@@ -1,36 +1,24 @@
 import { useTranslation } from "react-i18next"
 import { NextcloudSettings } from "../sync/Nextcloud"
 import { Checkbox } from "../components/Inputs"
-import { useSettings } from "../Settings"
-import { useEffect, useState } from "react"
-import { ThemeColor, TailwindBaseColor } from ".."
-import { Settings as SettingsItf } from ".."
+import { getColor, useSettings } from "../Settings"
+import { useState } from "react"
+import { TailwindBaseColor } from ".."
+import { DefaultTheme, DefaultThemes, BasicColors } from "../DefaultThemes"
 
 
-type ColorTarget = keyof SettingsItf['colors']
-type Tonality = keyof ThemeColor
 
-function ColorSelector({ target, tonality }: { target: ColorTarget, tonality: Tonality }) {
+function AccentColorSelector() {
 
-  const [{ colors: colorSettings }, updateSettings] = useSettings()
+  const [{ colors: { accent } }, updateSettings] = useSettings()
   const [showSelector, setShowSelector] = useState(false)
-  const [colors, setColors] = useState<TailwindBaseColor[]>(['slate', 'gray', 'zinc', 'neutral', 'stone', 'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'])
+  
 
-  useEffect(() => {
-    // move color to head
-    const newColors = [...colors]
-    const index = colors.indexOf(colorSettings[target] as TailwindBaseColor)
-    const selectedColor = newColors.splice(index, 1, colors[0])[0];
-    newColors.splice(0, 1, selectedColor)
-    setColors(newColors)
-  }, [colorSettings[target]])
-
-
+  const selectedColor = getColor(accent)
   return (
     <div className="relative">
 
-      <button className={`w-16 h-10 rounded-md border-2 border-${colorSettings[target]}-800 bg-${colorSettings[target]}-${tonality}`}
-        title={colorSettings[target]}
+      <button className={`w-16 h-10 rounded-md border-2 border-${selectedColor[4]}-800 bg-${selectedColor[5]}`}
         onClick={() => setShowSelector(true)}
       />
 
@@ -38,15 +26,15 @@ function ColorSelector({ target, tonality }: { target: ColorTarget, tonality: To
         showSelector &&
         <div className="grid grid-cols-5 absolute z-10 bg-primary-2 gap-1 rounded-md bottom-0 left-0 p-1 min-w-max">
           {
-            colors.map(
+            BasicColors.map(
               color => (
-                <button className={`w-16 h-10 rounded-md bg-${color}-${tonality}`}
+                <button className={`w-16 h-10 rounded-md bg-${color}-500`}
                   title={color}
                   key={color}
                   onClick={e => {
                     updateSettings({
                       colors: {
-                        [target]: color
+                        accent: color
                       }
                     })
                     setShowSelector(false)
@@ -87,7 +75,7 @@ function Settings() {
             {t('number_days_news', { n: general.numberOfDaysInNews })}
             <input
               type="text"
-              className="py-1 px-2 bg-primary-8 placeholder-primary0 text-primary-4 rounded-md focus:outline-none"
+              className="py-1 px-2 bg-primary-8 rounded-md focus:outline-none"
               value={general.numberOfDaysInNews}
               onChange={e => {
                 const value = Number(e.target.value)
@@ -100,14 +88,29 @@ function Settings() {
 
           <div className="">
             <h2 className="uppercase">{t('theme')}</h2>
-            <div className="flex gap-2">
+            <div className="flex gap-10">
               <label className=" uppercase flex items-center gap-2">
-                {t('primary')}:
-                <ColorSelector target="primary" tonality={800} />
+                {t('base')}:
+                <select className="px-2 py-[1px] text-center bg-primary-8 rounded-md outline-none"
+                  onChange={({ target: { value } }) => updateSettings({
+                    colors: {
+                      primary: value as TailwindBaseColor | DefaultTheme
+                    }
+                  })
+                  }
+                  defaultValue={(colorSettings.primary as string in DefaultThemes
+                                || BasicColors.includes(colorSettings.primary as TailwindBaseColor)) ?
+                                colorSettings.primary as string : 'CUSTOM'
+                                }
+                >
+                  <option value='dark'>DARK</option>
+                  <option value='light'>LIGHT</option>
+                  <option value='slate'>SLATE</option>
+                </select>
               </label>
               <label className=" uppercase flex items-center gap-2">
                 {t('accent')}:
-                <ColorSelector target="accent" tonality={500} />
+                <AccentColorSelector />
               </label>
             </div>
           </div>
