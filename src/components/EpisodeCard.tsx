@@ -103,7 +103,7 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
 
   return (
     <div ref={contextMenuTarget} className="w-full">
-      <div ref={ref} className={`flex ${reprState.complete ? '0' : ''} cursor-default min-h-20
+      <div ref={ref} className={`flex ${reprState.complete ? 'text-primary-6' : ''} cursor-default min-h-20
                                 p-2 justify-between gap-4 ${className}`}
         onClick={() => {
           navigate('/episode-preview', {
@@ -119,13 +119,11 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
                 label: t(reprState.complete ? 'mark_not_played' : 'mark_played'),
                 event: () => {
                   if (reprState.complete) {
-                    updateEpisodeState(episode.src, episode.podcastUrl,
-                      0, episode.duration)
+                    updateEpisodeState(episode.src, episode.podcastUrl, 0, episode.duration)
                     setReprState({ complete: false, position: 0, total: episode.duration })
                   } else {
-                    updateEpisodeState(episode.src, episode.podcastUrl,
-                      episode.duration, episode.duration)
-                    setReprState({ complete: true, position: episode.duration, total: episode.duration })
+                    updateEpisodeState(episode.src, episode.podcastUrl, reprState.total, reprState.total)
+                    setReprState({ complete: true, position: reprState.total, total: reprState.total })
                   }
                 }
               },

@@ -21,7 +21,7 @@ export default {
           2: 'var(--color-primary-2)',
           3: 'var(--color-primary-3)',
           4: 'var(--color-primary-4)',
-          5: 'var(--color-primary0)',
+          5: 'var(--color-primary-5)',
           6: 'var(--color-primary-6)',
           7: 'var(--color-primary-7)',
           8: 'var(--color-primary-8)',
