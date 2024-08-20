@@ -25,11 +25,11 @@ export interface EpisodeData {
   coverUrl?: string,
 }
 
-export interface NewEpisodeData extends EpisodeData{
+export interface NewEpisodeData extends EpisodeData {
   new?: boolean
 }
 
-export interface RawEpisodeData extends EpisodeData{
+export interface RawEpisodeData extends EpisodeData {
   pubDate: number
 }
 
@@ -50,7 +50,7 @@ export interface Settings {
     language: string
   }
   podcasts: {
-    [feedUrl: string] : PodcastSettings
+    [feedUrl: string]: PodcastSettings
   },
   sync: {
     syncAfterAppStart: boolean,
@@ -59,18 +59,18 @@ export interface Settings {
   general: {
     numberOfDaysInNews: number,
     fetchSubscriptionsAtStartup: boolean
-    colors: {
-      primary: TailwindColors,
-      accent: TailwindColors
-    }
+  },
+  colors: {
+    primary: ThemeColor | TailwindBaseColor,
+    accent: ThemeColor | TailwindBaseColor,
   }
 }
 
 type RecursivePartial<T> = {
   [P in keyof T]?:
-    T[P] extends (infer U)[] ? RecursivePartial<U>[] :
-    T[P] extends object | undefined ? RecursivePartial<T[P]> :
-    T[P];
+  T[P] extends (infer U)[] ? RecursivePartial<U>[] :
+  T[P] extends object | undefined ? RecursivePartial<T[P]> :
+  T[P];
 };
 
 export interface SortCriterion {
@@ -79,18 +79,24 @@ export interface SortCriterion {
 }
 
 
-export interface TailwindColor {
-  50: string
-  100: string
-  200: string
-  300: string
-  400: string
-  500: string
-  600: string
-  700: string
-  800: string
-  900: string
-  950: string
+// #region colors
+
+export interface ThemeColor {
+  DEFAULT: TailwindColor
+  1: TailwindColor
+  2: TailwindColor
+  3: TailwindColor
+  4: TailwindColor
+  5: TailwindColor
+  6: TailwindColor
+  7: TailwindColor
+  8: TailwindColor
+  9: TailwindColor
+  10: TailwindColor
 }
 
-export type TailwindColors = 'slate' | 'gray' | 'zinc' | 'neutral' | 'stone' | 'red' | 'orange' | 'amber' | 'yellow' | 'lime' | 'green' | 'emerald' | 'teal' | 'cyan' | 'sky' | 'blue' | 'indigo' | 'violet' | 'purple' | 'fuchsia' | 'pink' | 'rose'
+export type TailwindBaseColor = 'slate' | 'gray' | 'zinc' | 'neutral' | 'stone' | 'red' | 'orange' | 'amber' | 'yellow' | 'lime' | 'green' | 'emerald' | 'teal' | 'cyan' | 'sky' | 'blue' | 'indigo' | 'violet' | 'purple' | 'fuchsia' | 'pink' | 'rose'
+
+export type TailwindColor = `${TailwindBaseColor}-${50 |100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 950}`
+
+// #endregion

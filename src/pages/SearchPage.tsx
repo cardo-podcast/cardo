@@ -7,11 +7,11 @@ function PodcastPreview ({result}: {result: PodcastData}) {
   const [imageError, setImageError] = useState(false)
 
   return(
-    <div className="flex bg-primary-800 rounded-md h-20 p-2 justify-between gap-4">
+    <div className="flex bg-primary-8 rounded-md h-20 p-2 justify-between gap-4">
       {imageError?
         icons.photo:
         <img
-        className="bg-primary-700 h-full aspect-square rounded-md"
+        className="bg-primary-7 h-full aspect-square rounded-md"
         alt=""
         src={result.coverUrl}
         onError={() => setImageError(true)}
