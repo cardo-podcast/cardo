@@ -49,8 +49,6 @@ function SearchBar() {
     };
   }, [results]);
 
-  console.log(window.history)
-
   return (
     <div className="flex">
       <div className="flex gap-1 w-fit h-8 p-1 text-primary-4">
@@ -65,7 +63,7 @@ function SearchBar() {
             {arrowRight}
           </button>
       </div>
-      <div className="relative">
+      <div className="relative w-full">
         <form onSubmit={e => {
           e.preventDefault()
           clearTimeout(timeout.current)

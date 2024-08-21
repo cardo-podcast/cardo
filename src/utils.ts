@@ -64,8 +64,7 @@ export async function parseXML(url: string): Promise<EpisodeData[]> {
   const result = await Promise.all(Array.from(items).map(async(item: Element, i) => {
 
     const duration = parseDuration(getItunesTag(item, 'duration')?.textContent) ?? 0
-    const size = Number(item.querySelector('enclosure')?.getAttribute('length')) / 1000000 ?? 0
-    // console.log('HOLAAA', duration, size > 0? size:  duration * 128 / 8 / 1024)
+    const size = Number(item.querySelector('enclosure')?.getAttribute('length')) / 1000000
 
     const episode: EpisodeData = {
       id: i, //
