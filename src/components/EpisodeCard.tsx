@@ -62,7 +62,7 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
   const [inQueue, setInqueue] = useState(queue.includes(episode.src))
 
   const { t } = useTranslation();
-  const { play, playing, position: playingPosition } = usePlayer()
+  const { play, playing, position: playingPosition, quit: quitPlayer } = usePlayer()
 
 
   const [ref, entry] = useIntersectionObserver({
@@ -124,6 +124,9 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
                   } else {
                     updateEpisodeState(episode.src, episode.podcastUrl, reprState.total, reprState.total)
                     setReprState({ complete: true, position: reprState.total, total: reprState.total })
+                    if (playing?.src == episode.src) {
+                      quitPlayer()
+                    }
                   }
                 }
               },

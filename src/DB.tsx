@@ -142,6 +142,11 @@ const getLastPlayed = async (): Promise<EpisodeData | undefined> => {
       WHERE description = "lastPlaying"`,
   )
   if (r.length > 0) {
+
+    if (r[0].value == 'NONE') {
+      return
+    }
+
     const parsedEpisode: EpisodeData = JSON.parse(r[0].value)
 
     return {
@@ -151,7 +156,10 @@ const getLastPlayed = async (): Promise<EpisodeData | undefined> => {
   }
 }
 
-const setLastPlaying = async (playingEpisode: EpisodeData) => {
+const setLastPlaying = async (playingEpisode?: EpisodeData) => {
+  // empty args to set NONE as last played
+
+  const data = playingEpisode ? JSON.stringify(playingEpisode): 'NONE'
 
   await db.execute(
     `INSERT into misc (description, value)
@@ -160,7 +168,7 @@ const setLastPlaying = async (playingEpisode: EpisodeData) => {
     SET value = $1
     WHERE description = "lastPlaying"
     `,
-    [JSON.stringify(playingEpisode)],
+    [data],
   )
 
 }
