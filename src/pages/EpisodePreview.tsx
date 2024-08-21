@@ -65,7 +65,7 @@ function EpisodePreview() {
         {imageError ?
           icons.photo :
           <img
-            className="bg-primary-7 h-28 aspect-square rounded-md cursor-pointer"
+            className="bg-primary-8 h-28 aspect-square rounded-md cursor-pointer hover:p-1"
             src={episode.coverUrl}
             alt=""
             onError={() => setImageError(true)}

@@ -62,6 +62,11 @@ export async function parseXML(url: string): Promise<EpisodeData[]> {
   const podcastDetails = await parsePodcastDetails(xml)
 
   const result = await Promise.all(Array.from(items).map(async(item: Element, i) => {
+
+    const duration = parseDuration(getItunesTag(item, 'duration')?.textContent) ?? 0
+    const size = Number(item.querySelector('enclosure')?.getAttribute('length')) / 1000000 ?? 0
+    // console.log('HOLAAA', duration, size > 0? size:  duration * 128 / 8 / 1024)
+
     const episode: EpisodeData = {
       id: i, //
       title: item.querySelector('title')?.textContent ?? '',
@@ -69,8 +74,8 @@ export async function parseXML(url: string): Promise<EpisodeData[]> {
       src: item.querySelector('enclosure')?.getAttribute('url') ?? '',
       pubDate: new Date(item.querySelector('pubDate')?.textContent ?? 0),
       coverUrl: getItunesTag(item, 'image')?.getAttribute('href') ?? podcastDetails.coverUrl,
-      duration: parseDuration(getItunesTag(item, 'duration')?.textContent),
-      size: Number(item.querySelector('enclosure')?.getAttribute('length')) ?? 0,
+      duration: duration,
+      size: Math.round(size > 0? size: duration * 128 / 8 / 1024), // if size isn't especified on xml use estimated size suposing a 128kb/s bitrate
       podcastUrl: podcastDetails.feedUrl
     }
     return episode
