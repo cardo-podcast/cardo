@@ -63,7 +63,6 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
 
   const { t } = useTranslation();
   const { play, playing, position: playingPosition } = usePlayer()
-  console.log(episode.size)
 
 
   const [ref, entry] = useIntersectionObserver({

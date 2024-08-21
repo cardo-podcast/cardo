@@ -11,12 +11,12 @@ import { useTranslation } from "react-i18next";
 
 
 function SortButton({ children, podcastUrl, criterion }: { children: ReactNode, podcastUrl: string, criterion: SortCriterion['criterion'] }) {
-  const [{ sort }, updatePodcastSettings] = usePodcastSettings(podcastUrl)
+  const [{ current: {sort} }, updatePodcastSettings] = usePodcastSettings(podcastUrl)
   // podcastSettings.sort.criterion
 
   return (
     <button
-      className={`bg-primary-8 hover:bg-primary-7 flex items-center justify-center w-2/3 rounded-md ${sort.criterion == criterion ? 'text-accent-5' : ''}`}
+      className={`bg-primary-8 hover:bg-primary-7 flex items-center justify-center w-2/3 rounded-md ${sort.criterion == criterion ? '.text-accent-6' : ''}`}
       onClick={
         () => {
           if (sort.criterion == criterion) {
@@ -49,11 +49,14 @@ function PodcastPreview() {
   const [imageError, setImageError] = useState(false)
   const podcast = location.state.podcast as PodcastData
   const [episodes, setEpisodes] = useState<EpisodeData[]>([])
+  const [downloading, setDownloading] = useState(false)
   const [subscribed, setSubscribed] = useState(false)
   const { subscriptions: { getSubscription, deleteSubscription, addSubscription, reloadSubscriptions },
     history: { getCompletedEpisodes },
     subscriptionsEpisodes: { getAllSubscriptionsEpisodes, deleteSubscriptionEpisodes, saveSubscriptionsEpisodes } } = useDB()
   const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcast.feedUrl)
+  podcastSettings.current
+
   const [tweakMenu, setTweakMenu] = useState<ReactNode>(undefined)
   const { t } = useTranslation()
 
@@ -67,7 +70,7 @@ function PodcastPreview() {
     }
 
     let sortedEpisodes: EpisodeData[] = []
-    const sortCriterion = podcastSettings.sort
+    const sortCriterion = podcastSettings.current.sort
 
     switch (sortCriterion.criterion) {
       case 'duration':
@@ -81,35 +84,45 @@ function PodcastPreview() {
     return sortedEpisodes
   }
 
-  const loadEpisodes = async () => {
+  const loadEpisodes = async (forceDownload = false) => {
+
+    const downloadEpisodes = async () => {
+      setDownloading(true)
+      const episodes = await parseXML(podcast.feedUrl)
+      setDownloading(false)
+      return episodes
+    }
+
     const isSubscribed = await getSubscription(podcast.feedUrl) !== undefined
     setSubscribed(isSubscribed)
 
-    let episodes;
-    if (isSubscribed) {
+    let episodes: EpisodeData[] = []
+    if (!isSubscribed || forceDownload) {
+      episodes = await downloadEpisodes()
+    } else if (isSubscribed){
       episodes = await getAllSubscriptionsEpisodes({ podcastUrl: podcast.feedUrl })
       if (!episodes.length) {
-        episodes = await parseXML(podcast.feedUrl)
-        saveSubscriptionsEpisodes(episodes)
+        episodes = await downloadEpisodes()
       }
-    } else {
-      episodes = await parseXML(podcast.feedUrl)
     }
 
-    return sortEpisodes(episodes)
+    if (isSubscribed) {
+      saveSubscriptionsEpisodes(episodes)
+    }
+
+    return sortEpisodes(await filterEpisodes(episodes))
   }
 
-  const filterEpisodes = async () => {
-    const newEpisodes = await loadEpisodes()
-
+  const filterEpisodes = async (unfilteredEpisodes: EpisodeData[]) => {
     const completedEpisodes = await getCompletedEpisodes()
+    const filter = podcastSettings.current.filter
 
-    if (podcastSettings.filter.played === SwitchState.True) {
-      setEpisodes(newEpisodes.filter(ep => completedEpisodes.includes(ep.src)))
-    } else if (podcastSettings.filter.played === SwitchState.False) {
-      setEpisodes(newEpisodes.filter(ep => !completedEpisodes.includes(ep.src)))
-    }else {
-      setEpisodes(newEpisodes)
+    if (filter.played === SwitchState.True) {
+      return unfilteredEpisodes.filter(ep => completedEpisodes.includes(ep.src))
+    } else if (filter.played === SwitchState.False) {
+      return unfilteredEpisodes.filter(ep => !completedEpisodes.includes(ep.src))
+    } else {
+      return unfilteredEpisodes
     }
   }
 
@@ -121,14 +134,7 @@ function PodcastPreview() {
 
   useEffect(() => {
     setEpisodes(sortEpisodes(episodes))
-  }, [podcastSettings.sort.criterion, podcastSettings.sort.mode])
-
-
-  useEffect(() => {
-    filterEpisodes()
-
-    // setEpisodes(sortEpisodes(episodes))
-  }, [podcastSettings.filter.played])
+  }, [podcastSettings.current?.sort.criterion, podcastSettings.current?.sort.mode])
 
 
   return (
@@ -164,7 +170,7 @@ function PodcastPreview() {
           <h2 className="mb-2">{podcast.artistName}</h2>
 
           <div className="flex gap-2">
-            <button className="hover:text-accent-5" onClick={async () => {
+            <button className="hover:text-accent-6" onClick={async () => {
               if (subscribed) {
                 await deleteSubscription(podcast.feedUrl)
                 setSubscribed(false)
@@ -178,7 +184,7 @@ function PodcastPreview() {
             }}>
               {subscribed ? icons.starFilled : icons.star}
             </button>
-            <button className="hover:text-accent-5" onClick={async () => {
+            <button className="hover:text-accent-6" onClick={async () => {
               const fetchedEpisodes = await parseXML(podcast.feedUrl)
               setEpisodes(sortEpisodes(fetchedEpisodes))
               saveSubscriptionsEpisodes(fetchedEpisodes)
@@ -188,7 +194,7 @@ function PodcastPreview() {
             </button>
 
             <button
-              className="hover:text-accent-5"
+              className="hover:text-accent-6"
               onClick={() => {
                 setTweakMenu(
                   <>
@@ -205,18 +211,27 @@ function PodcastPreview() {
               {icons.sort}
             </button>
             <button
-              className="hover:text-accent-5"
+              className="hover:text-accent-6"
               onClick={() => {
                 setTweakMenu(
                   <>
-                    <Switch initialState={podcastSettings.filter.played} setState={value => {
+                    <Switch initialState={podcastSettings.current.filter.played} setState={async(value) => {
                       updatePodcastSettings({ filter: { played: value } })
+                      setEpisodes(await loadEpisodes())
                     }} labels={[t('not_played'), t('played')]} />
                   </>
                 )
               }
               }>
               {icons.filter}
+            </button>
+            <button className={`w-6 hover:text-accent-6 ${downloading
+              && 'animate-[spin_2s_linear_reverse_infinite]'}`}
+              onClick={async() => {
+                setEpisodes(await loadEpisodes(true))
+              }}
+            >
+              {icons.sync}
             </button>
           </div>
 

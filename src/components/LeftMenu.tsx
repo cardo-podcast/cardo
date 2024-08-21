@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useDB } from "../DB";
 import { useTranslation } from "react-i18next";
-import * as icons from '../Icons'
+import {sync} from '../Icons'
 
 
 function LeftMenu() {
@@ -10,7 +10,7 @@ function LeftMenu() {
   const { t } = useTranslation();
 
   return (
-    <div className="bg-primary-9 border-r-2 border-primary-8 w-56 h-full flex flex-col p-3 pt-4">
+    <div className="bg-primary-9 border-r-2 border-primary-8 w-56 lg:w-80 h-full flex flex-col p-3 pt-4">
       <div className="flex flex-col gap-1 uppercase mb-6">
         <Link to='/' className="hover:text-accent-5 hover:pl-1">
           {t('home')}
@@ -29,7 +29,7 @@ function LeftMenu() {
         onClick={updateSubscriptionsFeed}
         title={t('update_subs_feeds')}
         >
-          {icons.sync}
+          {sync}
         </button>
       </div>
       <div className="flex flex-col gap-1 overflow-y-auto">
