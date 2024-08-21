@@ -13,7 +13,8 @@ export type AudioPlayerRef = {
   position: number,
   setPosition: Dispatch<SetStateAction<number>>
   onExit: () => Promise<void>
-}
+  quit: () => void
+ }
 
 
 const PlayerContext = createContext<AudioPlayerRef | undefined>(undefined)
@@ -68,6 +69,14 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     audioRef.current.play()
   }
 
+  const quit = () => {
+    if (audioRef.current == null) return
+
+    audioRef.current.src = ''
+    setPlaying(undefined)
+    setLastPlaying() // revoke last playing
+  }
+
   const onExit = useCallback(async () => {
     // save state if closing without pause
     if (audioRef.current == null || playing == null) return
@@ -91,7 +100,8 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
       playing,
       position,
       setPosition,
-      onExit
+      onExit,
+      quit
     }}>
       {children}
     </PlayerContext.Provider>
@@ -165,10 +175,10 @@ function AudioPlayer({ className = '' }) {
 
 
   return (
-    <div className={`flex bg-primary-10 border-t-2 border-primary-8 p-2 gap-3 ${audioRef.current?.src ? '' : 'hidden'} ${className}`}>
+    <div className={`flex bg-primary-10 border-t-2 border-primary-8 p-2 gap-3 ${audioRef.current?.src && playing ? 'visible' : 'hidden'} ${className}`}>
       {playing &&
         <img
-          className="bg-primary-7 h-full aspect-square rounded-md cursor-pointer"
+          className="bg-primary-8 h-full aspect-square rounded-md cursor-pointer hover:p-1"
           src={playing.coverUrl}
           alt=''
           onClick={() => {

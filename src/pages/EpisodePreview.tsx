@@ -15,11 +15,11 @@ function EpisodePreview() {
   const location = useLocation()
   const episode = location.state.episode as EpisodeData
   const [position, setPosition] = useState(0)
-  const { play, playing, position: playingPosition } = usePlayer()
+  const [ended, setEnded] = useState(false)
+  const { play, playing, position: playingPosition, quit: quitPlayer } = usePlayer()
   const navigate = useNavigate()
-  const { subscriptions: { getSubscription } } = useDB()
+  const { subscriptions: { getSubscription }, history: {getEpisodeState, updateEpisodeState} } = useDB()
   const { t } = useTranslation()
-  const { history: { getEpisodeState } } = useDB()
   const [{ globals: { locale } },] = useSettings()
 
 
@@ -59,6 +59,10 @@ function EpisodePreview() {
     )
   }, [])
 
+  useEffect(() => {
+    setEnded(position >= episode.duration)
+  }, [position])
+
   return (
     <div className="p-2 w-full flex flex-col">
       <div className='flex justify-left w-full gap-3 mb-2 p-2 pb-3 border-b-2 border-primary-8'>
@@ -82,12 +86,12 @@ function EpisodePreview() {
 
         <div className="flex flex-col gap-2 justify-between p-1 w-full">
           <div className="flex flex-col">
-            <p className='text-sm'>{getDate()} - {Math.round(episode.size / 1000000)} MB </p>
+            <p className='text-sm'>{getDate()} - {episode.size} MB </p>
             <h1>{episode.title}</h1>
           </div>
           <div className="flex gap-2 justify-end items-center">
             {
-              (position === 0 || position >= episode.duration) && playing?.src != episode.src ?
+              (position === 0 || ended) && playing?.src != episode.src ?
                 secondsToStr(episode.duration) :
                 <ProgressBar position={playing?.src == episode.src ? playingPosition : position}
                   total={episode.duration}
@@ -97,6 +101,24 @@ function EpisodePreview() {
               onClick={() => play(episode)}
             >
               {icons.play}
+            </button>
+            <button className={`w-5 hover:text-accent-6 ${ended && 'text-primary-7'}`}
+            title={ended? t('mark_not_played'): t('mark_played')}
+            onClick={() => {
+              if (ended) {
+                setPosition(0)
+                updateEpisodeState(episode.src, episode.podcastUrl, 0, episode.duration)
+
+              } else {
+                setPosition(episode.duration)
+                updateEpisodeState(episode.src, episode.podcastUrl, episode.duration, episode.duration)
+                if (playing?.src == episode.src) {
+                  quitPlayer()
+                }
+              }
+            }}
+            >
+              {icons.check}
             </button>
           </div>
         </div>
