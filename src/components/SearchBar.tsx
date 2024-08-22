@@ -87,13 +87,18 @@ function SearchBar() {
 
         {
           results.length > 0 &&
-          (<div className="w-4/5 absolute left-1/2 -translate-x-1/2 top-0 mt-[32px] z-10 max-h-[400px] flex justify-center overflow-y-auto bg-primary-9 border-x-2 border-primary-8"
+          (<div className="w-4/5 absolute left-1/2 -translate-x-1/2 top-0 mt-[32px] z-10 max-h-[400px] flex justify-center overflow-y-auto scroll-smooth bg-primary-9 border-x-2 border-primary-8"
             ref={resultsRef}
           >
             <div className="grid w-full">
               {
                 results.map((result, i) => {
-                  return <PodcastCard key={i} podcast={result} callback={() => setResults([])} />
+                  return <PodcastCard key={i} podcast={result} callback={() => {
+                    setResults([])
+                    if (inputRef.current) {
+                      inputRef.current.value = ''
+                    }
+                  }} />
                 })
               }
             </div>
