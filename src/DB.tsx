@@ -13,8 +13,9 @@ let db: Database = new Database('');
 const addSubscription = async (podcast: PodcastData): Promise<number> => {
   // returns subscription id on database
   const r = await db.execute(
-    "INSERT into subscriptions (podcastName, artistName, coverUrl, coverUrlLarge, feedUrl) VALUES ($1, $2, $3, $4, $5)",
-    [podcast.podcastName, podcast.artistName, podcast.coverUrl, podcast.coverUrlLarge, podcast.feedUrl],
+    `INSERT into subscriptions (podcastName, artistName, coverUrl, coverUrlLarge, feedUrl, description)
+      VALUES ($1, $2, $3, $4, $5, $6)`,
+    [podcast.podcastName, podcast.artistName, podcast.coverUrl, podcast.coverUrlLarge, podcast.feedUrl, podcast.description ?? ''],
   );
 
   return r.lastInsertId

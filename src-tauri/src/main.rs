@@ -131,6 +131,14 @@ fn main() {
                                         coverUrl TEXT
                                                     );",
             kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 6,
+            description: "podcast description",
+            sql: "ALTER TABLE subscriptions
+            ADD COLUMN description TEXT
+            ",
+            kind: MigrationKind::Up,
         }
     ];
 
