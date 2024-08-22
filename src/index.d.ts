@@ -65,6 +65,11 @@ export interface Settings {
   colors: {
     primary: ColorTheme | TailwindBaseColor | DefaultTheme,
     accent: ColorTheme | TailwindBaseColor | DefaultTheme,
+  },
+  playback: {
+    stepForward: number,
+    stepBackwards: number,
+    resumeBefore: number // resume playing some seconds before the last state
   }
 }
 
