@@ -142,17 +142,23 @@ function PodcastPreview() {
     <div className="relative p-2 w-full flex flex-col">
 
       {tweakMenu &&
-        <div className="left-1/2 -translate-x-1/2 absolute w-4/5 top-0 rounded-b-3xl overflow-hidden bg-primary-9 border-[1px] border-t-0 border-primary-6 flex flex-col justify-between items-center transition-all duration-200 z-20">
-          <div className="p-2 flex flex-col gap-1 items-center w-full">
-            {tweakMenu}
-          </div>
+        <>
+          <div className="absolute top-0 left-0 z-20 w-screen h-screen"
+          onClick={() => setTweakMenu(undefined)}
+          />
 
-          <button className="border-t-2 border-primary-8 p-2 h-5 w-4/5 flex justify-center items-center mt-1"
-            onClick={() => setTweakMenu(undefined)}
-          >
-            <span className="h-6 w-6">{icons.upArrow}</span>
-          </button>
-        </div>
+          <div className="left-1/2 -translate-x-1/2 absolute w-4/5 top-0 rounded-b-3xl overflow-hidden bg-primary-9 border-[1px] border-t-0 border-primary-6 flex flex-col justify-between items-center transition-all duration-200 z-20">
+            <div className="p-2 flex flex-col gap-1 items-center w-full">
+              {tweakMenu}
+            </div>
+
+            <button className="border-t-2 border-primary-8 p-2 h-5 w-4/5 flex justify-center items-center mt-1"
+              onClick={() => setTweakMenu(undefined)}
+            >
+              <span className="h-6 w-6">{icons.upArrow}</span>
+            </button>
+          </div>
+        </>
       }
 
       <div className='flex justify-left w-full gap-3 pb-3 border-b-[3px] border-primary-8 h-52'>

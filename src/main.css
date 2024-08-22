@@ -8,5 +8,5 @@
 }
 
 button {
-    @apply transition-colors
+    @apply transition-colors;
 }
