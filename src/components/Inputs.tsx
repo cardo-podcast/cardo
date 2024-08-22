@@ -22,9 +22,9 @@ export function Switch({ initialState, setState, labels }: {
   }
 
   return (
-    <div className="flex gap-2 items-center uppercase text-sm">
-      <p>{labels[0]}</p>
-      <div className="bg-zinc-300 border-2 border-zinc-800 h-5 rounded-md overflow-hidden flex">
+    <div className="grid grid-cols-3 gap-1 uppercase items-center align-middle">
+      <p className="text-right">{labels[0]}</p>
+      <div className="bg-zinc-300 border-2 border-zinc-800 h-5 rounded-md overflow-hidden flex w-fit mx-auto">
         <input type="radio" name="toggle" checked={displayState === SwitchState.False} onChange={() => toggleSwitch(SwitchState.False)}
           className="w-5 h-full appearance-none checked:bg-blue-500" />
         <input type="radio" name="toggle" checked={displayState === SwitchState.None} onChange={() => toggleSwitch(SwitchState.None)}
@@ -32,7 +32,7 @@ export function Switch({ initialState, setState, labels }: {
         <input type="radio" name="toggle" checked={displayState === SwitchState.True} onChange={() => toggleSwitch(SwitchState.True)}
           className="w-5 h-full appearance-none checked:bg-green-500" />
       </div>
-      <p>{labels[1]}</p>
+      <p className="text-left">{labels[1]}</p>
     </div>
   )
 }

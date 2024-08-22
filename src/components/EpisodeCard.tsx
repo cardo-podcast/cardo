@@ -29,7 +29,7 @@ export function SortEpisodeGrip({ id, children }: { id: number, children: ReactN
   };
 
   return (
-    <div className="flex cursor-default hover:bg-primary-8 rounded-md" style={style} {...attributes}>
+    <div className="flex cursor-default hover:bg-primary-8 transition-colors rounded-md" style={style} {...attributes}>
       <div ref={setNodeRef} className="flex items-center" {...listeners}>
         <div className={`w-6 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}>
           {icons.grip}

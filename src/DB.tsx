@@ -435,7 +435,7 @@ function initDB() {
   const updateSubscriptionsFeed = async () => {
     setUpdatingFeeds(true)
     for (const subscription of subscriptionsList) {
-      const episodes = await parseXML(subscription.feedUrl)
+      const [episodes, ] = await parseXML(subscription.feedUrl)
       const r = await saveSubscriptionsEpisodes(episodes)
       if (r.rowsAffected > 0) {
         loadNewEpisodes()

@@ -43,7 +43,7 @@ const App = () => {
                 <LeftMenu />
                 <div className="flex flex-col overflow-y-hidden w-full h-full">
                   <SearchBar />
-                  <div className="flex h-full overflow-y-auto border-t-2 border-primary-8">
+                  <div className="flex h-full overflow-y-auto scroll-smooth border-t-2 border-primary-8">
                     <Suspense>
                       <Routes>
                         <Route path='/' element={<HomePage />} />

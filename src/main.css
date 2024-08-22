@@ -6,3 +6,7 @@
 ::-webkit-scrollbar {
     display: none;
 }
+
+button {
+    @apply transition-colors
+}
