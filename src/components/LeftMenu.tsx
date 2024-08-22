@@ -10,15 +10,15 @@ function LeftMenu() {
   const { t } = useTranslation();
 
   return (
-    <div className="bg-primary-9 border-r-2 border-primary-8 w-56 lg:w-80 h-full flex flex-col p-3 pt-4">
+    <div className="bg-primary-9 border-r-2 border-primary-8 w-64 lg:w-80 h-full flex flex-col p-3 pt-4 overflow-x-hidden">
       <div className="flex flex-col gap-1 uppercase mb-6">
-        <Link to='/' className="hover:text-accent-5 hover:pl-1">
+        <Link to='/' className="hover:text-accent-5 hover:pl-1 transition-all">
           {t('home')}
         </Link>
-        <Link to='/settings' className="hover:text-accent-5 hover:pl-1">
+        <Link to='/settings' className="hover:text-accent-5 hover:pl-1 transition-all">
           {t('settings')}
         </Link>
-        <Link to='/queue' className="hover:text-accent-5 hover:pl-1">
+        <Link to='/queue' className="hover:text-accent-5 hover:pl-1 transition-all">
           {t('queue')}
         </Link>
       </div>
@@ -36,7 +36,7 @@ function LeftMenu() {
         {
           subscriptions.subscriptions.map((fav, i) => {
             return (
-              <div key={i} className="p-1 rounded-md flex gap-2 justify-between cursor-pointer hover:bg-primary-8 hover:pl-2"
+              <div key={i} className="p-1 rounded-md flex gap-2 justify-between cursor-pointer hover:bg-primary-8 hover:pl-2 transition-all"
                 onClick={() => navigate('/preview', {
                   state: {
                     podcast: fav

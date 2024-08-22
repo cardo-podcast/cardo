@@ -35,7 +35,7 @@ function getItunesTag(item: Element, tag: string) {
   return item.getElementsByTagNameNS('http://www.itunes.com/dtds/podcast-1.0.dtd', tag)[0]
 }
 
-export async function parseXML(url: string): Promise<EpisodeData[]> {
+export async function parseXML(url: string): Promise<[EpisodeData[], PodcastData]> {
   // dynamic import of sanitize module, to reduce bundle size
   const module = await import('sanitize-html');
   const sanitizeHtml = module.default;
@@ -49,7 +49,7 @@ export async function parseXML(url: string): Promise<EpisodeData[]> {
     if (!duration) return 0
 
     const durationNumber = Number(duration)
-    
+
     if (Number.isNaN(durationNumber)) {
       // format comes in '00:00:00'
       return strToSeconds(duration)
@@ -61,7 +61,7 @@ export async function parseXML(url: string): Promise<EpisodeData[]> {
 
   const podcastDetails = await parsePodcastDetails(xml)
 
-  const result = await Promise.all(Array.from(items).map(async(item: Element, i) => {
+  const result = Array.from(items).map((item: Element, i) => {
 
     const duration = parseDuration(getItunesTag(item, 'duration')?.textContent) ?? 0
     const size = Number(item.querySelector('enclosure')?.getAttribute('length')) / 1000000
@@ -69,18 +69,18 @@ export async function parseXML(url: string): Promise<EpisodeData[]> {
     const episode: EpisodeData = {
       id: i, //
       title: item.querySelector('title')?.textContent ?? '',
-      description: await sanitizeHtml(item.querySelector('description')?.textContent ?? '') ?? item.querySelector('itunes\\:summary')?.textContent,
+      description: sanitizeHtml(item.querySelector('description')?.textContent ?? '') ?? item.querySelector('itunes\\:summary')?.textContent,
       src: item.querySelector('enclosure')?.getAttribute('url') ?? '',
       pubDate: new Date(item.querySelector('pubDate')?.textContent ?? 0),
       coverUrl: getItunesTag(item, 'image')?.getAttribute('href') ?? podcastDetails.coverUrl,
       duration: duration,
-      size: Math.round(size > 0? size: duration * 128 / 8 / 1024), // if size isn't especified on xml use estimated size suposing a 128kb/s bitrate
+      size: Math.round(size > 0 ? size : duration * 128 / 8 / 1024), // if size isn't especified on xml use estimated size suposing a 128kb/s bitrate
       podcastUrl: podcastDetails.feedUrl
     }
     return episode
-  }))
+  })
 
-  return result
+  return [result, podcastDetails]
 }
 
 export async function parsePodcastDetails(xml: Document | string) {
@@ -88,6 +88,10 @@ export async function parsePodcastDetails(xml: Document | string) {
   xml:  string -> url to download xml
         Document -> parsed downloaded xml
   */
+
+  // dynamic import of sanitize module, to reduce bundle size
+  const module = await import('sanitize-html');
+  const sanitizeHtml = module.default;
 
   if (typeof xml === "string") {
     const xmlString = await downloadXml(xml)
@@ -97,7 +101,7 @@ export async function parsePodcastDetails(xml: Document | string) {
 
   const channel = xml.querySelector('channel')
 
-  if (channel == null) return {podcastName:'', artistName: '', coverUrl: '', coverUrlLarge: '', feedUrl: ''}
+  if (channel == null) return { podcastName: '', artistName: '', coverUrl: '', coverUrlLarge: '', feedUrl: '' }
 
   const coverUrl = channel.querySelector('image')?.getAttribute('href') ?? channel.querySelector('image')?.querySelector('url')?.textContent ?? ''
 
@@ -106,7 +110,8 @@ export async function parsePodcastDetails(xml: Document | string) {
     artistName: getItunesTag(channel, 'author').textContent ?? '',
     coverUrl: coverUrl,
     coverUrlLarge: coverUrl,
-    feedUrl: channel.querySelector('link[rel="self"]')?.getAttribute('href') ?? ''
+    feedUrl: channel.querySelector('link[rel="self"]')?.getAttribute('href') ?? '',
+    description: sanitizeHtml(channel.querySelector('description')?.textContent ?? '')
   }
 
   return podcast
@@ -118,10 +123,10 @@ export async function getAllCreds(): Promise<any | undefined> {
 
   if (!await exists(file)) return
 
-  try{
+  try {
     const data = JSON.parse(await readTextFile(file))
     return data
-  }catch{
+  } catch {
     return {}
   }
 

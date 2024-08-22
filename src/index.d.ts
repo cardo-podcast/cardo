@@ -11,6 +11,7 @@ export interface PodcastData {
   coverUrl: string,
   coverUrlLarge: string,
   feedUrl: string,
+  description?: string
 }
 
 export interface EpisodeData {

@@ -10,7 +10,7 @@ function PodcastCard ({podcast, callback}: {podcast: PodcastData, callback: ()=>
 
 
   return(
-    <div className="flex hover:bg-primary-8 cursor-pointer h-20 p-2 justify-between border-b-2 border-primary-8"
+    <div className="flex hover:bg-primary-8 transition-colors cursor-pointer h-20 p-2 justify-between border-b-2 border-primary-8"
     onClick={() => {
       callback()
         navigate('/preview', {
