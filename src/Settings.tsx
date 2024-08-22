@@ -125,6 +125,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     colors: {
       primary: 'dark',
       accent: 'red'
+    },
+    playback: {
+      stepForward: 30,
+      stepBackwards: 10,
+      resumeBefore: 5
     }
   })
 

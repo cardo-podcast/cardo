@@ -1,9 +1,11 @@
 import React, { useRef, useEffect, useState, RefObject, createContext, ReactNode, useContext, Dispatch, SetStateAction, useCallback } from "react";
 import { secondsToStr } from "../utils";
-import * as icons from "../Icons"
+import { play as playIcon, pause as pauseIcon, forward as forwardIcon, backwards as backwardsIcon } from "../Icons"
 import { EpisodeData } from "..";
 import { useDB } from "../DB";
 import { useNavigate } from "react-router-dom";
+import { useSettings } from "../Settings";
+
 
 
 export type AudioPlayerRef = {
@@ -14,7 +16,7 @@ export type AudioPlayerRef = {
   setPosition: Dispatch<SetStateAction<number>>
   onExit: () => Promise<void>
   quit: () => void
- }
+}
 
 
 const PlayerContext = createContext<AudioPlayerRef | undefined>(undefined)
@@ -24,7 +26,7 @@ export const usePlayer = () => useContext(PlayerContext) as AudioPlayerRef
 export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playing, setPlaying] = useState<EpisodeData>()
-  const {dbLoaded, history: { getEpisodeState, getLastPlayed, setLastPlaying } } = useDB()
+  const { dbLoaded, history: { getEpisodeState, getLastPlayed, setLastPlaying } } = useDB()
   const [position, setPosition] = useState(0);
   const { history: { updateEpisodeState } } = useDB()
 
@@ -39,7 +41,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    if (dbLoaded){
+    if (dbLoaded) {
       loadLastPlayed()
     }
   }, [dbLoaded])
@@ -114,6 +116,7 @@ function AudioPlayer({ className = '' }) {
   const { history: { updateEpisodeState }, queue } = useDB()
   const { audioRef, play, playing, position, setPosition } = usePlayer()
   const navigate = useNavigate()
+  const [{ playback: { stepForward, stepBackwards } },] = useSettings()
 
   useEffect(() => {
     if (audioRef.current == null || playing == null) return
@@ -159,10 +162,17 @@ function AudioPlayer({ className = '' }) {
     }
   };
 
-  const handleSeekChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const changeTime = (newTime: number, relative = false) => {
     if (audioRef.current) {
-      const newTime = Number(event.target.value);
-      audioRef.current.currentTime = newTime;
+
+      if (relative) {
+        newTime += audioRef.current.currentTime
+      }
+
+
+      newTime = Math.max(Math.min(audioRef.current.duration, newTime), 0)
+
+      audioRef.current.currentTime = newTime
       setPosition(newTime);
     }
   };
@@ -175,10 +185,10 @@ function AudioPlayer({ className = '' }) {
 
 
   return (
-    <div className={`flex bg-primary-10 border-t-2 border-primary-8 p-2 gap-3 ${audioRef.current?.src && playing ? 'visible' : 'hidden'} ${className}`}>
+    <div className={`relative w-full flex bg-primary-10 border-t-2 border-primary-8 p-2 gap-3 ${audioRef.current?.src && playing ? 'visible' : 'hidden'} ${className}`}>
       {playing &&
         <img
-          className="bg-primary-8 h-full aspect-square rounded-md cursor-pointer hover:p-1"
+          className="h-full aspect-square rounded-md cursor-pointer hover:p-1 transition-all"
           src={playing.coverUrl}
           alt=''
           onClick={() => {
@@ -190,19 +200,12 @@ function AudioPlayer({ className = '' }) {
           }}
         />
       }
+      
 
-      <div className={`flex flex-col justify-center w-full`}>
-        {playing && <p className="text-sm">{playing.title}</p>}
-        <div className="flex justify-center">
+      <div className={`absolute left-1/2 -translate-x-1/2 flex flex-col w-1/2`}>
+        
+        {playing && <h1 className="text-sm mb-1">{playing.title}</h1>}
 
-          <button
-            className="flex items-center focus:outline-none hover: hover:text-accent-6 w-8"
-            onClick={handlePlayPause}
-          >
-            {audioRef.current?.paused ? icons.play : icons.pause}
-          </button>
-
-        </div>
         <div className="flex justify-evenly items-center">
           <p>{secondsToStr(position)}</p>
           <input
@@ -210,10 +213,40 @@ function AudioPlayer({ className = '' }) {
             min="0"
             max={duration}
             value={position}
-            onChange={handleSeekChange}
-            className="w-full mx-4 h-1 bg-primary-3 accent-accent-6"
+            onChange={(event) => changeTime(Number(event.target.value))}
+            className="w-full mx-1 h-1 bg-primary-3 accent-accent-6"
           />
           <p>{secondsToStr(duration)}</p>
+        </div>
+
+        <div className="flex justify-center gap-3 mb-1">
+
+            <button
+              className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
+              onClick={() => {
+                changeTime(-1 * stepBackwards, true)
+              }}
+            >
+              {backwardsIcon}
+              <p className="text-xs text-center -mt-[7px]">{stepBackwards}</p>
+            </button>
+
+          <button
+            className="flex items-center focus:outline-none hover: hover:text-accent-6 w-9 mb-1"
+            onClick={handlePlayPause}
+          >
+            {audioRef.current?.paused ? playIcon : pauseIcon}
+          </button>
+
+            <button
+              className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
+              onClick={() => {
+                changeTime(stepForward, true)
+              }}
+            >
+              {forwardIcon}
+              <p className="text-xs text-center -mt-[7px]">{stepForward}</p>
+            </button>
         </div>
 
         <audio ref={audioRef} onLoadedMetadata={handleLoadedMetadata} className="hidden" />
