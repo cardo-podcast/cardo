@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, RefObject, createContext, ReactNode, useContext, Dispatch, SetStateAction, useCallback } from "react";
+import { useRef, useEffect, useState, RefObject, createContext, ReactNode, useContext, Dispatch, SetStateAction, useCallback } from "react";
 import { secondsToStr } from "../utils";
 import { play as playIcon, pause as pauseIcon, forward as forwardIcon, backwards as backwardsIcon } from "../Icons"
 import { EpisodeData } from "..";
@@ -185,10 +185,10 @@ function AudioPlayer({ className = '' }) {
 
 
   return (
-    <div className={`relative w-full flex bg-primary-10 border-t-2 border-primary-8 p-2 gap-3 ${audioRef.current?.src && playing ? 'visible' : 'hidden'} ${className}`}>
+    <div className={`w-full flex bg-primary-10 border-t-2 border-primary-8 p-2 gap-4 ${audioRef.current?.src && playing ? 'visible' : 'hidden'} ${className}`}>
       {playing &&
         <img
-          className="h-full aspect-square rounded-md cursor-pointer hover:p-1 transition-all"
+          className="w-24 aspect-square m-auto rounded-md cursor-pointer hover:p-1 transition-all"
           src={playing.coverUrl}
           alt=''
           onClick={() => {
@@ -200,26 +200,26 @@ function AudioPlayer({ className = '' }) {
           }}
         />
       }
-      
 
-      <div className={`absolute left-1/2 -translate-x-1/2 flex flex-col w-1/2`}>
-        
-        {playing && <h1 className="text-sm mb-1">{playing.title}</h1>}
 
-        <div className="flex justify-evenly items-center">
-          <p>{secondsToStr(position)}</p>
-          <input
-            type="range"
-            min="0"
-            max={duration}
-            value={position}
-            onChange={(event) => changeTime(Number(event.target.value))}
-            className="w-full mx-1 h-1 bg-primary-3 accent-accent-6"
-          />
-          <p>{secondsToStr(duration)}</p>
-        </div>
+      <div className={`flex flex-col w-full`}>
+        {playing && <h1 className="mb-1 truncate">{playing.title}</h1>}
 
-        <div className="flex justify-center gap-3 mb-1">
+        <div className="w-7/12 flex flex-col absolute left-0 right-0 mx-auto mt-7 items-center justify-center">
+          <div className="flex items-center w-full">
+            <p>{secondsToStr(position)}</p>
+            <input
+              type="range"
+              min="0"
+              max={duration}
+              value={position}
+              onChange={(event) => changeTime(Number(event.target.value))}
+              className="w-full mx-1 h-[3px] bg-primary-3 accent-accent-6"
+            />
+            <p>{secondsToStr(duration)}</p>
+          </div>
+
+          <div className="flex justify-center gap-3 items-center">
 
             <button
               className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
@@ -231,12 +231,12 @@ function AudioPlayer({ className = '' }) {
               <p className="text-xs text-center -mt-[7px]">{stepBackwards}</p>
             </button>
 
-          <button
-            className="flex items-center focus:outline-none hover: hover:text-accent-6 w-9 mb-1"
-            onClick={handlePlayPause}
-          >
-            {audioRef.current?.paused ? playIcon : pauseIcon}
-          </button>
+            <button
+              className="flex items-center focus:outline-none hover: hover:text-accent-6 w-9 mb-2"
+              onClick={handlePlayPause}
+            >
+              {audioRef.current?.paused ? playIcon : pauseIcon}
+            </button>
 
             <button
               className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
@@ -247,7 +247,9 @@ function AudioPlayer({ className = '' }) {
               {forwardIcon}
               <p className="text-xs text-center -mt-[7px]">{stepForward}</p>
             </button>
+          </div>
         </div>
+
 
         <audio ref={audioRef} onLoadedMetadata={handleLoadedMetadata} className="hidden" />
       </div>

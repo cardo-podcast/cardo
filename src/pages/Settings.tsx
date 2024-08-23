@@ -12,7 +12,7 @@ function AccentColorSelector() {
 
   const [{ colors: { accent } }, updateSettings] = useSettings()
   const [showSelector, setShowSelector] = useState(false)
-  
+
 
   const selectedColor = getColor(accent)
   return (
@@ -53,7 +53,7 @@ function AccentColorSelector() {
 
 function Settings() {
   const { t } = useTranslation()
-  const [{ general, colors: colorSettings }, updateSettings] = useSettings()
+  const [{ general, colors: colorSettings, playback }, updateSettings] = useSettings()
 
   return (
     <div className="p-2 w-full flex flex-col gap-2">
@@ -99,9 +99,9 @@ function Settings() {
                   })
                   }
                   defaultValue={(colorSettings.primary as string in DefaultThemes
-                                || BasicColors.includes(colorSettings.primary as TailwindBaseColor)) ?
-                                colorSettings.primary as string : 'CUSTOM'
-                                }
+                    || BasicColors.includes(colorSettings.primary as TailwindBaseColor)) ?
+                    colorSettings.primary as string : 'CUSTOM'
+                  }
                 >
                   <option value='dark'>DARK</option>
                   <option value='light'>LIGHT</option>
@@ -115,6 +115,43 @@ function Settings() {
             </div>
           </div>
         </div>
+
+        <div className=" py-4flex flex-col gap-1 border-primary-8 border-[2px] p-2 rounded-md">
+          <h1 className="uppercase border-b-2 border-primary-8 mb-2">{t('playback')}</h1>
+          <div className="flex gap-6">
+            <label className="w-fit flex gap-2 items-center">
+              {t('step_backwards')}:
+              <input
+                type="text"
+                className="py-1 px-2 bg-primary-8 rounded-md focus:outline-none w-12"
+                value={playback.stepBackwards}
+                onChange={e => {
+                  const value = Number(e.target.value)
+                  if (!Number.isNaN(value)) {
+                    updateSettings({ playback: { stepBackwards: value } })
+                  }
+                }}
+              />
+              <p className="-ml-1">s</p>
+            </label>
+            <label className="w-fit flex gap-2 items-center">
+              {t('step_forward')}:
+              <input
+                type="text"
+                className="py-1 px-2 bg-primary-8 rounded-md focus:outline-none w-12"
+                value={playback.stepForward}
+                onChange={e => {
+                  const value = Number(e.target.value)
+                  if (!Number.isNaN(value)) {
+                    updateSettings({ playback: { stepForward: value } })
+                  }
+                }}
+              />
+              <p className="-ml-1">s</p>
+            </label>
+          </div>
+        </div>
+
       </div>
 
     </div>

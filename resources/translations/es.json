@@ -38,5 +38,8 @@
   "base": "Base",
   "accent": "Acento",
   "light_theme": "Tema claro",
-  "dark_theme": "Tema oscuro"
+  "dark_theme": "Tema oscuro",
+  "playback": "Reproducción",
+  "step_forward": "Salto hacia delante",
+  "step_backwards": "Salto hacia detrás"
 }
