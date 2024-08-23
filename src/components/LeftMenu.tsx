@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useDB } from "../DB";
 import { useTranslation } from "react-i18next";
 import {sync} from '../Icons'
@@ -12,15 +12,15 @@ function LeftMenu() {
   return (
     <div className="bg-primary-9 border-r-2 border-primary-8 w-64 lg:w-80 h-full flex flex-col p-3 pt-4 overflow-x-hidden">
       <div className="flex flex-col gap-1 uppercase mb-6">
-        <Link to='/' className="hover:text-accent-5 hover:pl-1 transition-all">
+        <NavLink to='/' className={({isActive}) => `transition-all ${isActive? 'text-primary-4 cursor-default': 'hover:text-accent-5 hover:pl-1'}`}>
           {t('home')}
-        </Link>
-        <Link to='/settings' className="hover:text-accent-5 hover:pl-1 transition-all">
+        </NavLink>
+        <NavLink to='/settings' className={({isActive}) => `transition-all ${isActive? 'text-primary-4 cursor-default': 'hover:text-accent-5 hover:pl-1'}`}>
           {t('settings')}
-        </Link>
-        <Link to='/queue' className="hover:text-accent-5 hover:pl-1 transition-all">
+        </NavLink>
+        <NavLink to='/queue' className={({isActive}) => `transition-all ${isActive? 'text-primary-4 cursor-default': 'hover:text-accent-5 hover:pl-1'}`}>
           {t('queue')}
-        </Link>
+        </NavLink>
       </div>
 
       <div className="flex items-center gap-1 mb-2">
