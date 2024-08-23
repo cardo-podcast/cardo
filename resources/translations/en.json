@@ -39,5 +39,8 @@
   "accent": "Accent",
   "light_theme": "Clear theme",
   "dark_theme": "Dark theme",
-  "base": "Base"
+  "base": "Base",
+  "playback": "Reproduction",
+  "step_forward": "Jump forward",
+  "step_backwards": "Back jump"
 }

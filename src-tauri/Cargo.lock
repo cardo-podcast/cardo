@@ -313,6 +313,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "cardo"
+version = "0.0.0"
+dependencies = [
+ "aes-gcm",
+ "base64 0.22.1",
+ "mio",
+ "rand 0.8.5",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-context-menu",
+ "tauri-plugin-sql",
+]
+
+[[package]]
 name = "cargo_toml"
 version = "0.15.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2535,22 +2551,6 @@ dependencies = [
  "fdeflate",
  "flate2",
  "miniz_oxide",
-]
-
-[[package]]
-name = "podland"
-version = "0.0.0"
-dependencies = [
- "aes-gcm",
- "base64 0.22.1",
- "mio",
- "rand 0.8.5",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-context-menu",
- "tauri-plugin-sql",
 ]
 
 [[package]]
