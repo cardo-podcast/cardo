@@ -39,6 +39,9 @@
       },
       "os": {
         "all": true
+      },
+      "globalShortcut": {
+        "all": true
       }
     },
     "windows": [

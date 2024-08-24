@@ -75,13 +75,16 @@ const getEpisodesStates = async (timestamp = 0): Promise<EpisodeState[]> => {
 
 const updateEpisodeState = async (episodeUrl: string, podcastUrl: string, position: number, total: number, timestamp?: number) => {
 
+  position = Math.floor(position)
+  total = Math.floor(total)
+
   await db.execute(
     `INSERT into episodes_history (episode, podcast, position, total, timestamp)
       VALUES ($1, $2, $3, $4, $5)
       ON CONFLICT (episode) DO UPDATE
-      SET position = $3, timestamp = $5
+      SET position = $3, total = $4, timestamp = $5
       WHERE episode = $1 AND timestamp < $5`,
-    [episodeUrl, podcastUrl, Math.min(Math.floor(position), total), total, timestamp ?? Date.now()],
+    [episodeUrl, podcastUrl, Math.min(position, total), Math.max(position, total), timestamp ?? Date.now()],
   );
 
 }
