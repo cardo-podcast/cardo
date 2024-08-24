@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 
 
 export enum SwitchState {
@@ -13,7 +13,7 @@ export function Switch({ initialState, setState, labels }: {
   setState: (state: SwitchState) => void,
   labels: [string, string]
 }) {
-  
+
   const [displayState, setDisplayState] = useState<SwitchState>(initialState)
 
   const toggleSwitch = (value: SwitchState) => {
@@ -53,6 +53,58 @@ export function Checkbox({ onChange, defaultChecked = false }: { onChange: (valu
       <span className="text-transparent peer-checked:text-black bg-white text-lg font-bold flex justify-center items-center h-5 w-5 text-center border-2 border-primary-2 transition duration-100 ease-in-out rounded-md m-1">
         ✓
       </span>
+    </div>
+  )
+}
+
+
+export function AutocompleteInput({ value, callback, options, className }: {
+  value: string,
+  callback: (value: string) => void,
+  options: typeof value[],
+  className?: string
+}) {
+
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [showOptions, setShowOptions] = useState<typeof value[]>([])
+
+  console.log(options)
+  return (
+    <div className={'relative flex flex-col items-center ' + className}>
+      <input
+        ref={inputRef}
+        type="text"
+        className='bg-primary-8 rounded-md px-2 py-1 focus:outline-none w-full'
+        defaultValue={value}
+        onChange={e => {
+          if (options.includes(e.target.value)) {
+            callback(e.target.value)
+          }
+
+          setShowOptions(
+            options.filter(option => option.includes(e.target.value))
+          )
+        }}
+        onSubmit={() => setShowOptions([])}
+      />
+      <div className="absolute top-10 flex flex-col items-center w-full rounded-md overflow-hidden h-36 overflow-y-auto">
+        {
+          showOptions.map(option => (
+            <button key={option}
+              className='w-full p-1 bg-primary-7 hover:bg-primary-6'
+              onClick={() => {
+                if (inputRef.current) {
+                  inputRef.current.value = option
+                  callback(option)
+                  setShowOptions([])
+                }
+              }}
+            >
+              {option}
+            </button>
+          ))
+        }
+      </div>
     </div>
   )
 }
