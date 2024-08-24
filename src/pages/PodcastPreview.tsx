@@ -11,8 +11,7 @@ import { useTranslation } from "react-i18next";
 
 
 function SortButton({ children, podcastUrl, criterion }: { children: ReactNode, podcastUrl: string, criterion: SortCriterion['criterion'] }) {
-  const [{ current: { sort } }, updatePodcastSettings] = usePodcastSettings(podcastUrl)
-  // podcastSettings.sort.criterion
+  const [{sort}, updatePodcastSettings] = usePodcastSettings(podcastUrl)
 
   return (
     <button
@@ -55,7 +54,7 @@ function PodcastPreview() {
     history: { getCompletedEpisodes },
     subscriptionsEpisodes: { getAllSubscriptionsEpisodes, deleteSubscriptionEpisodes, saveSubscriptionsEpisodes } } = useDB()
   const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcast.feedUrl)
-  podcastSettings.current
+
 
   const [tweakMenu, setTweakMenu] = useState<ReactNode>(undefined)
   const { t } = useTranslation()
@@ -70,7 +69,7 @@ function PodcastPreview() {
     }
 
     let sortedEpisodes: EpisodeData[] = []
-    const sortCriterion = podcastSettings.current.sort
+    const sortCriterion = podcastSettings.sort
 
     switch (sortCriterion.criterion) {
       case 'duration':
@@ -116,7 +115,7 @@ function PodcastPreview() {
 
   const filterEpisodes = async (unfilteredEpisodes: EpisodeData[]) => {
     const completedEpisodes = await getCompletedEpisodes()
-    const filter = podcastSettings.current.filter
+    const filter = podcastSettings.filter
 
     if (filter.played === SwitchState.True) {
       return unfilteredEpisodes.filter(ep => completedEpisodes.includes(ep.src))
@@ -129,13 +128,11 @@ function PodcastPreview() {
 
   useEffect(() => {
     loadEpisodes().then(episodes => setEpisodes(episodes))
-    setTweakMenu(undefined)
-  }, [podcast.feedUrl])
-
+  }, [podcast.feedUrl, podcastSettings])
 
   useEffect(() => {
-    setEpisodes(sortEpisodes(episodes))
-  }, [podcastSettings.current?.sort.criterion, podcastSettings.current?.sort.mode])
+    setTweakMenu(undefined)
+  }, [podcast.feedUrl])
 
 
   return (
@@ -219,9 +216,8 @@ function PodcastPreview() {
               onClick={() => {
                 setTweakMenu(
                   <div className="flex justify-center items-center">
-                    <Switch initialState={podcastSettings.current.filter.played} setState={async (value) => {
+                    <Switch initialState={podcastSettings.filter.played} setState={async (value) => {
                       updatePodcastSettings({ filter: { played: value } })
-                      setEpisodes(await loadEpisodes())
                     }} labels={[t('not_played'), t('played')]} />
                   </div>
                 )
