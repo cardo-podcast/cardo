@@ -4,6 +4,11 @@ import { exists, readTextFile, writeTextFile } from "@tauri-apps/api/fs"
 import { appCacheDir, join } from "@tauri-apps/api/path"
 
 export function secondsToStr(seconds: number) {
+  const negative = seconds < 0
+  if (negative) {
+    seconds = Math.abs(seconds)
+  }
+
   const hours = Math.floor(seconds / 3600)
   const minutes = Math.floor(seconds / 60) - hours * 60
   const secondsStr = Math.floor(seconds % 60).toString().padStart(2, '0')
@@ -11,9 +16,9 @@ export function secondsToStr(seconds: number) {
   if (Number.isNaN(seconds)) return ''
 
   if (hours > 0) {
-    return `${hours}:${minutes.toString().padStart(2, '0')}:${secondsStr}`
+    return `${negative? '-': ''}${hours}:${minutes.toString().padStart(2, '0')}:${secondsStr}`
   } else {
-    return `${minutes}:${secondsStr}`
+    return `${negative? '-': ''}${minutes}:${secondsStr}`
   }
 }
 

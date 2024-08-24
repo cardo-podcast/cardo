@@ -128,7 +128,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     playback: {
       stepForward: 30,
       stepBackwards: 10,
-      resumeBefore: 5
+      resumeBefore: 5,
+      displayRemainingTime: false
     }
   })
 

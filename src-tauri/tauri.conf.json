@@ -46,9 +46,10 @@
         "title": "Cardo",
         "width": 900,
         "height": 675,  
-        "minWidth": 675,
         "decorations": false,
-        "transparent": true
+        "transparent": true,
+        "minWidth": 700,
+        "minHeight": 500
       }
     ],
     "security": {

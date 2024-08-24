@@ -41,5 +41,10 @@
   "dark_theme": "Tema oscuro",
   "playback": "Reproducción",
   "step_forward": "Salto hacia delante",
-  "step_backwards": "Salto hacia detrás"
+  "step_backwards": "Salto hacia detrás",
+  "about": "Sobre Cardo",
+  "podcast_player": "Reproductor de podcasts",
+  "source_code": "Código fuente",
+  "author": "Autor",
+  "toggle_remaining_time": "Mostrar tiempo total / restante"
 }
