@@ -47,5 +47,8 @@
   "podcast_player": "Podcast player",
   "source_code": "Source code",
   "author": "Author",
-  "toggle_remaining_time": "Show total/remaining time"
+  "toggle_remaining_time": "Show total/remaining time",
+  "queue_default_message": "You can add items to the queue by right clicking on the episodes",
+  "remove_complete": "Delete completed items",
+  "empty_queue": "Clear the queue"
 }

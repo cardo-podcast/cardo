@@ -286,6 +286,24 @@ function initQueue() {
     )
   }
 
+  const batchRemove = async (episodesSrc: string[]) => {
+    // delete from queue
+
+    if (!episodesSrc.length) return
+
+    const newQueue = queue.filter(episode => !episodesSrc.includes(episode.src))
+
+    setQueue(newQueue)
+
+    const placeholders = episodesSrc.map((_, i) => '$' + (i + 1)).join(',');
+
+    console.log(`DELETE FROM queue WHERE src IN (${placeholders})`)
+    await db.execute(
+      `DELETE FROM queue WHERE src IN (${placeholders})`,
+      [...episodesSrc],
+    )
+  }
+
   const getAll = async (): Promise<EpisodeData[]> => {
     const r: EpisodeData[] = await db.select(
       "SELECT * from queue")
@@ -304,7 +322,7 @@ function initQueue() {
   }
 
 
-  return { queue, load, includes, push, unshift, remove, next, move }
+  return { queue, load, includes, push, unshift, remove, batchRemove, next, move }
 }
 
 // #endregion
