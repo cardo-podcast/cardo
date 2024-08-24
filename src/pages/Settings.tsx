@@ -2,11 +2,13 @@ import { useTranslation } from "react-i18next"
 import { NextcloudSettings } from "../sync/Nextcloud"
 import { Checkbox } from "../components/Inputs"
 import { getColor, useSettings } from "../Settings"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { TailwindBaseColor } from ".."
 import { DefaultTheme, DefaultThemes, BasicColors } from "../DefaultThemes"
 import appIcon from '../../src-tauri/icons/icon.png'
 import { shell } from "@tauri-apps/api"
+import { resolveResource } from '@tauri-apps/api/path';
+import { readDir } from '@tauri-apps/api/fs';
 
 
 
@@ -55,7 +57,18 @@ function AccentColorSelector() {
 
 function Settings() {
   const { t } = useTranslation()
-  const [{ general, colors: colorSettings, playback }, updateSettings] = useSettings()
+  const [{ globals, general, colors: colorSettings, playback }, updateSettings] = useSettings()
+  const [languages, setLanguages] = useState<string[]>()
+
+  useEffect(() => {
+    const loadLocales = async () => {
+      const translationsDir = await resolveResource(`_up_/resources/translations`)
+      console.log(await readDir(translationsDir))
+      setLanguages((await readDir(translationsDir)).map(file => file.name?.split('.')[0] ?? ''))
+    }
+
+    loadLocales()
+  }, [])
 
   return (
     <div className="p-2 w-full flex flex-col gap-2">
@@ -64,9 +77,33 @@ function Settings() {
         <NextcloudSettings />
       </div>
 
-      <div className=" py-4flex flex-col gap-1 border-primary-8 border-[2px] p-2 rounded-md">
+      <div className=" py-4 flex flex-col gap-1 border-primary-8 border-[2px] p-2 rounded-md">
         <h1 className="uppercase border-b-2 border-primary-8 mb-2">{t('general')}</h1>
-        <div className="flex flex-col gap-2">
+
+        <div className="flex flex-col gap-1">
+
+          <label className=" uppercase flex items-center gap-2 mb-1">
+            {t('language')}:
+            <select className="px-2 py-[1px] text-center bg-primary-8 rounded-md outline-none"
+              onChange={({ target: { value } }) => updateSettings({
+                globals: {
+                  language: value as string
+                }
+              })
+              }
+              defaultValue={globals.language}
+            >
+              {
+                languages?.map(language => (
+                  <option key={language} value={language}>
+                    {language}
+                  </option>
+                ))
+              }
+
+            </select>
+          </label>
+
           <label className="w-fit flex gap-1">
             {t('fetch_subscriptions_startup')}:
             <Checkbox defaultChecked={general.fetchSubscriptionsAtStartup}
@@ -116,6 +153,7 @@ function Settings() {
               </label>
             </div>
           </div>
+
         </div>
       </div>
 
@@ -167,13 +205,13 @@ function Settings() {
             <h1 className="UPPERCASE">{t('author')}: n0vella</h1>
             <div className="flex gap-1 h-fit items-center">
               <p>{t('source_code')}: </p>
-                <img
-                  className="w-5 bg-primary-2 rounded-full p-[1px] cursor-pointer"
-                  src='https://github.githubassets.com/favicons/favicon.png'
-                  alt='Github'
-                  title="https://github.com/n0vella/cardo"
-                  onClick={() => shell.open("https://github.com/n0vella/cardo")}
-                />
+              <img
+                className="w-5 bg-primary-2 rounded-full p-[1px] cursor-pointer"
+                src='https://github.githubassets.com/favicons/favicon.png'
+                alt='Github'
+                title="https://github.com/n0vella/cardo"
+                onClick={() => shell.open("https://github.com/n0vella/cardo")}
+              />
             </div>
           </div>
         </div>
