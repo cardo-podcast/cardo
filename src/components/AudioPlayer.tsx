@@ -5,6 +5,7 @@ import { EpisodeData } from "..";
 import { useDB } from "../DB";
 import { useNavigate } from "react-router-dom";
 import { useSettings } from "../Settings";
+import { useTranslation } from "react-i18next";
 
 
 
@@ -116,7 +117,8 @@ function AudioPlayer({ className = '' }) {
   const { history: { updateEpisodeState }, queue } = useDB()
   const { audioRef, play, playing, position, setPosition } = usePlayer()
   const navigate = useNavigate()
-  const [{ playback: { stepForward, stepBackwards } },] = useSettings()
+  const [{ playback: { stepForward, stepBackwards, displayRemainingTime } }, updateSettings] = useSettings()
+  const { t } = useTranslation()
 
   useEffect(() => {
     if (audioRef.current == null || playing == null) return
@@ -202,11 +204,10 @@ function AudioPlayer({ className = '' }) {
       }
 
 
-      <div className={`flex flex-col w-full`}>
+      <div className={`w-full flex flex-col`}>
         {playing && <h1 className="mb-1 truncate">{playing.title}</h1>}
 
-        <div className="w-7/12 flex flex-col absolute left-0 right-0 mx-auto mt-7 items-center justify-center">
-          <div className="flex items-center w-full">
+          <div className="w-full flex items-center justify-center">
             <p>{secondsToStr(position)}</p>
             <input
               type="range"
@@ -214,9 +215,13 @@ function AudioPlayer({ className = '' }) {
               max={duration}
               value={position}
               onChange={(event) => changeTime(Number(event.target.value))}
-              className="w-full mx-1 h-[3px] bg-primary-3 accent-accent-6"
+              className="w-4/5 mx-1 h-[3px] bg-primary-3 accent-accent-6"
             />
-            <p>{secondsToStr(duration)}</p>
+            <p className="cursor-pointer"
+              title={t('toggle_remaining_time')}
+              onClick={() => updateSettings({ playback: { displayRemainingTime: !displayRemainingTime } })}>
+              {secondsToStr(displayRemainingTime ? position - duration : duration)}
+            </p>
           </div>
 
           <div className="flex justify-center gap-3 items-center">
@@ -248,11 +253,15 @@ function AudioPlayer({ className = '' }) {
               <p className="text-xs text-center -mt-[7px]">{stepForward}</p>
             </button>
           </div>
-        </div>
 
 
         <audio ref={audioRef} onLoadedMetadata={handleLoadedMetadata} className="hidden" />
       </div>
+      
+      <div className="w-24 aspect-square shrink-0">
+        {/* space to keep simetry */}
+      </div>
+
     </div>
 
   );

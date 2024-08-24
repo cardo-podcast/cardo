@@ -52,12 +52,12 @@ function SearchBar() {
   return (
     <div className="flex">
       <div className="flex gap-1 w-fit h-8 p-1 text-primary-4">
-          <button className={`w-5 ${window.history.state.idx < 1 ? 'cursor-default text-primary-8': 'hover:text-primary'}`}
+          <button className={`w-5 ${window.history.state.idx < 1 ? 'cursor-default text-primary-8': 'hover:text-accent-5'}`}
             onClick={() => navigate(-1)}
           >
             {arrowLeft}
           </button>
-          <button className={`w-5 ${window.history.state.idx >= window.history.length - 1? 'cursor-default text-primary-8' : 'hover:text-primary'}`}
+          <button className={`w-5 ${window.history.state.idx >= window.history.length - 1? 'cursor-default text-primary-8' : 'hover:text-accent-5'}`}
             onClick={() => navigate(1)}
           >
             {arrowRight}

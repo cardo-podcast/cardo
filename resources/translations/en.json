@@ -42,5 +42,10 @@
   "base": "Base",
   "playback": "Reproduction",
   "step_forward": "Jump forward",
-  "step_backwards": "Back jump"
+  "step_backwards": "Back jump",
+  "about": "About Cardo",
+  "podcast_player": "Podcast player",
+  "source_code": "Source code",
+  "author": "Author",
+  "toggle_remaining_time": "Show total/remaining time"
 }

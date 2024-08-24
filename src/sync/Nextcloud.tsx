@@ -103,8 +103,11 @@ async function login(url: string, getSyncKey: () => Promise<string | undefined>,
   // nextcloud flow v2 o-auth login
   // https://docs.nextcloud.com/server/latest/developer_manual/client_apis/LoginFlow/index.html#login-flow-v2
 
-  const baseUrl = new URL(url).origin
+  if (!url.startsWith('http://') && !url.startsWith('https://')){
+    url = 'https://' + url
+  }
 
+  const baseUrl = new URL(url).origin
   const r = await http.fetch(baseUrl + '/index.php/login/v2', {
     method: 'POST',
     responseType: http.ResponseType.JSON

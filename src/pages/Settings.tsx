@@ -5,6 +5,8 @@ import { getColor, useSettings } from "../Settings"
 import { useState } from "react"
 import { TailwindBaseColor } from ".."
 import { DefaultTheme, DefaultThemes, BasicColors } from "../DefaultThemes"
+import appIcon from '../../src-tauri/icons/icon.png'
+import { shell } from "@tauri-apps/api"
 
 
 
@@ -115,43 +117,66 @@ function Settings() {
             </div>
           </div>
         </div>
+      </div>
 
-        <div className=" py-4flex flex-col gap-1 border-primary-8 border-[2px] p-2 rounded-md">
-          <h1 className="uppercase border-b-2 border-primary-8 mb-2">{t('playback')}</h1>
-          <div className="flex gap-6">
-            <label className="w-fit flex gap-2 items-center">
-              {t('step_backwards')}:
-              <input
-                type="text"
-                className="py-1 px-2 bg-primary-8 rounded-md focus:outline-none w-12"
-                value={playback.stepBackwards}
-                onChange={e => {
-                  const value = Number(e.target.value)
-                  if (!Number.isNaN(value)) {
-                    updateSettings({ playback: { stepBackwards: value } })
-                  }
-                }}
-              />
-              <p className="-ml-1">s</p>
-            </label>
-            <label className="w-fit flex gap-2 items-center">
-              {t('step_forward')}:
-              <input
-                type="text"
-                className="py-1 px-2 bg-primary-8 rounded-md focus:outline-none w-12"
-                value={playback.stepForward}
-                onChange={e => {
-                  const value = Number(e.target.value)
-                  if (!Number.isNaN(value)) {
-                    updateSettings({ playback: { stepForward: value } })
-                  }
-                }}
-              />
-              <p className="-ml-1">s</p>
-            </label>
+      <div className=" py-4flex flex-col gap-1 border-primary-8 border-[2px] p-2 rounded-md">
+        <h1 className="uppercase border-b-2 border-primary-8 mb-2">{t('playback')}</h1>
+        <div className="flex gap-6">
+          <label className="w-fit flex gap-2 items-center">
+            {t('step_backwards')}:
+            <input
+              type="text"
+              className="py-1 px-2 bg-primary-8 rounded-md focus:outline-none w-12"
+              value={playback.stepBackwards}
+              onChange={e => {
+                const value = Number(e.target.value)
+                if (!Number.isNaN(value)) {
+                  updateSettings({ playback: { stepBackwards: value } })
+                }
+              }}
+            />
+            <p className="-ml-1">s</p>
+          </label>
+          <label className="w-fit flex gap-2 items-center">
+            {t('step_forward')}:
+            <input
+              type="text"
+              className="py-1 px-2 bg-primary-8 rounded-md focus:outline-none w-12"
+              value={playback.stepForward}
+              onChange={e => {
+                const value = Number(e.target.value)
+                if (!Number.isNaN(value)) {
+                  updateSettings({ playback: { stepForward: value } })
+                }
+              }}
+            />
+            <p className="-ml-1">s</p>
+          </label>
+        </div>
+      </div>
+
+      <div className=" py-4flex flex-col gap-1 border-primary-8 border-[2px] p-2 rounded-md">
+        <h1 className="uppercase border-b-2 border-primary-8 mb-2">{t('about')}</h1>
+        <div className="flex gap-2">
+          <img
+            className="w-28"
+            src={appIcon}
+          />
+          <div className="flex flex-col gap-2">
+            <h1 className="UPPERCASE">Cardo - {t('podcast_player')}</h1>
+            <h1 className="UPPERCASE">{t('author')}: n0vella</h1>
+            <div className="flex gap-1 h-fit items-center">
+              <p>{t('source_code')}: </p>
+                <img
+                  className="w-5 bg-primary-2 rounded-full p-[1px] cursor-pointer"
+                  src='https://github.githubassets.com/favicons/favicon.png'
+                  alt='Github'
+                  title="https://github.com/n0vella/cardo"
+                  onClick={() => shell.open("https://github.com/n0vella/cardo")}
+                />
+            </div>
           </div>
         </div>
-
       </div>
 
     </div>
