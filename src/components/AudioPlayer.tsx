@@ -6,6 +6,7 @@ import { useDB } from "../DB";
 import { useNavigate } from "react-router-dom";
 import { useSettings } from "../Settings";
 import { useTranslation } from "react-i18next";
+import { globalShortcut } from "@tauri-apps/api";
 
 
 
@@ -91,7 +92,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
       await updateEpisodeState(playing.src,
         playing.podcastUrl,
         audioRef.current.currentTime,
-        playing.duration
+        audioRef.current.duration
       )
     }
   }, [playing])
@@ -115,10 +116,24 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
 function AudioPlayer({ className = '' }) {
   const [duration, setDuration] = useState(0);
   const { history: { updateEpisodeState }, queue } = useDB()
-  const { audioRef, play, playing, position, setPosition } = usePlayer()
+  const { audioRef, play, playing, position, setPosition, quit } = usePlayer()
   const navigate = useNavigate()
   const [{ playback: { stepForward, stepBackwards, displayRemainingTime } }, updateSettings] = useSettings()
   const { t } = useTranslation()
+
+  // #region MEDIA_KEYS
+  useEffect(() => {
+    if (!globalShortcut.isRegistered('MediaPlayPause')) {
+      globalShortcut.register('MediaPlayPause', handlePlayPause)
+    }
+
+    if (!globalShortcut.isRegistered('MediaNextTrack')) {
+      globalShortcut.register('MediaNextTrack', () => playNextInQueue)
+    }
+
+    // MediaPreviousTrack
+  })
+  // #endregion
 
   useEffect(() => {
     if (audioRef.current == null || playing == null) return
@@ -127,7 +142,7 @@ function AudioPlayer({ className = '' }) {
       updateEpisodeState(playing.src,
         playing.podcastUrl,
         audioRef.current.currentTime,
-        playing.duration
+        audioRef.current.duration
       )
     }
 
@@ -138,11 +153,11 @@ function AudioPlayer({ className = '' }) {
 
     updateEpisodeState(playing.src,
       playing.podcastUrl,
-      playing.duration,
-      playing.duration
+      audioRef.current.duration,
+      audioRef.current.duration
     )
 
-    play(queue.next(playing))
+    playNextInQueue() ?? quit()
 
   }, [audioRef.current?.ended])
 
@@ -161,6 +176,14 @@ function AudioPlayer({ className = '' }) {
   const handlePlayPause = () => {
     if (audioRef.current) {
       audioRef.current.paused ? audioRef.current.play() : audioRef.current.pause()
+    }
+  };
+
+  const playNextInQueue = () => {
+    if (audioRef.current && playing) {
+      if (queue.includes(playing.src)) {
+        return play(queue.next(playing))
+      }
     }
   };
 

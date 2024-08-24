@@ -91,14 +91,14 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
     // update reproduction state
     getEpisodeState(episode.src).then(state => {
       if (state !== undefined) {
-        setReprState({ position: state.position, total: state.total, complete: state.position === state.total })
+        setReprState({ position: state.position, total: state.total, complete: state.position >= state.total })
       } else {
         // render a not played episode
         setReprState({ position: 0, total: episode.duration, complete: false })
       }
 
     })
-  }, [entry?.isIntersecting, noLazyLoad, episode, getEpisodeState, locale])
+  }, [entry?.isIntersecting, noLazyLoad, episode, playing?.src, locale, ])
 
 
   return (
@@ -120,7 +120,7 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
                 event: () => {
                   if (reprState.complete) {
                     updateEpisodeState(episode.src, episode.podcastUrl, 0, episode.duration)
-                    setReprState({ complete: false, position: 0, total: episode.duration })
+                    setReprState({ complete: false, position: 0, total: reprState.total })
                   } else {
                     updateEpisodeState(episode.src, episode.podcastUrl, reprState.total, reprState.total)
                     setReprState({ complete: true, position: reprState.total, total: reprState.total })

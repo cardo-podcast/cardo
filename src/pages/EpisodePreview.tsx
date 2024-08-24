@@ -55,7 +55,12 @@ function EpisodePreview() {
 
     // set actual position if episode was played before
     getEpisodeState(episode.src).then(
-      episode => setPosition(episode?.position ?? 0)
+      epState => {
+        if (epState) {
+          setPosition(epState.position)
+          episode.duration = epState.total
+        }
+      }
     )
   }, [])
 
