@@ -1,5 +1,5 @@
 import { os } from "@tauri-apps/api"
-import { createContext, MutableRefObject, ReactNode, useContext, useEffect, useRef, useState } from "react"
+import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react"
 import { appConfigDir, join } from "@tauri-apps/api/path"
 import { readTextFile, writeTextFile } from "@tauri-apps/api/fs"
 import { RecursivePartial, Settings, SortCriterion, TailwindBaseColor, ColorTheme } from "."
@@ -42,17 +42,16 @@ export function useSettings(): [Settings, (newSettings: RecursivePartial<Setting
 }
 
 
-export function usePodcastSettings(feedUrl: string): [MutableRefObject<PodcastSettings>, typeof updatePodcastSettings] {
+export function usePodcastSettings(feedUrl: string): [PodcastSettings, typeof updatePodcastSettings] {
   const [settings, updateSettings] = useSettings()
   const readSettings = () => {
     return settings.podcasts[feedUrl] ?? new PodcastSettings()
   }
 
-
-  const podcastSettings = useRef<PodcastSettings>(readSettings())
+  const [podcastSettings, setPodcastSettings] = useState<PodcastSettings>(readSettings())
   
   useEffect(() => {
-    podcastSettings.current = readSettings()
+    setPodcastSettings(readSettings())
   }, [settings, feedUrl])
 
 
@@ -66,12 +65,12 @@ export function usePodcastSettings(feedUrl: string): [MutableRefObject<PodcastSe
     merge(newSettings.podcasts[feedUrl], newPodcastSettings)
 
     if (PodcastSettings.isDefault((newSettings.podcasts[feedUrl]))) {
-      // default settings aren't stored
+      // default settings aren't stored on json
       delete newSettings.podcasts[feedUrl]
     }
 
     updateSettings({ podcasts: newSettings.podcasts })
-    podcastSettings.current = newSettings.podcasts[feedUrl]
+    setPodcastSettings(newSettings.podcasts[feedUrl] ?? new PodcastSettings)
   }
 
 

@@ -134,7 +134,9 @@ export async function getAllCreds(): Promise<any | undefined> {
 
 export async function getCreds(name: string): Promise<any | undefined> {
   const creds = await getAllCreds()
-  return creds[name] || undefined
+  if (creds) {
+    return creds[name] ?? undefined
+  }
 }
 
 export async function saveCreds(name: string, value: any) {
