@@ -68,7 +68,6 @@ export function AutocompleteInput({ value, callback, options, className }: {
   const inputRef = useRef<HTMLInputElement>(null)
   const [showOptions, setShowOptions] = useState<typeof value[]>([])
 
-  console.log(options)
   return (
     <div className={'relative flex flex-col items-center ' + className}>
       <input

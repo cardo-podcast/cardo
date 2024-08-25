@@ -2,7 +2,7 @@
   "home": "home",
   "settings": "settings",
   "queue": "queue",
-  "search_placeholder": "Search a podcast...",
+  "search_placeholder": "Search",
   "played": "played",
   "not_played": "not played",
   "mark_played": "mark as played",
