@@ -50,5 +50,6 @@
   "queue_default_message": "Puedes añadir elementos a la cola haciendo click derecho en los episodios",
   "remove_complete": "Borrar los completados",
   "empty_queue": "Vaciar la cola",
-  "language": "Idioma"
+  "language": "Idioma",
+  "welcome_message": "Bienvenido a Cardo. En esta pantalla verás tu cola de reproducción y las novedades en tus podcasts favoritos."
 }
