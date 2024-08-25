@@ -306,7 +306,7 @@ enum SyncStatus {
 export function initSync() {
   const [status, setStatus] = useState<SyncStatus>(SyncStatus.Standby)
   const [error, setError] = useState('')
-  const { sync: { getSyncKey, setLastSync, getLastSync, loggedInSync: loggedIn, setLoggedInSync: setLoggedIn },
+  const { dbLoaded, sync: { getSyncKey, setLastSync, getLastSync, loggedInSync: loggedIn, setLoggedInSync: setLoggedIn },
     history: { updateEpisodeState, getEpisodesStates }, subscriptions } = useDB()
   const navigate = useNavigate()
   const [{ sync: syncSettings }, _] = useSettings()
@@ -319,8 +319,8 @@ export function initSync() {
   }
 
   useEffect(() => {
-    load()
-  }, [])
+    dbLoaded && load()
+  }, [dbLoaded])
 
   useEffect(() => {
     if (loggedIn && syncSettings.syncAfterAppStart) {
