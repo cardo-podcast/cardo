@@ -28,7 +28,7 @@
   "automatic_sync": "Automatically sync",
   "when_opening_app": "After opening the application",
   "when_closing_app": "Before closing the application",
-  "number_days_news": "See last {{n}} days on news",
+  "number_days_news": "Number of days in news",
   "general": "General",
   "fetch_subscriptions_startup": "Update subscription feeds at startup",
   "news": "News",
@@ -53,5 +53,7 @@
   "empty_queue": "Clear the queue",
   "language": "Language",
   "welcome_message": "Welcome to Cardo. On this screen you'll see your playlist and what's new on your favorite podcasts.",
-  "current_podcast": "This podcast"
+  "current_podcast": "This podcast",
+  "copy_feed_url": "Copy podcast URL",
+  "feed_url_copied": "Podcast URL copied to clipboard"
 }

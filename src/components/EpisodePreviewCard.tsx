@@ -1,6 +1,6 @@
 /*Compact variation of EpisodeCard */
 
-import { useEffect, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import { EpisodeData, NewEpisodeData } from "..";
 import * as icons from "../Icons"
 import { useNavigate } from "react-router-dom";
@@ -10,11 +10,11 @@ import { usePlayer } from "./AudioPlayer";
 import { useSettings } from "../Settings";
 import { useTranslation } from "react-i18next";
 import { showMenu } from "tauri-plugin-context-menu";
+import appIcon from '../../src-tauri/icons/icon.png'
 
 
 
 export default function EpisodePreviewCard({ episode }: { episode: EpisodeData | NewEpisodeData }) {
-  const [imageError, setImageError] = useState(false)
   const navigate = useNavigate()
   const [reprState, setReprState] = useState({ position: 0, total: episode.duration, complete: false })
   const { queue, history: { getEpisodeState, updateEpisodeState } } = useDB()
@@ -74,23 +74,25 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
       }}
     >
       <div className='flex flex-col rounded-md overflow-hidden relative'>
-        {
-          imageError ?
-            icons.photo :
-            <img
-              className='w-full'
-              onClick={() => {
-                navigate('/episode-preview', {
-                  state: {
-                    episode: episode,
-                  }
-                })
-              }}
-              alt=""
-              src={episode.coverUrl}
-              onError={() => setImageError(true)}
-            />
-        }
+          <img
+            className='w-full bg-purple-950'
+            onClick={() => {
+              navigate('/episode-preview', {
+                state: {
+                  episode: episode,
+                }
+              })
+            }}
+            alt=""
+            src={episode.coverUrl}
+            onError={(e: SyntheticEvent<HTMLImageElement>) => {
+              if (e.currentTarget.src === episode.podcast?.coverUrl) {
+                e.currentTarget.src = appIcon
+              } else {
+                e.currentTarget.src = episode.podcast?.coverUrl ?? appIcon
+              }
+            }}
+          />
         <ProgressBar position={playing?.src == episode.src ? playingPosition : reprState.position}
           total={episode.duration}
           showTime={false}

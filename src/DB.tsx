@@ -199,10 +199,7 @@ function initQueue() {
 
     loadedQueue.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id))
 
-    setQueue(loadedQueue.map(episode => ({
-      ...episode,
-      pubDate: new Date(episode.pubDate)
-    })))
+    setQueue(loadedQueue)
 
     queueLoaded.current = true
   }
@@ -307,10 +304,17 @@ function initQueue() {
   }
 
   const getAll = async (): Promise<EpisodeData[]> => {
-    const r: EpisodeData[] = await db.select(
-      "SELECT * from queue")
+    const r: RawEpisodeData[] = await db.select(
+      `SELECT queue.*, subscriptions.coverUrl AS podcastCover from queue
+        LEFT JOIN subscriptions ON queue.podcastUrl = subscriptions.feedUrl
+      `)
 
-    return r
+
+    return r.map(episode => ({
+      ...episode,
+      pubDate: new Date(episode.pubDate),
+      podcast: {coverUrl: episode.podcastCover}
+    }))
   }
 
   const move = (from: number, to: number) => {
@@ -412,17 +416,20 @@ const loadNewSubscriptionsEpisodes = async (pubdate_gt: number): Promise<NewEpis
 
   // get all episodes of the database, filter by pubdate
   const r2: RawEpisodeData[] = await db.select(`
-    SELECT subscriptions_episodes.* FROM subscriptions_episodes
+    SELECT subscriptions_episodes.*, subscriptions.coverUrl AS podcastCover FROM subscriptions_episodes
     LEFT JOIN episodes_history ON subscriptions_episodes.src = episodes_history.episode
+    LEFT JOIN subscriptions ON subscriptions_episodes.podcastUrl = subscriptions.feedUrl
     WHERE pubDate > $1
     AND (episodes_history.position IS NULL
 	  OR episodes_history.position < episodes_history.total)
     `, [pubdate_gt])
 
+
   return r2.map(episode => ({
     ...episode,
     pubDate: new Date(episode.pubDate),
-    new: episode.pubDate > lastSync // is new if it's just discovered
+    new: episode.pubDate > lastSync, // is new if it's just discovered
+    podcast: {coverUrl: episode.podcastCover}
   }))
 
 }

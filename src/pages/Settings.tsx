@@ -109,11 +109,11 @@ function Settings() {
               onChange={(value) => updateSettings({ general: { fetchSubscriptionsAtStartup: value } })} />
           </label>
 
-          <label className="w-full flex gap-1 flex-col">
-            {t('number_days_news', { n: general.numberOfDaysInNews })}
+          <label className="w-full flex gap-2 items-center">
+            {t('number_days_news')}: 
             <input
               type="text"
-              className="py-1 px-2 bg-primary-8 rounded-md focus:outline-none"
+              className="py-1 px-2 bg-primary-8 rounded-md focus:outline-none w-14"
               value={general.numberOfDaysInNews}
               onChange={e => {
                 const value = Number(e.target.value)

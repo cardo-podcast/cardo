@@ -2,6 +2,8 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useDB } from "../DB";
 import { useTranslation } from "react-i18next";
 import {sync} from '../Icons'
+import appIcon from '../../src-tauri/icons/icon.png'
+import { SyntheticEvent } from "react";
 
 
 function LeftMenu() {
@@ -47,6 +49,7 @@ function LeftMenu() {
                   className="h-10 bg-primary-7 aspect-square rounded-md"
                   src={fav.coverUrl}
                   alt=''
+                  onError={(e: SyntheticEvent<HTMLImageElement>) => e.currentTarget.src = appIcon}
                 />
                 <p className=" h-10 text-sm w-full truncate">{fav.podcastName}</p>
               </div>
