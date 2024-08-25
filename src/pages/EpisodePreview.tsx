@@ -18,9 +18,10 @@ function EpisodePreview() {
   const [ended, setEnded] = useState(false)
   const { play, playing, position: playingPosition, quit: quitPlayer } = usePlayer()
   const navigate = useNavigate()
-  const { subscriptions: { getSubscription }, history: {getEpisodeState, updateEpisodeState} } = useDB()
+  const { subscriptions: { getSubscription }, history: { getEpisodeState, updateEpisodeState }, queue } = useDB()
   const { t } = useTranslation()
   const [{ globals: { locale } },] = useSettings()
+  const [inQueue, setInqueue] = useState(queue.includes(episode.src))
 
 
   const getDate = () => {
@@ -102,28 +103,44 @@ function EpisodePreview() {
                   total={episode.duration}
                   className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }} />
             }
-            <button className="w-7 p-[2px] aspect-square flex justify-center items-center hover:text-accent-6 bg-primary-7 rounded-full"
+            <button className="w-7 p-1 aspect-square shrink-0 flex justify-center items-center hover:text-accent-6 hover:p-[2px] bg-primary-7 rounded-full"
               onClick={() => play(episode)}
             >
               {icons.play}
             </button>
-            <button className={`w-5 hover:text-accent-6 ${ended && 'text-primary-7'}`}
-            title={ended? t('mark_not_played'): t('mark_played')}
-            onClick={() => {
-              if (ended) {
-                setPosition(0)
-                updateEpisodeState(episode.src, episode.podcastUrl, 0, episode.duration)
 
-              } else {
-                setPosition(episode.duration)
-                updateEpisodeState(episode.src, episode.podcastUrl, episode.duration, episode.duration)
-                if (playing?.src == episode.src) {
-                  quitPlayer()
+            <button className={`w-5 hover:text-accent-6 ${ended && 'text-primary-7'}`}
+              title={ended ? t('mark_not_played') : t('mark_played')}
+              onClick={() => {
+                if (ended) {
+                  setPosition(0)
+                  updateEpisodeState(episode.src, episode.podcastUrl, 0, episode.duration)
+
+                } else {
+                  setPosition(episode.duration)
+                  updateEpisodeState(episode.src, episode.podcastUrl, episode.duration, episode.duration)
+                  if (playing?.src == episode.src) {
+                    quitPlayer()
+                  }
                 }
-              }
-            }}
+              }}
             >
               {icons.check}
+            </button>
+
+            <button className={`w-7 hover:text-accent-6 ${inQueue && 'text-primary-7'}`}
+              title={inQueue ? t('remove_queue') : t('add_queue')}
+              onClick={() => {
+                if (inQueue) {
+                  queue.remove(episode.src)
+                  setInqueue(false)
+                } else {
+                  queue.push(episode)
+                  setInqueue(true)
+                }
+              }}
+            >
+              {icons.queue}
             </button>
           </div>
         </div>
