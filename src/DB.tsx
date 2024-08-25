@@ -300,7 +300,6 @@ function initQueue() {
 
     const placeholders = episodesSrc.map((_, i) => '$' + (i + 1)).join(',');
 
-    console.log(`DELETE FROM queue WHERE src IN (${placeholders})`)
     await db.execute(
       `DELETE FROM queue WHERE src IN (${placeholders})`,
       [...episodesSrc],
@@ -367,12 +366,17 @@ const deleteSubscriptionEpisodes = async (podcastUrl: string) => {
   )
 }
 
-const getAllSubscriptionsEpisodes = async (options: { pubdate_gt?: number, podcastUrl?: string }): Promise<EpisodeData[]> => {
+const getAllSubscriptionsEpisodes = async (options: { pubdate_gt?: number, podcastUrl?: string, searchTerm?: string }): Promise<EpisodeData[]> => {
 
   let query = 'SELECT * FROM subscriptions_episodes WHERE pubDate > $1'
 
   if (options.podcastUrl) {
     query += ' AND podcastUrl = $2'
+  }
+
+  if (options.searchTerm) {
+    query += ` AND (lower(title) LIKE "%${options.searchTerm.toLowerCase()}%"
+                    OR lower(description) LIKE "%${options.searchTerm.toLocaleLowerCase()}%")`
   }
 
   const r: EpisodeData[] = await db.select(query, [options.pubdate_gt ?? 0, options.podcastUrl])

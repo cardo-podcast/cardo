@@ -63,7 +63,6 @@ function Settings() {
   useEffect(() => {
     const loadLocales = async () => {
       const translationsDir = await resolveResource(`_up_/resources/translations`)
-      console.log(await readDir(translationsDir))
       setLanguages((await readDir(translationsDir)).map(file => file.name?.split('.')[0] ?? ''))
     }
 
@@ -91,7 +90,7 @@ function Settings() {
                 }
               })
               }
-              defaultValue={globals.language}
+              value={globals.language}
             >
               {
                 languages?.map(language => (
@@ -206,7 +205,7 @@ function Settings() {
             <div className="flex gap-1 h-fit items-center">
               <p>{t('source_code')}: </p>
               <img
-                className="w-5 bg-primary-2 rounded-full p-[1px] cursor-pointer"
+                className="w-5 bg-white rounded-full p-[1px] cursor-pointer"
                 src='https://github.githubassets.com/favicons/favicon.png'
                 alt='Github'
                 title="https://github.com/n0vella/cardo"

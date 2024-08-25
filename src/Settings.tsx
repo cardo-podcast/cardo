@@ -123,7 +123,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     },
     colors: {
       primary: 'dark',
-      accent: 'red'
+      accent: 'purple'
     },
     playback: {
       stepForward: 30,

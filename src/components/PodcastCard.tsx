@@ -4,7 +4,7 @@ import * as icons from "../Icons"
 import { useNavigate } from "react-router-dom"
 
 
-function PodcastCard ({podcast, callback}: {podcast: PodcastData, callback: ()=>void}) {
+function PodcastCard ({podcast}: {podcast: PodcastData}) {
   const [imageError, setImageError] = useState(false)
   const navigate = useNavigate()
 
@@ -12,7 +12,6 @@ function PodcastCard ({podcast, callback}: {podcast: PodcastData, callback: ()=>
   return(
     <div className="flex hover:bg-primary-8 transition-colors cursor-pointer h-20 p-2 justify-between border-b-2 border-primary-8"
     onClick={() => {
-      callback()
         navigate('/preview', {
           state: {
             podcast: podcast
