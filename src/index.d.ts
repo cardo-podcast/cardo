@@ -23,7 +23,7 @@ export interface EpisodeData {
   duration: number,
   size: number,
   podcastUrl: string
-  podcast?: PodcastData
+  podcast?: Partial<PodcastData>
   coverUrl?: string,
 }
 
@@ -32,7 +32,8 @@ export interface NewEpisodeData extends EpisodeData {
 }
 
 export interface RawEpisodeData extends EpisodeData {
-  pubDate: number
+  pubDate: number,
+  podcastCover?: string
 }
 
 export interface EpisodeState {

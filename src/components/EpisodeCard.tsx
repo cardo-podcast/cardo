@@ -1,4 +1,4 @@
-import { MouseEventHandler, ReactNode, useEffect, useRef, useState } from "react"
+import { MouseEventHandler, ReactNode, SyntheticEvent, useEffect, useRef, useState } from "react"
 import { EpisodeData } from ".."
 import * as icons from "../Icons"
 import { useNavigate } from "react-router-dom"
@@ -12,6 +12,8 @@ import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from "react-i18next"
 import { usePlayer } from "./AudioPlayer"
 import { showMenu } from "tauri-plugin-context-menu";
+import appIcon from '../../src-tauri/icons/icon.png'
+
 
 export function SortEpisodeGrip({ id, children }: { id: number, children: ReactNode }) {
   const {
@@ -48,7 +50,6 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
     episode: EpisodeData, className?: string, noLazyLoad?: boolean,
     onImageClick?: MouseEventHandler<HTMLImageElement>
   }) {
-  const [imageError, setImageError] = useState(false)
 
   const { queue, history: { getEpisodeState, updateEpisodeState } } = useDB()
   const [reprState, setReprState] = useState({ position: 0, total: episode.duration, complete: false })
@@ -97,7 +98,7 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
       }
 
     })
-  }, [entry?.isIntersecting, noLazyLoad, episode, playing?.src, locale, ])
+  }, [entry?.isIntersecting, noLazyLoad, episode, playing?.src, locale,])
 
 
   return (
@@ -149,18 +150,20 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
         {(entry?.isIntersecting || noLazyLoad) &&
           <>
             <div className="h-16 aspect-square rounded-md">
-              {
-                imageError ?
-                  icons.photo :
-                  <img
-                    className={`rounded-md ${onImageClick !== undefined ? 'cursor-pointer' : ''}`}
-                    onClick={onImageClick}
-                    alt=""
-                    src={episode.coverUrl}
-                    title={onImageClick !== undefined ? t('open_podcast') + ' ' + episode.podcast?.podcastName : ''}
-                    onError={() => setImageError(true)}
-                  />
-              }
+                <img
+                  className={`rounded-md ${onImageClick !== undefined ? 'cursor-pointer' : ''}`}
+                  onClick={onImageClick}
+                  alt=""
+                  src={episode.coverUrl}
+                  title={onImageClick !== undefined ? t('open_podcast') + ' ' + episode.podcast?.podcastName : ''}
+                  onError={(e: SyntheticEvent<HTMLImageElement>) => {
+                    if (e.currentTarget.src === episode.podcast?.coverUrl) {
+                      e.currentTarget.src = appIcon
+                    } else {
+                      e.currentTarget.src = episode.podcast?.coverUrl ?? appIcon
+                    }
+                  }}
+                />
             </div>
 
             <div className="flex flex-col text-right w-full items-end justify-between">

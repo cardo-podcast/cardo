@@ -8,10 +8,11 @@ import { useDB } from "../DB";
 import { Switch, SwitchState } from "../components/Inputs";
 import { usePodcastSettings } from "../Settings";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 
 
 function SortButton({ children, podcastUrl, criterion }: { children: ReactNode, podcastUrl: string, criterion: SortCriterion['criterion'] }) {
-  const [{sort}, updatePodcastSettings] = usePodcastSettings(podcastUrl)
+  const [{ sort }, updatePodcastSettings] = usePodcastSettings(podcastUrl)
 
   return (
     <button
@@ -102,6 +103,7 @@ function PodcastPreview() {
     } else if (isSubscribed) {
       episodes = await getAllSubscriptionsEpisodes({ podcastUrl: podcast.feedUrl })
       if (!episodes.length) {
+        setEpisodes([])
         episodes = await downloadEpisodes()
       }
     }
@@ -134,6 +136,7 @@ function PodcastPreview() {
 
   useEffect(() => {
     setTweakMenu(undefined)
+    setImageError(false)
   }, [podcast.feedUrl])
 
 
@@ -143,7 +146,7 @@ function PodcastPreview() {
       {tweakMenu &&
         <>
           <div className="absolute top-0 left-0 z-20 w-screen h-screen"
-          onClick={() => setTweakMenu(undefined)}
+            onClick={() => setTweakMenu(undefined)}
           />
 
           <div className="left-1/2 -translate-x-1/2 absolute w-4/5 top-0 rounded-b-3xl overflow-hidden bg-primary-9 border-[1px] border-t-0 border-primary-6 flex flex-col justify-between items-center transition-all duration-200 z-20">
@@ -162,14 +165,31 @@ function PodcastPreview() {
 
       <div className='flex justify-left w-full gap-3 pb-3 border-b-[3px] border-primary-8 h-52'>
         <div className="flex flex-col gap-2 items-center shrink-0">
-          {imageError ?
-            icons.photo :
-            <img
-              className="bg-primary-7 h-40 aspect-square rounded-md"
-              src={podcast.coverUrlLarge}
-              alt=""
-              onError={() => setImageError(true)}
-            />}
+          <div className="h-40 aspect-square cursor-pointer"
+          title={t('copy_feed_url')}
+          onClick={() => {
+            navigator.clipboard.writeText(podcast.feedUrl)
+            toast.info(t('feed_url_copied'), {
+              position: "top-center",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "dark",
+            });
+          }}
+          >
+            {imageError ?
+              icons.photo :
+              <img
+                className="bg-primary-7 h-40 aspect-square rounded-md"
+                src={podcast.coverUrlLarge}
+                alt=""
+                onError={() => setImageError(true)}
+              />}
+          </div>
 
           {/* #region BUTTONS */}
           <div className="flex gap-2">
@@ -256,7 +276,10 @@ function PodcastPreview() {
         {episodes.map((episode, i) => (
           <Suspense key={i} fallback={<div className="bg-primary-8 h-20 w-full" />}>
             <EpisodeCard
-              episode={episode}
+              episode={{
+                ...episode,
+                podcast: {coverUrl: podcast.coverUrl}
+              }}
               className="hover:bg-primary-8 transition-colors border-b-[1px] border-primary-8"
             />
           </Suspense>

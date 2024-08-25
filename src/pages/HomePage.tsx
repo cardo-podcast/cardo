@@ -6,7 +6,7 @@ import appIcon from '../../src-tauri/icons/icon.png'
 
 
 function HomePage() {
-  const { queue,
+  const { dbLoaded, queue,
     subscriptionsEpisodes: { newEpisodes }} = useDB()
   const { t } = useTranslation()
 
@@ -46,7 +46,7 @@ function HomePage() {
 
       {
         // welcome message
-        queue.queue.length === 0 && newEpisodes.length === 0 &&
+        dbLoaded && queue.queue.length === 0 && newEpisodes.length === 0 &&
         <div className="flex flex-col items-center gap-4 p-2 px-4">
                     <img
             className="w-36"

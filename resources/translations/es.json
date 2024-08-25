@@ -30,7 +30,7 @@
   "when_closing_app": "Antes de cerrar la aplicación",
   "general": "General",
   "fetch_subscriptions_startup": "Actualizar feeds de las subscripciones al inicio",
-  "number_days_news": "Ver los ultimos {{n}} dias en novedades",
+  "number_days_news": "Numero de dias en novedades",
   "news": "Novedades",
   "new": "Nuevo",
   "update_subs_feeds": "Actualizar los feeds de las subscripciones",
@@ -52,5 +52,7 @@
   "empty_queue": "Vaciar la cola",
   "language": "Idioma",
   "welcome_message": "Bienvenido a Cardo. En esta pantalla verás tu cola de reproducción y las novedades en tus podcasts favoritos.",
-  "current_podcast": "Este podcast"
+  "current_podcast": "Este podcast",
+  "copy_feed_url": "Copiar URL del podcast",
+  "feed_url_copied": "URL del podcast copiada al portapapeles"
 }

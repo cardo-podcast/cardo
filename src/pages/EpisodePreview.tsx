@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { SyntheticEvent, useEffect, useState } from "react"
 import * as icons from "../Icons"
 import { EpisodeData } from ".."
 import { useLocation, useNavigate } from "react-router-dom"
@@ -8,10 +8,10 @@ import { parsePodcastDetails, secondsToStr } from "../utils"
 import { useTranslation } from "react-i18next"
 import ProgressBar from "../components/ProgressBar"
 import { useSettings } from "../Settings"
+import appIcon from '../../src-tauri/icons/icon.png'
 
 
 function EpisodePreview() {
-  const [imageError, setImageError] = useState(false)
   const location = useLocation()
   const episode = location.state.episode as EpisodeData
   const [position, setPosition] = useState(0)
@@ -71,24 +71,27 @@ function EpisodePreview() {
 
   return (
     <div className="p-2 w-full flex flex-col">
-      <div className='flex justify-left w-full gap-3 mb-2 p-2 pb-3 border-b-2 border-primary-8'>
-        {imageError ?
-          icons.photo :
-          <img
-            className="h-28 aspect-square rounded-md cursor-pointer hover:p-1 transition-all"
-            src={episode.coverUrl}
-            alt=""
-            onError={() => setImageError(true)}
-            title={t('open_podcast')}
-            onClick={() => {
-              navigate('/preview', {
-                state: {
-                  podcast: episode.podcast
-                }
-              })
-            }}
-          />
-        }
+      <div className=' flex justify-left w-full gap-3 mb-2 p-2 pb-3 border-b-2 border-primary-8'>
+        <img
+          className="h-28 aspect-square rounded-md cursor-pointer hover:p-1 transition-all"
+          src={episode.coverUrl}
+          alt=""
+          onError={(e: SyntheticEvent<HTMLImageElement>) => {
+            if (e.currentTarget.src === episode.podcast?.coverUrl) {
+              e.currentTarget.src = appIcon
+            } else {
+              e.currentTarget.src = episode.podcast?.coverUrl ?? appIcon
+            }
+          }}
+          title={t('open_podcast')}
+          onClick={() => {
+            navigate('/preview', {
+              state: {
+                podcast: episode.podcast
+              }
+            })
+          }}
+        />
 
         <div className="flex flex-col gap-2 justify-between p-1 w-full">
           <div className="flex flex-col">

@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, RefObject, createContext, ReactNode, useContext, Dispatch, SetStateAction, useCallback } from "react";
+import { useRef, useEffect, useState, RefObject, createContext, ReactNode, useContext, Dispatch, SetStateAction, useCallback, SyntheticEvent } from "react";
 import { secondsToStr } from "../utils";
 import { play as playIcon, pause as pauseIcon, forward as forwardIcon, backwards as backwardsIcon } from "../Icons"
 import { EpisodeData } from "..";
@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useSettings } from "../Settings";
 import { useTranslation } from "react-i18next";
 import { globalShortcut } from "@tauri-apps/api";
+import appIcon from '../../src-tauri/icons/icon.png'
 
 
 
@@ -182,7 +183,9 @@ function AudioPlayer({ className = '' }) {
   const playNextInQueue = () => {
     if (audioRef.current && playing) {
       if (queue.includes(playing.src)) {
-        return play(queue.next(playing))
+        const next = queue.next(playing)
+        play(next)
+        return next
       }
     }
   };
@@ -222,6 +225,13 @@ function AudioPlayer({ className = '' }) {
                 episode: playing
               }
             })
+          }}
+          onError={(e: SyntheticEvent<HTMLImageElement>) => {
+            if (e.currentTarget.src === playing.podcast?.coverUrl) {
+              e.currentTarget.src = appIcon
+            } else {
+              e.currentTarget.src = playing.podcast?.coverUrl ?? appIcon
+            }
           }}
         />
       }
