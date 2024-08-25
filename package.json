@@ -1,13 +1,13 @@
 {
   "name": "cardo",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "tauri": "tauri",
+    "tauri": "dotenv -- tauri",
     "analyze": "vite-bundle-visualizer"
   },
   "dependencies": {
@@ -36,6 +36,7 @@
     "@types/sanitize-html": "^2.11.0",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.19",
+    "dotenv-cli": "^7.4.2",
     "eslint": "^8.0.0",
     "eslint-config-react-app": "^7.0.1",
     "postcss": "^8.4.40",
