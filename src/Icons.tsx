@@ -1,10 +1,10 @@
 
 
 export const play = (
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="icon icon-tabler icons-tabler-filled icon-tabler-player-play">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-  <path d="M6 4v16a1 1 0 0 0 1.524 .852l13 -8a1 1 0 0 0 0 -1.704l-13 -8a1 1 0 0 0 -1.524 .852z" />
-</svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="icon icon-tabler icons-tabler-filled icon-tabler-player-play">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M6 4v16a1 1 0 0 0 1.524 .852l13 -8a1 1 0 0 0 0 -1.704l-13 -8a1 1 0 0 0 -1.524 .852z" />
+  </svg>
 )
 
 export const pause = (
@@ -164,5 +164,17 @@ export const grip = (
     <path d="M15 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
     <path d="M15 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
     <path d="M15 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+  </svg>
+)
+
+export const queue = (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-list">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M9 6l11 0" />
+    <path d="M9 12l11 0" />
+    <path d="M9 18l11 0" />
+    <path d="M5 6l0 .01" />
+    <path d="M5 12l0 .01" />
+    <path d="M5 18l0 .01" />
   </svg>
 )
