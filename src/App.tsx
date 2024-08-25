@@ -14,6 +14,7 @@ const QueuePage = lazy(() => import('./pages/QueuePage'));
 import { appWindow } from "@tauri-apps/api/window";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import { SyncProvider } from "./sync/Nextcloud";
 
 
 const App = () => {
@@ -37,26 +38,28 @@ const App = () => {
         <SettingsProvider>
           <DBProvider>
             <AudioPlayerProvider>
-              <TitleBar />
-              <ToastContainer />
-              <div className="flex justify-start w-full h-full overflow-hidden">
-                <LeftMenu />
-                <div className="flex flex-col overflow-y-hidden w-full h-full">
-                  <SearchBar />
-                  <div className="flex h-full overflow-y-auto scroll-smooth border-t-2 border-primary-8">
-                    <Suspense>
-                      <Routes>
-                        <Route path='/' element={<HomePage />} />
-                        <Route path='/preview' element={<PodcastPreview />} />
-                        <Route path='/episode-preview' element={<EpisodePreview />} />
-                        <Route path='/settings' element={<Settings />} />
-                        <Route path='/queue' element={<QueuePage />} />
-                      </Routes>
-                    </Suspense>
+              <SyncProvider>
+                <TitleBar />
+                <ToastContainer />
+                <div className="flex justify-start w-full h-full overflow-hidden">
+                  <LeftMenu />
+                  <div className="flex flex-col overflow-y-hidden w-full h-full">
+                    <SearchBar />
+                    <div className="flex h-full overflow-y-auto scroll-smooth border-t-2 border-primary-8">
+                      <Suspense>
+                        <Routes>
+                          <Route path='/' element={<HomePage />} />
+                          <Route path='/preview' element={<PodcastPreview />} />
+                          <Route path='/episode-preview' element={<EpisodePreview />} />
+                          <Route path='/settings' element={<Settings />} />
+                          <Route path='/queue' element={<QueuePage />} />
+                        </Routes>
+                      </Suspense>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <AudioPlayer className="w-full h-28 flex-shrink-0" />
+                <AudioPlayer className="w-full h-28 flex-shrink-0" />
+              </SyncProvider>
             </AudioPlayerProvider>
           </DBProvider>
         </SettingsProvider>

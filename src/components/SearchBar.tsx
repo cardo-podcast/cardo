@@ -58,7 +58,8 @@ function SearchBar() {
     if (!episodes) return []
 
 
-    return episodes.filter(episode => episode.title.includes(term) || episode.description.includes(term))
+    return episodes.filter(episode => episode.title.toLowerCase().includes(term.toLowerCase()) ||
+                                      episode.description.toLowerCase().includes(term.toLowerCase()))
   }
 
   const handleChange = async (term: string) => {
@@ -71,8 +72,14 @@ function SearchBar() {
   return (
     <div className="flex relative w-full">
       <div className="flex gap-1 w-fit h-8 p-1 text-primary-4">
-        <button className={`w-5 ${window.history.state.idx < 1 ? 'cursor-default text-primary-8' : 'hover:text-accent-5'}`}
-          onClick={() => navigate(-1)}
+        <button className={`w-5 ${window.history.state.idx < 1 && results.length == 0 ? 'cursor-default text-primary-8' : 'hover:text-accent-5'}`}
+          onClick={() => {
+            if (results.length > 0) {
+              setResults([])
+            } else {
+              navigate(-1)
+            }
+          }}
         >
           {arrowLeft}
         </button>
@@ -145,7 +152,7 @@ function SearchBar() {
         results.length > 0 &&
         <>
           {/* close with click outside */}
-          <div className="fixed z-10 mt-10 top-0 left-0 w-screen h-screen" onClick={() => setResults([])} />
+          <div className="absolute z-10 mt-10 top-0 left-0 w-screen h-screen" onClick={() => setResults([])} />
 
           <div className="w-4/5 absolute left-1/2 -translate-x-1/2 top-0 mt-[32px] z-10 max-h-[400px] flex justify-center overflow-y-auto scroll-smooth bg-primary-9 border-x-2 border-primary-8"
             ref={resultsRef}
