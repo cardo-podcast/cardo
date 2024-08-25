@@ -40,7 +40,10 @@ function EpisodePreview() {
 
 
   const fetchPodcastData = async (episode: EpisodeData) => {
-    if (episode.podcast?.podcastName) return // complete podcast data passed with episode
+    if (episode.podcast?.podcastName) {
+      setPodcastFetched(true)
+      return
+    } // complete podcast data has been passed with episode
 
     const subscription = await getSubscription(episode.podcastUrl)
 
