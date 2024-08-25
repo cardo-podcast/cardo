@@ -10,6 +10,7 @@ function HomePage() {
     subscriptionsEpisodes: { newEpisodes }} = useDB()
   const { t } = useTranslation()
 
+  if (!dbLoaded) return
 
   return (
     <div className="flex flex-col p-2 w-full h-fit gap-3 mt-1">
@@ -46,7 +47,7 @@ function HomePage() {
 
       {
         // welcome message
-        dbLoaded && queue.queue.length === 0 && newEpisodes.length === 0 &&
+        queue.queue.length === 0 && newEpisodes.length === 0 &&
         <div className="flex flex-col items-center gap-4 p-2 px-4">
                     <img
             className="w-36"

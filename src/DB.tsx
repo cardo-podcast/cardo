@@ -31,6 +31,7 @@ const getSubscription = async (feedUrl: string): Promise<PodcastData | undefined
 }
 
 const deleteSubscription = async (feedUrl: string): Promise<QueryResult | undefined> => {
+  await deleteSubscriptionEpisodes(feedUrl)
   return await db.execute(
     "DELETE FROM subscriptions WHERE feedUrl = $1",
     [feedUrl],

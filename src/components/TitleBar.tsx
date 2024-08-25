@@ -1,7 +1,7 @@
 import { appWindow } from "@tauri-apps/api/window";
 import * as icons from "../Icons"
 import { useEffect, useRef, useState } from "react";
-import { SyncButton, useSyncButton } from "../sync/Nextcloud";
+import { SyncButton, useSync } from "../sync/Nextcloud";
 import { usePlayer } from "./AudioPlayer";
 import { UnlistenFn } from "@tauri-apps/api/event";
 import { useSettings } from "../Settings";
@@ -11,7 +11,7 @@ function TitleBar() {
   const [windowPinned, setWindowPinned] = useState(false)
   const [maximized, setMaximized] = useState(false)
   const { onExit: savePlayerStatus } = usePlayer()
-  const { performSync } = useSyncButton()
+  const { performSync } = useSync()
   const [{ sync: {syncBeforeAppClose} }, _] = useSettings()
   const unlistenClose = useRef<UnlistenFn>()
 

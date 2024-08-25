@@ -1,7 +1,7 @@
 import { http, invoke, shell } from "@tauri-apps/api"
-import { useEffect, useRef, useState } from "react"
-import { useDB } from "../DB"
-import { getCreds, removeCreds, saveCreds } from "../utils"
+import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react"
+import { useDB, DB } from "../DB"
+import { getCreds, parsePodcastDetails, removeCreds, saveCreds } from "../utils"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { toast } from 'react-toastify';
@@ -103,7 +103,7 @@ async function login(url: string, getSyncKey: () => Promise<string | undefined>,
   // nextcloud flow v2 o-auth login
   // https://docs.nextcloud.com/server/latest/developer_manual/client_apis/LoginFlow/index.html#login-flow-v2
 
-  if (!url.startsWith('http://') && !url.startsWith('https://')){
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
     url = 'https://' + url
   }
 
@@ -179,10 +179,10 @@ async function getNextcloudCreds(syncKey: string): Promise<{ server: string, log
 }
 
 
-async function pullUpdates(server: string, loginName: string, appPassword: string, since?: number): Promise<GpodderUpdate[]> {
-  const url = server + `/index.php/apps/gpoddersync/episode_action?since=${(since === undefined) ? '0' : since?.toString()}`
+async function pullUpdates(server: string, request: string, loginName: string, appPassword: string, since?: number) {
+  const url = server + `/index.php/apps/gpoddersync/${request}?since=${(since === undefined) ? '0' : since?.toString()}`
 
-  const r = await http.fetch(url, {
+  const r: { data: any } = await http.fetch(url, {
     method: 'GET',
     responseType: http.ResponseType.JSON,
     headers: {
@@ -191,11 +191,11 @@ async function pullUpdates(server: string, loginName: string, appPassword: strin
     }
   })
 
-  return (r.data as any).actions as GpodderUpdate[]
+  return r.data
 }
 
-async function pushUpdates(server: string, loginName: string, appPassword: string, updates: GpodderUpdate[]) {
-  const url = server + `/index.php/apps/gpoddersync/episode_action/create`
+async function pushUpdates(server: string, request: string, loginName: string, appPassword: string, updates: any) {
+  const url = server + `/index.php/apps/gpoddersync/${request}/create`
 
   const r = await http.fetch(url, {
     method: 'POST',
@@ -215,19 +215,56 @@ async function pushUpdates(server: string, loginName: string, appPassword: strin
   }
 }
 
-type updateEpisodeStateType = (episodeUrl: string, podcastUrl: string, position: number, total: number, timestamp?: number) => Promise<void>
+
+type updateEpisodeStateType = (episodeUrl: string, podcastUrl: string, position: number, total: number, timestamp?: number,) => Promise<void>
+
 async function sync(syncKey: string, updateEpisodeState: updateEpisodeStateType,
-  getLastSync: () => Promise<number>, getEpisodesStates: (timestamp?: number) => Promise<EpisodeState[]>) {
+  getLastSync: () => Promise<number>,
+  getEpisodesStates: (timestamp?: number) => Promise<EpisodeState[]>,
+  subscriptions: DB['subscriptions'],
+  updateSubscriptions?: { add?: string[], remove?: string[] }
+) {
 
   if (syncKey === '') return
 
   const { server, loginName, appPassword } = await getNextcloudCreds(syncKey)
-  const lastSync = await getLastSync()
+  const lastSync = await getLastSync() / 1000 // nextcloud server uses seconds
 
-  const serverUpdates = await pullUpdates(server, loginName, appPassword, lastSync / 1000) // nextcloud server uses seconds
 
-  if (serverUpdates.length > 0) {
-    for (const update of serverUpdates) {
+  // #region subscriptions
+  const subsServerUpdates: { add: string[], remove: string[] } = await pullUpdates(server, 'subscriptions', loginName, appPassword, lastSync)
+  const localSubscriptions = subscriptions.subscriptions.map(sub => sub.feedUrl)
+
+
+  // add new subscriptions
+  for (const feedUrl of subsServerUpdates.add) {
+    if (!localSubscriptions.includes(feedUrl)) {
+      const podcastData = await parsePodcastDetails(feedUrl)
+      subscriptions.addSubscription(podcastData)
+    }
+  }
+
+
+  // remove subscriptions
+  for (const feedUrl of subsServerUpdates.remove) {
+    if (localSubscriptions.includes(feedUrl)) {
+      subscriptions.deleteSubscription(feedUrl)
+    }
+  }
+
+  if (updateSubscriptions !== undefined) {
+    await pushUpdates(server, 'subscription_change', loginName, appPassword, { add: [], remove: [], ...updateSubscriptions })
+  }
+
+
+  subscriptions.reloadSubscriptions()
+  // #endregion
+
+
+  const serverUpdates: { actions: GpodderUpdate[] } = await pullUpdates(server, 'episode_action', loginName, appPassword, lastSync)
+
+  if (serverUpdates.actions.length > 0) {
+    for (const update of serverUpdates.actions) {
       const timestamp = new Date(update.timestamp + '+00:00').getTime() //timestamp in epoch format (server is in utc ISO format)
       if (update.action !== 'PLAY') continue
 
@@ -255,7 +292,7 @@ async function sync(syncKey: string, updateEpisodeState: updateEpisodeStateType,
     }
   })
 
-  await pushUpdates(server, loginName, appPassword, gpodderLocalUpdates)
+  await pushUpdates(server, 'episode_action', loginName, appPassword, gpodderLocalUpdates)
 }
 
 enum SyncStatus {
@@ -266,11 +303,11 @@ enum SyncStatus {
 }
 
 
-export function useSyncButton() {
+export function initSync() {
   const [status, setStatus] = useState<SyncStatus>(SyncStatus.Standby)
   const [error, setError] = useState('')
   const { sync: { getSyncKey, setLastSync, getLastSync, loggedInSync: loggedIn, setLoggedInSync: setLoggedIn },
-    history: { updateEpisodeState, getEpisodesStates } } = useDB()
+    history: { updateEpisodeState, getEpisodesStates }, subscriptions } = useDB()
   const navigate = useNavigate()
   const [{ sync: syncSettings }, _] = useSettings()
   const { t } = useTranslation()
@@ -292,7 +329,8 @@ export function useSyncButton() {
   }, [loggedIn])
 
 
-  const performSync = async () => {
+  const performSync = async (updateSubscriptions?: { add?: string[], remove?: string[] }) => {
+
 
     if (!loggedIn) {
       toast.info(t('not_logged_sync'), {
@@ -319,10 +357,13 @@ export function useSyncButton() {
       if (!key) {
         throw 'Error obtaining cipher key, please log-in again on Nextcloud'
       }
-      await sync(key, updateEpisodeState, getLastSync, getEpisodesStates)
+
+      await sync(key, updateEpisodeState, getLastSync, getEpisodesStates, subscriptions, updateSubscriptions)
+
       await setLastSync(Date.now())
       setStatus(SyncStatus.Ok)
     } catch (e) {
+      console.error(e)
       setError(e as string)
       setStatus(SyncStatus.Error)
     }
@@ -334,12 +375,12 @@ export function useSyncButton() {
 
 export function SyncButton() {
   const { t } = useTranslation()
-  const { status, error, performSync } = useSyncButton()
+  const {status, error, performSync} = useSync()
 
 
   return (
     <button className={`w-6 hover:text-accent-4 outline-none ${status === SyncStatus.Synchronizing && 'animate-[spin_2s_linear_infinite_reverse]'}`}
-      onClick={performSync} title={error == '' ? t('sync') : error}
+      onClick={() => performSync()} title={error == '' ? t('sync') : error}
     >
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-refresh">
         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -348,5 +389,20 @@ export function SyncButton() {
         <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
       </svg>
     </button>
+  )
+}
+
+
+const SyncContext = createContext<ReturnType<typeof initSync> | undefined>(undefined)
+
+export const useSync = () => useContext(SyncContext) as ReturnType<typeof initSync>
+
+export function SyncProvider({ children }: { children: ReactNode }) {
+  const sync = initSync()
+
+  return (
+    <SyncContext.Provider value={sync}>
+      {children}
+    </SyncContext.Provider>
   )
 }

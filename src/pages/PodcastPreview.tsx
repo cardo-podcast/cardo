@@ -9,6 +9,7 @@ import { Switch, SwitchState } from "../components/Inputs";
 import { usePodcastSettings } from "../Settings";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
+import { useSync } from "../sync/Nextcloud";
 
 
 function SortButton({ children, podcastUrl, criterion }: { children: ReactNode, podcastUrl: string, criterion: SortCriterion['criterion'] }) {
@@ -53,8 +54,10 @@ function PodcastPreview() {
   const [subscribed, setSubscribed] = useState(false)
   const { subscriptions: { getSubscription, deleteSubscription, addSubscription, reloadSubscriptions },
     history: { getCompletedEpisodes },
-    subscriptionsEpisodes: { getAllSubscriptionsEpisodes, deleteSubscriptionEpisodes, saveSubscriptionsEpisodes } } = useDB()
+    sync: {loggedInSync: loggedInSync},
+    subscriptionsEpisodes: { getAllSubscriptionsEpisodes, saveSubscriptionsEpisodes } } = useDB()
   const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcast.feedUrl)
+  const { performSync } = useSync()
 
 
   const [tweakMenu, setTweakMenu] = useState<ReactNode>(undefined)
@@ -195,10 +198,11 @@ function PodcastPreview() {
           <div className="flex gap-2">
             <button className="hover:text-accent-6" onClick={async () => {
               if (subscribed) {
+                loggedInSync && performSync({remove: [podcast.feedUrl]})
                 await deleteSubscription(podcast.feedUrl)
                 setSubscribed(false)
-                await deleteSubscriptionEpisodes(podcast.feedUrl)
               } else {
+                loggedInSync && performSync({add: [podcast.feedUrl]})
                 podcast.id = await addSubscription(podcast)
                 setSubscribed(true)
                 await saveSubscriptionsEpisodes(episodes)
