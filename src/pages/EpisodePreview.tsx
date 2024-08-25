@@ -22,6 +22,7 @@ function EpisodePreview() {
   const { t } = useTranslation()
   const [{ globals: { locale } },] = useSettings()
   const [inQueue, setInqueue] = useState(queue.includes(episode.src))
+  const [podcastFetched, setPodcastFetched] = useState(false)
 
 
   const getDate = () => {
@@ -39,7 +40,7 @@ function EpisodePreview() {
 
 
   const fetchPodcastData = async (episode: EpisodeData) => {
-    if (episode.podcast) return
+    if (episode.podcast?.podcastName) return // complete podcast data passed with episode
 
     const subscription = await getSubscription(episode.podcastUrl)
 
@@ -48,6 +49,8 @@ function EpisodePreview() {
     } else {
       episode.podcast = await parsePodcastDetails(episode.podcastUrl)
     }
+
+    setPodcastFetched(true)
   }
 
   useEffect(() => {
@@ -73,7 +76,7 @@ function EpisodePreview() {
     <div className="p-2 w-full flex flex-col">
       <div className=' flex justify-left w-full gap-3 mb-2 p-2 pb-3 border-b-2 border-primary-8'>
         <img
-          className="h-28 aspect-square rounded-md cursor-pointer hover:p-1 transition-all"
+          className={`h-28 aspect-square rounded-md transition-all ${podcastFetched ? 'hover:p-1 cursor-pointer': ''}`}
           src={episode.coverUrl}
           alt=""
           onError={(e: SyntheticEvent<HTMLImageElement>) => {
@@ -83,8 +86,9 @@ function EpisodePreview() {
               e.currentTarget.src = episode.podcast?.coverUrl ?? appIcon
             }
           }}
-          title={t('open_podcast')}
+          title={podcastFetched ? t('open_podcast'): ''}
           onClick={() => {
+            podcastFetched && // buton didn't work if podcast isn't loaded yet
             navigate('/preview', {
               state: {
                 podcast: episode.podcast
