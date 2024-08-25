@@ -52,5 +52,6 @@
   "remove_complete": "Delete completed items",
   "empty_queue": "Clear the queue",
   "language": "Language",
-  "welcome_message": "Welcome to Cardo. On this screen you'll see your playlist and what's new on your favorite podcasts."
+  "welcome_message": "Welcome to Cardo. On this screen you'll see your playlist and what's new on your favorite podcasts.",
+  "current_podcast": "This podcast"
 }

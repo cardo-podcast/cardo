@@ -51,5 +51,6 @@
   "remove_complete": "Borrar los completados",
   "empty_queue": "Vaciar la cola",
   "language": "Idioma",
-  "welcome_message": "Bienvenido a Cardo. En esta pantalla verás tu cola de reproducción y las novedades en tus podcasts favoritos."
+  "welcome_message": "Bienvenido a Cardo. En esta pantalla verás tu cola de reproducción y las novedades en tus podcasts favoritos.",
+  "current_podcast": "Este podcast"
 }

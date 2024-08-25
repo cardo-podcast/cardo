@@ -110,6 +110,8 @@ function PodcastPreview() {
       saveSubscriptionsEpisodes(episodes)
     }
 
+    location.state['currentPodcastEpisodes'] = episodes
+
     return sortEpisodes(await filterEpisodes(episodes))
   }
 
