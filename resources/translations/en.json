@@ -51,5 +51,6 @@
   "queue_default_message": "You can add items to the queue by right clicking on the episodes",
   "remove_complete": "Delete completed items",
   "empty_queue": "Clear the queue",
-  "language": "Language"
+  "language": "Language",
+  "welcome_message": "Welcome to Cardo. On this screen you'll see your playlist and what's new on your favorite podcasts."
 }

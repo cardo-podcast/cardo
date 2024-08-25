@@ -50,7 +50,7 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
   }) {
   const [imageError, setImageError] = useState(false)
 
-  const { history: { getEpisodeState, updateEpisodeState } } = useDB()
+  const { queue, history: { getEpisodeState, updateEpisodeState } } = useDB()
   const [reprState, setReprState] = useState({ position: 0, total: episode.duration, complete: false })
 
   const navigate = useNavigate()
@@ -58,7 +58,6 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
   const [date, setDate] = useState('')
   const contextMenuTarget = useRef<HTMLDivElement>(null)
 
-  const { queue } = useDB()
   const [inQueue, setInqueue] = useState(queue.includes(episode.src))
 
   const { t } = useTranslation();
@@ -166,7 +165,7 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
 
             <div className="flex flex-col text-right w-full items-end justify-between">
               <p className={`text-sm ${reprState.complete ? '0' : '-4'}`}>{date} - {episode.size} MB </p>
-              <h2 className="mb-2">{episode.title}</h2>
+              <h2 className="mb-2" title={episode.description}>{episode.title}</h2>
               <div className="flex w-full gap-2 items-center justify-end">
                 {
                   (reprState.position === 0 ||
@@ -176,7 +175,7 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
                       total={reprState.total}
                       className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }} />
                 }
-                <button className="w-7 p-[2px] aspect-square flex justify-center items-center hover:text-accent-6 border-2 border-primary-6 rounded-full"
+                <button className="w-7 p-1 aspect-square shrink-0 flex justify-center items-center hover:text-accent-6 hover:p-[2px] border-2 border-primary-6 rounded-full"
                   onClick={e => {
                     e.stopPropagation()
                     play(episode)
