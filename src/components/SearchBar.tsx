@@ -11,8 +11,8 @@ import EpisodeCard from "./EpisodeCard";
 
 function SearchBar() {
   const [results, setResults] = useState<PodcastData[] | EpisodeData[]>([])
-  const { subscriptionsEpisodes: { getAllSubscriptionsEpisodes } } = useDB()
-  const [searchMode, setSearchMode] = useState<'subscriptions' | 'podcasts'>('subscriptions')
+  const { subscriptionsEpisodes: { getAllSubscriptionsEpisodes }, subscriptions: {subscriptions} } = useDB()
+  const [searchMode, setSearchMode] = useState<'subscriptions' | 'podcasts' | 'current'>(subscriptions.length > 0 ? 'subscriptions': 'podcasts')
   const timeout = useRef(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
@@ -32,6 +32,8 @@ function SearchBar() {
       setResults(await getAllSubscriptionsEpisodes({ searchTerm: term }))
     } else if (searchMode === 'podcasts') {
       setResults(await searchOnline(term))
+    } else if (searchMode === 'current') {
+      setResults(searchOnCurrentPodcast(term))
     }
   }
 
@@ -46,7 +48,18 @@ function SearchBar() {
     if (inputRef.current) {
       inputRef.current.value = ''
     }
+    if (location.pathname != '/preview' && searchMode === 'current') {
+      setSearchMode(subscriptions.length > 0 ? 'subscriptions': 'podcasts')
+    }
   }, [location])
+
+  const searchOnCurrentPodcast = (term: string) => {
+    const episodes = location.state.currentPodcastEpisodes as EpisodeData[]
+    if (!episodes) return []
+
+
+    return episodes.filter(episode => episode.title.includes(term) || episode.description.includes(term))
+  }
 
   const handleChange = async (term: string) => {
     if (term.length > 3) {
@@ -89,7 +102,8 @@ function SearchBar() {
               setResults([])
             }
           }} />
-        <div className="items-center gap-2 mr-2 hidden peer-focus:flex active:flex">
+        <div className="items-center gap-2 mr-2 hidden peer-focus:flex active:flex whitespace-nowrap">
+
           <button className={`${searchMode == 'subscriptions' ? 'bg-accent-7' : ''} border-2 border-accent-7 rounded-md flex items-center text-xs uppercase px-1 py-[1px]`}
             type="button"
             onClick={() => {
@@ -99,6 +113,7 @@ function SearchBar() {
           >
             {t('subscriptions')}
           </button>
+
           <button className={`${searchMode == 'podcasts' ? 'bg-accent-7' : ''} border-2 border-accent-7 rounded-md flex items-center text-xs uppercase px-1 py-[1px]`}
             type="button"
             onClick={() => {
@@ -108,6 +123,21 @@ function SearchBar() {
           >
             {t('podcasts')}
           </button>
+
+          {
+            location.pathname == '/preview' &&
+
+            <button className={`${searchMode == 'current' ? 'bg-accent-7' : ''} border-2 border-accent-7 rounded-md flex items-center text-xs uppercase px-1 py-[1px]`}
+              type="button"
+              onClick={() => {
+                setSearchMode('current')
+                inputRef.current?.focus()
+              }}
+            >
+              {t('current_podcast')}
+            </button>
+          }
+
         </div>
       </form>
 
@@ -115,7 +145,7 @@ function SearchBar() {
         results.length > 0 &&
         <>
           {/* close with click outside */}
-          <div className="fixed z-10 mt-10 top-0 left-0 w-screen h-screen" onClick={() => setResults([])}/>
+          <div className="fixed z-10 mt-10 top-0 left-0 w-screen h-screen" onClick={() => setResults([])} />
 
           <div className="w-4/5 absolute left-1/2 -translate-x-1/2 top-0 mt-[32px] z-10 max-h-[400px] flex justify-center overflow-y-auto scroll-smooth bg-primary-9 border-x-2 border-primary-8"
             ref={resultsRef}
