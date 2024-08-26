@@ -9,6 +9,7 @@ import appIcon from '../../src-tauri/icons/icon.png'
 import { shell } from "@tauri-apps/api"
 import { resolveResource } from '@tauri-apps/api/path';
 import { readDir } from '@tauri-apps/api/fs';
+import tauriConfig from '../../src-tauri/tauri.conf.json'
 
 
 
@@ -109,6 +110,12 @@ function Settings() {
               onChange={(value) => updateSettings({ general: { fetchSubscriptionsAtStartup: value } })} />
           </label>
 
+          <label className="w-fit flex gap-1">
+            {t('check_updates')}:
+            <Checkbox defaultChecked={general.checkUpdates}
+              onChange={(value) => updateSettings({ general: { checkUpdates: value } })} />
+          </label>
+
           <label className="w-full flex gap-2 items-center">
             {t('number_days_news')}: 
             <input
@@ -200,8 +207,8 @@ function Settings() {
             src={appIcon}
           />
           <div className="flex flex-col gap-2">
-            <h1 className="UPPERCASE">Cardo - {t('podcast_player')}</h1>
-            <h1 className="UPPERCASE">{t('author')}: n0vella</h1>
+            <h1 className="UPPERCASE">Cardo - {t('podcast_player')} (v{tauriConfig.package.version})</h1>
+            <h1>{t('author')}: n0vella</h1>
             <div className="flex gap-1 h-fit items-center">
               <p>{t('source_code')}: </p>
               <img

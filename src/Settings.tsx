@@ -120,6 +120,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     general: {
       numberOfDaysInNews: 15,
       fetchSubscriptionsAtStartup: true,
+      checkUpdates: true
     },
     colors: {
       primary: 'dark',
