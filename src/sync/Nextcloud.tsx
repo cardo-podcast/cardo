@@ -29,15 +29,22 @@ export function NextcloudSettings() {
     return (
       <div className="flex flex-col gap-3 p-1">
         <div className="flex gap-2 items-center">
-          <p className="text-lg">{t('logged_in')}:</p>
-          <button className="uppercase bg-accent-6 w-fit px-4 hover:bg-accent-7 rounded-md p-1"
-            onClick={async () => {
-              removeCreds('nextcloud')
-              setLoggedIn(false)
-            }}
-          >
-            {t('log_out')}
-          </button>
+          <img
+            className="h-24 shrink-0"
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/141px-Nextcloud_Logo.svg.png"
+            alt="Nextcloud logo"
+          />
+          <div className="flex flex-col gap-2">
+            <p className="text-lg">{t('logged_in')}</p>
+            <button className="uppercase bg-accent-6 w-fit px-4 hover:bg-accent-7 rounded-md p-1"
+              onClick={async () => {
+                removeCreds('nextcloud')
+                setLoggedIn(false)
+              }}
+            >
+              {t('log_out')}
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-col gap-1">
@@ -60,8 +67,13 @@ export function NextcloudSettings() {
   }
 
   return (
-    <div className="flex flex-col gap-2 p-1">
-      <form className="flex flex-col gap-2 items-center" onSubmit={async (e) => {
+    <div className="flex gap-2 p-1 w-full h-full">
+      <img
+        className="h-24 shrink-0"
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/141px-Nextcloud_Logo.svg.png"
+        alt="Nextcloud logo"
+      />
+      <form className="flex flex-col gap-2 items-center w-full" onSubmit={async (e) => {
         e.preventDefault()
         if (urlRef.current) {
           try {
@@ -375,7 +387,7 @@ export function initSync() {
 
 export function SyncButton() {
   const { t } = useTranslation()
-  const {status, error, performSync} = useSync()
+  const { status, error, performSync } = useSync()
 
 
   return (

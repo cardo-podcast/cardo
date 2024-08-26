@@ -57,14 +57,17 @@ const getEpisodeState = async (episodeUrl: string): Promise<EpisodeState | undef
   }
 }
 
-const getCompletedEpisodes = async () => {
+const getCompletedEpisodes = async (podcastUrl?: string) => {
 
-  const playedEpisodes: EpisodeState[] = await db.select(
-    `SELECT episode from episodes_history
-    WHERE position = total`)
+  const query = `SELECT episode from episodes_history
+    WHERE position = total
+    ${podcastUrl? 'AND podcast = $1': ''}
+    `
 
-    return playedEpisodes.map(episode => episode.episode) //only returns url
-  }
+  const playedEpisodes: EpisodeState[] = await db.select(query, [podcastUrl])
+
+  return playedEpisodes.map(episode => episode.episode) //only returns url
+}
 
 const getEpisodesStates = async (timestamp = 0): Promise<EpisodeState[]> => {
   const r: EpisodeState[] = await db.select(
@@ -155,18 +158,18 @@ const getLastPlayed = async (): Promise<EpisodeData | undefined> => {
 const setLastPlaying = async (playingEpisode?: EpisodeData) => {
   // empty args to set NONE as last played
 
-  const data = playingEpisode ? JSON.stringify(playingEpisode): 'NONE'
+  const data = playingEpisode ? JSON.stringify(playingEpisode) : 'NONE'
 
   return await setMiscValue('lastPlaying', data)
 
 }
 
 
-const getLastUpdate = async() => {
+const getLastUpdate = async () => {
   return Number(await getMiscKey('lastUpdate') ?? '0')
 }
 
-const setLastUpdate = async(timestamp: number) => {
+const setLastUpdate = async (timestamp: number) => {
   return await setMiscValue('lastUpdate', timestamp.toString())
 }
 
@@ -306,7 +309,7 @@ function initQueue() {
     return r.map(episode => ({
       ...episode,
       pubDate: new Date(episode.pubDate),
-      podcast: {coverUrl: episode.podcastCover}
+      podcast: { coverUrl: episode.podcastCover }
     }))
   }
 
@@ -422,7 +425,7 @@ const loadNewSubscriptionsEpisodes = async (pubdate_gt: number): Promise<NewEpis
     ...episode,
     pubDate: new Date(episode.pubDate),
     new: episode.pubDate > lastSync, // is new if it's just discovered
-    podcast: {coverUrl: episode.podcastCover}
+    podcast: { coverUrl: episode.podcastCover }
   }))
 
 }
@@ -461,7 +464,7 @@ function initDB() {
   const updateSubscriptionsFeed = async () => {
     setUpdatingFeeds(true)
     for (const subscription of subscriptionsList) {
-      const [episodes, ] = await parseXML(subscription.feedUrl)
+      const [episodes,] = await parseXML(subscription.feedUrl)
       const r = await saveSubscriptionsEpisodes(episodes)
       if (r.rowsAffected > 0) {
         loadNewEpisodes()

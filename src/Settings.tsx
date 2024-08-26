@@ -56,21 +56,21 @@ export function usePodcastSettings(feedUrl: string): [PodcastSettings, typeof up
 
 
   const updatePodcastSettings = (newPodcastSettings: RecursivePartial<PodcastSettings>) => {
-    const newSettings = { ...settings }
+    const newSettings = settings.podcasts
 
-    if (!newSettings.podcasts[feedUrl]) {
-      newSettings.podcasts[feedUrl] = new PodcastSettings()
+    if (!newSettings[feedUrl]) {
+      newSettings[feedUrl] = new PodcastSettings()
     }
 
-    merge(newSettings.podcasts[feedUrl], newPodcastSettings)
+    merge(newSettings[feedUrl], newPodcastSettings)
 
-    if (PodcastSettings.isDefault((newSettings.podcasts[feedUrl]))) {
+    if (PodcastSettings.isDefault((newSettings[feedUrl]))) {
       // default settings aren't stored on json
-      delete newSettings.podcasts[feedUrl]
+      delete newSettings[feedUrl]
     }
 
-    updateSettings({ podcasts: newSettings.podcasts })
-    setPodcastSettings(newSettings.podcasts[feedUrl] ?? new PodcastSettings)
+    updateSettings({ podcasts: newSettings })
+    setPodcastSettings(newSettings[feedUrl] ?? new PodcastSettings)
   }
 
 

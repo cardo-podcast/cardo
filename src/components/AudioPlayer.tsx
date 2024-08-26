@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, RefObject, createContext, ReactNode, useContext, Dispatch, SetStateAction, useCallback, SyntheticEvent } from "react";
 import { secondsToStr } from "../utils";
-import { play as playIcon, pause as pauseIcon, forward as forwardIcon, backwards as backwardsIcon } from "../Icons"
+import { play as playIcon, pause as pauseIcon, forward as forwardIcon, backwards as backwardsIcon, close as closeIcon } from "../Icons"
 import { EpisodeData } from "..";
 import { useDB } from "../DB";
 import { useNavigate } from "react-router-dom";
@@ -240,59 +240,66 @@ function AudioPlayer({ className = '' }) {
       <div className={`w-full flex flex-col`}>
         {playing && <h1 className="mb-1 truncate">{playing.title}</h1>}
 
-          <div className="w-full flex items-center justify-center">
-            <p>{secondsToStr(position)}</p>
-            <input
-              type="range"
-              min="0"
-              max={duration}
-              value={position}
-              onChange={(event) => changeTime(Number(event.target.value))}
-              className="w-4/5 mx-1 h-[3px] bg-primary-3 accent-accent-6"
-            />
-            <p className="cursor-pointer"
-              title={t('toggle_remaining_time')}
-              onClick={() => updateSettings({ playback: { displayRemainingTime: !displayRemainingTime } })}>
-              {secondsToStr(displayRemainingTime ? position - duration : duration)}
-            </p>
-          </div>
+        <div className="w-full flex items-center justify-center">
+          <p>{secondsToStr(position)}</p>
+          <input
+            type="range"
+            min="0"
+            max={duration}
+            value={position}
+            onChange={(event) => changeTime(Number(event.target.value))}
+            className="w-4/5 mx-1 h-[3px] bg-primary-3 accent-accent-6"
+          />
+          <p className="cursor-pointer"
+            title={t('toggle_remaining_time')}
+            onClick={() => updateSettings({ playback: { displayRemainingTime: !displayRemainingTime } })}>
+            {secondsToStr(displayRemainingTime ? position - duration : duration)}
+          </p>
+        </div>
 
-          <div className="flex justify-center gap-3 items-center">
+        <div className="flex justify-center gap-3 items-center">
 
-            <button
-              className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
-              onClick={() => {
-                changeTime(-1 * stepBackwards, true)
-              }}
-            >
-              {backwardsIcon}
-              <p className="text-xs text-center -mt-[7px]">{stepBackwards}</p>
-            </button>
+          <button
+            className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
+            onClick={() => {
+              changeTime(-1 * stepBackwards, true)
+            }}
+          >
+            {backwardsIcon}
+            <p className="text-xs text-center -mt-[7px]">{stepBackwards}</p>
+          </button>
 
-            <button
-              className="flex items-center focus:outline-none hover: hover:text-accent-6 w-9 mb-2"
-              onClick={handlePlayPause}
-            >
-              {audioRef.current?.paused ? playIcon : pauseIcon}
-            </button>
+          <button
+            className="flex items-center focus:outline-none hover: hover:text-accent-6 w-9 mb-2"
+            onClick={handlePlayPause}
+          >
+            {audioRef.current?.paused ? playIcon : pauseIcon}
+          </button>
 
-            <button
-              className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
-              onClick={() => {
-                changeTime(stepForward, true)
-              }}
-            >
-              {forwardIcon}
-              <p className="text-xs text-center -mt-[7px]">{stepForward}</p>
-            </button>
-          </div>
+          <button
+            className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
+            onClick={() => {
+              changeTime(stepForward, true)
+            }}
+          >
+            {forwardIcon}
+            <p className="text-xs text-center -mt-[7px]">{stepForward}</p>
+          </button>
+        </div>
 
 
         <audio ref={audioRef} onLoadedMetadata={handleLoadedMetadata} className="hidden" />
       </div>
-      
-      <div className="w-24 aspect-square shrink-0">
-        {/* space to keep simetry */}
+
+      <div className="group w-24 h-full aspect-square shrink-0">
+        {/* extra width is to keep simetry */}
+        <div className="w-full justify-end flex">
+          <button className="w-7 group-hover:text-red-600 text-transparent"
+          onClick={quit}
+          >
+            {closeIcon}
+          </button>
+        </div>
       </div>
 
     </div>

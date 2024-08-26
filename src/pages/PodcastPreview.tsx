@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { EpisodeData, PodcastData, SortCriterion } from "..";
-import { ReactNode, Suspense, useEffect, useState } from "react";
+import { ReactNode, Suspense, SyntheticEvent, useEffect, useState } from "react";
 import * as icons from "../Icons"
 import { parseXML } from "../utils";
 import EpisodeCard from "../components/EpisodeCard";
@@ -10,6 +10,7 @@ import { usePodcastSettings } from "../Settings";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { useSync } from "../sync/Nextcloud";
+import appIcon from '../../src-tauri/icons/icon.png'
 
 
 function SortButton({ children, podcastUrl, criterion }: { children: ReactNode, podcastUrl: string, criterion: SortCriterion['criterion'] }) {
@@ -47,14 +48,13 @@ function SortButton({ children, podcastUrl, criterion }: { children: ReactNode, 
 
 function PodcastPreview() {
   const location = useLocation();
-  const [imageError, setImageError] = useState(false)
   const podcast = location.state.podcast as PodcastData
   const [episodes, setEpisodes] = useState<EpisodeData[]>([])
   const [downloading, setDownloading] = useState(false)
   const [subscribed, setSubscribed] = useState(false)
   const { subscriptions: { getSubscription, deleteSubscription, addSubscription, reloadSubscriptions },
     history: { getCompletedEpisodes },
-    sync: {loggedInSync: loggedInSync},
+    sync: { loggedInSync: loggedInSync },
     subscriptionsEpisodes: { getAllSubscriptionsEpisodes, saveSubscriptionsEpisodes } } = useDB()
   const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcast.feedUrl)
   const { performSync } = useSync()
@@ -117,11 +117,12 @@ function PodcastPreview() {
 
     location.state['currentPodcastEpisodes'] = episodes
 
+
     return sortEpisodes(await filterEpisodes(episodes))
   }
 
   const filterEpisodes = async (unfilteredEpisodes: EpisodeData[]) => {
-    const completedEpisodes = await getCompletedEpisodes()
+    const completedEpisodes = await getCompletedEpisodes(podcast.feedUrl)
     const filter = podcastSettings.filter
 
     if (filter.played === SwitchState.True) {
@@ -134,12 +135,11 @@ function PodcastPreview() {
   }
 
   useEffect(() => {
-    loadEpisodes().then(episodes => setEpisodes(episodes))
-  }, [podcast.feedUrl, podcastSettings])
+    loadEpisodes().then(loadedEpisodes => setEpisodes(loadedEpisodes))
+  }, [podcast.feedUrl, JSON.stringify(podcastSettings)])
 
   useEffect(() => {
     setTweakMenu(undefined)
-    setImageError(false)
   }, [podcast.feedUrl])
 
 
@@ -169,128 +169,126 @@ function PodcastPreview() {
       <div className='flex justify-left w-full gap-3 pb-3 border-b-[3px] border-primary-8 h-52'>
         <div className="flex flex-col gap-2 items-center shrink-0">
           <div className="h-40 aspect-square cursor-pointer"
-          title={t('copy_feed_url')}
-          onClick={() => {
-            navigator.clipboard.writeText(podcast.feedUrl)
-            toast.info(t('feed_url_copied'), {
-              position: "top-center",
-              autoClose: 3000,
-              hideProgressBar: true,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "dark",
-            });
-          }}
+            title={t('copy_feed_url')}
+            onClick={() => {
+              navigator.clipboard.writeText(podcast.feedUrl)
+              toast.info(t('feed_url_copied'), {
+                position: "top-center",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+              });
+            }}
           >
-            {imageError ?
-              icons.photo :
-              <img
-                className="bg-primary-7 h-40 aspect-square rounded-md"
-                src={podcast.coverUrlLarge}
-                alt=""
-                onError={() => setImageError(true)}
-              />}
-          </div>
+            <img
+              className="bg-primary-7 h-40 aspect-square rounded-md"
+              src={podcast.coverUrlLarge}
+              alt=""
+              onError={(e: SyntheticEvent<HTMLImageElement>) => e.currentTarget.src = appIcon}
+            />
+            </div>
 
-          {/* #region BUTTONS */}
-          <div className="flex gap-2">
-            <button className="hover:text-accent-6" onClick={async () => {
-              if (subscribed) {
-                loggedInSync && performSync({remove: [podcast.feedUrl]})
-                await deleteSubscription(podcast.feedUrl)
-                setSubscribed(false)
-              } else {
-                loggedInSync && performSync({add: [podcast.feedUrl]})
-                podcast.id = await addSubscription(podcast)
-                setSubscribed(true)
-                await saveSubscriptionsEpisodes(episodes)
-              }
-              reloadSubscriptions()
-            }}>
-              {subscribed ? icons.starFilled : icons.star}
-            </button>
-            <button className="hover:text-accent-6" onClick={async () => {
-              const [fetchedEpisodes,] = await parseXML(podcast.feedUrl)
-              setEpisodes(sortEpisodes(fetchedEpisodes))
-              saveSubscriptionsEpisodes(fetchedEpisodes)
-            }
-            }>
-              {icons.reload}
-            </button>
-
-            <button
-              className="hover:text-accent-6"
-              onClick={() => {
-                setTweakMenu(
-                  <div className="w-4/5 flex flex-col gap-1 justify-center items-center">
-                    <SortButton podcastUrl={podcast.feedUrl} criterion="date">
-                      {t('date')}
-                    </SortButton>
-                    <SortButton podcastUrl={podcast.feedUrl} criterion="duration">
-                      {t('duration')}
-                    </SortButton>
-                  </div>
-                )
+            {/* #region BUTTONS */}
+            <div className="flex gap-2">
+              <button className="hover:text-accent-6" onClick={async () => {
+                if (subscribed) {
+                  loggedInSync && performSync({ remove: [podcast.feedUrl] })
+                  await deleteSubscription(podcast.feedUrl)
+                  setSubscribed(false)
+                } else {
+                  loggedInSync && performSync({ add: [podcast.feedUrl] })
+                  podcast.id = await addSubscription(podcast)
+                  setSubscribed(true)
+                  await saveSubscriptionsEpisodes(episodes)
+                }
+                reloadSubscriptions()
+              }}>
+                {subscribed ? icons.starFilled : icons.star}
+              </button>
+              <button className="hover:text-accent-6" onClick={async () => {
+                const [fetchedEpisodes,] = await parseXML(podcast.feedUrl)
+                setEpisodes(sortEpisodes(fetchedEpisodes))
+                saveSubscriptionsEpisodes(fetchedEpisodes)
               }
               }>
-              {icons.sort}
-            </button>
-            <button
-              className="hover:text-accent-6"
-              onClick={() => {
-                setTweakMenu(
-                  <div className="flex justify-center items-center">
-                    <Switch initialState={podcastSettings.filter.played} setState={async (value) => {
-                      updatePodcastSettings({ filter: { played: value } })
-                    }} labels={[t('not_played'), t('played')]} />
-                  </div>
-                )
-              }
-              }>
-              {icons.filter}
-            </button>
-            <button className={`w-6 hover:text-accent-6 ${downloading
-              && 'animate-[spin_2s_linear_reverse_infinite]'}`}
-              onClick={async () => {
-                setEpisodes(await loadEpisodes(true))
-              }}
-            >
-              {icons.sync}
-            </button>
+                {icons.reload}
+              </button>
+
+              <button
+                className="hover:text-accent-6"
+                onClick={() => {
+                  setTweakMenu(
+                    <div className="w-4/5 flex flex-col gap-1 justify-center items-center">
+                      <SortButton podcastUrl={podcast.feedUrl} criterion="date">
+                        {t('date')}
+                      </SortButton>
+                      <SortButton podcastUrl={podcast.feedUrl} criterion="duration">
+                        {t('duration')}
+                      </SortButton>
+                    </div>
+                  )
+                }
+                }>
+                {icons.sort}
+              </button>
+              <button
+                className="hover:text-accent-6"
+                onClick={() => {
+                  setTweakMenu(
+                    <div className="flex justify-center items-center">
+                      <Switch initialState={podcastSettings.filter.played} setState={async (value) => {
+                        updatePodcastSettings({ filter: { played: value } })
+                      }} labels={[t('not_played'), t('played')]} />
+                    </div>
+                  )
+                }
+                }>
+                {icons.filter}
+              </button>
+              <button className={`w-6 hover:text-accent-6 ${downloading
+                && 'animate-[spin_2s_linear_reverse_infinite]'}`}
+                onClick={async () => {
+                  setEpisodes(await loadEpisodes(true))
+                }}
+              >
+                {icons.sync}
+              </button>
+            </div>
+            {/* #endregion */}
+
           </div>
-          {/* #endregion */}
 
-        </div>
+          <div className="flex flex-col h-full">
+            <h1 className="text-lg">{podcast.podcastName}</h1>
+            <h2 className="mb-2">{podcast.artistName}</h2>
 
-        <div className="flex flex-col h-full">
-          <h1 className="text-lg">{podcast.podcastName}</h1>
-          <h2 className="mb-2">{podcast.artistName}</h2>
+            <div className="flex overflow-y-auto rounded-md scroll-smooth pr-2">
+              <div className="whitespace-pre-line text-sm text-primary-4"
+                dangerouslySetInnerHTML={{ __html: podcast.description ?? '' }} />
+            </div>
 
-          <div className="flex overflow-y-auto rounded-md scroll-smooth pr-2">
-            <div className="whitespace-pre-line text-sm text-primary-4"
-              dangerouslySetInnerHTML={{ __html: podcast.description ?? '' }} />
           </div>
+        </div >
 
+        <div className="grid content-start">
+          {episodes.map((episode, i) => (
+            <Suspense key={i} fallback={<div className="bg-primary-8 h-20 w-full" />}>
+              <EpisodeCard
+                episode={{
+                  ...episode,
+                  podcast: { coverUrl: podcast.coverUrl }
+                }}
+                className="hover:bg-primary-8 transition-colors border-b-[1px] border-primary-8"
+              />
+            </Suspense>
+          ))}
         </div>
       </div >
-
-      <div className="grid content-start">
-        {episodes.map((episode, i) => (
-          <Suspense key={i} fallback={<div className="bg-primary-8 h-20 w-full" />}>
-            <EpisodeCard
-              episode={{
-                ...episode,
-                podcast: {coverUrl: podcast.coverUrl}
-              }}
-              className="hover:bg-primary-8 transition-colors border-b-[1px] border-primary-8"
-            />
-          </Suspense>
-        ))}
-      </div>
-    </div >
-  )
+      )
 }
 
-export default PodcastPreview;
+      export default PodcastPreview;

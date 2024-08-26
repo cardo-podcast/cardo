@@ -12,7 +12,7 @@
   "date": "date",
   "duration": "duration",
   "logged_in": "You have already logged in",
-  "nextcloud_server_url": "https://nextcloud.example.com",
+  "nextcloud_server_url": "URL of Nextcloud server",
   "connect": "connect",
   "log_out": "log out",
   "sync": "synchronization",
