@@ -13,11 +13,11 @@ function TitleBar() {
   const [maximized, setMaximized] = useState(false)
   const { onExit: savePlayerStatus } = usePlayer()
   const { performSync } = useSync()
-  const [{ sync: {syncBeforeAppClose}, general: {checkUpdates} }, _] = useSettings()
+  const [{ sync: { syncBeforeAppClose }, general: { checkUpdates }, ui }, _] = useSettings()
   const unlistenClose = useRef<UnlistenFn>()
 
 
-  const executeBeforeExit = async() => {
+  const executeBeforeExit = async () => {
     await savePlayerStatus()
 
     if (syncBeforeAppClose) {
@@ -33,7 +33,7 @@ function TitleBar() {
   useEffect(() => {
     /* listen onCloseRequest to do exit actions when close is not triggered
       from app X button (for example taskbar right click menu) */
-    appWindow.onCloseRequested(async() => {
+    appWindow.onCloseRequested(async () => {
       await executeBeforeExit()
     }).then(
       unlisten => unlistenClose.current = unlisten
@@ -46,15 +46,20 @@ function TitleBar() {
   return (
     <div className={`bg-primary-10 border-b-2 border-primary-8 flex w-full h-10 justify-between px-2 py-1 items-center relative stroke-[1.5px]`} data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>
       <div className='flex gap-2 items-center'>
-        <button onClick={() => {
-          appWindow.setAlwaysOnTop(!windowPinned)
-          setWindowPinned(!windowPinned)
-        }} className='hover:text-accent-5 w-6 -mr-1'>
-          {windowPinned ? icons.unpin : icons.pin}
-        </button>
+
+        {ui.showPinWindowButton &&
+
+          <button onClick={() => {
+            appWindow.setAlwaysOnTop(!windowPinned)
+            setWindowPinned(!windowPinned)
+          }} className='hover:text-accent-5 w-6 -mr-1'>
+            {windowPinned ? icons.unpin : icons.pin}
+          </button>
+        }
+
         <SyncButton />
 
-        {checkUpdates && <Updater/>}
+        {checkUpdates && <Updater />}
       </div>
 
       <h1 className="cursor-default absolute left-1/2 -translate-x-1/2" data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>Cardo</h1>
@@ -69,7 +74,7 @@ function TitleBar() {
         }} className='hover:text-accent-5 w-5'>
           {maximized ? icons.unmaximize : icons.maximize}
         </button>
-        <button onClick={async() => {
+        <button onClick={async () => {
           await executeBeforeExit()
           appWindow.close()
         }} className='hover:text-red-500 w-6'>

@@ -60,5 +60,6 @@
   "release_notes": "Release Notes",
   "install": "Install",
   "later": "Later",
-  "check_updates": "Check for updates"
+  "check_updates": "Check for updates",
+  "show_pinWindow_button": "Show button to pin/unpin window"
 }

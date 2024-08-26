@@ -16,14 +16,14 @@ export default function Updater() {
   const unlistenCeckUpdates = useRef<UnlistenFn>()
   const [dialog, setDialog] = useState<{ version: string, releaseNotes: string }>()
   const [showDialog, setShowDialog] = useState(false)
-  const { appUpdate } = useDB()
+  const { appUpdate, dbLoaded } = useDB()
   const { t } = useTranslation()
 
   useEffect(() => {
-    checkUpdates()
+    dbLoaded && checkUpdates()
 
     return () => unlistenCeckUpdates.current && unlistenCeckUpdates.current()
-  }, [])
+  }, [dbLoaded])
 
 
   const checkUpdates = async () => {
@@ -38,18 +38,16 @@ export default function Updater() {
 
       if (!manifest || !shouldUpdate) return
 
-
       setDialog({
         version: manifest.version,
         releaseNotes: manifest.body
       })
 
-      const formatString = "yyyy-MM-dd HH:mm:ss.SS xxxxx"
+      const formatString = "yyyy-MM-dd HH:mm:ss.SSS xxxxx"
       const releaseDate = parse(manifest.date, formatString, new Date())
+      const lastUpdate = await appUpdate.getLastUpdate()
 
-      const lastUpdate = new Date(await appUpdate.getLastUpdate())
-
-      setShowDialog(releaseDate.getTime() > lastUpdate.getTime()) // annoying dialog is shown only once, after that only the title bar icon appears
+      setShowDialog(releaseDate.getTime() > lastUpdate) // annoying dialog is shown only once, after that only the title bar icon appears
 
       await appUpdate.setLastUpdate(Date.now())
 
@@ -61,13 +59,13 @@ export default function Updater() {
   return (
     <>
       <button onClick={() => setShowDialog(true)} title={t('new_update_available')}
-        className={`bg-green-600 w-5 h-5 rounded-full ${dialog? 'flex': 'hidden'}`}
+        className={`bg-green-600 w-5 h-5 rounded-full transition-all ${dialog? 'flex': 'hidden'}`}
       >
         {upArrow}
       </button>
 
       <div className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-64 max-w-[70%] min-h-36 bg-primary-9 rounded-md z-40
-            border-2 border-primary-6 shadow-md shadow-primary-8 px-3 pb-2 flex-col justify-between ${showDialog ? 'flex' : 'hidden'}
+            border-2 border-primary-6 shadow-md shadow-primary-8 px-3 pb-2 flex-col justify-between transition-all ${showDialog ? 'flex' : 'hidden'}
         `}>
         <h1 className='text-lg border-b-2 border-primary-8 p-1'>{t('new_update_available')}</h1>
         <div>

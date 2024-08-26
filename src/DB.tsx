@@ -97,7 +97,7 @@ const updateEpisodeState = async (episodeUrl: string, podcastUrl: string, positi
 const getMiscKey = async (key: string): Promise<string | undefined> => {
   const r: { value: string }[] = await db.select(
     `SELECT value from misc
-      WHERE description = "$1"`, [key])
+      WHERE description = $1`, [key])
   if (r.length > 0) {
     return r[0].value
   }
@@ -106,10 +106,10 @@ const getMiscKey = async (key: string): Promise<string | undefined> => {
 const setMiscValue = async (key: string, value: string) => {
   await db.execute(
     `INSERT into misc (description, value)
-    VALUES ("$1", $2)
+    VALUES ($1, $2)
     ON CONFLICT (description) DO UPDATE
     SET value = $2
-    WHERE description = "$1"
+    WHERE description = $1
     `,
     [key, value],
   )
@@ -125,7 +125,7 @@ const setSyncKey = async (key: string) => {
 }
 
 const getLastSync = async (): Promise<number> => {
-  return Number(await getMiscKey('lastSync')) ?? 0
+  return Number(await getMiscKey('lastSync') ?? '0')
 }
 
 const setLastSync = async (timestamp: number) => {
@@ -163,7 +163,7 @@ const setLastPlaying = async (playingEpisode?: EpisodeData) => {
 
 
 const getLastUpdate = async() => {
-  return Number(await getMiscKey('lastUpdate')) ?? 0
+  return Number(await getMiscKey('lastUpdate') ?? '0')
 }
 
 const setLastUpdate = async(timestamp: number) => {

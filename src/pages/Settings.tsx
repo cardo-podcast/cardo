@@ -58,7 +58,7 @@ function AccentColorSelector() {
 
 function Settings() {
   const { t } = useTranslation()
-  const [{ globals, general, colors: colorSettings, playback }, updateSettings] = useSettings()
+  const [{ globals, general, colors: colorSettings, playback, ui }, updateSettings] = useSettings()
   const [languages, setLanguages] = useState<string[]>()
 
   useEffect(() => {
@@ -117,7 +117,7 @@ function Settings() {
           </label>
 
           <label className="w-full flex gap-2 items-center">
-            {t('number_days_news')}: 
+            {t('number_days_news')}:
             <input
               type="text"
               className="py-1 px-2 bg-primary-8 rounded-md focus:outline-none w-14"
@@ -195,6 +195,17 @@ function Settings() {
               }}
             />
             <p className="-ml-1">s</p>
+          </label>
+        </div>
+      </div>
+
+      <div className=" py-4flex flex-col gap-1 border-primary-8 border-[2px] p-2 rounded-md">
+        <h1 className="uppercase border-b-2 border-primary-8 mb-2">UI</h1>
+        <div>
+          <label className="w-fit flex gap-1">
+            {t('show_pinWindow_button')}:
+            <Checkbox defaultChecked={ui.showPinWindowButton}
+              onChange={(value) => updateSettings({ ui: { showPinWindowButton: value } })} />
           </label>
         </div>
       </div>

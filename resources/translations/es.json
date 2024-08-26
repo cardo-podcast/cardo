@@ -59,5 +59,6 @@
   "release_notes": "Notas del lanzamiento",
   "install": "Instalar",
   "later": "Mas tarde",
-  "check_updates": "Buscar actualizaciones"
+  "check_updates": "Buscar actualizaciones",
+  "show_pinWindow_button": "Mostrar botón para anclar/desanclar la ventana"
 }

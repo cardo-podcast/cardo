@@ -73,6 +73,9 @@ export interface Settings {
     stepBackwards: number,
     resumeBefore: number, // resume playing some seconds before the last state
     displayRemainingTime: boolean //show -remaining time in player instead of total time
+  },
+  ui: {
+    showPinWindowButton: boolean
   }
 }
 
