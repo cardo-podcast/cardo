@@ -5,6 +5,7 @@ import { SyncButton, useSync } from "../sync/Nextcloud";
 import { usePlayer } from "./AudioPlayer";
 import { UnlistenFn } from "@tauri-apps/api/event";
 import { useSettings } from "../Settings";
+import Updater from "../Updater";
 
 
 function TitleBar() {
@@ -12,7 +13,7 @@ function TitleBar() {
   const [maximized, setMaximized] = useState(false)
   const { onExit: savePlayerStatus } = usePlayer()
   const { performSync } = useSync()
-  const [{ sync: {syncBeforeAppClose} }, _] = useSettings()
+  const [{ sync: {syncBeforeAppClose}, general: {checkUpdates} }, _] = useSettings()
   const unlistenClose = useRef<UnlistenFn>()
 
 
@@ -44,17 +45,19 @@ function TitleBar() {
 
   return (
     <div className={`bg-primary-10 border-b-2 border-primary-8 flex w-full h-10 justify-between px-2 py-1 items-center relative stroke-[1.5px]`} data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>
-      <div className='flex w-12 justify-between'>
+      <div className='flex gap-2 items-center'>
         <button onClick={() => {
           appWindow.setAlwaysOnTop(!windowPinned)
           setWindowPinned(!windowPinned)
-        }} className='hover:text-accent-5 w-6'>
+        }} className='hover:text-accent-5 w-6 -mr-1'>
           {windowPinned ? icons.unpin : icons.pin}
         </button>
         <SyncButton />
+
+        {checkUpdates && <Updater/>}
       </div>
 
-      <h1 className="cursor-default" data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>Cardo</h1>
+      <h1 className="cursor-default absolute left-1/2 -translate-x-1/2" data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>Cardo</h1>
 
       <div className='flex justify-between gap-1'>
         <button onClick={() => appWindow.minimize()} className='hover:text-accent-5 w-6'>

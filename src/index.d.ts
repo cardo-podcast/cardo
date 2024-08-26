@@ -61,7 +61,8 @@ export interface Settings {
   },
   general: {
     numberOfDaysInNews: number,
-    fetchSubscriptionsAtStartup: boolean
+    fetchSubscriptionsAtStartup: boolean,
+    checkUpdates: boolean
   },
   colors: {
     primary: ColorTheme | TailwindBaseColor | DefaultTheme,

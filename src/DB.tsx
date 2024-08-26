@@ -93,52 +93,43 @@ const updateEpisodeState = async (episodeUrl: string, podcastUrl: string, positi
 // #endregion
 // #region MISC
 
-const getSyncKey = async (): Promise<string | undefined> => {
+
+const getMiscKey = async (key: string): Promise<string | undefined> => {
   const r: { value: string }[] = await db.select(
     `SELECT value from misc
-      WHERE description = "syncKey"`,
-  )
+      WHERE description = "$1"`, [key])
   if (r.length > 0) {
     return r[0].value
   }
+}
+
+const setMiscValue = async (key: string, value: string) => {
+  await db.execute(
+    `INSERT into misc (description, value)
+    VALUES ("$1", $2)
+    ON CONFLICT (description) DO UPDATE
+    SET value = $2
+    WHERE description = "$1"
+    `,
+    [key, value],
+  )
+}
+
+
+const getSyncKey = async (): Promise<string | undefined> => {
+  return await getMiscKey('syncKey')
 }
 
 const setSyncKey = async (key: string) => {
-  await db.execute(
-    `INSERT into misc (description, value)
-    VALUES ("syncKey", $1)
-    ON CONFLICT (description) DO UPDATE
-    SET value = $1
-    WHERE description = "syncKey"
-    `,
-    [key],
-  )
+  return await setMiscValue('syncKey', key)
 }
 
 const getLastSync = async (): Promise<number> => {
-  const r: { value: number }[] = await db.select(
-    `SELECT value from misc
-      WHERE description = "lastSync"`,
-  )
-  if (r.length > 0) {
-    return r[0].value
-  } else {
-    return 0
-  }
+  return Number(await getMiscKey('lastSync')) ?? 0
 }
 
 const setLastSync = async (timestamp: number) => {
-
-  await db.execute(
-    `INSERT into misc (description, value)
-    VALUES ("lastSync", $1)
-    ON CONFLICT (description) DO UPDATE
-    SET value = $1
-    WHERE description = "lastSync"
-    `,
-    [timestamp],
-  )
-
+  return await setMiscValue('lastSync', timestamp.toString())
 }
 
 const getLastPlayed = async (): Promise<EpisodeData | undefined> => {
@@ -166,16 +157,17 @@ const setLastPlaying = async (playingEpisode?: EpisodeData) => {
 
   const data = playingEpisode ? JSON.stringify(playingEpisode): 'NONE'
 
-  await db.execute(
-    `INSERT into misc (description, value)
-    VALUES ("lastPlaying", $1)
-    ON CONFLICT (description) DO UPDATE
-    SET value = $1
-    WHERE description = "lastPlaying"
-    `,
-    [data],
-  )
+  return await setMiscValue('lastPlaying', data)
 
+}
+
+
+const getLastUpdate = async() => {
+  return Number(await getMiscKey('lastUpdate')) ?? 0
+}
+
+const setLastUpdate = async(timestamp: number) => {
+  return await setMiscValue('lastUpdate', timestamp.toString())
 }
 
 // #endregion
@@ -556,7 +548,11 @@ function initDB() {
       updatingFeeds,
       updateSubscriptionsFeed
     },
-    dbLoaded
+    dbLoaded,
+    appUpdate: {
+      getLastUpdate,
+      setLastUpdate
+    }
   }
 }
 

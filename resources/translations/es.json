@@ -54,5 +54,10 @@
   "welcome_message": "Bienvenido a Cardo. En esta pantalla verás tu cola de reproducción y las novedades en tus podcasts favoritos.",
   "current_podcast": "Este podcast",
   "copy_feed_url": "Copiar URL del podcast",
-  "feed_url_copied": "URL del podcast copiada al portapapeles"
+  "feed_url_copied": "URL del podcast copiada al portapapeles",
+  "new_update_available": "¡Hay una nueva actualizacion disponible!",
+  "release_notes": "Notas del lanzamiento",
+  "install": "Instalar",
+  "later": "Mas tarde",
+  "check_updates": "Buscar actualizaciones"
 }
