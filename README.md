@@ -36,10 +36,11 @@ Cardo is a podcast player, inspired on Android's [Antennapod](https://antennapod
 If you like this app you can contribute buying me a cofee or whatever you want, that would be really great :)
 
 <div style="display: inline-flex; gap: 10px; align-items: center">
-    <a href="https://www.buymeacoffee.com/n0vella" target="_blank">
-        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+    <a href="https://www.buymeacoffee.com/n0vella" target="_blank" rel="noopener">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;"
+        >
     </a>
-    <a href="https://www.paypal.com/paypalme/adriannovella target="_blank"">
+    <a href="https://www.paypal.com/paypalme/adriannovella" target="_blank" rel="noopener">
         <img src="https://www.paypalobjects.com/webstatic/icon/pp196.png" alt="Paypal" width="60" height="60" style="border-radius: 10px" />
     </a>
 </div>
