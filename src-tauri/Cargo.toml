@@ -1,7 +1,7 @@
 [package]
 name = "cardo"
 version = "0.0.0"
-description = "A Tauri App"
+description = "Cardo Podcast Player"
 authors = ["you"]
 edition = "2021"
 
@@ -19,6 +19,7 @@ aes-gcm = "0.10"
 base64 = "0.22"
 rand = "0.8.5"
 tauri-plugin-context-menu = { git = "https://github.com/c2r0b/tauri-plugin-context-menu", branch = "main" }
+tauri-plugin-single-instance = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

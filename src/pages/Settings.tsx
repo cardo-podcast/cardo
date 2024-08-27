@@ -214,8 +214,9 @@ function Settings() {
         <h1 className="uppercase border-b-2 border-primary-8 mb-2">{t('about')}</h1>
         <div className="flex gap-2">
           <img
-            className="w-28"
+            className="w-36 cursor-pointer hover:p-1"
             src={appIcon}
+            onClick={() => shell.open("https://n0vella.github.io/cardo")}
           />
           <div className="flex flex-col gap-2">
             <h1 className="UPPERCASE">Cardo - {t('podcast_player')} (v{tauriConfig.package.version})</h1>
@@ -229,6 +230,14 @@ function Settings() {
                 title="https://github.com/n0vella/cardo"
                 onClick={() => shell.open("https://github.com/n0vella/cardo")}
               />
+            </div>
+            <div className="flex gap-2 items-center">
+              <a href="https://www.buymeacoffee.com/n0vella" target="_blank">
+                <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" className="h-10"/>
+              </a>
+              <a href="https://www.paypal.com/paypalme/adriannovella" target="_blank">
+                <img src="https://www.paypalobjects.com/webstatic/icon/pp196.png" alt="Paypal" className="h-10 rounded-md"/>
+              </a>
             </div>
           </div>
         </div>
