@@ -51,6 +51,16 @@ jobs:
         # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
         # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
 
+      - name: Get tag description
+        id: tag_description
+        run: |
+          TAG_SHA=$(curl -s -X GET -H "Authorization: Bearer ${{secrets.GITHUB_TOKEN}}" "https://api.github.com/repos/${{ github.repository }}/git/matching-refs/tags/${{github.ref_name}}" | jq '.[0].object.sha' -r)
+  
+          TAG_INFO=$(curl -s -X GET -H "Authorization: Bearer ${{secrets.GITHUB_TOKEN}}" "https://api.github.com/repos/${{ github.repository }}/git/tags/$TAG_SHA")
+  
+          MESSAGE=$(echo $TAG_INFO | jq -r '.message')
+          echo "MESSAGE=$MESSAGE" >> $GITHUB_OUTPUT
+
       - name: import windows certificate
         if: matrix.platform == 'windows-latest'
         env:
@@ -74,7 +84,7 @@ jobs:
         with:
           tagName: __VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
           releaseName: '__VERSION__'
-          releaseBody: ${{ github.event.head_commit.message }}
+          releaseBody: ${{ steps.tag_description.outputs.MESSAGE }}
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
