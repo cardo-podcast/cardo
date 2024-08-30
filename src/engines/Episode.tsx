@@ -6,7 +6,6 @@ import { useDB } from "./DB";
 import { useSettings } from "./Settings";
 import { usePlayer } from "../components/AudioPlayer";
 import { downloadEpisode, removeDownloadedEpisode } from "../utils";
-import { convertFileSrc } from "@tauri-apps/api/tauri";
 
 
 
@@ -17,7 +16,7 @@ export function useEpisode(episode: EpisodeData) {
   const [reprState, setReprState] = useState({ position: 0, total: episode.duration, complete: false })
   const [{ globals: { locale } },] = useSettings()
   const { play: playEpisode, playing, position: playingPosition, quit: quitPlayer } = usePlayer()
-  const episodeUrl = useRef(episode.src)
+  const downloadedFile = useRef('')
 
   useEffect(() => {
     // update reproduction state
@@ -84,13 +83,13 @@ export function useEpisode(episode: EpisodeData) {
   const download = async () => {
     const localFile = await downloadEpisode(episode)
     setDownloaded(true)
-    episodeUrl.current = localFile
+    downloadedFile.current = localFile
     downloads.addToDownloadList(episode, localFile)
   }
 
   const removeDownload = async () => {
     if (downloaded) {
-      await removeDownloadedEpisode(episodeUrl.current)
+      await removeDownloadedEpisode(downloadedFile.current)
       await downloads.removeFromDownloadList(episode.src)
       setDownloaded(false)
     }
@@ -105,10 +104,11 @@ export function useEpisode(episode: EpisodeData) {
   }
 
   const play = () => {
-    playEpisode({
-      ...episode,
-      src: convertFileSrc(episodeUrl.current)
-    })
+    if (downloaded){
+      playEpisode(episode, downloadedFile.current)
+    }else{
+      playEpisode(episode)
+    }
   }
 
 

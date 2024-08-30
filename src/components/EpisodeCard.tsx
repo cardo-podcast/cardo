@@ -65,8 +65,6 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
   useEffect(() => {
     if (!entry?.isIntersecting && !noLazyLoad) return
 
-
-
     setDate(getDateString())
 
   }, [entry?.isIntersecting, noLazyLoad, getDateString])
