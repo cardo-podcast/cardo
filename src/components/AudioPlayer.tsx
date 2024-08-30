@@ -8,12 +8,13 @@ import { useSettings } from "../engines/Settings";
 import { useTranslation } from "react-i18next";
 import { globalShortcut } from "@tauri-apps/api";
 import appIcon from '../../src-tauri/icons/icon.png'
+import { convertFileSrc } from "@tauri-apps/api/tauri";
 
 
 
 export type AudioPlayerRef = {
   audioRef: RefObject<HTMLAudioElement>
-  play: (episode?: EpisodeData | undefined) => void
+  play: (episode?: EpisodeData | undefined, localSrc?: string) => void
   playing: EpisodeData | undefined,
   position: number,
   setPosition: Dispatch<SetStateAction<number>>
@@ -49,11 +50,25 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     }
   }, [dbLoaded])
 
-  const load = async (episode: EpisodeData) => {
+  const load = async (episode: EpisodeData, localSrc?: string) => {
     if (audioRef.current == null) return
 
+    // update state if other episode was being played
+    if (playing && !audioRef.current.paused && audioRef.current.currentTime > 0) {
+      updateEpisodeState(playing.src,
+        playing.podcastUrl,
+        audioRef.current.currentTime,
+        audioRef.current.duration
+      )
+    }
+
     setPlaying(episode)
-    audioRef.current.src = episode.src
+    if (localSrc) {
+      console.log('hola')
+      audioRef.current.src = convertFileSrc(localSrc)
+    } else {
+      audioRef.current.src = episode.src
+    }
     audioRef.current.load()
 
     const previousState = await getEpisodeState(episode?.src)
@@ -64,11 +79,11 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const play = async (episode?: EpisodeData | undefined) => {
+  const play = async (episode?: EpisodeData | undefined, localSrc?: string) => {
     if (audioRef.current == null) return
 
     if (episode !== undefined) {
-      load(episode)
+      load(episode, localSrc)
     }
 
     audioRef.current.play()
@@ -295,7 +310,7 @@ function AudioPlayer({ className = '' }) {
         {/* extra width is to keep simetry */}
         <div className="w-full justify-end flex">
           <button className="w-7 group-hover:text-red-600 text-transparent"
-          onClick={quit}
+            onClick={quit}
           >
             {closeIcon}
           </button>
