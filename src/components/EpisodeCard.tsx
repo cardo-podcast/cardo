@@ -8,7 +8,6 @@ import ProgressBar from "./ProgressBar"
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from "react-i18next"
-import { usePlayer } from "./AudioPlayer"
 import { showMenu } from "tauri-plugin-context-menu";
 import appIcon from '../../src-tauri/icons/icon.png'
 import { useEpisode } from "../engines/Episode"
@@ -53,12 +52,8 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
   const navigate = useNavigate()
   const [date, setDate] = useState('')
   const contextMenuTarget = useRef<HTMLDivElement>(null)
-  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress } = useEpisode(episode)
-
-
+  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, play } = useEpisode(episode)
   const { t } = useTranslation();
-  const { play } = usePlayer()
-
 
   const [ref, entry] = useIntersectionObserver({
     threshold: 0,
@@ -137,7 +132,7 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
                 <button className="w-7 p-1 aspect-square shrink-0 flex justify-center items-center hover:text-accent-6 hover:p-[2px] border-2 border-primary-6 rounded-full"
                   onClick={e => {
                     e.stopPropagation()
-                    play(episode)
+                    play()
                   }}
                 >
                   {icons.play}

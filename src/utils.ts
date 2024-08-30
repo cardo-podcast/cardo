@@ -1,9 +1,8 @@
 import { ResponseType, fetch as tauriFetch } from "@tauri-apps/api/http"
 import { EpisodeData, PodcastData } from "."
-import { createDir, exists, readTextFile, writeTextFile } from "@tauri-apps/api/fs"
-import { appCacheDir, join } from "@tauri-apps/api/path"
+import { createDir, exists, readTextFile, writeTextFile, removeFile, removeDir, readDir } from "@tauri-apps/api/fs"
+import { appCacheDir, dirname, join } from "@tauri-apps/api/path"
 import { invoke } from "@tauri-apps/api"
-import { DB, useDB } from "./DB"
 
 export function secondsToStr(seconds: number) {
   const negative = seconds < 0
@@ -179,17 +178,43 @@ export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export async function downloadEpisode(episode: EpisodeData, addToDownloadList: DB['downloads']['addToDownloadList']) {
+function makeSafeFilename(name: string) {
+  return name.replace(/(\\)|(\/)|(\:)|(\*)|(\?)|(\")|(\<)|(\>)|(\|)/g, '')
+}
 
-  const destFolder = await join(await appCacheDir(), 'Downloads', episode.podcast?.artistName ?? 'unknown')
-  const filename = `${episode.podcast?.podcastName}_${Date.now()}.${episode.src.split('.').pop() ?? 'mp3'}`
+export async function downloadEpisode(episode: EpisodeData) {
+
+  const podcastName = episode.podcast?.podcastName ?? 'unknown'
+  const destFolder = await join(await appCacheDir(), 'Downloads', makeSafeFilename(podcastName))
+
+  let extension = episode.src.split('.').pop()
+  extension = extension && ['mp3', 'wav', 'aac', 'ogg', 'm4a'].includes(extension)? extension: 'mp3'
+
+  // limiting max filename lenght to 255 characters if it was the case
+  const maxFilenameLenght = 255 - destFolder.length - episode.id.toString().length - extension.length - 3
+
+  const filename = `${makeSafeFilename(episode.title.slice(0, maxFilenameLenght))}_${episode.id}.${extension}`
+
+
   const destination = await join(destFolder, filename)
+
   
   if (!await exists(destFolder)){
     await createDir(destFolder, {recursive: true})
   }
 
-  addToDownloadList(episode, destination)
-
   await invoke('download_file', { url: episode.src, destination })
+
+  return destination
+}
+
+export async function removeDownloadedEpisode(localFile: string) {
+  await removeFile(localFile)
+
+  const podcastDir = await dirname(localFile)
+  const downloadedPodcasts = await readDir(podcastDir)
+
+  if (downloadedPodcasts.length == 0) {
+    removeDir(podcastDir)
+  }
 }

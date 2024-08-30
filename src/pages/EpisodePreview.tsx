@@ -2,9 +2,8 @@ import { SyntheticEvent, useEffect, useState } from "react"
 import * as icons from "../Icons"
 import { EpisodeData } from ".."
 import { useLocation, useNavigate } from "react-router-dom"
-import { usePlayer } from "../components/AudioPlayer"
 import { useDB } from "../engines/DB"
-import { downloadEpisode, parsePodcastDetails, secondsToStr } from "../utils"
+import { parsePodcastDetails, secondsToStr } from "../utils"
 import { useTranslation } from "react-i18next"
 import ProgressBar from "../components/ProgressBar"
 import appIcon from '../../src-tauri/icons/icon.png'
@@ -14,12 +13,11 @@ import { useEpisode } from "../engines/Episode"
 function EpisodePreview() {
   const location = useLocation()
   const episode = location.state.episode as EpisodeData
-  const { play } = usePlayer()
   const navigate = useNavigate()
   const { subscriptions: { getSubscription } } = useDB()
   const { t } = useTranslation()
   const [podcastFetched, setPodcastFetched] = useState(false)
-  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress } = useEpisode(episode)
+  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, toggleDownload, downloaded, play } = useEpisode(episode)
 
 
   const fetchPodcastData = async (episode: EpisodeData) => {
@@ -84,7 +82,7 @@ function EpisodePreview() {
                 : secondsToStr(episode.duration)
             }
             <button className="w-7 p-1 aspect-square shrink-0 flex justify-center items-center hover:text-accent-6 hover:p-[2px] bg-primary-7 rounded-full"
-              onClick={() => play(episode)}
+              onClick={play}
             >
               {icons.play}
             </button>
@@ -100,7 +98,12 @@ function EpisodePreview() {
               title={inQueue ? t('remove_queue') : t('add_queue')}
               onClick={toggleQueue}
             >
-              {icons.downArrow}
+              {icons.queue}
+            </button>
+            <button className={`w-7 hover:text-accent-6 ${downloaded && 'text-primary-7'}`}
+              onClick={toggleDownload}
+            >
+              {icons.download}
             </button>
           </div>
         </div>

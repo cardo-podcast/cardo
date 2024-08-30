@@ -61,7 +61,7 @@ const getCompletedEpisodes = async (podcastUrl?: string) => {
 
   const query = `SELECT episode from episodes_history
     WHERE position = total
-    ${podcastUrl? 'AND podcast = $1': ''}
+    ${podcastUrl ? 'AND podcast = $1' : ''}
     `
 
   const playedEpisodes: EpisodeState[] = await db.select(query, [podcastUrl])
@@ -434,12 +434,17 @@ const loadNewSubscriptionsEpisodes = async (pubdate_gt: number): Promise<NewEpis
 // #region DOWNLOADS
 type DownloadedEpisode = EpisodeData & { localFile: string }
 
-const getDownloadedEpisodes = async (episodeUrl: string): Promise<DownloadedEpisode[]> => {
+const getDownloadedEpisodes = async (): Promise<DownloadedEpisode[]> => {
+  return await db.select(
+    "SELECT * from downloads")
+}
+
+const getLocalFile = async (episodeUrl: string) => {
   const r: DownloadedEpisode[] = await db.select(
     "SELECT * from downloads WHERE src = $1", [episodeUrl]
   )
-  console.log(r)
-  return r
+
+  return r.length > 0? r[0].localFile: undefined
 }
 
 const addToDownloadList = async (episode: EpisodeData, localFile: string) => {
@@ -588,6 +593,7 @@ function initDB() {
     downloads: {
       getDownloadedEpisodes,
       addToDownloadList,
+      getLocalFile,
       removeFromDownloadList
     }
   }

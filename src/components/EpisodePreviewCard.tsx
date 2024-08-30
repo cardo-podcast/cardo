@@ -5,7 +5,6 @@ import { EpisodeData, NewEpisodeData } from "..";
 import * as icons from "../Icons"
 import { useNavigate } from "react-router-dom";
 import ProgressBar from "./ProgressBar";
-import { usePlayer } from "./AudioPlayer";
 import { useTranslation } from "react-i18next";
 import { showMenu } from "tauri-plugin-context-menu";
 import appIcon from '../../src-tauri/icons/icon.png'
@@ -15,9 +14,8 @@ import { useEpisode } from "../engines/Episode";
 
 export default function EpisodePreviewCard({ episode }: { episode: EpisodeData | NewEpisodeData }) {
   const navigate = useNavigate()
-  const { play } = usePlayer()
   const { t } = useTranslation()
-  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition } = useEpisode(episode)
+  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, play } = useEpisode(episode)
 
 
 
@@ -65,7 +63,7 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
         <button className="absolute bottom-2 right-2 bg-accent-7 w-7 p-[4px] pl-[6px] aspect-square flex justify-center items-center hover:p-[1px] border-2 border-accent-8 rounded-full transition-all"
           onClick={e => {
             e.stopPropagation()
-            play(episode)
+            play()
           }}
         >
           {icons.play}
