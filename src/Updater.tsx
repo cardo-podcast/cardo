@@ -6,7 +6,7 @@ import {
 import { relaunch } from '@tauri-apps/api/process'
 import { useEffect, useRef, useState } from 'react'
 import { UnlistenFn } from '@tauri-apps/api/event'
-import { useDB } from './DB'
+import { useDB } from './engines/DB'
 import { parse } from 'date-fns';
 import { useTranslation } from 'react-i18next'
 import { upArrow } from './Icons'

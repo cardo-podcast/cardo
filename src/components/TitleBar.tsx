@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { SyncButton, useSync } from "../sync/Nextcloud";
 import { usePlayer } from "./AudioPlayer";
 import { UnlistenFn } from "@tauri-apps/api/event";
-import { useSettings } from "../Settings";
+import { useSettings } from "../engines/Settings";
 import Updater from "../Updater";
 
 

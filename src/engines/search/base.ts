@@ -1,4 +1,4 @@
-import { PodcastData } from ".."
+import { PodcastData } from "../.."
 import { SearchApple } from "./apple"
 
 

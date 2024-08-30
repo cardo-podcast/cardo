@@ -2,9 +2,9 @@ import { useRef, useEffect, useState, RefObject, createContext, ReactNode, useCo
 import { secondsToStr } from "../utils";
 import { play as playIcon, pause as pauseIcon, forward as forwardIcon, backwards as backwardsIcon, close as closeIcon } from "../Icons"
 import { EpisodeData } from "..";
-import { useDB } from "../DB";
+import { useDB } from "../engines/DB";
 import { useNavigate } from "react-router-dom";
-import { useSettings } from "../Settings";
+import { useSettings } from "../engines/Settings";
 import { useTranslation } from "react-i18next";
 import { globalShortcut } from "@tauri-apps/api";
 import appIcon from '../../src-tauri/icons/icon.png'

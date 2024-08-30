@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { useDB } from "../DB";
+import { useDB } from "../engines/DB";
 import { useTranslation } from "react-i18next";
 import {sync} from '../Icons'
 import appIcon from '../../src-tauri/icons/icon.png'

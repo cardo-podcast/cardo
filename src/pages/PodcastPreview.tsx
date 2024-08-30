@@ -4,9 +4,9 @@ import { ReactNode, Suspense, SyntheticEvent, useEffect, useState } from "react"
 import * as icons from "../Icons"
 import { parseXML } from "../utils";
 import EpisodeCard from "../components/EpisodeCard";
-import { useDB } from "../DB";
+import { useDB } from "../engines/DB";
 import { Switch, SwitchState } from "../components/Inputs";
-import { usePodcastSettings } from "../Settings";
+import { usePodcastSettings } from "../engines/Settings";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { useSync } from "../sync/Nextcloud";

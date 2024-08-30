@@ -1,5 +1,5 @@
 import EpisodePreviewCard from "../components/EpisodePreviewCard";
-import { useDB } from "../DB";
+import { useDB } from "../engines/DB";
 import { useTranslation } from "react-i18next";
 import EpisodeOverview from "../components/EpisodeOverview";
 import appIcon from '../../src-tauri/icons/icon.png'

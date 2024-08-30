@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { SearchPodcast } from "../SearchAPI/base";
+import { SearchPodcast } from "../engines/search/base";
 import { EpisodeData, PodcastData } from "..";
 import PodcastCard from "./PodcastCard";
 import { useTranslation } from "react-i18next";
 import { arrowLeft, arrowRight } from "../Icons";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDB } from "../DB";
+import { useDB } from "../engines/DB";
 import EpisodeCard from "./EpisodeCard";
 
 
