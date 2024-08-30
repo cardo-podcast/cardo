@@ -1,19 +1,23 @@
 // useful functions for episode management
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { EpisodeData } from "..";
 import { useDB } from "./DB";
 import { useSettings } from "./Settings";
 import { usePlayer } from "../components/AudioPlayer";
+import { downloadEpisode, removeDownloadedEpisode } from "../utils";
+import { convertFileSrc } from "@tauri-apps/api/tauri";
 
 
 
 export function useEpisode(episode: EpisodeData) {
-  const { queue, history: { getEpisodeState, updateEpisodeState } } = useDB()
+  const { queue, history: { getEpisodeState, updateEpisodeState }, downloads: { addToDownloadList, getLocalFile, removeFromDownloadList } } = useDB()
   const [inQueue, setInqueue] = useState(queue.includes(episode.src))
+  const [downloaded, setDownloaded] = useState(false)
   const [reprState, setReprState] = useState({ position: 0, total: episode.duration, complete: false })
   const [{ globals: { locale } },] = useSettings()
-  const { playing, position: playingPosition, quit: quitPlayer } = usePlayer()
+  const { play: playEpisode, playing, position: playingPosition, quit: quitPlayer } = usePlayer()
+  const episodeUrl = useRef(episode.src)
 
   useEffect(() => {
     // update reproduction state
@@ -26,6 +30,15 @@ export function useEpisode(episode: EpisodeData) {
       }
 
     })
+
+    // check if file is downloaded
+    getLocalFile(episode.src).then(localFile => {
+      if (localFile) {
+        setDownloaded(true)
+        episodeUrl.current = localFile
+      }
+    })
+
   }, [episode.src])
 
   const getDateString = useCallback(() => {
@@ -73,6 +86,36 @@ export function useEpisode(episode: EpisodeData) {
     return playing?.src == episode.src || (reprState.position > 0 && !reprState.complete)
   }, [playing?.src, episode.src, reprState.position, reprState.complete])
 
+  const download = async () => {
+    const localFile = await downloadEpisode(episode)
+    setDownloaded(true)
+    episodeUrl.current = localFile
+    addToDownloadList(episode, localFile)
+  }
 
-  return {reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress}
+  const removeDownload = async () => {
+    if (downloaded) {
+      await removeDownloadedEpisode(episodeUrl.current)
+      await removeFromDownloadList(episode.src)
+      setDownloaded(false)
+    }
+  }
+
+  const toggleDownload = () => {
+    if (downloaded) {
+      removeDownload()
+    } else {
+      download()
+    }
+  }
+
+  const play = () => {
+    playEpisode({
+      ...episode,
+      src: convertFileSrc(episodeUrl.current)
+    })
+  }
+
+
+  return { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, toggleDownload, downloaded, play }
 }
