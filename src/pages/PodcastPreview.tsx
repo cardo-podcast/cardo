@@ -280,7 +280,10 @@ function PodcastPreview() {
               <EpisodeCard
                 episode={{
                   ...episode,
-                  podcast: { coverUrl: podcast.coverUrl }
+                  podcast: { // not including all vars to save some memory
+                    coverUrl: podcast.coverUrl,
+                    podcastName: podcast.podcastName
+                  }
                 }}
                 className="hover:bg-primary-8 transition-colors border-b-[1px] border-primary-8"
               />

@@ -60,5 +60,10 @@
   "install": "Instalar",
   "later": "Mas tarde",
   "check_updates": "Buscar actualizaciones",
-  "show_pinWindow_button": "Mostrar botón para anclar/desanclar la ventana"
+  "show_pinWindow_button": "Mostrar botón para anclar/desanclar la ventana",
+  "download": "Descargar",
+  "remove_download": "Eliminar la descarga",
+  "downloads": "Descargas",
+  "remove_all": "Borrar todo",
+  "downloads_default_message": "Puedes descargar episodios haciendo click derecho en la lista o desde la vista previa del episodio"
 }

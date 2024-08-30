@@ -118,6 +118,17 @@ const setMiscValue = async (key: string, value: string) => {
   )
 }
 
+const batchRemoveFrom = async (episodesSrc: string[], table: string, srcColumn = 'src') => {
+  if (!episodesSrc.length) return
+
+  const placeholders = episodesSrc.map((_, i) => '$' + (i + 1)).join(',');
+
+  await db.execute(
+    `DELETE FROM ${table} WHERE ${srcColumn} IN (${placeholders})`,
+    [...episodesSrc],
+  )
+}
+
 
 const getSyncKey = async (): Promise<string | undefined> => {
   return await getMiscKey('syncKey')
@@ -291,12 +302,7 @@ function initQueue() {
 
     setQueue(newQueue)
 
-    const placeholders = episodesSrc.map((_, i) => '$' + (i + 1)).join(',');
-
-    await db.execute(
-      `DELETE FROM queue WHERE src IN (${placeholders})`,
-      [...episodesSrc],
-    )
+    await batchRemoveFrom(episodesSrc, 'queue')
   }
 
   const getAll = async (): Promise<EpisodeData[]> => {
@@ -434,33 +440,85 @@ const loadNewSubscriptionsEpisodes = async (pubdate_gt: number): Promise<NewEpis
 // #region DOWNLOADS
 type DownloadedEpisode = EpisodeData & { localFile: string }
 
-const getDownloadedEpisodes = async (): Promise<DownloadedEpisode[]> => {
-  return await db.select(
-    "SELECT * from downloads")
-}
+function initDownloads() {
+  const [downloads, setDownloads] = useState<DownloadedEpisode[]>([])
 
-const getLocalFile = async (episodeUrl: string) => {
-  const r: DownloadedEpisode[] = await db.select(
-    "SELECT * from downloads WHERE src = $1", [episodeUrl]
-  )
+  const indexOf = (episodeSrc: string) => {
+    return downloads.findIndex(episode => episode.src == episodeSrc)
+  }
 
-  return r.length > 0? r[0].localFile: undefined
-}
+  const includes = (episodeSrc: string) => {
+    return indexOf(episodeSrc) > -1
+  }
 
-const addToDownloadList = async (episode: EpisodeData, localFile: string) => {
-  await db.execute(
-    `INSERT into downloads (title, description, src, pubDate, duration, size, podcastUrl, coverUrl, localFile) 
+  const load = async () => {
+    const downloadedEpisodes = await getDownloadedEpisodes()
+    setDownloads(downloadedEpisodes)
+  }
+
+  const getDownloadedEpisodes = async () => {
+    const r: (DownloadedEpisode & {podcastCover: string})[] = await db.select(
+      `SELECT downloads.*, subscriptions.coverUrl AS podcastCover from downloads
+        left join subscriptions_episodes ON subscriptions_episodes.src = downloads.src
+        LEFT JOIN subscriptions ON subscriptions_episodes.podcastUrl = subscriptions.feedUrl`)
+
+
+    return r.map(episode => ({
+      ...episode,
+      pubDate: new Date(episode.pubDate),
+      podcast: { coverUrl: episode.podcastCover }
+    }))
+  }
+
+  const getLocalFile = async (episodeUrl: string) => {
+    const r: DownloadedEpisode[] = await db.select(
+      "SELECT * from downloads WHERE src = $1", [episodeUrl]
+    )
+
+    return r.length > 0 ? r[0].localFile : undefined
+  }
+
+  const addToDownloadList = async (episode: EpisodeData, localFile: string) => {
+    setDownloads([...downloads, { ...episode, localFile }])
+
+    await db.execute(
+      `INSERT into downloads (title, description, src, pubDate, duration, size, podcastUrl, coverUrl, localFile) 
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     ON CONFLICT (src) DO NOTHING`,
-    [episode.title, episode.description, episode.src, episode.pubDate, episode.duration, episode.size, episode.podcastUrl, episode.coverUrl, localFile],
-  );
-}
+      [episode.title, episode.description, episode.src, episode.pubDate, episode.duration, episode.size, episode.podcastUrl, episode.coverUrl, localFile],
+    );
+  }
 
-const removeFromDownloadList = async (episodeUrl: string): Promise<QueryResult | undefined> => {
-  return await db.execute(
-    "DELETE FROM downloads WHERE src = $1",
-    [episodeUrl],
-  )
+  const removeFromDownloadList = async (episodeSrc: string): Promise<QueryResult | undefined> => {
+    const newDownloads = [...downloads]
+    newDownloads.splice(indexOf(episodeSrc), 1)
+    setDownloads(newDownloads)
+
+    return await db.execute(
+      "DELETE FROM downloads WHERE src = $1",
+      [episodeSrc],
+    )
+  }
+
+  const batchRemoveFromDownloadList = async (episodesSrc: string[]) => {
+    if (!episodesSrc.length) return
+
+    const newDownloads = downloads.filter(episode => !episodesSrc.includes(episode.src))
+    setDownloads(newDownloads)
+
+    return await batchRemoveFrom(episodesSrc, 'downloads')
+  }
+
+  return {
+    downloads,
+    load,
+    includes,
+    getDownloadedEpisodes,
+    addToDownloadList,
+    getLocalFile,
+    removeFromDownloadList,
+    batchRemoveFromDownloadList
+  }
 }
 
 
@@ -483,6 +541,7 @@ function initDB() {
   const [subscriptionsList, setSubscriptionsList] = useState<PodcastData[]>([]);
   const [newEpisodes, setNewEpisodes] = useState<NewEpisodeData[]>([])
   const queue = initQueue()
+  const downloads = initDownloads()
   const [{ general: { numberOfDaysInNews, fetchSubscriptionsAtStartup } }, _] = useSettings()
 
 
@@ -527,6 +586,7 @@ function initDB() {
     if (!dbLoaded) return
 
     queue.load()
+    downloads.load()
 
     getSubscriptions().then(r => {
       setSubscriptionsList(r)
@@ -590,12 +650,7 @@ function initDB() {
       getLastUpdate,
       setLastUpdate
     },
-    downloads: {
-      getDownloadedEpisodes,
-      addToDownloadList,
-      getLocalFile,
-      removeFromDownloadList
-    }
+    downloads
   }
 }
 

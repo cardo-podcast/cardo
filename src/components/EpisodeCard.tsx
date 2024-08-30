@@ -52,7 +52,7 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
   const navigate = useNavigate()
   const [date, setDate] = useState('')
   const contextMenuTarget = useRef<HTMLDivElement>(null)
-  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, play } = useEpisode(episode)
+  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, play, toggleDownload, downloaded } = useEpisode(episode)
   const { t } = useTranslation();
 
   const [ref, entry] = useIntersectionObserver({
@@ -93,7 +93,12 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
               {
                 label: t(inQueue ? 'remove_queue' : 'add_queue'),
                 event: toggleQueue
-              }
+              },
+              {
+                label: t(downloaded ? 'remove_download' : 'download'),
+                event: toggleDownload
+              },
+              
             ]
           });
         }}

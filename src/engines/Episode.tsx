@@ -11,7 +11,7 @@ import { convertFileSrc } from "@tauri-apps/api/tauri";
 
 
 export function useEpisode(episode: EpisodeData) {
-  const { queue, history: { getEpisodeState, updateEpisodeState }, downloads: { addToDownloadList, getLocalFile, removeFromDownloadList } } = useDB()
+  const { queue, history: { getEpisodeState, updateEpisodeState }, downloads } = useDB()
   const [inQueue, setInqueue] = useState(queue.includes(episode.src))
   const [downloaded, setDownloaded] = useState(false)
   const [reprState, setReprState] = useState({ position: 0, total: episode.duration, complete: false })
@@ -32,12 +32,7 @@ export function useEpisode(episode: EpisodeData) {
     })
 
     // check if file is downloaded
-    getLocalFile(episode.src).then(localFile => {
-      if (localFile) {
-        setDownloaded(true)
-        episodeUrl.current = localFile
-      }
-    })
+    setDownloaded(downloads.includes(episode.src))
 
   }, [episode.src])
 
@@ -90,13 +85,13 @@ export function useEpisode(episode: EpisodeData) {
     const localFile = await downloadEpisode(episode)
     setDownloaded(true)
     episodeUrl.current = localFile
-    addToDownloadList(episode, localFile)
+    downloads.addToDownloadList(episode, localFile)
   }
 
   const removeDownload = async () => {
     if (downloaded) {
       await removeDownloadedEpisode(episodeUrl.current)
-      await removeFromDownloadList(episode.src)
+      await downloads.removeFromDownloadList(episode.src)
       setDownloaded(false)
     }
   }
