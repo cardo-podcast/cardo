@@ -15,6 +15,7 @@ import { appWindow } from "@tauri-apps/api/window";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { SyncProvider } from "./sync/Nextcloud";
+import DownloadsPage from "./pages/DownloadsPage";
 
 
 const App = () => {
@@ -53,6 +54,7 @@ const App = () => {
                           <Route path='/episode-preview' element={<EpisodePreview />} />
                           <Route path='/settings' element={<Settings />} />
                           <Route path='/queue' element={<QueuePage />} />
+                          <Route path='/downloads' element={<DownloadsPage />} />
                         </Routes>
                       </Suspense>
                     </div>

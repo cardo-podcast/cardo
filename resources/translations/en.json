@@ -61,5 +61,10 @@
   "install": "Install",
   "later": "Later",
   "check_updates": "Check for updates",
-  "show_pinWindow_button": "Show button to pin/unpin window"
+  "show_pinWindow_button": "Show button to pin/unpin window",
+  "download": "Discharge",
+  "remove_download": "Remove download",
+  "downloads": "Downloads",
+  "remove_all": "Delete all",
+  "downloads_default_message": "You can download episodes by right clicking on the list or from the episode preview"
 }
