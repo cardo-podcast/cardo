@@ -66,5 +66,7 @@
   "remove_download": "Remove download",
   "downloads": "Downloads",
   "remove_all": "Delete all",
-  "downloads_default_message": "You can download episodes by right clicking on the list or from the episode preview"
+  "downloads_default_message": "You can download episodes by right clicking on the list or from the episode preview",
+  "remove_from_subscriptions": "Unsubscribe",
+  "add_to_subscriptions": "Subscribe"
 }

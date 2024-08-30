@@ -194,7 +194,9 @@ function PodcastPreview() {
 
             {/* #region BUTTONS */}
             <div className="flex gap-2">
-              <button className="hover:text-accent-6" onClick={async () => {
+              <button className="hover:text-accent-6"
+              title={t(subscribed ? 'remove_from_subscriptions' : 'add_to_subscriptions')}
+              onClick={async () => {
                 if (subscribed) {
                   loggedInSync && performSync({ remove: [podcast.feedUrl] })
                   await deleteSubscription(podcast.feedUrl)

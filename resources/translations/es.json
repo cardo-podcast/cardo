@@ -65,5 +65,7 @@
   "remove_download": "Eliminar la descarga",
   "downloads": "Descargas",
   "remove_all": "Borrar todo",
-  "downloads_default_message": "Puedes descargar episodios haciendo click derecho en la lista o desde la vista previa del episodio"
+  "downloads_default_message": "Puedes descargar episodios haciendo click derecho en la lista o desde la vista previa del episodio",
+  "remove_from_subscriptions": "Cancelar subscripción",
+  "add_to_subscriptions": "Subscribirse"
 }
