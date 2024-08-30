@@ -4,7 +4,7 @@ import { EpisodeData } from ".."
 import { useLocation, useNavigate } from "react-router-dom"
 import { usePlayer } from "../components/AudioPlayer"
 import { useDB } from "../engines/DB"
-import { parsePodcastDetails, secondsToStr } from "../utils"
+import { downloadEpisode, parsePodcastDetails, secondsToStr } from "../utils"
 import { useTranslation } from "react-i18next"
 import ProgressBar from "../components/ProgressBar"
 import appIcon from '../../src-tauri/icons/icon.png'
@@ -100,7 +100,7 @@ function EpisodePreview() {
               title={inQueue ? t('remove_queue') : t('add_queue')}
               onClick={toggleQueue}
             >
-              {icons.queue}
+              {icons.downArrow}
             </button>
           </div>
         </div>

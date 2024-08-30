@@ -1,7 +1,9 @@
 import { ResponseType, fetch as tauriFetch } from "@tauri-apps/api/http"
 import { EpisodeData, PodcastData } from "."
-import { exists, readTextFile, writeTextFile } from "@tauri-apps/api/fs"
+import { createDir, exists, readTextFile, writeTextFile } from "@tauri-apps/api/fs"
 import { appCacheDir, join } from "@tauri-apps/api/path"
+import { invoke } from "@tauri-apps/api"
+import { DB, useDB } from "./DB"
 
 export function secondsToStr(seconds: number) {
   const negative = seconds < 0
@@ -16,9 +18,9 @@ export function secondsToStr(seconds: number) {
   if (Number.isNaN(seconds)) return ''
 
   if (hours > 0) {
-    return `${negative? '-': ''}${hours}:${minutes.toString().padStart(2, '0')}:${secondsStr}`
+    return `${negative ? '-' : ''}${hours}:${minutes.toString().padStart(2, '0')}:${secondsStr}`
   } else {
-    return `${negative? '-': ''}${minutes}:${secondsStr}`
+    return `${negative ? '-' : ''}${minutes}:${secondsStr}`
   }
 }
 
@@ -175,4 +177,19 @@ export async function removeCreds(name: string) {
 
 export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export async function downloadEpisode(episode: EpisodeData, addToDownloadList: DB['downloads']['addToDownloadList']) {
+
+  const destFolder = await join(await appCacheDir(), 'Downloads', episode.podcast?.artistName ?? 'unknown')
+  const filename = `${episode.podcast?.podcastName}_${Date.now()}.${episode.src.split('.').pop() ?? 'mp3'}`
+  const destination = await join(destFolder, filename)
+  
+  if (!await exists(destFolder)){
+    await createDir(destFolder, {recursive: true})
+  }
+
+  addToDownloadList(episode, destination)
+
+  await invoke('download_file', { url: episode.src, destination })
 }
