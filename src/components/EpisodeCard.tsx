@@ -4,15 +4,14 @@ import * as icons from "../Icons"
 import { useNavigate } from "react-router-dom"
 import { useIntersectionObserver } from "@uidotdev/usehooks"
 import { secondsToStr } from "../utils"
-import { useDB } from "../DB"
 import ProgressBar from "./ProgressBar"
-import { useSettings } from "../Settings"
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from "react-i18next"
 import { usePlayer } from "./AudioPlayer"
 import { showMenu } from "tauri-plugin-context-menu";
 import appIcon from '../../src-tauri/icons/icon.png'
+import { useEpisode } from "../engines/Episode"
 
 
 export function SortEpisodeGrip({ id, children }: { id: number, children: ReactNode }) {
@@ -51,18 +50,14 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
     onImageClick?: MouseEventHandler<HTMLImageElement>
   }) {
 
-  const { queue, history: { getEpisodeState, updateEpisodeState } } = useDB()
-  const [reprState, setReprState] = useState({ position: 0, total: episode.duration, complete: false })
-
   const navigate = useNavigate()
-  const [{ globals: { locale } },] = useSettings()
   const [date, setDate] = useState('')
   const contextMenuTarget = useRef<HTMLDivElement>(null)
+  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress } = useEpisode(episode)
 
-  const [inQueue, setInqueue] = useState(queue.includes(episode.src))
 
   const { t } = useTranslation();
-  const { play, playing, position: playingPosition, quit: quitPlayer } = usePlayer()
+  const { play } = usePlayer()
 
 
   const [ref, entry] = useIntersectionObserver({
@@ -75,30 +70,11 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
   useEffect(() => {
     if (!entry?.isIntersecting && !noLazyLoad) return
 
-    // set print date
-    const episodeYear = episode.pubDate.getFullYear()
-    const actualYear = new Date().getFullYear()
 
-    setDate(episode.pubDate
-      .toLocaleDateString(locale, {
-        day: 'numeric',
-        month: 'short',
-        year: episodeYear < actualYear ? 'numeric' : undefined
-      }
-      )
-    )
 
-    // update reproduction state
-    getEpisodeState(episode.src).then(state => {
-      if (state !== undefined) {
-        setReprState({ position: state.position, total: state.total, complete: state.position >= state.total })
-      } else {
-        // render a not played episode
-        setReprState({ position: 0, total: episode.duration, complete: false })
-      }
+    setDate(getDateString())
 
-    })
-  }, [entry?.isIntersecting, noLazyLoad, episode, playing?.src, locale,])
+  }, [entry?.isIntersecting, noLazyLoad, getDateString])
 
 
   return (
@@ -117,30 +93,11 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
             items: [
               {
                 label: t(reprState.complete ? 'mark_not_played' : 'mark_played'),
-                event: () => {
-                  if (reprState.complete) {
-                    updateEpisodeState(episode.src, episode.podcastUrl, 0, episode.duration)
-                    setReprState({ complete: false, position: 0, total: reprState.total })
-                  } else {
-                    updateEpisodeState(episode.src, episode.podcastUrl, reprState.total, reprState.total)
-                    setReprState({ complete: true, position: reprState.total, total: reprState.total })
-                    if (playing?.src == episode.src) {
-                      quitPlayer()
-                    }
-                  }
-                }
+                event: togglePlayed,
               },
               {
                 label: t(inQueue ? 'remove_queue' : 'add_queue'),
-                event: async () => {
-                  if (inQueue) {
-                    await queue.remove(episode.src)
-                    setInqueue(false)
-                  } else {
-                    await queue.push(episode)
-                    setInqueue(true)
-                  }
-                }
+                event: toggleQueue
               }
             ]
           });
@@ -150,20 +107,20 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
         {(entry?.isIntersecting || noLazyLoad) &&
           <>
             <div className="h-16 aspect-square rounded-md">
-                <img
-                  className={`rounded-md ${onImageClick !== undefined ? 'cursor-pointer' : ''}`}
-                  onClick={onImageClick}
-                  alt=""
-                  src={episode.coverUrl}
-                  title={onImageClick !== undefined ? t('open_podcast') + ' ' + episode.podcast?.podcastName : ''}
-                  onError={(e: SyntheticEvent<HTMLImageElement>) => {
-                    if (e.currentTarget.src === episode.podcast?.coverUrl) {
-                      e.currentTarget.src = appIcon
-                    } else {
-                      e.currentTarget.src = episode.podcast?.coverUrl ?? appIcon
-                    }
-                  }}
-                />
+              <img
+                className={`rounded-md ${onImageClick !== undefined ? 'cursor-pointer' : ''}`}
+                onClick={onImageClick}
+                alt=""
+                src={episode.coverUrl}
+                title={onImageClick !== undefined ? t('open_podcast') + ' ' + episode.podcast?.podcastName : ''}
+                onError={(e: SyntheticEvent<HTMLImageElement>) => {
+                  if (e.currentTarget.src === episode.podcast?.coverUrl) {
+                    e.currentTarget.src = appIcon
+                  } else {
+                    e.currentTarget.src = episode.podcast?.coverUrl ?? appIcon
+                  }
+                }}
+              />
             </div>
 
             <div className="flex flex-col text-right w-full items-end justify-between">
@@ -171,12 +128,11 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
               <h2 className="mb-2" title={episode.description}>{episode.title}</h2>
               <div className="flex w-full gap-2 items-center justify-end">
                 {
-                  (reprState.position === 0 ||
-                    reprState.complete) ?
-                    secondsToStr(reprState.total) :
-                    <ProgressBar position={playing?.src == episode.src ? playingPosition : reprState.position}
+                  inProgress() ?
+                    <ProgressBar position={getPosition()}
                       total={reprState.total}
                       className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }} />
+                    : secondsToStr(reprState.total)
                 }
                 <button className="w-7 p-1 aspect-square shrink-0 flex justify-center items-center hover:text-accent-6 hover:p-[2px] border-2 border-primary-6 rounded-full"
                   onClick={e => {

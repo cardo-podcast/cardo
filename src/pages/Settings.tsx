@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { NextcloudSettings } from "../sync/Nextcloud"
 import { Checkbox } from "../components/Inputs"
-import { getColor, useSettings } from "../Settings"
+import { getColor, useSettings } from "../engines/Settings"
 import { useEffect, useState } from "react"
 import { TailwindBaseColor } from ".."
 import { DefaultTheme, DefaultThemes, BasicColors } from "../DefaultThemes"

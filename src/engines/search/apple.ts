@@ -1,4 +1,4 @@
-import { PodcastData } from "..";
+import { PodcastData } from "../..";
 import { fetch as tauriFetch} from "@tauri-apps/api/http"
 
 
