@@ -431,6 +431,35 @@ const loadNewSubscriptionsEpisodes = async (pubdate_gt: number): Promise<NewEpis
 }
 
 // #endregion
+// #region DOWNLOADS
+type DownloadedEpisode = EpisodeData & { localFile: string }
+
+const getDownloadedEpisodes = async (episodeUrl: string): Promise<DownloadedEpisode[]> => {
+  const r: DownloadedEpisode[] = await db.select(
+    "SELECT * from downloads WHERE src = $1", [episodeUrl]
+  )
+  console.log(r)
+  return r
+}
+
+const addToDownloadList = async (episode: EpisodeData, localFile: string) => {
+  await db.execute(
+    `INSERT into downloads (title, description, src, pubDate, duration, size, podcastUrl, coverUrl, localFile) 
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    ON CONFLICT (src) DO NOTHING`,
+    [episode.title, episode.description, episode.src, episode.pubDate, episode.duration, episode.size, episode.podcastUrl, episode.coverUrl, localFile],
+  );
+}
+
+const removeFromDownloadList = async (episodeUrl: string): Promise<QueryResult | undefined> => {
+  return await db.execute(
+    "DELETE FROM downloads WHERE src = $1",
+    [episodeUrl],
+  )
+}
+
+
+// #endregion
 
 // #region DB PROVIDER
 
@@ -555,6 +584,11 @@ function initDB() {
     appUpdate: {
       getLastUpdate,
       setLastUpdate
+    },
+    downloads: {
+      getDownloadedEpisodes,
+      addToDownloadList,
+      removeFromDownloadList
     }
   }
 }

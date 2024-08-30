@@ -16,7 +16,7 @@
         "https://github.com/n0vella/cardo/releases/latest/download/latest.json"
       ],
       "dialog": false,
-      "pubkey":"dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdDODExNjU4QTczOUZDMUIKUldRYi9EbW5XQmFCZkdydnVrZ1dWQ0NBR2NMckRpLzBOam5HNzBOcUk0U3VLNTc3b21FKytDeksK"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdDODExNjU4QTczOUZDMUIKUldRYi9EbW5XQmFCZkdydnVrZ1dWQ0NBR2NMckRpLzBOam5HNzBOcUk0U3VLNTc3b21FKytDeksK"
     },
     "allowlist": {
       "all": false,
@@ -50,13 +50,19 @@
       },
       "globalShortcut": {
         "all": true
+      },
+      "protocol": {
+        "asset": true,
+        "assetScope": [
+          "$APPCACHE/Downloads/**"
+        ]
       }
     },
     "windows": [
       {
         "title": "Cardo",
         "width": 900,
-        "height": 675,  
+        "height": 675,
         "decorations": false,
         "transparent": true,
         "minWidth": 700,
@@ -77,7 +83,9 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "resources": ["../resources/**"],
+      "resources": [
+        "../resources/**"
+      ],
       "windows": {
         "certificateThumbprint": "adc7a1a8a7219a69236cc8b14d061771154d68b3",
         "digestAlgorithm": "sha256",

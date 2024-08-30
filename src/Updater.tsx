@@ -1,7 +1,6 @@
 import {
   checkUpdate,
-  installUpdate,
-  onUpdaterEvent,
+  installUpdate
 } from '@tauri-apps/api/updater'
 import { relaunch } from '@tauri-apps/api/process'
 import { useEffect, useRef, useState } from 'react'
@@ -27,11 +26,6 @@ export default function Updater() {
 
 
   const checkUpdates = async () => {
-
-    unlistenCeckUpdates.current = await onUpdaterEvent(({ error, status }) => {
-      // This will log all updater events, including status updates and errors.
-      console.log('Updater event', error, status)
-    })
 
     try {
       const { shouldUpdate, manifest } = await checkUpdate()

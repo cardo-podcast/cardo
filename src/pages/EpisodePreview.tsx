@@ -4,7 +4,7 @@ import { EpisodeData } from ".."
 import { useLocation, useNavigate } from "react-router-dom"
 import { usePlayer } from "../components/AudioPlayer"
 import { useDB } from "../DB"
-import { parsePodcastDetails, secondsToStr } from "../utils"
+import { downloadEpisode, parsePodcastDetails, secondsToStr } from "../utils"
 import { useTranslation } from "react-i18next"
 import ProgressBar from "../components/ProgressBar"
 import { useSettings } from "../Settings"
@@ -18,7 +18,10 @@ function EpisodePreview() {
   const [ended, setEnded] = useState(false)
   const { play, playing, position: playingPosition, quit: quitPlayer } = usePlayer()
   const navigate = useNavigate()
-  const { subscriptions: { getSubscription }, history: { getEpisodeState, updateEpisodeState }, queue } = useDB()
+  const { subscriptions: { getSubscription },
+          history: { getEpisodeState, updateEpisodeState },
+          queue,
+          downloads: {addToDownloadList} } = useDB()
   const { t } = useTranslation()
   const [{ globals: { locale } },] = useSettings()
   const [inQueue, setInqueue] = useState(queue.includes(episode.src))
@@ -151,6 +154,13 @@ function EpisodePreview() {
               }}
             >
               {icons.queue}
+            </button>
+            <button className={`w-7 hover:text-accent-6`}
+              onClick={() => {
+                downloadEpisode(episode, addToDownloadList)
+              }}
+            >
+              {icons.downArrow}
             </button>
           </div>
         </div>

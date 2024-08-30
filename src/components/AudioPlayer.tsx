@@ -8,6 +8,7 @@ import { useSettings } from "../Settings";
 import { useTranslation } from "react-i18next";
 import { globalShortcut } from "@tauri-apps/api";
 import appIcon from '../../src-tauri/icons/icon.png'
+import { convertFileSrc } from "@tauri-apps/api/tauri";
 
 
 
@@ -53,7 +54,11 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     if (audioRef.current == null) return
 
     setPlaying(episode)
-    audioRef.current.src = episode.src
+    if (episode.src.startsWith('http')){
+      audioRef.current.src = episode.src
+    }else{
+      audioRef.current.src = convertFileSrc(episode.src)
+    }
     audioRef.current.load()
 
     const previousState = await getEpisodeState(episode?.src)
