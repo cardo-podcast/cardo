@@ -1,15 +1,17 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-use tauri_plugin_sql::{Migration, MigrationKind};
-use aes_gcm::aead::{Aead, KeyInit, OsRng, generic_array::GenericArray};
+use std::fs::File;
+use std::io::Write;
+
+use aes_gcm::aead::{generic_array::GenericArray, Aead, KeyInit, OsRng};
 use aes_gcm::{Aes256Gcm, Nonce};
+use base64::{engine::general_purpose, Engine as _};
 use rand::RngCore;
 use tauri::command;
-use base64::{Engine as _, engine::general_purpose};
+use tauri_plugin_sql::{Migration, MigrationKind};
 
 const NONCE_SIZE: usize = 12; // 96-bit nonce
 const KEY_SIZE: usize = 32; // 256-bit key
-
 
 #[command]
 fn generate_key() -> Result<String, String> {
@@ -34,7 +36,7 @@ fn encrypt(text: String, base64_key: String) -> Result<String, String> {
         Ok(ciphertext) => {
             let encrypted_data = [nonce.as_slice(), ciphertext.as_slice()].concat();
             Ok(general_purpose::STANDARD.encode(&encrypted_data))
-        },
+        }
         Err(_) => Err("Encryption failed".into()),
     }
 }
@@ -61,13 +63,35 @@ fn decrypt(encrypted_text: String, base64_key: String) -> Result<String, String>
     let nonce = Nonce::from_slice(nonce);
 
     match cipher.decrypt(nonce, ciphertext) {
-        Ok(plaintext) => Ok(String::from_utf8(plaintext).unwrap_or_else(|_| "Invalid UTF-8".into())),
+        Ok(plaintext) => {
+            Ok(String::from_utf8(plaintext).unwrap_or_else(|_| "Invalid UTF-8".into()))
+        }
         Err(_) => Err("Decryption failed".into()),
     }
 }
 
-fn main() {
+#[command]
+async fn download_file(url: String, destination: String) -> Result<String, String> {
+    let mut response = reqwest::get(&url).await.map_err(|e| e.to_string())?;
 
+    let total_size = response.content_length().unwrap();
+    println!("total_size: {}", total_size);
+
+    let mut file = File::create(&destination).map_err(|e| e.to_string())?;
+
+    let mut downloaded: u64 = 0;
+
+    while let Some(chunk) = response.chunk().await.map_err(|e| e.to_string())? {
+        file.write_all(&chunk).map_err(|e| e.to_string())?;
+        downloaded += chunk.len() as u64;
+        println!("downloaded: {}", downloaded);
+        println!("downloaded {}%", downloaded * 100 / total_size)
+    }
+
+    Ok(destination)
+}
+
+fn main() {
     let migrations = vec![
         Migration {
             version: 1,
@@ -139,32 +163,52 @@ fn main() {
             ADD COLUMN description TEXT
             ",
             kind: MigrationKind::Up,
-        }
+        },
+        Migration {
+            version: 7,
+            description: "downloaded podcasts",
+            sql: "CREATE TABLE downloads (id INTEGER PRIMARY KEY,
+                                        title TEXT,
+                                        description TEXT,
+                                        src TEXT UNIQUE,
+                                        pubDate INTEGER,
+                                        duration INTEGER,
+                                        size INTEGER,
+                                        podcastUrl TEXT,
+                                        coverUrl TEXT,
+                                        localFile TEXT
+            );",
+            kind: MigrationKind::Up,
+        },
     ];
 
-
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![encrypt, decrypt, generate_key])
+        .invoke_handler(tauri::generate_handler![
+            encrypt,
+            decrypt,
+            generate_key,
+            download_file
+        ])
         .setup(|app| {
             let app_handle = app.handle();
 
-            let app_data_dir = app.path_resolver()
-                .app_data_dir().unwrap();
-      
+            let app_data_dir = app.path_resolver().app_data_dir().unwrap();
+
             let db_path = app_data_dir.join("db.sqlite");
             let db_path_str = db_path.to_str().unwrap();
 
-            app_handle.plugin(
-                tauri_plugin_sql::Builder::default()
-                .add_migrations(db_path_str, migrations)
-                .build())
+            app_handle
+                .plugin(
+                    tauri_plugin_sql::Builder::default()
+                        .add_migrations(db_path_str, migrations)
+                        .build(),
+                )
                 .expect("error while building sql plugin");
 
             Ok(())
-            
         })
         .plugin(tauri_plugin_context_menu::init())
-        .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {}))
+        .plugin(tauri_plugin_single_instance::init(|_, _, _| {}))
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
