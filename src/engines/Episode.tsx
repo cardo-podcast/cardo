@@ -9,7 +9,7 @@ import { downloadEpisode, removeDownloadedEpisode } from "../utils";
 
 
 
-export function useEpisode(episode: EpisodeData) {
+export function useEpisode(episode: EpisodeData, isIntersecting: boolean | undefined = true) {
   const { queue, history: { getEpisodeState, updateEpisodeState }, downloads } = useDB()
   const [inQueue, setInqueue] = useState(queue.includes(episode.src))
   const [downloaded, setDownloaded] = useState(false)
@@ -17,23 +17,39 @@ export function useEpisode(episode: EpisodeData) {
   const [{ globals: { locale } },] = useSettings()
   const { play: playEpisode, playing, position: playingPosition, quit: quitPlayer } = usePlayer()
   const downloadedFile = useRef('')
+  const dataLoaded = useRef(false)
+
 
   useEffect(() => {
-    // update reproduction state
-    getEpisodeState(episode.src).then(state => {
-      if (state !== undefined) {
-        setReprState({ position: state.position, total: state.total, complete: state.position >= state.total })
-      } else {
-        // render a not played episode
-        setReprState({ position: 0, total: episode.duration, complete: false })
-      }
+    if (isIntersecting) { // avoid extra computing on db on large lists
+      load()
+    }
 
-    })
+  }, [episode.src, playing?.src])
+
+  useEffect(() => {
+    if (isIntersecting && !dataLoaded.current){
+      load() // load when entering in scope (only one time)
+    }
+  }, [isIntersecting])
+
+  const load = async () => {
+    dataLoaded.current = true
+    
+    // update reproduction state
+    const state = await getEpisodeState(episode.src)
+
+    if (state !== undefined) {
+      setReprState({ position: state.position, total: state.total, complete: state.position >= state.total })
+    } else {
+      // render a not played episode
+      setReprState({ position: 0, total: episode.duration, complete: false })
+    }
 
     // check if file is downloaded
     setDownloaded(downloads.includes(episode.src))
 
-  }, [episode.src])
+  }
 
   const getDateString = useCallback(() => {
     // set print date
@@ -104,9 +120,9 @@ export function useEpisode(episode: EpisodeData) {
   }
 
   const play = () => {
-    if (downloaded){
+    if (downloaded) {
       playEpisode(episode, downloadedFile.current)
-    }else{
+    } else {
       playEpisode(episode)
     }
   }
