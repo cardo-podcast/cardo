@@ -12,7 +12,7 @@ import { downloadEpisode, removeDownloadedEpisode } from "../utils";
 export function useEpisode(episode: EpisodeData, isIntersecting: boolean | undefined = true) {
   const { queue, history: { getEpisodeState, updateEpisodeState }, downloads } = useDB()
   const [inQueue, setInqueue] = useState(queue.includes(episode.src))
-  const [downloaded, setDownloaded] = useState(false)
+  const [downloadState, setDownloadState] = useState<'downloaded' | ['downloading', number] | undefined>()
   const [reprState, setReprState] = useState({ position: 0, total: episode.duration, complete: false })
   const [{ globals: { locale } },] = useSettings()
   const { play: playEpisode, playing, position: playingPosition, quit: quitPlayer } = usePlayer()
@@ -28,14 +28,15 @@ export function useEpisode(episode: EpisodeData, isIntersecting: boolean | undef
   }, [episode.src, playing?.src])
 
   useEffect(() => {
-    if (isIntersecting && !dataLoaded.current){
+    if (isIntersecting && !dataLoaded.current) {
       load() // load when entering in scope (only one time)
     }
   }, [isIntersecting])
 
+
   const load = async () => {
     dataLoaded.current = true
-    
+
     // update reproduction state
     const state = await getEpisodeState(episode.src)
 
@@ -47,7 +48,11 @@ export function useEpisode(episode: EpisodeData, isIntersecting: boolean | undef
     }
 
     // check if file is downloaded
-    setDownloaded(downloads.includes(episode.src))
+    const downloadIndex = downloads.indexOf(episode.src)
+    if (downloadIndex > -1) {
+      setDownloadState('downloaded')
+      downloadedFile.current = downloads.downloads[downloadIndex].localFile
+    }
 
   }
 
@@ -97,30 +102,42 @@ export function useEpisode(episode: EpisodeData, isIntersecting: boolean | undef
   }, [playing?.src, episode.src, reprState.position, reprState.complete])
 
   const download = async () => {
-    const localFile = await downloadEpisode(episode)
-    setDownloaded(true)
-    downloadedFile.current = localFile
-    downloads.addToDownloadList(episode, localFile)
+
+    setDownloadState(['downloading', 0])
+    downloadEpisode(episode).then(localFile => {
+      // unlisten()
+      setDownloadState('downloaded')
+      downloadedFile.current = localFile
+      downloads.addToDownloadList(episode, localFile)
+    })
+
+    // status could be readed
+    // const unlisten = await listen<DownloadPayload>('downloading', ({payload: {src, downloaded, total}}) => {
+    //   if (src == episode.src){
+    //     setDownloadState(['downloading', downloaded / total * 100])
+    //   }
+    // })
+
   }
 
   const removeDownload = async () => {
-    if (downloaded) {
+    if (downloadState == 'downloaded') {
       await removeDownloadedEpisode(downloadedFile.current)
       await downloads.removeFromDownloadList(episode.src)
-      setDownloaded(false)
+      setDownloadState(undefined)
     }
   }
 
   const toggleDownload = () => {
-    if (downloaded) {
-      removeDownload()
-    } else {
+    if (!downloadState) {
       download()
+    } else {
+      removeDownload()
     }
   }
 
   const play = () => {
-    if (downloaded) {
+    if (downloadState == 'downloaded') {
       playEpisode(episode, downloadedFile.current)
     } else {
       playEpisode(episode)
@@ -128,5 +145,5 @@ export function useEpisode(episode: EpisodeData, isIntersecting: boolean | undef
   }
 
 
-  return { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, toggleDownload, downloaded, play }
+  return { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, toggleDownload, downloadState, play }
 }

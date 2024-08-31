@@ -15,7 +15,7 @@ import { useEpisode } from "../engines/Episode";
 export default function EpisodePreviewCard({ episode }: { episode: EpisodeData | NewEpisodeData }) {
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, play, toggleDownload, downloaded } = useEpisode(episode)
+  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, play, toggleDownload, downloadState } = useEpisode(episode)
 
 
 
@@ -33,7 +33,7 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
               event: toggleQueue
             },
             {
-              label: t(downloaded ? 'remove_download' : 'download'),
+              label: t(downloadState == 'downloaded' ? 'remove_download' : 'download'),
               event: toggleDownload
             },
           ]

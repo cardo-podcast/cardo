@@ -64,7 +64,6 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
 
     setPlaying(episode)
     if (localSrc) {
-      console.log('hola')
       audioRef.current.src = convertFileSrc(localSrc)
     } else {
       audioRef.current.src = episode.src
