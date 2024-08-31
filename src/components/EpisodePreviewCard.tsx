@@ -32,11 +32,10 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
               label: t(inQueue ? 'remove_queue' : 'add_queue'),
               event: toggleQueue
             },
-            // {
-            //   label: t(downloaded ? 'remove_download' : 'download'),
-            //   event: toggleDownload
-            // },
-            // TODO this component hasn't access to podcast title yet
+            {
+              label: t(downloaded ? 'remove_download' : 'download'),
+              event: toggleDownload
+            },
           ]
         });
       }}

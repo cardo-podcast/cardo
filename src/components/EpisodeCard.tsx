@@ -52,14 +52,14 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
   const navigate = useNavigate()
   const [date, setDate] = useState('')
   const contextMenuTarget = useRef<HTMLDivElement>(null)
-  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, play, toggleDownload, downloaded } = useEpisode(episode)
   const { t } = useTranslation();
-
   const [ref, entry] = useIntersectionObserver({
     threshold: 0,
     root: null,
     rootMargin: "0px",
   });
+
+  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, play, toggleDownload, downloaded } = useEpisode(episode, entry?.isIntersecting)
 
 
   useEffect(() => {

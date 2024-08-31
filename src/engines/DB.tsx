@@ -307,7 +307,10 @@ function initQueue() {
 
   const getAll = async (): Promise<EpisodeData[]> => {
     const r: RawEpisodeData[] = await db.select(
-      `SELECT queue.*, subscriptions.coverUrl AS podcastCover from queue
+      `SELECT queue.*,
+            subscriptions.coverUrl AS podcastCover,
+            subscriptions.podcastName
+            FROM queue
         LEFT JOIN subscriptions ON queue.podcastUrl = subscriptions.feedUrl
       `)
 
@@ -315,7 +318,7 @@ function initQueue() {
     return r.map(episode => ({
       ...episode,
       pubDate: new Date(episode.pubDate),
-      podcast: { coverUrl: episode.podcastCover }
+      podcast: { coverUrl: episode.podcastCover, podcastName: episode.podcastName }
     }))
   }
 
@@ -418,7 +421,10 @@ const loadNewSubscriptionsEpisodes = async (pubdate_gt: number): Promise<NewEpis
 
   // get all episodes of the database, filter by pubdate
   const r2: RawEpisodeData[] = await db.select(`
-    SELECT subscriptions_episodes.*, subscriptions.coverUrl AS podcastCover FROM subscriptions_episodes
+    SELECT subscriptions_episodes.*,
+          subscriptions.coverUrl AS podcastCover,
+          subscriptions.podcastName
+          FROM subscriptions_episodes
     LEFT JOIN episodes_history ON subscriptions_episodes.src = episodes_history.episode
     LEFT JOIN subscriptions ON subscriptions_episodes.podcastUrl = subscriptions.feedUrl
     WHERE pubDate > $1
@@ -431,7 +437,7 @@ const loadNewSubscriptionsEpisodes = async (pubdate_gt: number): Promise<NewEpis
     ...episode,
     pubDate: new Date(episode.pubDate),
     new: episode.pubDate > lastSync, // is new if it's just discovered
-    podcast: { coverUrl: episode.podcastCover }
+    podcast: { coverUrl: episode.podcastCover, podcastName: episode.podcastName }
   }))
 
 }
