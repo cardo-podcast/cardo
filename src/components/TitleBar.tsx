@@ -6,6 +6,7 @@ import { usePlayer } from "./AudioPlayer";
 import { UnlistenFn } from "@tauri-apps/api/event";
 import { useSettings } from "../engines/Settings";
 import Updater from "../Updater";
+import DownloadsIndicator from "./DownloadsIndicator";
 
 
 function TitleBar() {
@@ -58,6 +59,7 @@ function TitleBar() {
         }
 
         <SyncButton />
+        <DownloadsIndicator/>
 
         {checkUpdates && <Updater />}
       </div>

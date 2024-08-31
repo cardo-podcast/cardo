@@ -17,7 +17,7 @@ function EpisodePreview() {
   const { subscriptions: { getSubscription } } = useDB()
   const { t } = useTranslation()
   const [podcastFetched, setPodcastFetched] = useState(false)
-  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, toggleDownload, downloaded, play } = useEpisode(episode)
+  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, toggleDownload, downloadState, play } = useEpisode(episode)
 
 
   const fetchPodcastData = async (episode: EpisodeData) => {
@@ -100,7 +100,7 @@ function EpisodePreview() {
             >
               {icons.queue}
             </button>
-            <button className={`w-7 hover:text-accent-6 ${downloaded && 'text-primary-7'}`}
+            <button className={`w-7 hover:text-accent-6 ${downloadState == 'downloaded' && 'text-primary-7'}`}
               onClick={toggleDownload}
             >
               {icons.download}

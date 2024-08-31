@@ -2,12 +2,11 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use std::fs::File;
 use std::io::Write;
-
 use aes_gcm::aead::{generic_array::GenericArray, Aead, KeyInit, OsRng};
 use aes_gcm::{Aes256Gcm, Nonce};
 use base64::{engine::general_purpose, Engine as _};
 use rand::RngCore;
-use tauri::command;
+use tauri::{command, Window};
 use tauri_plugin_sql::{Migration, MigrationKind};
 
 const NONCE_SIZE: usize = 12; // 96-bit nonce
@@ -70,25 +69,47 @@ fn decrypt(encrypted_text: String, base64_key: String) -> Result<String, String>
     }
 }
 
+#[derive(Clone, serde::Serialize)]
+struct DownloadPayload {
+    src: String,
+    name: String,
+    downloaded: u64,
+    total: u64,
+    complete: bool
+}
+
 #[command]
-async fn download_file(url: String, destination: String) -> Result<String, String> {
+async fn download_file(url: String, destination: String, name:String, window: Window) -> Result<(), String> {
     let mut response = reqwest::get(&url).await.map_err(|e| e.to_string())?;
 
     let total_size = response.content_length().unwrap();
-    println!("total_size: {}", total_size);
 
     let mut file = File::create(&destination).map_err(|e| e.to_string())?;
 
-    let mut downloaded: u64 = 0;
+    let mut payload =  DownloadPayload {
+        src: url,
+        name: name,
+        downloaded: 0,
+        total: total_size,
+        complete: false
+    };
 
+    let mut i: u8 = 0;
     while let Some(chunk) = response.chunk().await.map_err(|e| e.to_string())? {
         file.write_all(&chunk).map_err(|e| e.to_string())?;
-        downloaded += chunk.len() as u64;
-        println!("downloaded: {}", downloaded);
-        println!("downloaded {}%", downloaded * 100 / total_size)
+        payload.downloaded += chunk.len() as u64;
+
+        i += 1;
+        if i == 50 { // reduce event emmisions
+            window.emit("downloading", payload.clone()).unwrap();
+            i = 0;
+        }
     }
 
-    Ok(destination)
+    payload.complete = true;
+    window.emit("downloading", payload.clone()).unwrap();
+
+    Ok(())
 }
 
 fn main() {

@@ -59,7 +59,7 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
     rootMargin: "0px",
   });
 
-  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, play, toggleDownload, downloaded } = useEpisode(episode, entry?.isIntersecting)
+  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, play, toggleDownload, downloadState } = useEpisode(episode, entry?.isIntersecting)
 
 
   useEffect(() => {
@@ -93,7 +93,7 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
                 event: toggleQueue
               },
               {
-                label: t(downloaded ? 'remove_download' : 'download'),
+                label: t(downloadState == 'downloaded' ? 'remove_download' : 'download'),
                 event: toggleDownload
               },
               

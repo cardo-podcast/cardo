@@ -3,6 +3,13 @@ import colors from "tailwindcss/colors"
 import { TailwindColor } from "./ThemeConfigurator"
 import { DefaultTheme } from "./DefaultThemes"
 
+export interface DownloadPayload { 
+  src: string,
+  name: string
+  downloaded: number,
+  total: number,
+  complete: boolean
+}
 
 export interface PodcastData {
   id?: number,

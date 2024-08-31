@@ -203,7 +203,7 @@ export async function downloadEpisode(episode: EpisodeData) {
     await createDir(destFolder, {recursive: true})
   }
 
-  await invoke('download_file', { url: episode.src, destination })
+  await invoke('download_file', { url: episode.src, destination, name: episode.title })
 
   return destination
 }

@@ -485,7 +485,7 @@ function initDownloads() {
   }
 
   const addToDownloadList = async (episode: EpisodeData, localFile: string) => {
-    setDownloads([...downloads, { ...episode, localFile }])
+    setDownloads(prevDownloads => [...prevDownloads, { ...episode, localFile }])
 
     await db.execute(
       `INSERT into downloads (title, description, src, pubDate, duration, size, podcastUrl, coverUrl, localFile) 
@@ -519,6 +519,7 @@ function initDownloads() {
     downloads,
     load,
     includes,
+    indexOf,
     getDownloadedEpisodes,
     addToDownloadList,
     getLocalFile,
