@@ -32,9 +32,11 @@ export default function Updater() {
 
       if (!manifest || !shouldUpdate) return
 
+      const release_notes = manifest.body.replace(/^v\d.\d.\d\s*\n*/, '') // messages could start with vX.X.X (in github  appears as title)
+
       setDialog({
         version: manifest.version,
-        releaseNotes: manifest.body
+        releaseNotes: release_notes
       })
 
       const formatString = "yyyy-MM-dd HH:mm:ss.SSS xxxxx"
@@ -64,7 +66,7 @@ export default function Updater() {
         <h1 className='text-lg border-b-2 border-primary-8 p-1'>{t('new_update_available')}</h1>
         <div>
           <p>{t('release_notes')}: v{dialog?.version}</p>
-          <p className='text-sm break-words bg-primary-8 rounded-md'>{dialog?.releaseNotes}</p>
+          <p className='text-sm bg-primary-8 rounded-md whitespace-pre-line'>{dialog?.releaseNotes}</p>
         </div>
         <div className='flex gap-4 justify-center mt-1'>
           <button className='bg-green-600 px-2 py-1 rounded-md uppercase'
