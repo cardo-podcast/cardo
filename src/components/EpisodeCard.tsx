@@ -59,7 +59,7 @@ function EpisodeCard({ episode, className = '', noLazyLoad = false, onImageClick
     rootMargin: "0px",
   });
 
-  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, play, toggleDownload, downloadState } = useEpisode(episode, entry?.isIntersecting)
+  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, play, toggleDownload, downloadState } = useEpisode(episode, entry?.isIntersecting || noLazyLoad)
 
 
   useEffect(() => {
