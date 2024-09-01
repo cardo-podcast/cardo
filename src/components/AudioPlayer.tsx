@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { globalShortcut } from "@tauri-apps/api";
 import appIcon from '../../src-tauri/icons/icon.png'
 import { convertFileSrc } from "@tauri-apps/api/tauri";
+import { useAudioProcessor } from "../engines/AudioProcessor";
 
 
 
@@ -33,6 +34,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const { dbLoaded, history: { getEpisodeState, getLastPlayed, setLastPlaying } } = useDB()
   const [position, setPosition] = useState(0);
   const { history: { updateEpisodeState } } = useDB()
+  const {skipSilence} = useAudioProcessor(audioRef)
 
 
   const loadLastPlayed = async () => {
@@ -69,6 +71,8 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
       audioRef.current.src = episode.src
     }
     audioRef.current.load()
+
+    audioRef.current.onplay = skipSilence
 
     const previousState = await getEpisodeState(episode?.src)
 
