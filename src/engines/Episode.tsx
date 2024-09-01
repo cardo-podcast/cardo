@@ -21,21 +21,15 @@ export function useEpisode(episode: EpisodeData, isIntersecting: boolean | undef
 
 
   useEffect(() => {
-    if (isIntersecting) { // avoid extra computing on db on large lists
+    if (episode.src && isIntersecting && !dataLoaded.current) { // avoid extra computing on db on large lists
       load()
     }
 
-  }, [episode.src, playing?.src])
-
-  useEffect(() => {
-    if (isIntersecting && !dataLoaded.current) {
-      load() // load when entering in scope (only one time)
-    }
-  }, [isIntersecting])
+  }, [episode.src, playing?.src, isIntersecting])
 
 
   const load = async () => {
-    dataLoaded.current = true
+    // dataLoaded.current = true
 
     // update reproduction state
     const state = await getEpisodeState(episode.src)
