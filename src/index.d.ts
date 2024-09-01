@@ -57,19 +57,19 @@ export interface EpisodeState {
 
 export interface Settings {
   globals: {
-    locale: string,
+    locale: string
     language: string
   }
   podcasts: {
     [feedUrl: string]: PodcastSettings
   },
   sync: {
-    syncAfterAppStart: boolean,
+    syncAfterAppStart: boolean
     syncBeforeAppClose: boolean
   },
   general: {
-    numberOfDaysInNews: number,
-    fetchSubscriptionsAtStartup: boolean,
+    numberOfDaysInNews: number
+    fetchSubscriptionsAtStartup: boolean
     checkUpdates: boolean
   },
   colors: {
@@ -77,10 +77,12 @@ export interface Settings {
     accent: ColorTheme | TailwindBaseColor | DefaultTheme,
   },
   playback: {
-    stepForward: number,
-    stepBackwards: number,
-    resumeBefore: number, // resume playing some seconds before the last state
+    stepForward: number
+    stepBackwards: number
+    resumeBefore: number // resume playing some seconds before the last state
     displayRemainingTime: boolean //show -remaining time in player instead of total time
+    rateChangeStep: number
+    playbackRate: number
   },
   ui: {
     showPinWindowButton: boolean

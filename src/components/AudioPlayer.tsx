@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, RefObject, createContext, ReactNode, useContext, Dispatch, SetStateAction, useCallback, SyntheticEvent } from "react";
 import { secondsToStr } from "../utils";
-import { play as playIcon, pause as pauseIcon, forward as forwardIcon, backwards as backwardsIcon, close as closeIcon } from "../Icons"
+import { play as playIcon, pause as pauseIcon, forward as forwardIcon, backwards as backwardsIcon, close as closeIcon, speedometer } from "../Icons"
 import { EpisodeData } from "..";
 import { useDB } from "../engines/DB";
 import { useNavigate } from "react-router-dom";
@@ -128,6 +128,67 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
 }
 
 
+
+
+function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement>}) {
+  const [showMenu, setShowMenu] = useState(false)
+  const [{ playback: settings }, updateSettings] = useSettings()
+  const [playbackRate, setPlaybackRate] = useState(settings.playbackRate)
+
+  useEffect(() => {
+    if (audioRef.current) {
+      // load settings value first time
+      audioRef.current.playbackRate = settings.playbackRate
+    }
+  }, [])
+
+  useEffect(() => {
+    if (audioRef.current) {
+
+      setPlaybackRate(audioRef.current.playbackRate)
+      settings.playbackRate = audioRef.current.playbackRate
+      updateSettings({ playback: settings })
+    }
+  }, [audioRef.current?.playbackRate])
+
+  return (
+    <div className="relative">
+      <button className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-6"
+        onClick={() => setShowMenu(!showMenu)}
+      >
+        {speedometer}
+      </button>
+
+      <div className={`${showMenu ? 'flex' : 'hidden'} flex-col absolute gap-1 h-10 items-center justify-center bottom-7 left-1/2 -translate-x-1/2 rounded-md bg-primary-9 border-2 border-primary-7 p-2`}>
+        <div className="flex items-center gap-2">
+          <button className="flex items-center text-xl mb-1 hover:text-accent-6"
+            onClick={() => {
+              if (audioRef.current) {
+                audioRef.current.playbackRate -= settings.rateChangeStep
+              }
+            }}
+          >
+            ‒
+          </button>
+
+          <span>{playbackRate.toFixed(2)}</span>
+
+          <button className="flex items-center text-xl mb-1 hover:text-accent-6"
+            onClick={() => {
+              if (audioRef.current) {
+                audioRef.current.playbackRate += settings.rateChangeStep
+              }
+            }}
+          >
+            +
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+
 function AudioPlayer({ className = '' }) {
   const [duration, setDuration] = useState(0);
   const { history: { updateEpisodeState }, queue } = useDB()
@@ -147,7 +208,7 @@ function AudioPlayer({ className = '' }) {
     }
 
     // MediaPreviousTrack
-  })
+  }, [])
   // #endregion
 
   useEffect(() => {
@@ -186,7 +247,7 @@ function AudioPlayer({ className = '' }) {
 
       return () => clearInterval(intervalId);
     }
-  }, [audioRef]);
+  }, []);
 
   const handlePlayPause = () => {
     if (audioRef.current) {
@@ -228,7 +289,7 @@ function AudioPlayer({ className = '' }) {
 
   return (
     <div className={`w-full flex bg-primary-10 border-t-2 border-primary-8 p-2 gap-4 ${audioRef.current?.src && playing ? 'visible' : 'hidden'} ${className}`}>
-      {playing &&
+      {playing?.src &&
         <img
           className="w-24 aspect-square m-auto rounded-md cursor-pointer hover:p-1 transition-all"
           src={playing.coverUrl}
@@ -251,8 +312,8 @@ function AudioPlayer({ className = '' }) {
       }
 
 
-      <div className={`w-full flex flex-col`}>
-        {playing && <h1 className="mb-1 truncate">{playing.title}</h1>}
+      <div className='w-full flex flex-col'>
+        {playing && <h1 className="mb-1 line-clamp-1">{playing.title}</h1>}
 
         <div className="w-full flex items-center justify-center">
           <p>{secondsToStr(position)}</p>
@@ -271,36 +332,42 @@ function AudioPlayer({ className = '' }) {
           </p>
         </div>
 
-        <div className="flex justify-center gap-3 items-center">
+        <div className="grid grid-cols-3 w-full">
+          <div className="flex justify-center items-center">
+            {/* left side menu */}
+          </div>
+          <div className="flex justify-center gap-3 items-center">
+            <button
+              className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
+              onClick={() => {
+                changeTime(-1 * stepBackwards, true)
+              }}
+            >
+              {backwardsIcon}
+              <p className="text-xs text-center -mt-[7px]">{stepBackwards}</p>
+            </button>
 
-          <button
-            className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
-            onClick={() => {
-              changeTime(-1 * stepBackwards, true)
-            }}
-          >
-            {backwardsIcon}
-            <p className="text-xs text-center -mt-[7px]">{stepBackwards}</p>
-          </button>
+            <button
+              className="flex items-center focus:outline-none hover: hover:text-accent-6 w-9 mb-2"
+              onClick={handlePlayPause}
+            >
+              {audioRef.current?.paused ? playIcon : pauseIcon}
+            </button>
 
-          <button
-            className="flex items-center focus:outline-none hover: hover:text-accent-6 w-9 mb-2"
-            onClick={handlePlayPause}
-          >
-            {audioRef.current?.paused ? playIcon : pauseIcon}
-          </button>
-
-          <button
-            className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
-            onClick={() => {
-              changeTime(stepForward, true)
-            }}
-          >
-            {forwardIcon}
-            <p className="text-xs text-center -mt-[7px]">{stepForward}</p>
-          </button>
+            <button
+              className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
+              onClick={() => {
+                changeTime(stepForward, true)
+              }}
+            >
+              {forwardIcon}
+              <p className="text-xs text-center -mt-[7px]">{stepForward}</p>
+            </button>
+          </div>
+          <div className="flex justify-start items-center">
+            <SpeedButton audioRef={audioRef}/>
+          </div>
         </div>
-
 
         <audio ref={audioRef} onLoadedMetadata={handleLoadedMetadata} className="hidden" />
       </div>
