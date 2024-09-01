@@ -59,7 +59,12 @@ jobs:
           TAG_INFO=$(curl -s -X GET -H "Authorization: Bearer ${{secrets.GITHUB_TOKEN}}" "https://api.github.com/repos/${{ github.repository }}/git/tags/$TAG_SHA")
   
           MESSAGE=$(echo $TAG_INFO | jq -r '.message')
-          echo "MESSAGE=$MESSAGE" >> $GITHUB_OUTPUT
+          
+          # multiline GIHUB_OUTPUT variable
+          echo "MESSAGE<<EOF" >> $GITHUB_OUTPUT
+          echo "$MESSAGE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        shell: bash
 
       - name: import windows certificate
         if: matrix.platform == 'windows-latest'
