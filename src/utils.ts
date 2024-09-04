@@ -79,7 +79,7 @@ export async function parseXML(url: string): Promise<[EpisodeData[], PodcastData
       src: item.querySelector('enclosure')?.getAttribute('url') ?? '',
       pubDate: new Date(item.querySelector('pubDate')?.textContent ?? 0),
       coverUrl: getItunesTag(item, 'image')?.getAttribute('href') ?? podcastDetails.coverUrl,
-      duration: duration,
+      duration: duration > 0? duration: size * 1024 * 8 / 128, // if duration isn't especified on xml use estimated size suposing a 128kb/s bitrate
       size: Math.round(size > 0 ? size : duration * 128 / 8 / 1024), // if size isn't especified on xml use estimated size suposing a 128kb/s bitrate
       podcastUrl: podcastDetails.feedUrl
     }

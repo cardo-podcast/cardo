@@ -21,7 +21,7 @@ function EpisodePreview() {
 
 
   const fetchPodcastData = async (episode: EpisodeData) => {
-    if (episode.podcast?.podcastName) {
+    if (episode.podcast?.description) { // suposing that if we have the description we will have everything
       setPodcastFetched(true)
       return
     } // complete podcast data has been passed with episode
