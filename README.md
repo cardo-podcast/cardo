@@ -1,4 +1,4 @@
-<h1 align="center">CARDO - PODCAST PLAYER</h1>
+<h1 align="center">CARDO - PODCAST CLIENT</h1>
 <p align="center">
     <a href="https://n0vella.github.io">
         <img src="https://raw.githubusercontent.com/n0vella/cardo/master/src-tauri/icons/icon.png" alt="logo" width="256" height="256" />
@@ -7,7 +7,7 @@
 
 ## Overview
 
-Cardo is a podcast player, inspired on Android's [Antennapod](https://antennapod.org/). Cardo could be synchonized with Antennapod and other apps using [Nextcloud Gppoder](https://github.com/thrillfall/nextcloud-gpodder/).
+Cardo is a podcast client for desktop, inspired on Android's [Antennapod](https://antennapod.org/). Cardo could be synchonized with Antennapod and other apps using [Nextcloud Gppoder](https://github.com/thrillfall/nextcloud-gpodder/).
 
 ![1](assets/readme/1.png)
 
@@ -19,14 +19,17 @@ Cardo is a podcast player, inspired on Android's [Antennapod](https://antennapod
 
 ### Features
 
-- Search podcasts online
-- Manage your subscriptions
-- Look at new episodes of your subscriptions with a glance
-- Synchronizing episodes state and subscriptions using Nexcloud Gpodder
-- Lightweight app (thanks to Tauri)
-- Customizable themes
-- [ ] Download episodes to listen them offline
+- [X] Search podcasts online
+- [X] Manage your subscriptions
+- [X] Look at new episodes of your subscriptions with a glance
+- [X] Synchronizing episodes state and subscriptions using Nexcloud Gpodder
+- [X] Lightweight app (thanks to Tauri)
+- [X] Customizable themes
+- [X] Download episodes to listen them offline
 - [ ] Keep your favorite episodes
+- [ ] Audio manipulation, speed, silenze skip & normalization
+- [ ] Synchronization using [Opodsync](https://github.com/kd2org/opodsync)
+
 
 
 ## Contributing

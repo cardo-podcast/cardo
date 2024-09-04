@@ -83,6 +83,7 @@ export interface Settings {
     displayRemainingTime: boolean //show -remaining time in player instead of total time
     rateChangeStep: number
     playbackRate: number
+    playbackRatePresets: number[]
   },
   ui: {
     showPinWindowButton: boolean

@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { globalShortcut } from "@tauri-apps/api";
 import appIcon from '../../src-tauri/icons/icon.png'
 import { convertFileSrc } from "@tauri-apps/api/tauri";
+import round from "lodash/round";
 
 
 
@@ -130,10 +131,12 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
 
 
 
-function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement>}) {
+function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
   const [showMenu, setShowMenu] = useState(false)
   const [{ playback: settings }, updateSettings] = useSettings()
   const [playbackRate, setPlaybackRate] = useState(settings.playbackRate)
+  const { t } = useTranslation()
+
 
   useEffect(() => {
     if (audioRef.current) {
@@ -153,18 +156,20 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement>}) {
 
   return (
     <div className="relative">
-      <button className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-6"
+      <button className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
         onClick={() => setShowMenu(!showMenu)}
       >
         {speedometer}
+        <p className="text-[10px] text-center -mt-[6px]">{playbackRate.toFixed(2)}</p>
       </button>
 
-      <div className={`${showMenu ? 'flex' : 'hidden'} flex-col absolute gap-1 h-10 items-center justify-center bottom-7 left-1/2 -translate-x-1/2 rounded-md bg-primary-9 border-2 border-primary-7 p-2`}>
+      {showMenu && <div className="fixed z-10 top-0 left-0 w-full h-full" onClick={() => setShowMenu(false)}/>}
+      <div className={`${showMenu ? 'flex' : 'hidden'} flex-col absolute z-20 gap-1 items-center justify-center bottom-10 left-1/2 -translate-x-1/2 rounded-md bg-primary-9 border-2 border-primary-7 p-2 w-32`}>
         <div className="flex items-center gap-2">
           <button className="flex items-center text-xl mb-1 hover:text-accent-6"
             onClick={() => {
               if (audioRef.current) {
-                setPlaybackRate(prev => prev - settings.rateChangeStep)
+                setPlaybackRate(prev => round(prev - settings.rateChangeStep, 2))
               }
             }}
           >
@@ -176,8 +181,41 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement>}) {
           <button className="flex items-center text-xl mb-1 hover:text-accent-6"
             onClick={() => {
               if (audioRef.current) {
-                setPlaybackRate(prev => prev + settings.rateChangeStep)
+                setPlaybackRate(prev => round(prev + settings.rateChangeStep, 2))
               }
+            }}
+          >
+            +
+          </button>
+        </div>
+
+        <div className="grid grid-flow-row grid-cols-3 gap-2 text-xs shrink-0">
+          {
+            settings.playbackRatePresets.map(preset => (
+              <button className={`bg-primary-7 hover:bg-primary-6 disabled:bg-primary-8 rounded-md p-1 w-8`}
+                disabled={(playbackRate === preset)}
+                title={t('right_click_remove_preset')}
+                onContextMenu={() => {
+                  const deleteIndex = settings.playbackRatePresets.indexOf(preset)
+                  settings.playbackRatePresets.splice(deleteIndex, 1)
+                  updateSettings({ playback: { playbackRatePresets: settings.playbackRatePresets } })
+                }}
+                onClick={() => {
+                  setPlaybackRate(preset)
+                }}
+              >
+                {preset.toFixed(2)}
+              </button>
+            ))
+          }
+
+          <button className="bg-primary-7 hover:bg-primary-6 disabled:hidden rounded-md p-1"
+            disabled={settings.playbackRatePresets.includes(playbackRate)}
+            title={t('add')}
+            onClick={() => {
+              settings.playbackRatePresets.push(playbackRate)
+              settings.playbackRatePresets.sort((a, b) => a - b)
+              updateSettings({ playback: { playbackRatePresets: settings.playbackRatePresets } })
             }}
           >
             +
@@ -344,7 +382,7 @@ function AudioPlayer({ className = '' }) {
               }}
             >
               {backwardsIcon}
-              <p className="text-xs text-center -mt-[7px]">{stepBackwards}</p>
+              <p className="text-[10px] text-center -mt-[6px]">{stepBackwards}</p>
             </button>
 
             <button
@@ -361,11 +399,11 @@ function AudioPlayer({ className = '' }) {
               }}
             >
               {forwardIcon}
-              <p className="text-xs text-center -mt-[7px]">{stepForward}</p>
+              <p className="text-[10px] text-center -mt-[6px]">{stepForward}</p>
             </button>
           </div>
           <div className="flex justify-start items-center">
-            <SpeedButton audioRef={audioRef}/>
+            <SpeedButton audioRef={audioRef} />
           </div>
         </div>
 
