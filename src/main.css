@@ -10,3 +10,7 @@
 button {
     @apply transition-colors;
 }
+
+h1, h2{
+    @apply font-thin;
+}

@@ -11,7 +11,7 @@ function LeftMenu() {
 
   return (
     <div className="bg-primary-9 border-r-2 border-primary-8 w-64 lg:w-80 h-full flex flex-col p-3 pt-4 overflow-x-hidden">
-      <div className="flex flex-col gap-1 uppercase mb-6">
+      <div className="flex flex-col gap-1 uppercase mb-6 font-thin">
         <NavLink to='/' className={({ isActive }) => `transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 hover:pl-1'}`}>
           {t('home')}
         </NavLink>

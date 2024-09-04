@@ -68,5 +68,7 @@
   "remove_all": "Delete all",
   "downloads_default_message": "You can download episodes by right clicking on the list or from the episode preview",
   "remove_from_subscriptions": "Unsubscribe",
-  "add_to_subscriptions": "Subscribe"
+  "add_to_subscriptions": "Subscribe",
+  "add": "Add",
+  "right_click_remove_preset": "Right click to delete the preset"
 }
