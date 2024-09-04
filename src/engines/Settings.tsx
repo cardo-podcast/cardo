@@ -130,7 +130,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       stepForward: 30,
       stepBackwards: 10,
       resumeBefore: 5,
-      displayRemainingTime: false
+      displayRemainingTime: false,
+      rateChangeStep: 0.05,
+      playbackRate: 1
     },
     ui: {
       showPinWindowButton: false
