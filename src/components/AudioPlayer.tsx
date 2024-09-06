@@ -143,7 +143,7 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
       // load settings value first time
       audioRef.current.playbackRate = settings.playbackRate
     }
-  }, [])
+  }, [audioRef.current?.src])
 
   useEffect(() => {
     if (audioRef.current) {
