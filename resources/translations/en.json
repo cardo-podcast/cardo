@@ -70,5 +70,9 @@
   "remove_from_subscriptions": "Unsubscribe",
   "add_to_subscriptions": "Subscribe",
   "add": "Add",
-  "right_click_remove_preset": "Right click to delete the preset"
+  "right_click_remove_preset": "Right click to delete the preset",
+  "open_settings_file": "Open the configuration file",
+  "open_settings_danger_menu": "Handle this file with care, things may break.",
+  "ok": "Ok",
+  "cancel": "Cancel"
 }

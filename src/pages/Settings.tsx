@@ -7,9 +7,10 @@ import { TailwindBaseColor } from ".."
 import { DefaultTheme, DefaultThemes, BasicColors } from "../DefaultThemes"
 import appIcon from '../../src-tauri/icons/icon.png'
 import { shell } from "@tauri-apps/api"
-import { resolveResource } from '@tauri-apps/api/path';
+import { appConfigDir, join, resolveResource } from '@tauri-apps/api/path';
 import { readDir } from '@tauri-apps/api/fs';
 import tauriConfig from '../../src-tauri/tauri.conf.json'
+import { useModalBanner } from "../components/ModalBanner"
 
 
 
@@ -60,6 +61,7 @@ function Settings() {
   const { t } = useTranslation()
   const [{ globals, general, colors: colorSettings, playback, ui }, updateSettings] = useSettings()
   const [languages, setLanguages] = useState<string[]>()
+  const [showBanner, Banner] = useModalBanner()
 
   useEffect(() => {
     const loadLocales = async () => {
@@ -72,12 +74,30 @@ function Settings() {
 
   return (
     <div className="p-2 w-full flex flex-col gap-2">
-      <div className=" py-4flex flex-col gap-1 border-primary-8 border-[2px] p-2 rounded-md">
+
+      <div className="flex justify-between border-primary-8 border-[2px] p-2 rounded-md">
+        <h2>{t('open_settings_file')}:</h2>
+        <button className="bg-accent-7 hover:bg-accent-8 rounded-md px-2 py-1 text-sm"
+        onClick={() => showBanner()}
+        >
+          config.json
+        </button>
+
+        <Banner labels={[t('ok'), t('cancel')]}
+          onAccepted={async() => {
+            const confFile = await join(await appConfigDir(), 'config.json')
+            shell.open(confFile)
+          }}>
+          <h1 className='whitespace-pre-line p-1 max-w-80'>{t('open_settings_danger_menu')}</h1>
+          </Banner>
+      </div>
+
+      <div className="flex flex-col gap-1 border-primary-8 border-[2px] p-2 rounded-md">
         <h1 className="uppercase border-b-2 border-primary-8 mb-2">{t('sync')}</h1>
         <NextcloudSettings />
       </div>
 
-      <div className=" py-4 flex flex-col gap-1 border-primary-8 border-[2px] p-2 rounded-md">
+      <div className="flex flex-col gap-1 border-primary-8 border-[2px] p-2 rounded-md">
         <h1 className="uppercase border-b-2 border-primary-8 mb-2">{t('general')}</h1>
 
         <div className="flex flex-col gap-1">
@@ -163,7 +183,7 @@ function Settings() {
         </div>
       </div>
 
-      <div className=" py-4flex flex-col gap-1 border-primary-8 border-[2px] p-2 rounded-md">
+      <div className="flex flex-col gap-1 border-primary-8 border-[2px] p-2 rounded-md">
         <h1 className="uppercase border-b-2 border-primary-8 mb-2">{t('playback')}</h1>
         <div className="flex gap-6">
           <label className="w-fit flex gap-2 items-center">
@@ -199,7 +219,7 @@ function Settings() {
         </div>
       </div>
 
-      <div className=" py-4flex flex-col gap-1 border-primary-8 border-[2px] p-2 rounded-md">
+      <div className="flex flex-col gap-1 border-primary-8 border-[2px] p-2 rounded-md">
         <h1 className="uppercase border-b-2 border-primary-8 mb-2">UI</h1>
         <div>
           <label className="w-fit flex gap-1">
@@ -210,7 +230,7 @@ function Settings() {
         </div>
       </div>
 
-      <div className=" py-4flex flex-col gap-1 border-primary-8 border-[2px] p-2 rounded-md">
+      <div className="flex flex-col gap-1 border-primary-8 border-[2px] p-2 rounded-md">
         <h1 className="uppercase border-b-2 border-primary-8 mb-2">{t('about')}</h1>
         <div className="flex gap-2">
           <img
@@ -233,17 +253,17 @@ function Settings() {
             </div>
             <div className="flex gap-2 items-center">
               <a href="https://www.buymeacoffee.com/n0vella" target="_blank">
-                <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" className="h-10"/>
+                <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" className="h-10" />
               </a>
               <a href="https://www.paypal.com/paypalme/adriannovella" target="_blank">
-                <img src="https://www.paypalobjects.com/webstatic/icon/pp196.png" alt="Paypal" className="h-10 rounded-md"/>
+                <img src="https://www.paypalobjects.com/webstatic/icon/pp196.png" alt="Paypal" className="h-10 rounded-md" />
               </a>
             </div>
           </div>
         </div>
       </div>
 
-    </div>
+    </div >
   )
 }
 
