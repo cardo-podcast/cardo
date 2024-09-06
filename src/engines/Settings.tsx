@@ -136,7 +136,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       playbackRatePresets: [1, 1.25, 1.50, 2]
     },
     ui: {
-      showPinWindowButton: false
+      showPinWindowButton: false,
+      collapsedLeftMenu: false
     }
   })
 

@@ -192,7 +192,7 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
         <div className="grid grid-flow-row grid-cols-3 gap-2 text-xs shrink-0">
           {
             settings.playbackRatePresets.map(preset => (
-              <button className={`bg-primary-7 hover:bg-primary-6 disabled:bg-primary-8 rounded-md p-1 w-8`}
+              <button key={preset} className={`bg-primary-7 hover:bg-primary-6 disabled:bg-primary-8 rounded-md p-1 w-8`}
                 disabled={(playbackRate === preset)}
                 title={t('right_click_remove_preset')}
                 onContextMenu={() => {

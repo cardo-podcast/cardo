@@ -86,7 +86,8 @@ export interface Settings {
     playbackRatePresets: number[]
   },
   ui: {
-    showPinWindowButton: boolean
+    showPinWindowButton: boolean,
+    collapsedLeftMenu: boolean
   }
 }
 

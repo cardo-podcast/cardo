@@ -7,13 +7,13 @@ import { PodcastData } from '..';
 import { useDB } from '../engines/DB';
 
 
-export default function SubscriptionCard({podcast}: {podcast: PodcastData}){
+export default function SubscriptionCard({podcast, mini=false}: {podcast: PodcastData, mini?: boolean}){
   const navigate = useNavigate()
   const { t } = useTranslation();
   const { subscriptions: {deleteSubscription, reloadSubscriptions} } = useDB()
 
   return(
-    <div className="p-1 rounded-md flex gap-2 justify-between cursor-pointer hover:bg-primary-8 hover:pl-2 transition-all"
+    <div className={`p-1 rounded-md flex gap-2 ${mini? 'justify-center': 'justify-between hover:pl-2'} cursor-pointer hover:bg-primary-8 transition-all`}
     onClick={() => navigate('/preview', {
       state: {
         podcast
@@ -33,12 +33,13 @@ export default function SubscriptionCard({podcast}: {podcast: PodcastData}){
         })}}
   >
     <img
-      className="h-10 bg-primary-7 aspect-square rounded-md"
+      className={`h-10 aspect-square rounded-md ${mini? 'hover:p-0.5': ''}`}
+      title={podcast.podcastName}
       src={podcast.coverUrl}
       alt=''
       onError={(e: SyntheticEvent<HTMLImageElement>) => e.currentTarget.src = appIcon}
     />
-    <p className=" h-10 text-sm w-full truncate">{podcast.podcastName}</p>
+    {!mini && <p className=" h-10 text-sm w-full truncate">{podcast.podcastName}</p>}
   </div>
   )
 }
