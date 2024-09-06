@@ -69,5 +69,9 @@
   "remove_from_subscriptions": "Cancelar subscripción",
   "add_to_subscriptions": "Subscribirse",
   "add": "Añadir",
-  "right_click_remove_preset": "Click derecho para eliminar el preset"
+  "right_click_remove_preset": "Click derecho para eliminar el preset",
+  "open_settings_file": "Abrir el archivo de configuración",
+  "open_settings_danger_menu": "Manipula este archivo con cuidado, podrían romperse cosas",
+  "ok": "Ok",
+  "cancel": "Cancelar"
 }

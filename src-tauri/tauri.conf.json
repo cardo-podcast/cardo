@@ -22,7 +22,7 @@
       "all": false,
       "shell": {
         "all": false,
-        "open": true
+        "open": "^((.*config.json)|(https?://\\w+))"
       },
       "window": {
         "all": true
