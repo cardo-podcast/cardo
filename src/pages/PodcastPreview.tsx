@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom";
 import { EpisodeData, PodcastData, SortCriterion } from "..";
 import { ReactNode, Suspense, SyntheticEvent, useEffect, useState } from "react";
 import * as icons from "../Icons"
-import { parseXML } from "../utils";
+import { parseXML } from "../utils/utils";
 import EpisodeCard from "../components/EpisodeCard";
 import { useDB } from "../engines/DB";
 import { Switch, SwitchState } from "../components/Inputs";
@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { useSync } from "../sync/Nextcloud";
 import appIcon from '../../src-tauri/icons/icon.png'
+import { sanitizeHTML } from "../utils/sanitize";
 
 
 function SortButton({ children, podcastUrl, criterion }: { children: ReactNode, podcastUrl: string, criterion: SortCriterion['criterion'] }) {
@@ -270,7 +271,7 @@ function PodcastPreview() {
 
             <div className="flex overflow-y-auto rounded-md scroll-smooth pr-2">
               <div className="whitespace-pre-line text-sm text-primary-4"
-                dangerouslySetInnerHTML={{ __html: podcast.description ?? '' }} />
+                dangerouslySetInnerHTML={{ __html: sanitizeHTML(podcast.description ?? '') }} />
             </div>
 
           </div>

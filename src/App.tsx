@@ -15,7 +15,7 @@ import { appWindow } from "@tauri-apps/api/window";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { SyncProvider } from "./sync/Nextcloud";
-import DownloadsPage from "./pages/DownloadsPage";
+const DownloadsPage = lazy(() => import('./pages/DownloadsPage'));
 
 
 const App = () => {

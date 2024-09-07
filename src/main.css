@@ -14,3 +14,7 @@ button {
 h1, h2{
     @apply font-thin;
 }
+
+.external-link {
+    @apply text-accent-6
+}

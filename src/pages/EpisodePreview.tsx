@@ -3,11 +3,12 @@ import * as icons from "../Icons"
 import { EpisodeData } from ".."
 import { useLocation, useNavigate } from "react-router-dom"
 import { useDB } from "../engines/DB"
-import { parsePodcastDetails, secondsToStr } from "../utils"
+import { parsePodcastDetails, secondsToStr } from "../utils/utils"
 import { useTranslation } from "react-i18next"
 import ProgressBar from "../components/ProgressBar"
 import appIcon from '../../src-tauri/icons/icon.png'
 import { useEpisode } from "../engines/Episode"
+import { sanitizeHTML } from "../utils/sanitize"
 
 
 function EpisodePreview() {
@@ -109,7 +110,7 @@ function EpisodePreview() {
         </div>
       </div>
       <div className="rounded-md p-3 whitespace-pre-line"
-        dangerouslySetInnerHTML={{ __html: episode.description }} />
+        dangerouslySetInnerHTML={{ __html: sanitizeHTML(episode.description) }} />
     </div>
   )
 }

@@ -102,9 +102,11 @@ function LeftMenu() {
         </div>
       }
 
-      <div id="folder" className="h-full w-1 -ml-0.5 hover:bg-accent-6 cursor-w-resize" onDoubleClick={() => {
+      <div id="folder" className="h-full w-2 -ml-1 opacity-0 hover:opacity-100 cursor-w-resize" onDoubleClick={() => {
         updateSettings({ui: {collapsedLeftMenu: !collapsedLeftMenu}})
-      }} />
+      }}>
+        <div className=" h-full w-0.5 bg-accent-8 m-auto" />
+      </div>
     </div>
   )
 }

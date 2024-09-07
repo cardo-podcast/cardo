@@ -5,7 +5,7 @@ import { EpisodeData } from "..";
 import { useDB } from "./DB";
 import { useSettings } from "./Settings";
 import { usePlayer } from "../components/AudioPlayer";
-import { downloadEpisode, removeDownloadedEpisode } from "../utils";
+import { downloadEpisode, removeDownloadedEpisode } from "../utils/utils";
 
 
 

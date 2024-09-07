@@ -1,9 +1,10 @@
-import EpisodeCard, { SortEpisodeGrip } from "../components/EpisodeCard"
+import EpisodeCard from "../components/EpisodeCard"
+import SortEpisodeGrip from "../components/SortEpisodeGrip"
 import { useDB } from "../engines/DB"
 import { EpisodeData } from ".."
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext } from '@dnd-kit/sortable';
-import { capitalize, parsePodcastDetails } from "../utils";
+import { capitalize, parsePodcastDetails } from "../utils/utils";
 import { useNavigate } from "react-router-dom";
 import { Suspense, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";

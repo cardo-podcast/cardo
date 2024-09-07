@@ -1,4 +1,4 @@
-import { secondsToStr } from "../utils";
+import { secondsToStr } from "../utils/utils";
 
 
 const ProgressBar = ({ position, total, showTime=true, className }:

@@ -3,7 +3,7 @@ import { path } from "@tauri-apps/api"
 import { EpisodeData, EpisodeState, NewEpisodeData, PodcastData, RawEpisodeData } from "..";
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react";
 import { useSettings } from "./Settings";
-import { parseXML } from "../utils";
+import { parseXML } from "../utils/utils";
 
 
 let db: Database = new Database('');

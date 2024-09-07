@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, RefObject, createContext, ReactNode, useContext, Dispatch, SetStateAction, useCallback, SyntheticEvent } from "react";
-import { secondsToStr } from "../utils";
+import { secondsToStr } from "../utils/utils";
 import { play as playIcon, pause as pauseIcon, forward as forwardIcon, backwards as backwardsIcon, close as closeIcon, speedometer } from "../Icons"
 import { EpisodeData } from "..";
 import { useDB } from "../engines/DB";
