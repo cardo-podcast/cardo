@@ -1,7 +1,7 @@
 import { http, invoke, shell } from "@tauri-apps/api"
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react"
 import { useDB, DB } from "../engines/DB"
-import { getCreds, parsePodcastDetails, removeCreds, saveCreds } from "../utils"
+import { getCreds, parsePodcastDetails, removeCreds, saveCreds } from "../utils/utils"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { toast } from 'react-toastify';

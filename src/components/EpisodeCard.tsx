@@ -1,45 +1,14 @@
-import { MouseEventHandler, ReactNode, SyntheticEvent, useEffect, useRef, useState } from "react"
+import { MouseEventHandler, SyntheticEvent, useEffect, useRef, useState } from "react"
 import { EpisodeData } from ".."
 import * as icons from "../Icons"
 import { useNavigate } from "react-router-dom"
 import { useIntersectionObserver } from "@uidotdev/usehooks"
-import { secondsToStr } from "../utils"
+import { secondsToStr } from "../utils/utils"
 import ProgressBar from "./ProgressBar"
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from "react-i18next"
 import { showMenu } from "tauri-plugin-context-menu";
 import appIcon from '../../src-tauri/icons/icon.png'
 import { useEpisode } from "../engines/Episode"
-
-
-export function SortEpisodeGrip({ id, children }: { id: number, children: ReactNode }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging
-  } = useSortable({ id: id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  return (
-    <div className="flex cursor-default hover:bg-primary-8 transition-colors rounded-md" style={style} {...attributes}>
-      <div ref={setNodeRef} className="flex items-center" {...listeners}>
-        <div className={`w-6 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}>
-          {icons.grip}
-        </div>
-      </div>
-      {children}
-    </div>
-  );
-}
-
 
 
 
