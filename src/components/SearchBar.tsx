@@ -12,7 +12,8 @@ import EpisodeCard from "./EpisodeCard";
 function SearchBar() {
   const [results, setResults] = useState<PodcastData[] | EpisodeData[]>([])
   const { subscriptionsEpisodes: { getAllSubscriptionsEpisodes }, subscriptions: {subscriptions} } = useDB()
-  const [searchMode, setSearchMode] = useState<'subscriptions' | 'podcasts' | 'current'>(subscriptions.length > 0 ? 'subscriptions': 'podcasts')
+  const [searchMode, setSearchMode_] = useState<'subscriptions' | 'podcasts' | 'current'>(subscriptions.length > 0 ? 'subscriptions': 'podcasts')
+  const [noResults, setNoResults] = useState(false)
   const timeout = useRef(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
@@ -25,16 +26,27 @@ function SearchBar() {
     return await SearchPodcast(term)
   }
 
+  const setSearchMode = (mode: typeof searchMode) => {
+    if (mode != searchMode) {
+      setResults([])
+      setSearchMode_(mode)
+    }
+  }
+
   const search = async (term: string) => {
     if (term.length === 0) return
+    let newResults: typeof results = []
 
     if (searchMode === 'subscriptions') {
-      setResults(await getAllSubscriptionsEpisodes({ searchTerm: term }))
+      newResults = await getAllSubscriptionsEpisodes({ searchTerm: term })
     } else if (searchMode === 'podcasts') {
-      setResults(await searchOnline(term))
+      newResults = await searchOnline(term)
     } else if (searchMode === 'current') {
-      setResults(searchOnCurrentPodcast(term))
+      newResults = searchOnCurrentPodcast(term)
     }
+
+    setResults(newResults)
+    setNoResults(newResults.length == 0)
   }
 
   useEffect(() => {
@@ -63,6 +75,7 @@ function SearchBar() {
   }
 
   const handleChange = async (term: string) => {
+    setNoResults(false)
     if (term.length > 3) {
       clearTimeout(timeout.current)
       timeout.current = setTimeout(() => search(term), 300)
@@ -102,7 +115,7 @@ function SearchBar() {
           ref={inputRef}
           type="text"
           placeholder={t('search_placeholder')}
-          className="py-1 px-2 bg-primary-9 w-full focus:outline-none peer"
+          className={`py-1 px-2 bg-primary-9 w-full focus:outline-none peer ${noResults && inputRef.current?.value && 'text-red-600 font-semibold'}`}
           onChange={(event) => { handleChange(event.target.value) }}
           onKeyDown={e => {
             if (e.key === 'Escape' || e.key === 'Tab') {
@@ -154,7 +167,7 @@ function SearchBar() {
           {/* close with click outside */}
           <div className="absolute z-10 mt-10 top-0 left-0 w-screen h-screen" onClick={() => setResults([])} />
 
-          <div className="w-4/5 absolute left-1/2 -translate-x-1/2 top-0 mt-[32px] z-10 max-h-[400px] flex justify-center overflow-y-auto scroll-smooth bg-primary-9 border-x-2 border-primary-8"
+          <div className="w-4/5 absolute left-1/2 -translate-x-1/2 top-0 mt-[32px] z-10 max-h-[400px] flex justify-center overflow-y-auto scroll-smooth bg-primary-9 border-x-2 border-primary-8 rounded-b-md overflow-hidden shadow-md shadow-primary-8"
             ref={resultsRef}
           >
             <div className="grid w-full">
