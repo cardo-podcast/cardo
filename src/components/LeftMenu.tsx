@@ -17,35 +17,35 @@ function LeftMenu() {
       {
         collapsedLeftMenu &&
 
-        <div className="bg-primary-9 border-r-2 border-primary-8 w-16 lg:w-80 h-full flex flex-col p-0.5 pt-4 overflow-x-hidden">
+        <div className="bg-primary-9 border-r-2 border-primary-8 w-16 h-full flex flex-col p-0.5 pt-4 overflow-x-hidden">
           <div className="flex flex-col gap-2 uppercase mb-6 font-thin items-center">
-            <NavLink to='/' className={({ isActive }) => `w-6 transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 '}`}
+            <NavLink to='/' className={({ isActive }) => `w-7 p-0.5 transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 hover:p-0'}`}
             title={t('home')}
             >
               {home}
             </NavLink>
-            <NavLink to='/settings' className={({ isActive }) => `w-6 transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5'}`}
+            <NavLink to='/settings' className={({ isActive }) => `w-7 p-0.5 transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 hover:p-0'}`}
             title={t('settings')}
             >
               {settings}
             </NavLink>
-            <NavLink to='/queue' className={({ isActive }) => `w-6 transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5'}`}
+            <NavLink to='/queue' className={({ isActive }) => `w-7 p-0.5 transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 hover:p-0'}`}
             title={t('queue')}
             >
               {queue}
             </NavLink>
-            <NavLink to='/downloads' className={({ isActive }) => `w-6 transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5'}`}
+            <NavLink to='/downloads' className={({ isActive }) => `w-7 p-0.5 transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 hover:p-0'}`}
             title={t('downloads')}
             >
               {download}
             </NavLink>
           </div>
 
-          <button className={`flex justify-center hover:text-accent-5 p-1 ${updatingFeeds && 'animate-[spin_1.5s_linear_reverse_infinite]'}`}
+          <button className={`flex justify-center hover:text-accent-5 mb-1 ${updatingFeeds && 'animate-[spin_1.5s_linear_reverse_infinite]'}`}
               onClick={updateSubscriptionsFeed}
               title={t('update_subs_feeds')}
             >
-              <span className="w-5">{sync}</span>
+              <span className="w-6 p-0.5 hover:p-0">{sync}</span>
            </button>
 
           <div className="flex flex-col gap-1 overflow-y-auto">
