@@ -50,9 +50,6 @@ export default function DownloadsPage() {
       downloads.filter(episode => completedEpisodes.includes(episode.src)) :
       downloads
 
-    console.log(completedEpisodes)
-    console.log(downloads.map(d=>d.src))
-
     batchRemoveFromDownloadList(deleteEpisodes.map(episode => {
       removeDownloadedEpisode(episode.localFile)
       return episode.src

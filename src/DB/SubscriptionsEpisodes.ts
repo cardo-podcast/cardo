@@ -9,7 +9,7 @@ import { useSettings } from "../engines/Settings";
 export function useSubscriptionsEpisodes(db: Database, subscriptions: PodcastData[]) {
   const [updatingFeeds, setUpdatingFeeds] = useState(false)
   const [{ general: { fetchSubscriptionsAtStartup } }, _] = useSettings()
-  const savedSubscriptions = useRef(subscriptions)
+  const savedSubscriptions = useRef<PodcastData[]>()
 
   useEffect(() => {
     if (db && fetchSubscriptionsAtStartup) {
@@ -20,10 +20,17 @@ export function useSubscriptionsEpisodes(db: Database, subscriptions: PodcastDat
   useEffect(() => {
     // when a new subscription is added load new episodes
     // when a subscription is removed remove saved episode data
-    updateSubscriptions()
+    if (subscriptions.length > 0 && savedSubscriptions.current === undefined) {
+      savedSubscriptions.current = subscriptions //when subscriptions are loaded save array only
+    } else {
+      updateSubscriptions()
+    }
   }, [subscriptions])
 
   async function updateSubscriptions() {
+
+    if (savedSubscriptions.current === undefined) return
+
     function includes(source: PodcastData[], element: PodcastData) {
       return source.findIndex(s => s.feedUrl == element.feedUrl) > -1
     }
@@ -86,7 +93,6 @@ export function useSubscriptionsEpisodes(db: Database, subscriptions: PodcastDat
 
 
   const remove = useCallback(async function (podcastUrl: string) {
-    console.log('DELETE FROM subscriptions_episodes WHERE podcastUrl', podcastUrl)
     await db.execute(
       "DELETE FROM subscriptions_episodes WHERE podcastUrl = $1",
       [podcastUrl],
