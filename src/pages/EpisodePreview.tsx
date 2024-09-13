@@ -2,7 +2,7 @@ import { SyntheticEvent, useEffect, useState } from "react"
 import * as icons from "../Icons"
 import { EpisodeData } from ".."
 import { useLocation, useNavigate } from "react-router-dom"
-import { useDB } from "../engines/DB"
+import { useDB } from "../DB/DB"
 import { parsePodcastDetails, secondsToStr } from "../utils/utils"
 import { useTranslation } from "react-i18next"
 import ProgressBar from "../components/ProgressBar"
@@ -15,7 +15,7 @@ function EpisodePreview() {
   const location = useLocation()
   const episode = location.state.episode as EpisodeData
   const navigate = useNavigate()
-  const { subscriptions: { getSubscription } } = useDB()
+  const { subscriptions } = useDB()
   const { t } = useTranslation()
   const [podcastFetched, setPodcastFetched] = useState(false)
   const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, toggleDownload, downloadState, play } = useEpisode(episode)
@@ -27,7 +27,7 @@ function EpisodePreview() {
       return
     } // complete podcast data has been passed with episode
 
-    const subscription = await getSubscription(episode.podcastUrl)
+    const subscription = await subscriptions.get(episode.podcastUrl)
 
     if (subscription !== undefined) {
       episode.podcast = subscription

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { EpisodeData } from "..";
-import { useDB } from "./DB";
+import { useDB } from "../DB/DB";
 import { useSettings } from "./Settings";
 import { usePlayer } from "../components/AudioPlayer";
 import { downloadEpisode, removeDownloadedEpisode } from "../utils/utils";
@@ -10,7 +10,7 @@ import { downloadEpisode, removeDownloadedEpisode } from "../utils/utils";
 
 
 export function useEpisode(episode: EpisodeData, isIntersecting: boolean | undefined = true) {
-  const { queue, history: { getEpisodeState, updateEpisodeState }, downloads } = useDB()
+  const { queue, history, downloads } = useDB()
   const [inQueue, setInqueue] = useState(queue.includes(episode.src))
   const [downloadState, setDownloadState] = useState<'downloaded' | ['downloading', number] | undefined>()
   const [reprState, setReprState] = useState({ position: 0, total: episode.duration, complete: false })
@@ -32,7 +32,7 @@ export function useEpisode(episode: EpisodeData, isIntersecting: boolean | undef
     // dataLoaded.current = true
 
     // update reproduction state
-    const state = await getEpisodeState(episode.src)
+    const state = await history.get(episode.src)
 
     if (state !== undefined) {
       setReprState({ position: state.position, total: state.total, complete: state.position >= state.total })
@@ -66,10 +66,10 @@ export function useEpisode(episode: EpisodeData, isIntersecting: boolean | undef
 
   const togglePlayed = () => {
     if (reprState.complete) {
-      updateEpisodeState(episode.src, episode.podcastUrl, 0, episode.duration)
+      history.update(episode.src, episode.podcastUrl, 0, episode.duration)
       setReprState({ complete: false, position: 0, total: reprState.total })
     } else {
-      updateEpisodeState(episode.src, episode.podcastUrl, reprState.total, reprState.total)
+      history.update(episode.src, episode.podcastUrl, reprState.total, reprState.total)
       setReprState({ complete: true, position: reprState.total, total: reprState.total })
       if (playing?.src == episode.src) {
         quitPlayer()

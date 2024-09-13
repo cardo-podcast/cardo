@@ -4,13 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { showMenu } from "tauri-plugin-context-menu";
 import { PodcastData } from '..';
-import { useDB } from '../engines/DB';
+import { useDB } from '../DB/DB';
 
 
 export default function SubscriptionCard({podcast, mini=false}: {podcast: PodcastData, mini?: boolean}){
   const navigate = useNavigate()
   const { t } = useTranslation();
-  const { subscriptions: {deleteSubscription, reloadSubscriptions} } = useDB()
+  const { subscriptions } = useDB()
 
   return(
     <div className={`p-1 rounded-md flex gap-2 ${mini? 'justify-center': 'justify-between hover:pl-2'} cursor-pointer hover:bg-primary-8 transition-all`}
@@ -25,8 +25,7 @@ export default function SubscriptionCard({podcast, mini=false}: {podcast: Podcas
           {
             label: t('remove_from_subscriptions'),
             event: async() => {
-              await deleteSubscription(podcast.feedUrl)
-              reloadSubscriptions()
+              await subscriptions.remove(podcast.feedUrl)
             },
           }
         ]

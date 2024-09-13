@@ -2,7 +2,7 @@ import { useRef, useEffect, useState, RefObject, createContext, ReactNode, useCo
 import { secondsToStr } from "../utils/utils";
 import { play as playIcon, pause as pauseIcon, forward as forwardIcon, backwards as backwardsIcon, close as closeIcon, speedometer } from "../Icons"
 import { EpisodeData } from "..";
-import { useDB } from "../engines/DB";
+import { useDB } from "../DB/DB";
 import { useNavigate } from "react-router-dom";
 import { useSettings } from "../engines/Settings";
 import { useTranslation } from "react-i18next";
@@ -31,15 +31,14 @@ export const usePlayer = () => useContext(PlayerContext) as AudioPlayerRef
 export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playing, setPlaying] = useState<EpisodeData>()
-  const { dbLoaded, history: { getEpisodeState, getLastPlayed, setLastPlaying } } = useDB()
+  const { dbLoaded, history, misc } = useDB()
   const [position, setPosition] = useState(0);
-  const { history: { updateEpisodeState } } = useDB()
 
 
   const loadLastPlayed = async () => {
     if (audioRef.current == null) return
 
-    const lastPlayed = await getLastPlayed()
+    const lastPlayed = await misc.getLastPlayed()
     if (lastPlayed) {
       load(lastPlayed)
     }
@@ -56,7 +55,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
 
     // update state if other episode was being played
     if (playing && !audioRef.current.paused && audioRef.current.currentTime > 0) {
-      updateEpisodeState(playing.src,
+      history.update(playing.src,
         playing.podcastUrl,
         audioRef.current.currentTime,
         audioRef.current.duration
@@ -71,7 +70,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     }
     audioRef.current.load()
 
-    const previousState = await getEpisodeState(episode?.src)
+    const previousState = await history.get(episode?.src)
 
     if (previousState !== undefined && previousState.position < previousState.total) {
       audioRef.current.currentTime = previousState.position
@@ -94,7 +93,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
 
     audioRef.current.src = ''
     setPlaying(undefined)
-    setLastPlaying() // revoke last playing
+    misc.setLastPlaying() // revoke last playing
   }
 
   const onExit = useCallback(async () => {
@@ -102,10 +101,10 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     if (audioRef.current == null || playing == null) return
 
     // save the opened episode to load it when opening app again
-    await setLastPlaying(playing)
+    await misc.setLastPlaying(playing)
 
     if (!audioRef.current.paused && audioRef.current.currentTime > 0) {
-      await updateEpisodeState(playing.src,
+      await history.update(playing.src,
         playing.podcastUrl,
         audioRef.current.currentTime,
         audioRef.current.duration
@@ -229,7 +228,7 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
 
 function AudioPlayer({ className = '' }) {
   const [duration, setDuration] = useState(0);
-  const { history: { updateEpisodeState }, queue } = useDB()
+  const { history, queue } = useDB()
   const { audioRef, play, playing, position, setPosition, quit } = usePlayer()
   const navigate = useNavigate()
   const [{ playback: { stepForward, stepBackwards, displayRemainingTime } }, updateSettings] = useSettings()
@@ -253,7 +252,7 @@ function AudioPlayer({ className = '' }) {
     if (audioRef.current == null || playing == null) return
 
     if (audioRef.current.paused && audioRef.current.currentTime > 0) {
-      updateEpisodeState(playing.src,
+      history.update(playing.src,
         playing.podcastUrl,
         audioRef.current.currentTime,
         audioRef.current.duration
@@ -265,7 +264,7 @@ function AudioPlayer({ className = '' }) {
   useEffect(() => {
     if (!playing || !audioRef.current?.ended) return
 
-    updateEpisodeState(playing.src,
+    history.update(playing.src,
       playing.podcastUrl,
       audioRef.current.duration,
       audioRef.current.duration

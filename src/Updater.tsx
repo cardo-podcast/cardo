@@ -5,7 +5,7 @@ import {
 import { relaunch } from '@tauri-apps/api/process'
 import { useEffect, useRef, useState } from 'react'
 import { UnlistenFn } from '@tauri-apps/api/event'
-import { useDB } from './engines/DB'
+import { useDB } from './DB/DB'
 import { parse } from 'date-fns';
 import { useTranslation } from 'react-i18next'
 import { upArrow } from './Icons'
@@ -16,7 +16,7 @@ export default function Updater() {
   const unlistenCeckUpdates = useRef<UnlistenFn>()
   const [dialog, setDialog] = useState<{ version: string, releaseNotes: string }>()
   const [showBanner, Banner] = useModalBanner()
-  const { appUpdate, dbLoaded } = useDB()
+  const { misc: {getLastUpdate, setLastUpdate}, dbLoaded } = useDB()
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -42,11 +42,11 @@ export default function Updater() {
 
       const formatString = "yyyy-MM-dd HH:mm:ss.SSS xxxxx"
       const releaseDate = parse(manifest.date, formatString, new Date())
-      const lastUpdate = await appUpdate.getLastUpdate()
+      const lastUpdate = await getLastUpdate()
 
       showBanner(releaseDate.getTime() > lastUpdate) // annoying dialog is shown only once, after that only the title bar icon appears
 
-      await appUpdate.setLastUpdate(Date.now())
+      await setLastUpdate(Date.now())
 
     } catch (error) {
       console.error(error)

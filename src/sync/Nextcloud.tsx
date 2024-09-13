@@ -1,6 +1,6 @@
 import { http, invoke, shell } from "@tauri-apps/api"
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react"
-import { useDB, DB } from "../engines/DB"
+import { useDB, DB } from "../DB/DB"
 import { getCreds, parsePodcastDetails, removeCreds, saveCreds } from "../utils/utils"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
@@ -13,7 +13,7 @@ import { useSettings } from "../engines/Settings"
 export function NextcloudSettings() {
   const urlRef = useRef<HTMLInputElement>(null)
   const interval = useRef(0)
-  const { sync: { getSyncKey, setSyncKey, loggedInSync: loggedIn, setLoggedInSync: setLoggedIn } } = useDB()
+  const { misc: { getSyncKey, setSyncKey, loggedInSync: loggedIn, setLoggedInSync: setLoggedIn } } = useDB()
   const { t } = useTranslation()
   const [{ sync: syncSettings }, updateSettings] = useSettings()
 
@@ -252,7 +252,7 @@ async function sync(syncKey: string, updateEpisodeState: updateEpisodeStateType,
   for (const feedUrl of subsServerUpdates.add) {
     if (!localSubscriptions.includes(feedUrl)) {
       const podcastData = await parsePodcastDetails(feedUrl)
-      subscriptions.addSubscription(podcastData)
+      subscriptions.add(podcastData)
     }
   }
 
@@ -260,7 +260,7 @@ async function sync(syncKey: string, updateEpisodeState: updateEpisodeStateType,
   // remove subscriptions
   for (const feedUrl of subsServerUpdates.remove) {
     if (localSubscriptions.includes(feedUrl)) {
-      subscriptions.deleteSubscription(feedUrl)
+      subscriptions.remove(feedUrl)
     }
   }
 
@@ -268,8 +268,6 @@ async function sync(syncKey: string, updateEpisodeState: updateEpisodeStateType,
     await pushUpdates(server, 'subscription_change', loginName, appPassword, { add: [], remove: [], ...updateSubscriptions })
   }
 
-
-  subscriptions.reloadSubscriptions()
   // #endregion
 
 
@@ -318,8 +316,8 @@ enum SyncStatus {
 export function initSync() {
   const [status, setStatus] = useState<SyncStatus>(SyncStatus.Standby)
   const [error, setError] = useState('')
-  const { dbLoaded, sync: { getSyncKey, setLastSync, getLastSync, loggedInSync: loggedIn, setLoggedInSync: setLoggedIn },
-    history: { updateEpisodeState, getEpisodesStates }, subscriptions } = useDB()
+  const { dbLoaded, misc: { getSyncKey, setLastSync, getLastSync, loggedInSync: loggedIn, setLoggedInSync: setLoggedIn },
+    history, subscriptions } = useDB()
   const navigate = useNavigate()
   const [{ sync: syncSettings }, _] = useSettings()
   const { t } = useTranslation()
@@ -370,7 +368,7 @@ export function initSync() {
         throw 'Error obtaining cipher key, please log-in again on Nextcloud'
       }
 
-      await sync(key, updateEpisodeState, getLastSync, getEpisodesStates, subscriptions, updateSubscriptions)
+      await sync(key, history.update, getLastSync, history.getAll, subscriptions, updateSubscriptions)
 
       await setLastSync(Date.now())
       setStatus(SyncStatus.Ok)

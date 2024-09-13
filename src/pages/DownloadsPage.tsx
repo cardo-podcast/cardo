@@ -1,5 +1,5 @@
 import EpisodeCard from "../components/EpisodeCard"
-import { useDB } from "../engines/DB"
+import { useDB } from "../DB/DB"
 import { EpisodeData } from ".."
 import { capitalize, parsePodcastDetails, removeDownloadedEpisode } from "../utils/utils";
 import { useNavigate } from "react-router-dom";
@@ -10,14 +10,14 @@ import { useTranslation } from "react-i18next";
 export default function DownloadsPage() {
   const { downloads: { downloads, batchRemoveFromDownloadList } } = useDB()
   const navigate = useNavigate()
-  const { subscriptions: { getSubscription }, history: { getCompletedEpisodes } } = useDB()
+  const { subscriptions, history } = useDB()
   const { t } = useTranslation()
   const [downloadsInfo, setDownloadsInfo] = useState('')
 
 
 
   const fetchPodcastData = async (episode: EpisodeData) => {
-    const subscription = await getSubscription(episode.podcastUrl)
+    const subscription = await subscriptions.get(episode.podcastUrl)
 
     if (subscription !== undefined) {
       episode.podcast = subscription
@@ -44,11 +44,14 @@ export default function DownloadsPage() {
   }, [downloads])
 
   const clear = async (mode: 'completed' | 'all') => {
-    const completedEpisodes = await getCompletedEpisodes()
+    const completedEpisodes = await history.getCompleted()
 
     const deleteEpisodes = mode === 'completed' ?
       downloads.filter(episode => completedEpisodes.includes(episode.src)) :
       downloads
+
+    console.log(completedEpisodes)
+    console.log(downloads.map(d=>d.src))
 
     batchRemoveFromDownloadList(deleteEpisodes.map(episode => {
       removeDownloadedEpisode(episode.localFile)
