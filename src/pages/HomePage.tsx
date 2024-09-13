@@ -1,16 +1,33 @@
 import EpisodePreviewCard from "../components/EpisodePreviewCard";
-import { useDB } from "../engines/DB";
+import { useDB } from "../DB/DB";
 import { useTranslation } from "react-i18next";
 import EpisodeOverview from "../components/EpisodeOverview";
 import appIcon from '../../src-tauri/icons/icon.png'
+import { useSettings } from "../engines/Settings";
+import { useEffect, useState } from "react";
+import { NewEpisodeData } from "..";
 
 
 function HomePage() {
-  const { dbLoaded, queue,
-    subscriptionsEpisodes: { newEpisodes }} = useDB()
+  const { queue } = useDB()
   const { t } = useTranslation()
+  const [newEpisodes, setNewEpisodes] = useState<NewEpisodeData[]>([])
+  const {subscriptionsEpisodes, subscriptions} = useDB()
+  const [{ general: { numberOfDaysInNews } }, _] = useSettings()
 
-  if (!dbLoaded) return
+  const loadNewEpisodes = async () => {
+    const minDate = Date.now() - (24 * 3600 * 1000 * numberOfDaysInNews)
+    const episodes = await subscriptionsEpisodes.loadNew(minDate)
+
+    episodes.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime())
+
+    setNewEpisodes(episodes)
+  }
+
+  useEffect(() => {
+    // extract episodes newer than setting
+    loadNewEpisodes()
+  }, [numberOfDaysInNews, subscriptionsEpisodes.updatingFeeds, subscriptions.subscriptions])
 
   return (
     <div className="flex flex-col p-2 w-full h-fit gap-3 mt-1">

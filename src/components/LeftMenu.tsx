@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { useDB } from "../engines/DB";
+import { useDB } from "../DB/DB";
 import { useTranslation } from "react-i18next";
 import { sync, home, settings, queue, download } from '../Icons'
 import SubscriptionCard from "./SubscriptionCard";
@@ -7,7 +7,7 @@ import { useSettings } from "../engines/Settings";
 
 
 function LeftMenu() {
-  const { subscriptions, subscriptionsEpisodes: { updateSubscriptionsFeed, updatingFeeds } } = useDB()
+  const { subscriptions, subscriptionsEpisodes } = useDB()
   const { t } = useTranslation()
   const [{ui: {collapsedLeftMenu}}, updateSettings] = useSettings()
 
@@ -41,8 +41,8 @@ function LeftMenu() {
             </NavLink>
           </div>
 
-          <button className={`flex justify-center hover:text-accent-5 mb-1 ${updatingFeeds && 'animate-[spin_1.5s_linear_reverse_infinite]'}`}
-              onClick={updateSubscriptionsFeed}
+          <button className={`flex justify-center hover:text-accent-5 mb-1 ${subscriptionsEpisodes.updatingFeeds && 'animate-[spin_1.5s_linear_reverse_infinite]'}`}
+              onClick={subscriptionsEpisodes.updateFeeds}
               title={t('update_subs_feeds')}
             >
               <span className="w-6 p-0.5 hover:p-0">{sync}</span>
@@ -82,8 +82,8 @@ function LeftMenu() {
 
           <div className="flex items-center gap-1 mb-2">
             <h1 className="uppercase">{t('subscriptions')}</h1>
-            <button className={`flex items-center hover:text-accent-5 h-full aspect-square p-1 ${updatingFeeds && 'animate-[spin_1.5s_linear_reverse_infinite]'}`}
-              onClick={updateSubscriptionsFeed}
+            <button className={`flex items-center hover:text-accent-5 h-full aspect-square p-1 ${subscriptionsEpisodes.updatingFeeds && 'animate-[spin_1.5s_linear_reverse_infinite]'}`}
+              onClick={subscriptionsEpisodes.updateFeeds}
               title={t('update_subs_feeds')}
             >
               {sync}
@@ -93,7 +93,7 @@ function LeftMenu() {
             {
               subscriptions.subscriptions.map(subscription => {
                 return (
-                  <SubscriptionCard key={subscription.id} podcast={subscription} />
+                  <SubscriptionCard key={subscription.feedUrl} podcast={subscription} />
                 )
               }
               )

@@ -1,6 +1,6 @@
 import EpisodeCard from "../components/EpisodeCard"
 import SortEpisodeGrip from "../components/SortEpisodeGrip"
-import { useDB } from "../engines/DB"
+import { useDB } from "../DB/DB"
 import { EpisodeData } from ".."
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext } from '@dnd-kit/sortable';
@@ -13,7 +13,7 @@ import { useTranslation } from "react-i18next";
 export default function QueuePage() {
   const { queue: { queue, move, batchRemove } } = useDB()
   const navigate = useNavigate()
-  const { subscriptions: { getSubscription }, history: { getCompletedEpisodes } } = useDB()
+  const { subscriptions, history } = useDB()
   const { t } = useTranslation()
   const [queueInfo, setQueueInfo] = useState('')
 
@@ -31,7 +31,7 @@ export default function QueuePage() {
   }
 
   const fetchPodcastData = async (episode: EpisodeData) => {
-    const subscription = await getSubscription(episode.podcastUrl)
+    const subscription = await subscriptions.get(episode.podcastUrl)
 
     if (subscription !== undefined) {
       episode.podcast = subscription
@@ -58,7 +58,7 @@ export default function QueuePage() {
   }, [queue])
 
   const clear = async (mode: 'completed' | 'all') => {
-    const completedEpisodes = await getCompletedEpisodes()
+    const completedEpisodes = await history.getCompleted()
 
     const deleteEpisodes = mode === 'completed' ?
       queue.filter(episode => completedEpisodes.includes(episode.src)):

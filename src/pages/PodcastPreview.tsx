@@ -4,7 +4,7 @@ import { ReactNode, Suspense, SyntheticEvent, useEffect, useState } from "react"
 import * as icons from "../Icons"
 import { parseXML } from "../utils/utils";
 import EpisodeCard from "../components/EpisodeCard";
-import { useDB } from "../engines/DB";
+import { useDB } from "../DB/DB";
 import { Switch, SwitchState } from "../components/Inputs";
 import { usePodcastSettings } from "../engines/Settings";
 import { useTranslation } from "react-i18next";
@@ -53,10 +53,10 @@ function PodcastPreview() {
   const [episodes, setEpisodes] = useState<EpisodeData[]>([])
   const [downloading, setDownloading] = useState(false)
   const [subscribed, setSubscribed] = useState(false)
-  const { subscriptions: { getSubscription, deleteSubscription, addSubscription, reloadSubscriptions },
-    history: { getCompletedEpisodes },
-    sync: { loggedInSync: loggedInSync },
-    subscriptionsEpisodes: { getAllSubscriptionsEpisodes, saveSubscriptionsEpisodes } } = useDB()
+  const { subscriptions,
+    history: { getCompleted },
+    misc: { loggedInSync: loggedInSync },
+    subscriptionsEpisodes } = useDB()
   const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcast.feedUrl)
   const { performSync } = useSync()
 
@@ -98,14 +98,14 @@ function PodcastPreview() {
       return episodes
     }
 
-    const isSubscribed = await getSubscription(podcast.feedUrl) !== undefined
+    const isSubscribed = await subscriptions.get(podcast.feedUrl) !== undefined
     setSubscribed(isSubscribed)
 
     let episodes: EpisodeData[] = []
     if (!isSubscribed || forceDownload) {
       episodes = await downloadEpisodes()
     } else if (isSubscribed) {
-      episodes = await getAllSubscriptionsEpisodes({ podcastUrl: podcast.feedUrl })
+      episodes = await subscriptionsEpisodes.getAll({ podcastUrl: podcast.feedUrl })
       if (!episodes.length) {
         setEpisodes([])
         episodes = await downloadEpisodes()
@@ -113,7 +113,7 @@ function PodcastPreview() {
     }
 
     if (isSubscribed) {
-      saveSubscriptionsEpisodes(episodes)
+      subscriptionsEpisodes.save(episodes)
     }
 
     location.state['currentPodcastEpisodes'] = episodes
@@ -123,7 +123,7 @@ function PodcastPreview() {
   }
 
   const filterEpisodes = async (unfilteredEpisodes: EpisodeData[]) => {
-    const completedEpisodes = await getCompletedEpisodes(podcast.feedUrl)
+    const completedEpisodes = await getCompleted(podcast.feedUrl)
     const filter = podcastSettings.filter
 
     if (filter.played === SwitchState.True) {
@@ -200,22 +200,21 @@ function PodcastPreview() {
               onClick={async () => {
                 if (subscribed) {
                   loggedInSync && performSync({ remove: [podcast.feedUrl] })
-                  await deleteSubscription(podcast.feedUrl)
+                  await subscriptions.remove(podcast.feedUrl)
                   setSubscribed(false)
                 } else {
                   loggedInSync && performSync({ add: [podcast.feedUrl] })
-                  podcast.id = await addSubscription(podcast)
+                  podcast.id = await subscriptions.add(podcast)
                   setSubscribed(true)
-                  await saveSubscriptionsEpisodes(episodes)
+                  await subscriptionsEpisodes.save(episodes)
                 }
-                reloadSubscriptions()
               }}>
                 {subscribed ? icons.starFilled : icons.star}
               </button>
               <button className="hover:text-accent-6" onClick={async () => {
                 const [fetchedEpisodes,] = await parseXML(podcast.feedUrl)
                 setEpisodes(sortEpisodes(fetchedEpisodes))
-                saveSubscriptionsEpisodes(fetchedEpisodes)
+                subscriptionsEpisodes.save(fetchedEpisodes)
               }
               }>
                 {icons.reload}

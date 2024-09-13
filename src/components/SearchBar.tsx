@@ -5,13 +5,13 @@ import PodcastCard from "./PodcastCard";
 import { useTranslation } from "react-i18next";
 import { arrowLeft, arrowRight } from "../Icons";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDB } from "../engines/DB";
+import { useDB } from "../DB/DB";
 import EpisodeCard from "./EpisodeCard";
 
 
 function SearchBar() {
   const [results, setResults] = useState<PodcastData[] | EpisodeData[]>([])
-  const { subscriptionsEpisodes: { getAllSubscriptionsEpisodes }, subscriptions: {subscriptions} } = useDB()
+  const { subscriptionsEpisodes, subscriptions: {subscriptions} } = useDB()
   const [searchMode, setSearchMode_] = useState<'subscriptions' | 'podcasts' | 'current'>(subscriptions.length > 0 ? 'subscriptions': 'podcasts')
   const [noResults, setNoResults] = useState(false)
   const timeout = useRef(0)
@@ -38,7 +38,7 @@ function SearchBar() {
     let newResults: typeof results = []
 
     if (searchMode === 'subscriptions') {
-      newResults = await getAllSubscriptionsEpisodes({ searchTerm: term })
+      newResults = await subscriptionsEpisodes.getAll({ searchTerm: term })
     } else if (searchMode === 'podcasts') {
       newResults = await searchOnline(term)
     } else if (searchMode === 'current') {

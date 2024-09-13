@@ -6,7 +6,7 @@ import TitleBar from "./components/TitleBar";
 import HomePage from "./pages/HomePage";
 import SearchBar from "./components/SearchBar";
 const PodcastPreview = lazy(() => import('./pages/PodcastPreview'));
-import { DBProvider } from "./engines/DB";
+import { DBProvider } from "./DB/DB";
 const EpisodePreview = lazy(() => import('./pages/EpisodePreview'));
 const Settings = lazy(() => import('./pages/Settings'));
 import { SettingsProvider } from "./engines/Settings";
