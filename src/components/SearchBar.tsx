@@ -178,14 +178,13 @@ function SearchBar() {
                   } else {
                     return <EpisodeCard key={result.id}
                       episode={result as EpisodeData}
-                      noLazyLoad={true}
                       className="hover:bg-primary-8 transition-colors border-b-[1px] border-primary-8"
                     />
                   }
                 })
               }
             </div>
-          </div>)
+          </div>
         </>
       }
     </div>

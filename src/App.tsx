@@ -30,7 +30,8 @@ const App = () => {
     document.addEventListener('contextmenu', event => event.preventDefault());
 
     return () => document.removeEventListener('contextmenu', event => event.preventDefault());
-  })
+  }, [])
+
 
   return (
     <div className={`bg-primary-9 w-full h-screen flex flex-col border-primary-6 border-[1px]
