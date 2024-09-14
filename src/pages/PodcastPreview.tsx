@@ -163,150 +163,171 @@ function PodcastPreview() {
   }, [scrollRef.current?.clientHeight])
 
   return (
-    <div ref={scrollRef} className="relative p-2 w-full flex flex-col h-full overflow-y-auto scroll-smooth"
-      onScroll={() => {
-        if (!scrollRef.current) return
-        const scrolledWindows = scrollRef.current.scrollTop / scrollRef.current.clientHeight + 1
-        const elementsOnWindow = Math.floor(scrollRef.current.clientHeight / EPISODE_CARD_HEIGHT) + 1
+    <div className="relative">
 
-        setVisibleItems(Math.max(visibleItems, Math.round((scrolledWindows) * elementsOnWindow) + PRELOADED_EPISODES))
-      }}
-    >
+      {/* sticky bar that appears when scrolling */}
+      < div className="flex gap-2 items-center bg-primary-9 absolute w-full top-0 p-1 border-b-2 border-primary-8 z-10 cursor-default group "
+      >
+        <img className="bg-primary-7 h-10 aspect-square rounded-md"
+          src={podcast.coverUrlLarge}
+          alt=""
+          onError={(e: SyntheticEvent<HTMLImageElement>) => e.currentTarget.src = appIcon}
+        />
 
-      {tweakMenu &&
-        <>
-          <div className="absolute top-0 left-0 z-20 w-screen h-screen"
-            onClick={() => setTweakMenu(undefined)}
-          />
+        <h1 className="text-xl group-hover:hidden">{podcast.podcastName}</h1>
 
-          <div className="left-1/2 -translate-x-1/2 absolute w-4/5 top-0 rounded-b-3xl overflow-hidden bg-primary-9 border-[1px] border-t-0 border-primary-6 flex flex-col justify-between items-center transition-all duration-200 z-20">
-            <div className="p-2 flex flex-col gap-1 items-center w-full">
-              {tweakMenu}
-            </div>
-
-            <button className="border-t-2 border-primary-8 p-2 h-5 w-4/5 flex justify-center items-center mt-1"
-              onClick={() => setTweakMenu(undefined)}
-            >
-              <span className="h-6 w-6">{icons.upArrow}</span>
-            </button>
-          </div>
-        </>
-      }
-
-      <div className='flex justify-left w-full gap-3 pb-3 border-b-[3px] border-primary-8 h-52 bg-primary-9'>
-        <div className="flex flex-col gap-2 items-center shrink-0">
-          <div className="h-40 aspect-square cursor-pointer"
-            title={t('copy_feed_url')}
-            onClick={() => {
-              navigator.clipboard.writeText(podcast.feedUrl)
-              toast.info(t('feed_url_copied'), {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "dark",
-              });
-            }}
-          >
-            <img
-              className="bg-primary-7 h-40 aspect-square rounded-md"
-              src={podcast.coverUrlLarge}
-              alt=""
-              onError={(e: SyntheticEvent<HTMLImageElement>) => e.currentTarget.src = appIcon}
-            />
-          </div>
-
-          {/* #region BUTTONS */}
-          <div className="flex gap-2">
-            <button className="hover:text-accent-6"
-              title={t(subscribed ? 'remove_from_subscriptions' : 'add_to_subscriptions')}
-              onClick={async () => {
-                if (subscribed) {
-                  loggedInSync && performSync({ remove: [podcast.feedUrl] })
-                  await subscriptions.remove(podcast.feedUrl)
-                  setSubscribed(false)
-                } else {
-                  loggedInSync && performSync({ add: [podcast.feedUrl] })
-                  podcast.id = await subscriptions.add(podcast)
-                  setSubscribed(true)
-                  await subscriptionsEpisodes.save(episodes)
-                }
-              }}>
-              {subscribed ? icons.starFilled : icons.star}
-            </button>
-            <button className="hover:text-accent-6" onClick={async () => {
-              const [fetchedEpisodes,] = await parseXML(podcast.feedUrl)
-              setEpisodes(sortEpisodes(fetchedEpisodes))
-              subscriptionsEpisodes.save(fetchedEpisodes)
-            }
-            }>
-              {icons.reload}
-            </button>
-
-            <button
-              className="hover:text-accent-6"
-              onClick={() => {
-                setTweakMenu(
-                  <div className="w-4/5 flex flex-col gap-1 justify-center items-center">
-                    <SortButton podcastUrl={podcast.feedUrl} criterion="date">
-                      {t('date')}
-                    </SortButton>
-                    <SortButton podcastUrl={podcast.feedUrl} criterion="duration">
-                      {t('duration')}
-                    </SortButton>
-                  </div>
-                )
-              }
-              }>
-              {icons.sort}
-            </button>
-            <button
-              className="hover:text-accent-6"
-              onClick={() => {
-                setTweakMenu(
-                  <div className="flex justify-center items-center">
-                    <Switch initialState={podcastSettings.filter.played} setState={async (value) => {
-                      updatePodcastSettings({ filter: { played: value } })
-                    }} labels={[t('not_played'), t('played')]} />
-                  </div>
-                )
-              }
-              }>
-              {icons.filter}
-            </button>
-            <button className={`w-6 hover:text-accent-6 ${downloading
-              && 'animate-[spin_2s_linear_reverse_infinite]'}`}
-              onClick={async () => {
-                setEpisodes(await loadEpisodes(true))
-              }}
-            >
-              {icons.sync}
-            </button>
-          </div>
-          {/* #endregion */}
-
-        </div>
-
-        <div className="flex flex-col h-full">
-          <h1 className="text-lg">{podcast.podcastName}</h1>
-          <h2 className="mb-2">{podcast.artistName}</h2>
-
-          <div className="flex overflow-y-auto rounded-md scroll-smooth pr-2">
-            <div className="whitespace-pre-line text-sm text-primary-4"
-              dangerouslySetInnerHTML={{ __html: sanitizeHTML(podcast.description ?? '') }} />
-          </div>
-
-        </div>
+        <span className="opacity-0 group-hover:opacity-100 transition-opacity w-10 absolute left-1/2 -translate-x-1/2 cursor-pointer"
+        onClick={() => scrollRef.current && scrollRef.current.scrollTo({top: 0})}
+        >
+          {icons.upArrowSquare}
+        </span>
       </div >
 
-      <div className="flex flex-col">
-        {episodes.slice(0, visibleItems).map(episode => (
+      <div ref={scrollRef} className="relative w-full flex flex-col h-full overflow-y-auto scroll-smooth"
+        onScroll={() => {
+          if (!scrollRef.current) return
+          const scrolledWindows = scrollRef.current.scrollTop / scrollRef.current.clientHeight + 1
+          const elementsOnWindow = Math.floor(scrollRef.current.clientHeight / EPISODE_CARD_HEIGHT) + 1
+
+          setVisibleItems(Math.max(visibleItems, Math.round((scrolledWindows) * elementsOnWindow) + PRELOADED_EPISODES))
+        }}
+      >
+
+        {tweakMenu &&
+          <>
+            <div className="absolute top-0 left-0 z-20 w-screen h-screen"
+              onClick={() => setTweakMenu(undefined)}
+            />
+
+            <div className="left-1/2 -translate-x-1/2 absolute w-4/5 top-0 rounded-b-3xl overflow-hidden bg-primary-9 border-[1px] border-t-0 border-primary-6 flex flex-col justify-between items-center transition-all duration-200 z-20">
+              <div className="p-2 flex flex-col gap-1 items-center w-full">
+                {tweakMenu}
+              </div>
+
+              <button className="border-t-2 border-primary-8 p-2 h-5 w-4/5 flex justify-center items-center mt-1"
+                onClick={() => setTweakMenu(undefined)}
+              >
+                <span className="h-6 w-6">{icons.upArrow}</span>
+              </button>
+            </div>
+          </>
+        }
+
+        <div className='flex justify-left w-full gap-3 pb-3 border-b-2 border-primary-8 h-52 bg-primary-9 p-2 z-10'>
+          <div className="flex flex-col gap-2 items-center shrink-0">
+            <div className="h-40 aspect-square cursor-pointer"
+              title={t('copy_feed_url')}
+              onClick={() => {
+                navigator.clipboard.writeText(podcast.feedUrl)
+                toast.info(t('feed_url_copied'), {
+                  position: "top-center",
+                  autoClose: 3000,
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "dark",
+                });
+              }}
+            >
+              <img
+                className="bg-primary-7 h-40 aspect-square rounded-md"
+                src={podcast.coverUrlLarge}
+                alt=""
+                onError={(e: SyntheticEvent<HTMLImageElement>) => e.currentTarget.src = appIcon}
+              />
+            </div>
+
+            {/* #region BUTTONS */}
+            <div className="flex gap-2">
+              <button className="hover:text-accent-6"
+                title={t(subscribed ? 'remove_from_subscriptions' : 'add_to_subscriptions')}
+                onClick={async () => {
+                  if (subscribed) {
+                    loggedInSync && performSync({ remove: [podcast.feedUrl] })
+                    await subscriptions.remove(podcast.feedUrl)
+                    setSubscribed(false)
+                  } else {
+                    loggedInSync && performSync({ add: [podcast.feedUrl] })
+                    podcast.id = await subscriptions.add(podcast)
+                    setSubscribed(true)
+                    await subscriptionsEpisodes.save(episodes)
+                  }
+                }}>
+                {subscribed ? icons.starFilled : icons.star}
+              </button>
+              <button className="hover:text-accent-6" onClick={async () => {
+                const [fetchedEpisodes,] = await parseXML(podcast.feedUrl)
+                setEpisodes(sortEpisodes(fetchedEpisodes))
+                subscriptionsEpisodes.save(fetchedEpisodes)
+              }
+              }>
+                {icons.reload}
+              </button>
+
+              <button
+                className="hover:text-accent-6"
+                onClick={() => {
+                  setTweakMenu(
+                    <div className="w-4/5 flex flex-col gap-1 justify-center items-center">
+                      <SortButton podcastUrl={podcast.feedUrl} criterion="date">
+                        {t('date')}
+                      </SortButton>
+                      <SortButton podcastUrl={podcast.feedUrl} criterion="duration">
+                        {t('duration')}
+                      </SortButton>
+                    </div>
+                  )
+                }
+                }>
+                {icons.sort}
+              </button>
+              <button
+                className="hover:text-accent-6"
+                onClick={() => {
+                  setTweakMenu(
+                    <div className="flex justify-center items-center">
+                      <Switch initialState={podcastSettings.filter.played} setState={async (value) => {
+                        updatePodcastSettings({ filter: { played: value } })
+                      }} labels={[t('not_played'), t('played')]} />
+                    </div>
+                  )
+                }
+                }>
+                {icons.filter}
+              </button>
+              <button className={`w-6 hover:text-accent-6 ${downloading
+                && 'animate-[spin_2s_linear_reverse_infinite]'}`}
+                onClick={async () => {
+                  setEpisodes(await loadEpisodes(true))
+                }}
+              >
+                {icons.sync}
+              </button>
+            </div>
+            {/* #endregion */}
+
+          </div>
+
+          <div className="flex flex-col h-full">
+            <h1 className="text-lg">{podcast.podcastName}</h1>
+            <h2 className="mb-2">{podcast.artistName}</h2>
+
+            <div className="flex overflow-y-auto rounded-md scroll-smooth pr-2">
+              <div className="whitespace-pre-line text-sm text-primary-4"
+                dangerouslySetInnerHTML={{ __html: sanitizeHTML(podcast.description ?? '') }} />
+            </div>
+
+          </div>
+        </div >
+
+
+        <div className="flex flex-col px-1">
+          {episodes.slice(0, visibleItems).map(episode => (
 
             <EpisodeCard
-            key={episode.src}
+              key={episode.src}
               episode={{
                 ...episode,
                 podcast: { // not including all vars to save some memory
@@ -316,10 +337,10 @@ function PodcastPreview() {
               }}
               className="hover:bg-primary-8 transition-colors border-b-[1px] border-primary-8"
             />
-        ))}
-      </div>
-    </div >
-
+          ))}
+        </div>
+      </div >
+    </div>
   )
 }
 
