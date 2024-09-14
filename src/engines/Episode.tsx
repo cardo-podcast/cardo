@@ -9,7 +9,7 @@ import { downloadEpisode, removeDownloadedEpisode } from "../utils/utils";
 
 
 
-export function useEpisode(episode: EpisodeData, isIntersecting: boolean | undefined = true) {
+export function useEpisode(episode: EpisodeData) {
   const { queue, history, downloads } = useDB()
   const [inQueue, setInqueue] = useState(queue.includes(episode.src))
   const [downloadState, setDownloadState] = useState<'downloaded' | ['downloading', number] | undefined>()
@@ -17,20 +17,16 @@ export function useEpisode(episode: EpisodeData, isIntersecting: boolean | undef
   const [{ globals: { locale } },] = useSettings()
   const { play: playEpisode, playing, position: playingPosition, quit: quitPlayer } = usePlayer()
   const downloadedFile = useRef('')
-  const dataLoaded = useRef(false)
-
 
   useEffect(() => {
-    if (episode.src && isIntersecting && !dataLoaded.current) { // avoid extra computing on db on large lists
+    if (episode.src) { // avoid extra computing on db on large lists
       load()
     }
 
-  }, [episode.src, playing?.src, isIntersecting])
+  }, [episode.src, playing?.src])
 
 
   const load = async () => {
-    // dataLoaded.current = true
-
     // update reproduction state
     const state = await history.get(episode.src)
 

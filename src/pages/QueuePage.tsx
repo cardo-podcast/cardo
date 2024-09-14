@@ -106,7 +106,6 @@ export default function QueuePage() {
                       <Suspense fallback={<div className="bg-primary-8 h-20 w-full" />}>
                         <EpisodeCard
                           episode={episode}
-                          noLazyLoad={true}
                           className="hover:bg-primary-8 border-b-[1px] border-primary-8"
                           onImageClick={(e) => {
                             e.stopPropagation()
