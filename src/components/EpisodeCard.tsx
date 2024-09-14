@@ -61,10 +61,9 @@ function EpisodeCard({ episode, className = '', onImageClick = undefined }:
               className={`rounded-md ${onImageClick !== undefined ? 'cursor-pointer' : ''}`}
               onClick={onImageClick}
               alt=""
-              loading="eager"
+              loading="lazy"
               decoding="async"
               src={episode.coverUrl}
-              onLoad={()=>console.log(episode.pubDate)}
               title={onImageClick !== undefined ? t('open_podcast') + ' ' + episode.podcast?.podcastName : ''}
               onError={(e: SyntheticEvent<HTMLImageElement>) => {
                 if (e.currentTarget.src === episode.podcast?.coverUrl) {

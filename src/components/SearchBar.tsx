@@ -167,7 +167,7 @@ function SearchBar() {
           {/* close with click outside */}
           <div className="absolute z-10 mt-10 top-0 left-0 w-screen h-screen" onClick={() => setResults([])} />
 
-          <div className="w-4/5 absolute left-1/2 -translate-x-1/2 top-0 mt-[32px] z-10 max-h-[400px] flex justify-center overflow-y-auto scroll-smooth bg-primary-9 border-x-2 border-primary-8 rounded-b-md overflow-hidden shadow-md shadow-primary-8"
+          <div className="w-4/5 absolute left-1/2 -translate-x-1/2 top-0 mt-[32px] z-30 max-h-[400px] flex justify-center overflow-y-auto scroll-smooth bg-primary-9 border-x-2 border-primary-8 rounded-b-md overflow-hidden shadow-md shadow-primary-8"
             ref={resultsRef}
           >
             <div className="grid w-full">
