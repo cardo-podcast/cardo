@@ -44,16 +44,6 @@ export function useSettings(): [Settings, (newSettings: RecursivePartial<Setting
 
 export function usePodcastSettings(feedUrl: string): [PodcastSettings, typeof updatePodcastSettings] {
   const [settings, updateSettings] = useSettings()
-  const readSettings = () => {
-    return settings.podcasts[feedUrl] ?? new PodcastSettings()
-  }
-
-  const [podcastSettings, setPodcastSettings] = useState<PodcastSettings>(readSettings())
-  
-  useEffect(() => {
-    setPodcastSettings(readSettings())
-  }, [settings, feedUrl])
-
 
   const updatePodcastSettings = (newPodcastSettings: RecursivePartial<PodcastSettings>) => {
     const newSettings = settings.podcasts
@@ -70,11 +60,10 @@ export function usePodcastSettings(feedUrl: string): [PodcastSettings, typeof up
     }
 
     updateSettings({ podcasts: newSettings })
-    setPodcastSettings(newSettings[feedUrl] ?? new PodcastSettings)
   }
 
 
-  return [podcastSettings, updatePodcastSettings]
+  return [settings.podcasts[feedUrl] ?? new PodcastSettings(), updatePodcastSettings]
 }
 
 export function getColor(settingsColor: TailwindBaseColor | ColorTheme | DefaultTheme): ColorTheme {
