@@ -11,10 +11,11 @@ import { useEpisode } from "../engines/Episode"
 
 
 
-function EpisodeCard({ episode, className = '', onImageClick = undefined }:
+function EpisodeCard({ episode, className = '', onImageClick = undefined, onClick = undefined }:
   {
     episode: EpisodeData, className?: string,
-    onImageClick?: MouseEventHandler<HTMLImageElement>
+    onImageClick?: MouseEventHandler<HTMLImageElement>,
+    onClick?: () => void
   }) {
 
   const navigate = useNavigate()
@@ -28,6 +29,7 @@ function EpisodeCard({ episode, className = '', onImageClick = undefined }:
     <div ref={contextMenuTarget} className={`w-full flex ${reprState.complete ? 'text-primary-6' : ''} cursor-pointer min-h-20
                                 p-2 justify-between gap-4 ${className}`}
       onClick={() => {
+        onClick && onClick()
         navigate('/episode-preview', {
           state: {
             episode: episode

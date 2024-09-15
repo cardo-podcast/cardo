@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { EpisodeData, PodcastData, SortCriterion } from "..";
-import { ReactNode, Suspense, SyntheticEvent, useEffect, useRef, useState } from "react";
+import { ReactNode, SyntheticEvent, useEffect, useRef, useState } from "react";
 import * as icons from "../Icons"
 import { parseXML } from "../utils/utils";
 import EpisodeCard from "../components/EpisodeCard";
@@ -66,7 +66,15 @@ function PodcastPreview() {
   const { t } = useTranslation()
 
   const scrollRef = useRef<HTMLDivElement>(null)
-  const [visibleItems, setVisibleItems] = useState(0)
+  const [visibleItems, setVisibleItems] = useState(() => {
+    const savedVisibleItems = sessionStorage.getItem(`visibleItems-${location.key}`)
+    if (savedVisibleItems) {
+      sessionStorage.removeItem(`visibleItems-${location.key}`)
+      return Number(savedVisibleItems)
+    } else {
+      return 0
+    }
+  })
 
 
   const sortEpisodes = (unsortedEpisodes: EpisodeData[]) => {
@@ -146,12 +154,9 @@ function PodcastPreview() {
 
   useEffect(() => {
     setTweakMenu(undefined)
-    
-    if (scrollRef.current){
-      scrollRef.current.scrollTop = 0
 
-      const elementsOnWindow = Math.floor(scrollRef.current.clientHeight / EPISODE_CARD_HEIGHT) + 1
-      setVisibleItems(elementsOnWindow)
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({top: 0, behavior: 'instant'})
     }
   }, [podcast.feedUrl])
 
@@ -162,8 +167,20 @@ function PodcastPreview() {
 
   }, [scrollRef.current?.clientHeight])
 
+
+  useEffect(() => {
+    // triggered when episodes are loaded, saved scroll is deleted to avoid triggering after filter / sort
+    // scroll is saved when entering to any episode details
+
+    const savedScroll = sessionStorage.getItem(`scroll-${location.key}`)
+    if (savedScroll && scrollRef.current && episodes.length) {
+      scrollRef.current.scrollTo({ top: Number(savedScroll), behavior: "instant" })
+      sessionStorage.removeItem(`scroll-${location.key}`)
+    }
+  }, [episodes])
+
   return (
-    <div className="relative">
+    <div className="relative w-full px-1">
 
       {/* sticky bar that appears when scrolling */}
       < div className="flex gap-2 items-center bg-primary-9 absolute w-full top-0 p-1 border-b-2 border-primary-8 z-10 cursor-default group "
@@ -177,7 +194,7 @@ function PodcastPreview() {
         <h1 className="text-xl group-hover:hidden">{podcast.podcastName}</h1>
 
         <span className="opacity-0 group-hover:opacity-100 transition-opacity w-10 absolute left-1/2 -translate-x-1/2 cursor-pointer"
-        onClick={() => scrollRef.current && scrollRef.current.scrollTo({top: 0})}
+          onClick={() => scrollRef.current && scrollRef.current.scrollTo({ top: 0 })}
         >
           {icons.upArrowSquare}
         </span>
@@ -336,6 +353,10 @@ function PodcastPreview() {
                 }
               }}
               className="hover:bg-primary-8 transition-colors border-b-[1px] border-primary-8"
+              onClick={() => {
+                sessionStorage.setItem(`scroll-${location.key}`, Math.floor(scrollRef.current?.scrollTop ?? 0).toString())
+                sessionStorage.setItem(`visibleItems-${location.key}`, visibleItems.toString())
+              }}
             />
           ))}
         </div>
