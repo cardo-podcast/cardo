@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { EpisodeData, PodcastData, SortCriterion } from "..";
-import { ReactNode, SyntheticEvent, useEffect, useRef, useState } from "react";
+import { ReactNode, SyntheticEvent, useEffect, useMemo, useRef, useState } from "react";
 import * as icons from "../Icons"
 import { parseXML } from "../utils/utils";
 import EpisodeCard from "../components/EpisodeCard";
@@ -17,7 +17,8 @@ const EPISODE_CARD_HEIGHT = 80 // min height
 const PRELOADED_EPISODES = 10 //
 
 function SortButton({ children, podcastUrl, criterion }: { children: ReactNode, podcastUrl: string, criterion: SortCriterion['criterion'] }) {
-  const [{ sort }, updatePodcastSettings] = usePodcastSettings(podcastUrl)
+  const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcastUrl)
+  const sort = podcastSettings.sort
 
   return (
     <button
@@ -61,6 +62,7 @@ function PodcastPreview() {
     subscriptionsEpisodes } = useDB()
   const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcast.feedUrl)
   const { performSync } = useSync()
+  const allEpisodes = useMemo(async() => await getAllEpisodes(), [podcast.feedUrl])
 
   const [tweakMenu, setTweakMenu] = useState<ReactNode>(undefined)
   const { t } = useTranslation()
@@ -101,9 +103,10 @@ function PodcastPreview() {
     return sortedEpisodes
   }
 
-  const loadEpisodes = async (forceDownload = false) => {
 
-    const downloadEpisodes = async () => {
+  async function getAllEpisodes(forceDownload = false){
+    console.log('LOADED')
+    async function downloadEpisodes() {
       setDownloading(true)
       const [episodes, podcastDetails] = await parseXML(podcast.feedUrl)
       podcast.description = podcastDetails.description
@@ -131,8 +134,13 @@ function PodcastPreview() {
 
     location.state['currentPodcastEpisodes'] = episodes
 
+    return episodes
+  }
 
-    return sortEpisodes(await filterEpisodes(episodes))
+  async function loadEpisodes(forceDownload = false){
+
+    const episodes = await (forceDownload? getAllEpisodes(true): allEpisodes)
+    setEpisodes(sortEpisodes(await filterEpisodes(episodes)))
   }
 
   const filterEpisodes = async (unfilteredEpisodes: EpisodeData[]) => {
@@ -149,7 +157,7 @@ function PodcastPreview() {
   }
 
   useEffect(() => {
-    loadEpisodes().then(loadedEpisodes => setEpisodes(loadedEpisodes))
+    loadEpisodes()
   }, [podcast.feedUrl, JSON.stringify(podcastSettings)])
 
   useEffect(() => {
@@ -274,14 +282,6 @@ function PodcastPreview() {
                 }}>
                 {subscribed ? icons.starFilled : icons.star}
               </button>
-              <button className="hover:text-accent-6" onClick={async () => {
-                const [fetchedEpisodes,] = await parseXML(podcast.feedUrl)
-                setEpisodes(sortEpisodes(fetchedEpisodes))
-                subscriptionsEpisodes.save(fetchedEpisodes)
-              }
-              }>
-                {icons.reload}
-              </button>
 
               <button
                 className="hover:text-accent-6"
@@ -317,7 +317,7 @@ function PodcastPreview() {
               <button className={`w-6 hover:text-accent-6 ${downloading
                 && 'animate-[spin_2s_linear_reverse_infinite]'}`}
                 onClick={async () => {
-                  setEpisodes(await loadEpisodes(true))
+                  loadEpisodes(true)
                 }}
               >
                 {icons.sync}
