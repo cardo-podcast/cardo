@@ -17,6 +17,8 @@ Cardo is a podcast client for desktop, inspired on Android's [Antennapod](https:
 
 ![4](assets/readme/4.png)
 
+![5](assets/readme/5.png)
+
 ### Features
 
 - [X] Search podcasts online
