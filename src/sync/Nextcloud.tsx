@@ -3,7 +3,7 @@ import { createContext, ReactNode, useContext, useEffect, useRef, useState } fro
 import { useDB, DB } from "../DB/DB"
 import { getCreds, parsePodcastDetails, removeCreds, saveCreds } from "../utils/utils"
 import { useTranslation } from "react-i18next"
-import { redirect } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { toast } from 'react-toastify';
 import { EpisodeState } from ".."
 import { Checkbox } from "../components/Inputs"
@@ -320,6 +320,7 @@ export function initSync() {
     history, subscriptions } = useDB()
   const [{ sync: syncSettings }, _] = useSettings()
   const { t } = useTranslation()
+  const navigate = useNavigate()
 
 
   const load = async () => {
@@ -352,7 +353,7 @@ export function initSync() {
         progress: undefined,
         theme: "dark",
       });
-      redirect('/settings')
+      navigate('/settings')
       return
     }
 

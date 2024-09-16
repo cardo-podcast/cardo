@@ -74,5 +74,8 @@
   "open_settings_file": "Open the configuration file",
   "open_settings_danger_menu": "Handle this file with care, things may break.",
   "ok": "Ok",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "add_subscription_url": "Add subscription by RSS address",
+  "feed_url": "RSS Feed URL",
+  "please_indicate_url": "Please provide a valid URL"
 }

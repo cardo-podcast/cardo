@@ -9,7 +9,7 @@ export function useModalBanner(): [typeof showBanner, typeof Banner] {
   }
 
   function Banner({ children, onAccepted, labels=['ok', 'cancel'] }:
-    { children: ReactNode, onAccepted: () => void | Promise<void>, labels?: [string, string] }){
+    { children: ReactNode, onAccepted: () => void | Promise<void | 'error'>, labels?: [string, string] }){
 
     return ModalBanner({ children, onAccepted, showDialog, setShowDialog, labels })
   }
@@ -19,7 +19,7 @@ export function useModalBanner(): [typeof showBanner, typeof Banner] {
 
 
 function ModalBanner({ children, onAccepted, showDialog, setShowDialog, labels }:
-  { children: ReactNode, onAccepted: () => void | Promise<void>,
+  { children: ReactNode, onAccepted: () => void | Promise<void | 'error'>,
     showDialog: boolean, setShowDialog: (value:boolean) => void,
     labels: [string, string]}) {
 
@@ -31,9 +31,11 @@ function ModalBanner({ children, onAccepted, showDialog, setShowDialog, labels }
       {children}
       <div className='flex gap-4 justify-center mt-1'>
         <button className='bg-green-600 px-2 py-1 rounded-md uppercase min-w-20'
-          onClick={() => {
-            setShowDialog(false)
-            onAccepted()
+          onClick={async() => {
+            const error = await onAccepted()
+            if (!error){
+              setShowDialog(false)
+            }
           }}
         >
           {labels[0]}
