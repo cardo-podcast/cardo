@@ -86,7 +86,6 @@ function LeftMenu() {
   const { subscriptions, subscriptionsEpisodes } = useDB()
   const { t } = useTranslation()
   const [{ ui: { collapsedLeftMenu } }, updateSettings] = useSettings()
-  const hoverLinkEffect = collapsedLeftMenu ? 'hover:p-0' : 'hover:pl-1'
 
 
   return (

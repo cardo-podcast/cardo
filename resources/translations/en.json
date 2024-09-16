@@ -77,5 +77,6 @@
   "cancel": "Cancel",
   "add_subscription_url": "Add subscription by RSS address",
   "feed_url": "RSS Feed URL",
-  "please_indicate_url": "Please provide a valid URL"
+  "please_indicate_url": "Please provide a valid URL",
+  "open_web": "Open website"
 }
