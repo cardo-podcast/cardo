@@ -58,7 +58,7 @@ function PodcastPreview() {
   const [subscribed, setSubscribed] = useState(false)
   const { subscriptions,
     history: { getCompleted },
-    misc: { loggedInSync: loggedInSync },
+    misc: { loggedInSync },
     subscriptionsEpisodes } = useDB()
   const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcast.feedUrl)
   const { performSync } = useSync()
@@ -266,7 +266,7 @@ function PodcastPreview() {
 
             {/* #region BUTTONS */}
             <div className="flex gap-2">
-              <button className="hover:text-accent-6"
+              <button className="w-6 hover:text-accent-6"
                 title={t(subscribed ? 'remove_from_subscriptions' : 'add_to_subscriptions')}
                 onClick={async () => {
                   if (subscribed) {

@@ -108,7 +108,7 @@ export async function parsePodcastDetails(xml: Document | string) {
   const coverUrl = channel.querySelector('image')?.getAttribute('href') ?? channel.querySelector('image')?.querySelector('url')?.textContent ?? ''
 
   const podcast: PodcastData = {
-    podcastName: channel?.querySelector('title')?.textContent ?? '',
+    podcastName: capitalize(channel?.querySelector('title')?.textContent ?? ''),
     artistName: getItunesTag(channel, 'author').textContent ?? '',
     coverUrl: coverUrl,
     coverUrlLarge: coverUrl,
