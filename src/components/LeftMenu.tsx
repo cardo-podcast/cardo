@@ -15,7 +15,7 @@ function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
   const { t } = useTranslation()
   const [showBanner, Banner] = useModalBanner()
   const inputRef = useRef<HTMLInputElement>(null)
-  const {subscriptions, misc: { loggedInSync } } = useDB()
+  const { subscriptions, misc: { loggedInSync } } = useDB()
   const navigate = useNavigate()
   const { performSync } = useSync()
 
@@ -37,7 +37,7 @@ function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
               progress: undefined,
               theme: "dark",
             });
-            
+
             return 'error'
           }
 
@@ -45,149 +45,110 @@ function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
           loggedInSync && performSync({ add: [podcast.feedUrl] })
           subscriptions.add(podcast)
           navigate('/preview', {
-              state: {
-                podcast
-              }
+            state: {
+              podcast
             }
+          }
           )
 
         }}>
-          <div className="flex flex-col gap-2 mb-1">
-            <h1 className='text-lg border-b-2 border-primary-8 pb-1'>{t('add_subscription_url')}</h1>
-            <input
-              ref={inputRef}
-              type="url"
-              placeholder={t('feed_url')}
-              autoFocus
-              className="bg-primary-8 w-96 rounded-md px-2 py-1 focus:outline-none"
-              />
-          </div>
-        </Banner>
-
-        <div className={`group p-1 rounded-md flex gap-2 transition-all hover:bg-primary-8 ${mini ? 'justify-center' : 'justify-between'}`}
-        >
-          <button
-          onClick={() => showBanner()}
-            title={t('add_subscription_url')}
-            className={`group-[:not(:hover)]:bg-primary-8 bg-primary-7 hover:bg-accent-7 h-10 aspect-square rounded-md
-                flex items-center justify-center`}
-          >
-            <span className="text-3xl -mt-2">+</span>
-          </button>
-
-          {!mini && <p className={`h-10 text-sm w-full cursor-default`}>{t('add_subscription_url')}</p>}
+        <div className="flex flex-col gap-2 mb-1">
+          <h1 className='text-lg border-b-2 border-primary-8 pb-1'>{t('add_subscription_url')}</h1>
+          <input
+            ref={inputRef}
+            type="url"
+            placeholder={t('feed_url')}
+            autoFocus
+            className="bg-primary-8 w-96 rounded-md px-2 py-1 focus:outline-none"
+          />
         </div>
-      </>
-      )
+      </Banner>
+
+      <div className={`group p-1 rounded-md flex gap-2 transition-all hover:bg-primary-8 ${mini ? 'justify-center' : 'justify-between'}`}
+      >
+        <button
+          onClick={() => showBanner()}
+          title={t('add_subscription_url')}
+          className={`group-[:not(:hover)]:bg-primary-8 bg-primary-7 hover:bg-accent-7 h-10 aspect-square rounded-md
+                flex items-center justify-center`}
+        >
+          <span className="text-3xl -mt-2">+</span>
+        </button>
+
+        {!mini && <p className={`h-10 text-sm w-full cursor-default`}>{t('add_subscription_url')}</p>}
+      </div>
+    </>
+  )
 }
 
 
-      function LeftMenu() {
-  const {subscriptions, subscriptionsEpisodes} = useDB()
-      const {t} = useTranslation()
-      const [{ui: {collapsedLeftMenu} }, updateSettings] = useSettings()
+function LeftMenu() {
+  const { subscriptions, subscriptionsEpisodes } = useDB()
+  const { t } = useTranslation()
+  const [{ ui: { collapsedLeftMenu } }, updateSettings] = useSettings()
+  const hoverLinkEffect = collapsedLeftMenu ? 'hover:p-0' : 'hover:pl-1'
 
 
-      return (
-      <div className="flex">
-        {
-          collapsedLeftMenu &&
+  return (
+    <div className="flex">
+      <div className={`bg-primary-9 border-r-2 border-primary-8 h-full flex flex-col pt-4 overflow-x-hidden
+              ${collapsedLeftMenu ? 'w-16 p-0.5' : 'w-64 lg:w-80 p-3'}
+              `}>
+        <div className={`flex flex-col uppercase mb-6 font-thin ${collapsedLeftMenu ? 'items-center gap-2' : 'gap-1'}`}>
+          <NavLink to='/' className={({ isActive }) => `flex transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 hover:pl-1'}`}
+            title={t('home')}
+          >
+            {collapsedLeftMenu ? <span className="w-6">{home}</span> : t('home')}
+          </NavLink>
+          <NavLink to='/settings' className={({ isActive }) => `flex transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 hover:pl-1'}`}
+            title={t('settings')}
+          >
+            {collapsedLeftMenu ? <span className="w-6">{settings}</span> : t('settings')}
+          </NavLink>
+          <NavLink to='/queue' className={({ isActive }) => `flex transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 hover:pl-1'}`}
+            title={t('queue')}
+          >
+            {collapsedLeftMenu ? <span className="w-6">{queue}</span> : t('queue')}
+          </NavLink>
+          <NavLink to='/downloads' className={({ isActive }) => `flex transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 hover:pl-1'}`}
+            title={t('downloads')}
+          >
+            {collapsedLeftMenu ? <span className="w-6">{download}</span> : t('downloads')}
+          </NavLink>
+        </div>
 
-          <div className="bg-primary-9 border-r-2 border-primary-8 w-16 h-full flex flex-col p-0.5 pt-4 overflow-x-hidden">
-            <div className="flex flex-col gap-2 uppercase mb-6 font-thin items-center">
-              <NavLink to='/' className={({ isActive }) => `w-7 p-0.5 transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 hover:p-0'}`}
-                title={t('home')}
-              >
-                {home}
-              </NavLink>
-              <NavLink to='/settings' className={({ isActive }) => `w-7 p-0.5 transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 hover:p-0'}`}
-                title={t('settings')}
-              >
-                {settings}
-              </NavLink>
-              <NavLink to='/queue' className={({ isActive }) => `w-7 p-0.5 transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 hover:p-0'}`}
-                title={t('queue')}
-              >
-                {queue}
-              </NavLink>
-              <NavLink to='/downloads' className={({ isActive }) => `w-7 p-0.5 transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 hover:p-0'}`}
-                title={t('downloads')}
-              >
-                {download}
-              </NavLink>
-            </div>
+        <div className={`flex items-center gap-2 mb-1 ${collapsedLeftMenu && 'justify-center'}`}>
+          {!collapsedLeftMenu && <h1 className="uppercase mb-0.5">{t('subscriptions')}</h1>}
+          <button className={`flex justify-center hover:text-accent-5 ${subscriptionsEpisodes.updatingFeeds && 'animate-[spin_1.5s_linear_reverse_infinite]'}`}
+            onClick={subscriptionsEpisodes.updateFeeds}
+            title={t('update_subs_feeds')}
+          >
+            <span className={`${collapsedLeftMenu? 'w-6': 'w-5'}`}>{sync}</span>
+          </button>
+        </div>
 
-            <button className={`flex justify-center hover:text-accent-5 mb-1 ${subscriptionsEpisodes.updatingFeeds && 'animate-[spin_1.5s_linear_reverse_infinite]'}`}
-              onClick={subscriptionsEpisodes.updateFeeds}
-              title={t('update_subs_feeds')}
-            >
-              <span className="w-6 p-0.5 hover:p-0">{sync}</span>
-            </button>
-
-            <div className="flex flex-col gap-1 overflow-y-auto">
-              {
-                subscriptions.subscriptions.map(subscription => {
-                  return (
-                    <SubscriptionCard key={subscription.id} podcast={subscription} mini={true} />
-                  )
-                }
-                )
-              }
-              <NewSubscriptionButton mini={true} />
-            </div>
-          </div>
-        }
-
-        {
-          !collapsedLeftMenu &&
-
-          <div className="bg-primary-9 border-r-2 border-primary-8 w-64 lg:w-80 h-full flex flex-col p-3 pt-4 overflow-x-hidden">
-            <div className="flex flex-col gap-1 uppercase mb-6 font-thin">
-              <NavLink to='/' className={({ isActive }) => `transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 hover:pl-1'}`}>
-                {t('home')}
-              </NavLink>
-              <NavLink to='/settings' className={({ isActive }) => `transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 hover:pl-1'}`}>
-                {t('settings')}
-              </NavLink>
-              <NavLink to='/queue' className={({ isActive }) => `transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 hover:pl-1'}`}>
-                {t('queue')}
-              </NavLink>
-              <NavLink to='/downloads' className={({ isActive }) => `transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 hover:pl-1'}`}>
-                {t('downloads')}
-              </NavLink>
-            </div>
-
-            <div className="flex items-center gap-1 mb-2">
-              <h1 className="uppercase">{t('subscriptions')}</h1>
-              <button className={`flex items-center hover:text-accent-5 h-full aspect-square p-1 ${subscriptionsEpisodes.updatingFeeds && 'animate-[spin_1.5s_linear_reverse_infinite]'}`}
-                onClick={subscriptionsEpisodes.updateFeeds}
-                title={t('update_subs_feeds')}
-              >
-                {sync}
-              </button>
-            </div>
-            <div className="flex flex-col gap-1 overflow-y-auto">
-              {
-                subscriptions.subscriptions.map(subscription => {
-                  return (
-                    <SubscriptionCard key={subscription.feedUrl} podcast={subscription} />
-                  )
-                }
-                )
-              }
-              <NewSubscriptionButton />
-
-            </div>
-          </div>
-        }
-
-        <div id="folder" className="h-full w-2 -ml-1 opacity-0 hover:opacity-100 cursor-w-resize" onDoubleClick={() => {
-          updateSettings({ ui: { collapsedLeftMenu: !collapsedLeftMenu } })
-        }}>
-          <div className=" h-full w-0.5 bg-accent-8 m-auto" />
+        <div className="flex flex-col gap-1 overflow-y-auto scroll-smooth">
+          {
+            subscriptions.subscriptions.map(subscription => {
+              return (
+                <SubscriptionCard key={subscription.id} podcast={subscription} mini={collapsedLeftMenu} />
+              )
+            }
+            )
+          }
+          <NewSubscriptionButton mini={collapsedLeftMenu} />
         </div>
       </div>
-      )
+
+
+      {/* FOLD MENU TOGGLE ON BORDER */}
+      <div id="folder" className="h-full w-2 -ml-1 opacity-0 hover:opacity-100 cursor-w-resize" onDoubleClick={() => {
+        updateSettings({ ui: { collapsedLeftMenu: !collapsedLeftMenu } })
+      }}>
+        <div className=" h-full w-0.5 bg-accent-8 m-auto" />
+      </div>
+    </div>
+  )
 }
 
-      export default LeftMenu;
+export default LeftMenu;

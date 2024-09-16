@@ -26,7 +26,9 @@ function HomePage() {
 
   useEffect(() => {
     // extract episodes newer than setting
-    loadNewEpisodes()
+    if (subscriptionsEpisodes.updatingFeeds == null) {
+      loadNewEpisodes()
+    }
   }, [numberOfDaysInNews, subscriptionsEpisodes.updatingFeeds, subscriptions.subscriptions])
 
   return (
