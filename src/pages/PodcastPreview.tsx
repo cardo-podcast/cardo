@@ -78,7 +78,6 @@ function PodcastPreview() {
     }
   })
 
-
   const sortEpisodes = (unsortedEpisodes: EpisodeData[]) => {
     const applyMode = (a: any, b: any) => {
       if (sortCriterion.mode === 'asc') {
@@ -105,7 +104,6 @@ function PodcastPreview() {
 
 
   async function getAllEpisodes(forceDownload = false){
-    console.log('LOADED')
     async function downloadEpisodes() {
       setDownloading(true)
       const [episodes, podcastDetails] = await parseXML(podcast.feedUrl)

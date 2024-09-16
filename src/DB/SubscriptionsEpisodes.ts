@@ -7,7 +7,7 @@ import { useSettings } from "../engines/Settings";
 
 
 export function useSubscriptionsEpisodes(db: Database, subscriptions: PodcastData[]) {
-  const [updatingFeeds, setUpdatingFeeds] = useState(false)
+  const [updatingFeeds, setUpdatingFeeds] = useState<number | null>(null) //id of the feed that it's been updated
   const [{ general: { fetchSubscriptionsAtStartup } }, _] = useSettings()
   const savedSubscriptions = useRef<PodcastData[]>()
 
@@ -53,13 +53,18 @@ export function useSubscriptionsEpisodes(db: Database, subscriptions: PodcastDat
     savedSubscriptions.current = subscriptions
   }
 
+  async function updateFeed(subscription: PodcastData) {
+    setUpdatingFeeds(subscription.id!)
+    const [episodes,] = await parseXML(subscription.feedUrl)
+    await save(episodes)
+    setUpdatingFeeds(null)
+    return episodes
+  }
+
   async function updateFeeds() {
-    setUpdatingFeeds(true)
     for (const subscription of subscriptions) {
-      const [episodes,] = await parseXML(subscription.feedUrl)
-      await save(episodes)
+      await updateFeed(subscription)
     }
-    setUpdatingFeeds(false)
   }
 
   const save = useCallback(async function (episodes: EpisodeData[]) {
@@ -167,5 +172,5 @@ export function useSubscriptionsEpisodes(db: Database, subscriptions: PodcastDat
 
   }, [db])
 
-  return { save, getAll, remove, loadNew, updatingFeeds, updateFeeds }
+  return { save, getAll, remove, loadNew, updatingFeeds, updateFeed, updateFeeds }
 }
