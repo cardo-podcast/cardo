@@ -502,7 +502,7 @@ dependencies = [
 
 [[package]]
 name = "cardo"
-version = "0.0.0"
+version = "1.5.0"
 dependencies = [
  "aes-gcm",
  "base64 0.22.1",

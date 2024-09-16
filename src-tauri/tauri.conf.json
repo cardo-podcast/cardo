@@ -7,13 +7,13 @@
   },
   "package": {
     "productName": "Cardo",
-    "version": "1.4.0"
+    "version": "1.5.0"
   },
   "tauri": {
     "updater": {
       "active": true,
       "endpoints": [
-        "https://github.com/n0vella/cardo/releases/latest/download/latest.json"
+        "https://github.com/cardo-podcast/cardo/releases/latest/download/latest.json"
       ],
       "dialog": false,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdDODExNjU4QTczOUZDMUIKUldRYi9EbW5XQmFCZkdydnVrZ1dWQ0NBR2NMckRpLzBOam5HNzBOcUk0U3VLNTc3b21FKytDeksK"

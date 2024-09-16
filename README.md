@@ -1,7 +1,7 @@
 <h1 align="center">CARDO - PODCAST CLIENT</h1>
 <p align="center">
-    <a href="https://n0vella.github.io">
-        <img src="https://raw.githubusercontent.com/n0vella/cardo/master/src-tauri/icons/icon.png" alt="logo" width="256" height="256" />
+    <a href="https://cardo-podcast.github.io">
+        <img src="https://raw.githubusercontent.com/cardo-podcast/cardo/master/src-tauri/icons/icon.png" alt="logo" width="256" height="256" />
     </a>
 </p>
 
@@ -26,11 +26,19 @@ Cardo is a podcast client for desktop, inspired on Android's [Antennapod](https:
 - [X] Lightweight app (thanks to Tauri)
 - [X] Customizable themes
 - [X] Download episodes to listen them offline
+- [X] Add podcast from feed url
 - [ ] Keep your favorite episodes
 - [ ] Audio manipulation, speed, silenze skip & normalization
 - [ ] Synchronization using [Opodsync](https://github.com/kd2org/opodsync)
 
+### Compatible clients (from nextcloud-gpodder)
 
+| client | support status |
+| :- | :- |
+| [AntennaPod](https://antennapod.org) | Initial purpose for this project, as a synchronization endpoint for this client.<br> Support is available [as of version 2.5.1](https://github.com/AntennaPod/AntennaPod/pull/5243/). |
+| [KDE Kasts](https://apps.kde.org/de/kasts/) | Supported since version 21.12 |
+| [Podcast Merlin](https://github.com/yoyoooooooooo/Podcast-Merlin--Nextcloud-Gpodder-Client-For-Windows) | Full sync support podcast client for Windows |
+| [RePod](https://apps.nextcloud.com/apps/repod) | Nextcloud app for playing and managing podcasts with sync support |
 
 ## Contributing
 

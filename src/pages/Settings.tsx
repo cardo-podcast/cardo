@@ -234,11 +234,12 @@ function Settings() {
         <h1 className="uppercase border-b-2 border-primary-8 mb-2">{t('about')}</h1>
         <div className="flex gap-2">
           <img
-            className="w-36 cursor-pointer hover:p-1"
+            className="w-36 cursor-pointer hover:p-2 transition-all"
+            title={t('open_web')}
             src={appIcon}
-            onClick={() => shell.open("https://n0vella.github.io/cardo")}
+            onClick={() => shell.open("https://cardo-podcast.github.io")}
           />
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col justify-between">
             <h1 className="UPPERCASE">Cardo - {t('podcast_player')} (v{tauriConfig.package.version})</h1>
             <h1>{t('author')}: n0vella</h1>
             <div className="flex gap-1 h-fit items-center">
@@ -247,16 +248,18 @@ function Settings() {
                 className="w-5 bg-white rounded-full p-[1px] cursor-pointer"
                 src='https://github.githubassets.com/favicons/favicon.png'
                 alt='Github'
-                title="https://github.com/n0vella/cardo"
-                onClick={() => shell.open("https://github.com/n0vella/cardo")}
+                title="https://github.com/cardo-podcast/cardo"
+                onClick={() => shell.open("https://github.com/cardo-podcast/cardo")}
               />
             </div>
-            <div className="flex gap-2 items-center">
+            <div className="flex gap-2 items-center h-12">
               <a href="https://www.buymeacoffee.com/n0vella" target="_blank">
-                <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" className="h-10" />
+                <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee"
+                      className="h-12" />
               </a>
               <a href="https://www.paypal.com/paypalme/adriannovella" target="_blank">
-                <img src="https://www.paypalobjects.com/webstatic/icon/pp196.png" alt="Paypal" className="h-10 rounded-md" />
+                <img src="https://www.paypalobjects.com/webstatic/icon/pp196.png" alt="Paypal"
+                      className="h-12 rounded-md" />
               </a>
             </div>
           </div>
