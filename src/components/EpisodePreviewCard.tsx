@@ -70,7 +70,7 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
             play()
           }}
         >
-          {icons.play}
+          <span className="w-5 text-white">{icons.play}</span>
         </button>
       </div>
       <div className="relative">

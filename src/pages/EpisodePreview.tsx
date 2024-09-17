@@ -85,7 +85,7 @@ function EpisodePreview() {
             <button className="w-7 p-1 aspect-square shrink-0 flex justify-center items-center hover:text-accent-6 hover:p-[2px] bg-primary-7 rounded-full"
               onClick={play}
             >
-              {icons.play}
+              <span className="w-5">{icons.play}</span>
             </button>
 
             <button className={`w-5 hover:text-accent-6 ${reprState.complete && 'text-primary-7'}`}
@@ -110,7 +110,7 @@ function EpisodePreview() {
         </div>
       </div>
       <div className="rounded-md p-3 whitespace-pre-line"
-        dangerouslySetInnerHTML={{ __html: sanitizeHTML(episode.description) }} />
+        dangerouslySetInnerHTML={{ __html: sanitizeHTML(episode.description) }}/>
     </div>
   )
 }

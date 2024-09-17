@@ -360,7 +360,7 @@ function AudioPlayer({ className = '' }) {
             max={duration}
             value={position}
             onChange={(event) => changeTime(Number(event.target.value))}
-            className="w-4/5 mx-1 h-[3px] bg-primary-3 accent-accent-6"
+            className="w-4/5 mx-1 h-[3px] bg-primary-3 accent-accent-6 stroke-white"
           />
           <p className="cursor-pointer"
             title={t('toggle_remaining_time')}
@@ -388,7 +388,7 @@ function AudioPlayer({ className = '' }) {
               className="flex items-center focus:outline-none hover: hover:text-accent-6 w-9 mb-2"
               onClick={handlePlayPause}
             >
-              {audioRef.current?.paused ? playIcon : pauseIcon}
+              <span className="w-9">{audioRef.current?.paused ? playIcon : pauseIcon}</span>
             </button>
 
             <button
