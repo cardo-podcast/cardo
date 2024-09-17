@@ -93,7 +93,7 @@ function LeftMenu() {
       <div className={`bg-primary-9 border-r-2 border-primary-8 h-full flex flex-col pt-4 overflow-x-hidden
               ${collapsedLeftMenu ? 'w-16 p-0.5' : 'w-64 lg:w-80 p-3'}
               `}>
-        <div className={`flex flex-col uppercase mb-6 font-thin ${collapsedLeftMenu ? 'items-center gap-2' : 'gap-1'}`}>
+        <div className={`flex flex-col uppercase mb-6 font-light  ${collapsedLeftMenu ? 'items-center gap-2' : 'gap-1'}`}>
           <NavLink to='/' className={({ isActive }) => `flex transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 hover:pl-1'}`}
             title={t('home')}
           >

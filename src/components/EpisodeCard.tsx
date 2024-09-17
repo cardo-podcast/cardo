@@ -94,7 +94,7 @@ function EpisodeCard({ episode, className = '', onImageClick = undefined, onClic
                 play()
               }}
             >
-              {icons.play}
+              <span className="w-5">{icons.play}</span>
             </button>
           </div>
         </div>
