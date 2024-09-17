@@ -95,7 +95,7 @@ export function NextcloudSettings() {
         <label className="w-full flex gap-1 flex-col">
           {t('nextcloud_server_url')}
           <input
-            type="text"
+            type="url"
             className="py-1 px-2 bg-primary-8 rounded-md focus:outline-none"
             ref={urlRef}
             placeholder={t('nextcloud_server_url_example')}
@@ -115,11 +115,8 @@ async function login(url: string, getSyncKey: () => Promise<string | undefined>,
   // nextcloud flow v2 o-auth login
   // https://docs.nextcloud.com/server/latest/developer_manual/client_apis/LoginFlow/index.html#login-flow-v2
 
-  if (!url.startsWith('http://') && !url.startsWith('https://')) {
-    url = 'https://' + url
-  }
+  const baseUrl = url.split('index.php')[0] // clean possible extra paths in url, cannot guess subpaths without index.php
 
-  const baseUrl = new URL(url).origin
   const r = await http.fetch(baseUrl + '/index.php/login/v2', {
     method: 'POST',
     responseType: http.ResponseType.JSON
