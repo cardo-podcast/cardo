@@ -64,7 +64,7 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
           total={episode.duration}
           showTime={false}
           className={{ div: "h-[5px]" }} />
-        <button className="absolute bottom-2 right-2 bg-accent-7 w-7 p-[4px] pl-[6px] aspect-square flex justify-center items-center hover:p-[1px] border-2 border-accent-8 rounded-full transition-all"
+        <button className="absolute bottom-2 right-2 bg-accent-7 w-7 p-[3px] pl-[4px] aspect-square flex justify-center items-center hover:p-[1px] border-2 border-accent-8 rounded-full transition-all"
           onClick={e => {
             e.stopPropagation()
             play()
