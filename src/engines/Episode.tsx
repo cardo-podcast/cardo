@@ -89,7 +89,6 @@ export function useEpisode(episode: EpisodeData) {
 
   const inProgress = useCallback((mustBePlaying = false) => {
     const isInPlayer = playing?.src == episode.src && (reprState.position > 0 && !reprState.complete)
-    console.log(episode.title, isInPlayer)
     if (mustBePlaying) {
       return isInPlayer && !paused
     } else {
