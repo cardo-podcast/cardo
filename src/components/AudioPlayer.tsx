@@ -33,7 +33,7 @@ export const usePlayer = () => useContext(PlayerContext) as AudioPlayerRef
 export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playing, setPlaying] = useState<EpisodeData>()
-  const { dbLoaded, history, misc } = useDB()
+  const { history, misc, downloads } = useDB()
   const [position, setPosition] = useState(0);
 
 
@@ -47,12 +47,12 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    if (dbLoaded) {
+    if (downloads.loaded) {
       loadLastPlayed()
     }
-  }, [dbLoaded])
+  }, [downloads.loaded])
 
-  const load = async (episode: EpisodeData, localSrc?: string) => {
+  const load = async (episode: EpisodeData) => {
     if (audioRef.current == null) return
 
     // update state if other episode was being played
@@ -65,11 +65,13 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     }
 
     setPlaying(episode)
-    if (localSrc) {
-      audioRef.current.src = convertFileSrc(localSrc)
+    const localFile = downloads.includes(episode.src)
+    if (localFile) {
+      audioRef.current.src = convertFileSrc(localFile.localFile)
     } else {
       audioRef.current.src = episode.src
     }
+    console.log('SRC: ', audioRef.current.src)
     audioRef.current.load()
 
     const previousState = await history.get(episode?.src)
@@ -80,11 +82,11 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const play = async (episode?: EpisodeData | undefined, localSrc?: string) => {
+  const play = async (episode?: EpisodeData | undefined) => {
     if (audioRef.current == null) return
 
     if (episode !== undefined) {
-      load(episode, localSrc)
+      load(episode)
     }
 
     audioRef.current.play()
