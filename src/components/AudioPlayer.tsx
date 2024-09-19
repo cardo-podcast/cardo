@@ -15,7 +15,9 @@ import round from "lodash/round";
 
 export type AudioPlayerRef = {
   audioRef: RefObject<HTMLAudioElement>
-  play: (episode?: EpisodeData | undefined, localSrc?: string) => void
+  play: (episode?: EpisodeData | undefined, localSrc?: string) => void,
+  pause: () => void,
+  paused: boolean,
   playing: EpisodeData | undefined,
   position: number,
   setPosition: Dispatch<SetStateAction<number>>
@@ -88,6 +90,12 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     audioRef.current.play()
   }
 
+  const pause = () => {
+    if (audioRef.current) {
+      audioRef.current.pause()
+    }
+  }
+
   const quit = () => {
     if (audioRef.current == null) return
 
@@ -116,6 +124,8 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     <PlayerContext.Provider value={{
       audioRef,
       play,
+      pause,
+      paused: audioRef.current?.paused ?? false,
       playing,
       position,
       setPosition,
@@ -227,7 +237,7 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
 
 
 function VolumeControl({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
-  const [{playback: playbackSettings}, updateSettings] = useSettings()
+  const [{ playback: playbackSettings }, updateSettings] = useSettings()
 
   const [volume, setVolume] = useState(playbackSettings.volume); // volume is restored
   const [isMuted, setIsMuted] = useState(false); // Control mute
@@ -238,7 +248,7 @@ function VolumeControl({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) 
 
   useEffect(() => {
     // update volume in settings
-    updateSettings({playback: {volume}})
+    updateSettings({ playback: { volume } })
 
     // update audio volume when `volume` state changes
     if (audioRef.current) {
@@ -365,8 +375,8 @@ function AudioPlayer({ className = '' }) {
       newTime = Math.max(newTime, 0)
 
       if (newTime >= audioRef.current.duration) {
-        playNextInQueue()  ?? quit()
-      }else{
+        playNextInQueue() ?? quit()
+      } else {
         audioRef.current.currentTime = newTime
         setPosition(newTime)
       }
@@ -388,25 +398,25 @@ function AudioPlayer({ className = '' }) {
 
         <div className={`w-full flex gap-3 bg-primary-10 border-t-2 border-primary-8 p-2 ${className}`}>
           {/* COVER ON LEFT SIDE*/}
-            <img
-              className="w-24 z-10 aspect-square m-auto rounded-md cursor-pointer hover:p-1 transition-all"
-              src={playing.coverUrl}
-              alt=''
-              onClick={() => {
-                navigate('/episode-preview', {
-                  state: {
-                    episode: playing
-                  }
-                })
-              }}
-              onError={(e: SyntheticEvent<HTMLImageElement>) => {
-                if (e.currentTarget.src === playing.podcast?.coverUrl) {
-                  e.currentTarget.src = appIcon
-                } else {
-                  e.currentTarget.src = playing.podcast?.coverUrl ?? appIcon
+          <img
+            className="w-24 z-10 aspect-square m-auto rounded-md cursor-pointer hover:p-1 transition-all"
+            src={playing.coverUrl}
+            alt=''
+            onClick={() => {
+              navigate('/episode-preview', {
+                state: {
+                  episode: playing
                 }
-              }}
-            />
+              })
+            }}
+            onError={(e: SyntheticEvent<HTMLImageElement>) => {
+              if (e.currentTarget.src === playing.podcast?.coverUrl) {
+                e.currentTarget.src = appIcon
+              } else {
+                e.currentTarget.src = playing.podcast?.coverUrl ?? appIcon
+              }
+            }}
+          />
 
           <div className="flex flex-col w-full">
             {/* TITLE ON THE TOP NEXT TO COVER */}
@@ -420,70 +430,70 @@ function AudioPlayer({ className = '' }) {
             </div>
 
             {/* TIME BAR AND CONTROLS */}
-              <div className='absolute w-full bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center'>
+            <div className='absolute w-full bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center'>
 
-                {/* TIME BAR */}
-                <div className="w-2/3 flex items-center justify-center">
-                  <p className="select-none">{secondsToStr(position)}</p>
-                  <input
-                    type="range"
-                    min="0"
-                    max={duration}
-                    value={position}
-                    onChange={(event) => changeTime(Number(event.target.value))}
-                    className="w-full mx-1 h-[3px] bg-primary-3 accent-accent-6 stroke-white"
-                  />
-                  <p className="select-none cursor-pointer"
-                    title={t('toggle_remaining_time')}
-                    onClick={() => updateSettings({ playback: { displayRemainingTime: !displayRemainingTime } })}>
-                    {secondsToStr(displayRemainingTime ? position - duration : duration)}
-                  </p>
+              {/* TIME BAR */}
+              <div className="w-2/3 flex items-center justify-center">
+                <p className="select-none">{secondsToStr(position)}</p>
+                <input
+                  type="range"
+                  min="0"
+                  max={duration}
+                  value={position}
+                  onChange={(event) => changeTime(Number(event.target.value))}
+                  className="w-full mx-1 h-[3px] bg-primary-3 accent-accent-6 stroke-white"
+                />
+                <p className="select-none cursor-pointer"
+                  title={t('toggle_remaining_time')}
+                  onClick={() => updateSettings({ playback: { displayRemainingTime: !displayRemainingTime } })}>
+                  {secondsToStr(displayRemainingTime ? position - duration : duration)}
+                </p>
+              </div>
+
+              {/* CONTROLS */}
+              <div className="grid grid-cols-3 w-full px-4">
+                <div className="flex justify-center items-center">
+                  {/* left side menu */}
                 </div>
 
-                {/* CONTROLS */}
-                <div className="grid grid-cols-3 w-full px-4">
-                  <div className="flex justify-center items-center">
-                    {/* left side menu */}
-                  </div>
+                {/* PLAYER BUTTONS ON THE MIDDLE */}
+                <div className="flex justify-center gap-3 items-center">
+                  <button
+                    className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
+                    onClick={() => {
+                      changeTime(-1 * stepBackwards, true)
+                    }}
+                  >
+                    {backwardsIcon}
+                    <p className="text-[10px] text-center -mt-[6px]">{stepBackwards}</p>
+                  </button>
 
-                  {/* PLAYER BUTTONS ON THE MIDDLE */}
-                  <div className="flex justify-center gap-3 items-center">
-                    <button
-                      className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
-                      onClick={() => {
-                        changeTime(-1 * stepBackwards, true)
-                      }}
-                    >
-                      {backwardsIcon}
-                      <p className="text-[10px] text-center -mt-[6px]">{stepBackwards}</p>
-                    </button>
+                  <button
+                    className="flex items-center focus:outline-none hover: hover:text-accent-6 w-9 mb-2"
+                    onClick={handlePlayPause}
+                  >
+                    <span className="w-9">{audioRef.current?.paused ? playIcon : pauseIcon}</span>
+                  </button>
 
-                    <button
-                      className="flex items-center focus:outline-none hover: hover:text-accent-6 w-9 mb-2"
-                      onClick={handlePlayPause}
-                    >
-                      <span className="w-9">{audioRef.current?.paused ? playIcon : pauseIcon}</span>
-                    </button>
+                  <button
+                    className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
+                    onClick={() => {
+                      changeTime(stepForward, true)
+                    }}
+                  >
+                    {forwardIcon}
+                    <p className="text-[10px] text-center -mt-[6px]">{stepForward}</p>
+                  </button>
 
-                    <button
-                      className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
-                      onClick={() => {
-                        changeTime(stepForward, true)
-                      }}
-                    >
-                      {forwardIcon}
-                      <p className="text-[10px] text-center -mt-[6px]">{stepForward}</p>
-                    </button>
-                    
-                  </div>
-                  <div className="flex justify-between items-center gap-4">
-                    <SpeedButton audioRef={audioRef}/>
-                    <VolumeControl audioRef={audioRef}/>
-                  </div>
+                </div>
+                <div className="flex justify-between items-center gap-4">
+                  <SpeedButton audioRef={audioRef} />
+                  <VolumeControl audioRef={audioRef} />
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
       }
     </>

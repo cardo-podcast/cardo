@@ -15,7 +15,7 @@ import { useEpisode } from "../engines/Episode";
 export default function EpisodePreviewCard({ episode }: { episode: EpisodeData | NewEpisodeData }) {
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, play, toggleDownload, downloadState } = useEpisode(episode)
+  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, play, toggleDownload, downloadState, inProgress, pause } = useEpisode(episode)
 
 
 
@@ -67,10 +67,10 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
         <button className="absolute bottom-2 right-2 bg-accent-7 w-7 p-[3px] pl-[4px] aspect-square flex justify-center items-center hover:p-[1px] border-2 border-accent-8 rounded-full transition-all"
           onClick={e => {
             e.stopPropagation()
-            play()
+            inProgress(true)? pause(): play()
           }}
         >
-          <span className="w-5 text-white">{icons.play}</span>
+          <span className="w-5 text-white">{inProgress(true)? icons.pause: icons.play}</span>
         </button>
       </div>
       <div className="relative">
