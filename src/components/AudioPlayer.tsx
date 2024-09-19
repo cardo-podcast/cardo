@@ -227,16 +227,20 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
 
 
 function VolumeControl({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
+  const [{playback: playbackSettings}, updateSettings] = useSettings()
 
-  const [volume, setVolume] = useState(1);  // Volume State (MAX)
+  const [volume, setVolume] = useState(playbackSettings.volume); // volume is restored
   const [isMuted, setIsMuted] = useState(false); // Control mute
 
   const changeVolume = (newVolume: number) => {
     setVolume(newVolume);
   }
 
-  // update audio volume when `volume` state changes
   useEffect(() => {
+    // update volume in settings
+    updateSettings({playback: {volume}})
+
+    // update audio volume when `volume` state changes
     if (audioRef.current) {
       audioRef.current.volume = isMuted ? 0 : volume
     }
