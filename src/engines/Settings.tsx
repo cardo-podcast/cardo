@@ -122,7 +122,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       displayRemainingTime: false,
       rateChangeStep: 0.05,
       playbackRate: 1,
-      playbackRatePresets: [1, 1.25, 1.50, 2]
+      playbackRatePresets: [1, 1.25, 1.50, 2],
+      volume: 1
     },
     ui: {
       showPinWindowButton: false,
