@@ -202,15 +202,15 @@ export const speedometer = (
 )
 
 export const volume = (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" className="w-6 h-6">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2">
     <path d="M11 5 L7 9 H3 V15 H7 L11 19 V5 Z" />
-    <path d="M15 9 C17 10 17 14 15 15" />
+    <path d="M15 9 C17 10 17 14 15 15" />36
     <path d="M19 7 C21.5 10 21.5 14 19 17" />
   </svg>
 );
 
 export const mute = ( 
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" className="w-6 h-6">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2">
     <path d="M11 5L7 9H3V15H7L11 19V5Z"/>
     <path d="M19 5L5 19" />
   </svg>
