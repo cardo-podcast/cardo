@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import { useSync } from "../sync/Nextcloud";
 import appIcon from '../../src-tauri/icons/icon.png'
 import { sanitizeHTML } from "../utils/sanitize";
+import { showMenu } from "tauri-plugin-context-menu";
 
 const EPISODE_CARD_HEIGHT = 80 // min height
 const PRELOADED_EPISODES = 10 //
@@ -62,7 +63,7 @@ function PodcastPreview() {
     subscriptionsEpisodes } = useDB()
   const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcast.feedUrl)
   const { performSync } = useSync()
-  const allEpisodes = useMemo(async() => await getAllEpisodes(), [podcast.feedUrl])
+  const allEpisodes = useMemo(async () => await getAllEpisodes(), [podcast.feedUrl])
 
   const [tweakMenu, setTweakMenu] = useState<ReactNode>(undefined)
   const { t } = useTranslation()
@@ -103,7 +104,7 @@ function PodcastPreview() {
   }
 
 
-  async function getAllEpisodes(forceDownload = false){
+  async function getAllEpisodes(forceDownload = false) {
     async function downloadEpisodes() {
       setDownloading(true)
       const [episodes, podcastDetails] = await parseXML(podcast.feedUrl)
@@ -135,9 +136,9 @@ function PodcastPreview() {
     return episodes
   }
 
-  async function loadEpisodes(forceDownload = false){
+  async function loadEpisodes(forceDownload = false) {
 
-    const episodes = await (forceDownload? getAllEpisodes(true): allEpisodes)
+    const episodes = await (forceDownload ? getAllEpisodes(true) : allEpisodes)
     setEpisodes(sortEpisodes(await filterEpisodes(episodes)))
   }
 
@@ -162,7 +163,7 @@ function PodcastPreview() {
     setTweakMenu(undefined)
 
     if (scrollRef.current) {
-      scrollRef.current.scrollTo({top: 0, behavior: 'instant'})
+      scrollRef.current.scrollTo({ top: 0, behavior: 'instant' })
     }
   }, [podcast.feedUrl])
 
@@ -184,6 +185,20 @@ function PodcastPreview() {
       sessionStorage.removeItem(`scroll-${location.key}`)
     }
   }, [episodes])
+
+  function copyFeedUrl() {
+    navigator.clipboard.writeText(podcast.feedUrl)
+    toast.info(t('feed_url_copied'), {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
+  }
 
   return (
     <div className="relative w-full px-1">
@@ -239,19 +254,15 @@ function PodcastPreview() {
         <div className='flex justify-left w-full gap-3 pb-3 border-b-2 border-primary-8 h-52 bg-primary-9 p-2 z-10'>
           <div className="flex flex-col gap-2 items-center shrink-0">
             <div className="h-40 aspect-square cursor-pointer"
-              title={t('copy_feed_url')}
-              onClick={() => {
-                navigator.clipboard.writeText(podcast.feedUrl)
-                toast.info(t('feed_url_copied'), {
-                  position: "top-center",
-                  autoClose: 3000,
-                  hideProgressBar: true,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                  theme: "dark",
-                });
+              onContextMenu={() => {
+                showMenu({
+                  items: [
+                    {
+                      label: t('copy_feed_url'),
+                      event: copyFeedUrl
+                    }
+                  ]
+                })
               }}
             >
               <img

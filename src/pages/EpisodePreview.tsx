@@ -9,6 +9,8 @@ import ProgressBar from "../components/ProgressBar"
 import appIcon from '../../src-tauri/icons/icon.png'
 import { useEpisode } from "../engines/Episode"
 import { sanitizeHTML } from "../utils/sanitize"
+import { showMenu } from "tauri-plugin-context-menu"
+import { toast } from "react-toastify"
 
 
 function EpisodePreview() {
@@ -43,6 +45,20 @@ function EpisodePreview() {
     fetchPodcastData(episode)
   }, [])
 
+  function copyEpisodeSrc() {
+    navigator.clipboard.writeText(episode.src)
+    toast.info(t('episode_url_copied'), {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
+  }
+
 
   return (
     <div className="p-2 w-full flex flex-col">
@@ -58,7 +74,7 @@ function EpisodePreview() {
               e.currentTarget.src = episode.podcast?.coverUrl ?? appIcon
             }
           }}
-          title={podcastFetched ? t('open_podcast') : ''}
+          title={podcastFetched ? t('open_podcast') + ' ' + episode.podcast?.podcastName : ''}
           onClick={() => {
             podcastFetched && // buton didn't work if podcast isn't loaded yet
               navigate('/preview', {
@@ -66,6 +82,20 @@ function EpisodePreview() {
                   podcast: episode.podcast
                 }
               })
+          }}
+          onContextMenu={() => {
+            if (!podcastFetched) return
+
+            showMenu(
+              {
+                items: [
+                  {
+                    label: t('copy_episode_url'),
+                    event: copyEpisodeSrc
+                  }
+                ]
+                }
+            )
           }}
         />
 
