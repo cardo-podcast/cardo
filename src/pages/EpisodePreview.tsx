@@ -18,7 +18,7 @@ function EpisodePreview() {
   const { subscriptions } = useDB()
   const { t } = useTranslation()
   const [podcastFetched, setPodcastFetched] = useState(false)
-  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, toggleDownload, downloadState, play } = useEpisode(episode)
+  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, toggleDownload, downloadState, play, pause } = useEpisode(episode)
 
 
   const fetchPodcastData = async (episode: EpisodeData) => {
@@ -83,9 +83,9 @@ function EpisodePreview() {
                 : secondsToStr(episode.duration)
             }
             <button className="w-7 p-1 aspect-square shrink-0 flex justify-center items-center hover:text-accent-6 hover:p-[2px] bg-primary-7 rounded-full"
-              onClick={play}
+              onClick={() => inProgress(true)? pause(): play()}
             >
-              <span className="w-5">{icons.play}</span>
+              <span className="w-5">{inProgress(true)? icons.pause: icons.play}</span>
             </button>
 
             <button className={`w-5 hover:text-accent-6 ${reprState.complete && 'text-primary-7'}`}
