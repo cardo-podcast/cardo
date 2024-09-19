@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, RefObject, createContext, ReactNode, useContext, Dispatch, SetStateAction, useCallback, SyntheticEvent } from "react";
 import { secondsToStr } from "../utils/utils";
-import { play as playIcon, pause as pauseIcon, forward as forwardIcon, backwards as backwardsIcon, close as closeIcon, speedometer } from "../Icons"
+import { play as playIcon, pause as pauseIcon, forward as forwardIcon, backwards as backwardsIcon, close as closeIcon, speedometer, volume as volumeIcon, mute as muteIcon } from "../Icons"
 import { EpisodeData } from "..";
 import { useDB } from "../DB/DB";
 import { useNavigate } from "react-router-dom";
@@ -228,6 +228,9 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
 
 function AudioPlayer({ className = '' }) {
   const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);  // Volume State (MAX)
+  const [isMuted, setIsMuted] = useState(false); // Control mute
+  const [prevVolume, setPrevVolume] = useState<number>(volume); // Store the previous volume before muting
   const { history, queue } = useDB()
   const { audioRef, play, playing, position, setPosition, quit } = usePlayer()
   const navigate = useNavigate()
@@ -302,6 +305,13 @@ function AudioPlayer({ className = '' }) {
     }
   };
 
+  const changeVolume = (newVolume: number) => {
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+      setVolume(newVolume);
+    }
+  }
+
   const changeTime = (newTime: number, relative = false) => {
     if (audioRef.current) {
 
@@ -323,6 +333,58 @@ function AudioPlayer({ className = '' }) {
     }
   };
 
+  const VolumeControl = ({
+    setVolume,
+    isMuted,
+    setIsMuted,
+    volumeIcon,
+    muteIcon
+  }: {
+    setVolume: Dispatch<SetStateAction<number>>;
+    isMuted: boolean;
+    setIsMuted: Dispatch<SetStateAction<boolean>>;
+    volumeIcon: JSX.Element;
+    muteIcon: JSX.Element;
+  }) => {
+    const handleVolumeToggle = () => {
+      if (isMuted) {
+        // Restore the volume to the previous value before mute
+        setVolume(prevVolume);
+        setIsMuted(false);
+      } else {
+        // Store the current volume before muting
+        setPrevVolume(volume);
+        // Set volume to 0 if not muted
+        setVolume(0);
+        setIsMuted(true);
+      }
+    };
+  
+    return (
+      <div className="flex items-center justify-center mt-1">
+        <button
+          //className="flex items-center justify-center hover:text-accent-6 w-7"
+          className="hover:text-accent-6"
+
+          onClick={handleVolumeToggle}
+        >
+          {isMuted ? muteIcon : volumeIcon}
+        </button>
+      </div>
+    );
+  };
+
+  // update audio volume when `volume` state changes
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [ volume ]);
+
+  // Update the mute state based on the volume value
+  useEffect(() => {
+    setIsMuted(volume === 0);
+  }, [volume]);
 
   return (
     <div className={`w-full flex bg-primary-10 border-t-2 border-primary-8 p-2 gap-4 ${audioRef.current?.src && playing ? 'visible' : 'hidden'} ${className}`}>
@@ -369,7 +431,7 @@ function AudioPlayer({ className = '' }) {
           </p>
         </div>
 
-        <div className="grid grid-cols-3 w-full">
+        <div className="grid grid-cols-4 w-full">
           <div className="flex justify-center items-center">
             {/* left side menu */}
           </div>
@@ -403,6 +465,28 @@ function AudioPlayer({ className = '' }) {
           </div>
           <div className="flex justify-start items-center">
             <SpeedButton audioRef={audioRef} />
+          </div>
+          <div className="flex justify-center items-center">
+          <VolumeControl
+            setVolume={setVolume}
+            isMuted={isMuted}
+            setIsMuted={setIsMuted}
+            volumeIcon={volumeIcon}
+            muteIcon={muteIcon}
+          /> 
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={volume}
+            onChange={(e) => {
+              changeVolume(Number(e.target.value));
+            }
+          }
+            
+          className="mx-2 h-[3px] bg-primary-3 accent-accent-6 stroke-white"/>
+          <p>{Math.round(volume * 100)}</p>
           </div>
         </div>
 
