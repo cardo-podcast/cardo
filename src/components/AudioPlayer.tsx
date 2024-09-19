@@ -162,7 +162,7 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
         <p className="text-[10px] text-center -mt-[6px]">{playbackRate.toFixed(2)}</p>
       </button>
 
-      {showMenu && <div className="fixed z-10 top-0 left-0 w-full h-full" onClick={() => setShowMenu(false)}/>}
+      {showMenu && <div className="fixed z-10 top-0 left-0 w-full h-full" onClick={() => setShowMenu(false)} />}
       <div className={`${showMenu ? 'flex' : 'hidden'} flex-col absolute z-20 gap-1 items-center justify-center bottom-10 left-1/2 -translate-x-1/2 rounded-md bg-primary-9 border-2 border-primary-7 p-2 w-32`}>
         <div className="flex items-center gap-2">
           <button className="flex items-center text-xl mb-1 hover:text-accent-6"
@@ -226,11 +226,55 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
 }
 
 
-function AudioPlayer({ className = '' }) {
-  const [duration, setDuration] = useState(0);
+function VolumeControl({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
+
   const [volume, setVolume] = useState(1);  // Volume State (MAX)
   const [isMuted, setIsMuted] = useState(false); // Control mute
-  const [prevVolume, setPrevVolume] = useState<number>(volume); // Store the previous volume before muting
+
+  const changeVolume = (newVolume: number) => {
+    setVolume(newVolume);
+  }
+
+  // update audio volume when `volume` state changes
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume
+    }
+  }, [volume, isMuted]);
+
+  // Update the mute state based on the volume value
+  useEffect(() => {
+    setIsMuted(volume === 0);
+  }, [volume]);
+
+  return (
+    <div className="flex items-center">
+      <button
+        className="hover:text-accent-6 flex"
+        onClick={() => setIsMuted(!isMuted)}
+      >
+        <span className="w-5 h-5">{isMuted ? muteIcon : volumeIcon}</span>
+      </button>
+
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        value={isMuted ? 0 : volume}
+        onChange={(e) => {
+          changeVolume(Number(e.target.value));
+        }}
+        title={`${Math.round(volume * 100)} %`}
+        className="ml-2 h-[3px] bg-primary-3 accent-accent-6 stroke-white w-24" />
+
+    </div>
+  );
+};
+
+
+function AudioPlayer({ className = '' }) {
+  const [duration, setDuration] = useState(0);
   const { history, queue } = useDB()
   const { audioRef, play, playing, position, setPosition, quit } = usePlayer()
   const navigate = useNavigate()
@@ -305,12 +349,6 @@ function AudioPlayer({ className = '' }) {
     }
   };
 
-  const changeVolume = (newVolume: number) => {
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume;
-      setVolume(newVolume);
-    }
-  }
 
   const changeTime = (newTime: number, relative = false) => {
     if (audioRef.current) {
@@ -333,180 +371,115 @@ function AudioPlayer({ className = '' }) {
     }
   };
 
-  const VolumeControl = ({
-    setVolume,
-    isMuted,
-    setIsMuted,
-    volumeIcon,
-    muteIcon
-  }: {
-    setVolume: Dispatch<SetStateAction<number>>;
-    isMuted: boolean;
-    setIsMuted: Dispatch<SetStateAction<boolean>>;
-    volumeIcon: JSX.Element;
-    muteIcon: JSX.Element;
-  }) => {
-    const handleVolumeToggle = () => {
-      if (isMuted) {
-        // Restore the volume to the previous value before mute
-        setVolume(prevVolume);
-        setIsMuted(false);
-      } else {
-        // Store the current volume before muting
-        setPrevVolume(volume);
-        // Set volume to 0 if not muted
-        setVolume(0);
-        setIsMuted(true);
-      }
-    };
-  
-    return (
-      <div className="flex items-center justify-center mt-1">
-        <button
-          //className="flex items-center justify-center hover:text-accent-6 w-7"
-          className="hover:text-accent-6"
-
-          onClick={handleVolumeToggle}
-        >
-          {isMuted ? muteIcon : volumeIcon}
-        </button>
-      </div>
-    );
-  };
-
-  // update audio volume when `volume` state changes
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-    }
-  }, [ volume ]);
-
-  // Update the mute state based on the volume value
-  useEffect(() => {
-    setIsMuted(volume === 0);
-  }, [volume]);
-
   return (
-    <div className={`w-full flex bg-primary-10 border-t-2 border-primary-8 p-2 gap-4 ${audioRef.current?.src && playing ? 'visible' : 'hidden'} ${className}`}>
-      {playing?.src &&
-        <img
-          className="w-24 aspect-square m-auto rounded-md cursor-pointer hover:p-1 transition-all"
-          src={playing.coverUrl}
-          alt=''
-          onClick={() => {
-            navigate('/episode-preview', {
-              state: {
-                episode: playing
-              }
-            })
-          }}
-          onError={(e: SyntheticEvent<HTMLImageElement>) => {
-            if (e.currentTarget.src === playing.podcast?.coverUrl) {
-              e.currentTarget.src = appIcon
-            } else {
-              e.currentTarget.src = playing.podcast?.coverUrl ?? appIcon
-            }
-          }}
-        />
+    <>
+      <audio ref={audioRef} onLoadedMetadata={handleLoadedMetadata} className="hidden" />
+
+      {
+        playing &&
+
+        <div className={`w-full flex gap-3 bg-primary-10 border-t-2 border-primary-8 p-2 ${className}`}>
+          {/* COVER ON LEFT SIDE*/}
+            <img
+              className="w-24 z-10 aspect-square m-auto rounded-md cursor-pointer hover:p-1 transition-all"
+              src={playing.coverUrl}
+              alt=''
+              onClick={() => {
+                navigate('/episode-preview', {
+                  state: {
+                    episode: playing
+                  }
+                })
+              }}
+              onError={(e: SyntheticEvent<HTMLImageElement>) => {
+                if (e.currentTarget.src === playing.podcast?.coverUrl) {
+                  e.currentTarget.src = appIcon
+                } else {
+                  e.currentTarget.src = playing.podcast?.coverUrl ?? appIcon
+                }
+              }}
+            />
+
+          <div className="flex flex-col w-full">
+            {/* TITLE ON THE TOP NEXT TO COVER */}
+            <div className="group mb-1 inline-flex w-full justify-between">
+              <h1 className="line-clamp-1">{playing.title}</h1>
+              <button className="w-7 group-hover:text-red-600 text-transparent"
+                onClick={quit}
+              >
+                {closeIcon}
+              </button>
+            </div>
+
+            {/* TIME BAR AND CONTROLS */}
+              <div className='absolute w-full bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center'>
+
+                {/* TIME BAR */}
+                <div className="w-2/3 flex items-center justify-center">
+                  <p className="select-none">{secondsToStr(position)}</p>
+                  <input
+                    type="range"
+                    min="0"
+                    max={duration}
+                    value={position}
+                    onChange={(event) => changeTime(Number(event.target.value))}
+                    className="w-full mx-1 h-[3px] bg-primary-3 accent-accent-6 stroke-white"
+                  />
+                  <p className="select-none cursor-pointer"
+                    title={t('toggle_remaining_time')}
+                    onClick={() => updateSettings({ playback: { displayRemainingTime: !displayRemainingTime } })}>
+                    {secondsToStr(displayRemainingTime ? position - duration : duration)}
+                  </p>
+                </div>
+
+                {/* CONTROLS */}
+                <div className="grid grid-cols-3 w-full px-4">
+                  <div className="flex justify-center items-center">
+                    {/* left side menu */}
+                  </div>
+
+                  {/* PLAYER BUTTONS ON THE MIDDLE */}
+                  <div className="flex justify-center gap-3 items-center">
+                    <button
+                      className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
+                      onClick={() => {
+                        changeTime(-1 * stepBackwards, true)
+                      }}
+                    >
+                      {backwardsIcon}
+                      <p className="text-[10px] text-center -mt-[6px]">{stepBackwards}</p>
+                    </button>
+
+                    <button
+                      className="flex items-center focus:outline-none hover: hover:text-accent-6 w-9 mb-2"
+                      onClick={handlePlayPause}
+                    >
+                      <span className="w-9">{audioRef.current?.paused ? playIcon : pauseIcon}</span>
+                    </button>
+
+                    <button
+                      className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
+                      onClick={() => {
+                        changeTime(stepForward, true)
+                      }}
+                    >
+                      {forwardIcon}
+                      <p className="text-[10px] text-center -mt-[6px]">{stepForward}</p>
+                    </button>
+                    
+                  </div>
+                  <div className="flex justify-between items-center gap-4">
+                    <SpeedButton audioRef={audioRef}/>
+                    <VolumeControl audioRef={audioRef}/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
       }
-
-
-      <div className='w-full flex flex-col'>
-        {playing && <h1 className="mb-1 line-clamp-1">{playing.title}</h1>}
-
-        <div className="w-full flex items-center justify-center">
-          <p>{secondsToStr(position)}</p>
-          <input
-            type="range"
-            min="0"
-            max={duration}
-            value={position}
-            onChange={(event) => changeTime(Number(event.target.value))}
-            className="w-4/5 mx-1 h-[3px] bg-primary-3 accent-accent-6 stroke-white"
-          />
-          <p className="cursor-pointer"
-            title={t('toggle_remaining_time')}
-            onClick={() => updateSettings({ playback: { displayRemainingTime: !displayRemainingTime } })}>
-            {secondsToStr(displayRemainingTime ? position - duration : duration)}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-4 w-full">
-          <div className="flex justify-center items-center">
-            {/* left side menu */}
-          </div>
-          <div className="flex justify-center gap-3 items-center">
-            <button
-              className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
-              onClick={() => {
-                changeTime(-1 * stepBackwards, true)
-              }}
-            >
-              {backwardsIcon}
-              <p className="text-[10px] text-center -mt-[6px]">{stepBackwards}</p>
-            </button>
-
-            <button
-              className="flex items-center focus:outline-none hover: hover:text-accent-6 w-9 mb-2"
-              onClick={handlePlayPause}
-            >
-              <span className="w-9">{audioRef.current?.paused ? playIcon : pauseIcon}</span>
-            </button>
-
-            <button
-              className="flex flex-col items-center focus:outline-none hover: hover:text-accent-6 w-7"
-              onClick={() => {
-                changeTime(stepForward, true)
-              }}
-            >
-              {forwardIcon}
-              <p className="text-[10px] text-center -mt-[6px]">{stepForward}</p>
-            </button>
-          </div>
-          <div className="flex justify-start items-center">
-            <SpeedButton audioRef={audioRef} />
-          </div>
-          <div className="flex justify-center items-center">
-          <VolumeControl
-            setVolume={setVolume}
-            isMuted={isMuted}
-            setIsMuted={setIsMuted}
-            volumeIcon={volumeIcon}
-            muteIcon={muteIcon}
-          /> 
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={volume}
-            onChange={(e) => {
-              changeVolume(Number(e.target.value));
-            }
-          }
-            
-          className="mx-2 h-[3px] bg-primary-3 accent-accent-6 stroke-white"/>
-          <p>{Math.round(volume * 100)}</p>
-          </div>
-        </div>
-
-        <audio ref={audioRef} onLoadedMetadata={handleLoadedMetadata} className="hidden" />
-      </div>
-
-      <div className="group w-24 h-full aspect-square shrink-0">
-        {/* extra width is to keep simetry */}
-        <div className="w-full justify-end flex">
-          <button className="w-7 group-hover:text-red-600 text-transparent"
-            onClick={quit}
-          >
-            {closeIcon}
-          </button>
-        </div>
-      </div>
-
-    </div>
-
-  );
+    </>
+  )
 }
 
 export default AudioPlayer;
