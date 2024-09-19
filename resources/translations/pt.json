@@ -35,6 +35,7 @@
     "new": "Novo",
     "update_subs_feeds": "Atualizar o feed das inscrições",
     "theme": "Tema",
+    "primary": "Primário",
     "base": "Base",
     "accent": "Accent",
     "light_theme": "Tema claro",
@@ -69,5 +70,13 @@
     "remove_from_subscriptions": "Remover inscrição",
     "add_to_subscriptions": "Increver-se",
     "add": "Adicionar",
-    "right_click_remove_preset": "Clique com o botão direito para excluir a predefinição"
+    "right_click_remove_preset": "Clique com o botão direito para excluir a predefinição",
+    "open_settings_file": "Abrir arquivo de configuração",
+    "open_settings_danger_menu": "Manuseie este arquivo com cuidado, podem ocorrer falhas.",
+    "ok": "Ok",
+    "cancel": "Cancelar",
+    "add_subscription_url": "Adicionar inscrição por URL RSS",
+    "feed_url": "URL do feed RSS",
+    "please_indicate_url": "Por favor, forneça um URL válido",
+    "open_web": "Abrir site"
   }
