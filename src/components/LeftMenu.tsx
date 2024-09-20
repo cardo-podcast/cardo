@@ -5,10 +5,9 @@ import { sync, home, settings, queue, download } from '../Icons'
 import SubscriptionCard from "./SubscriptionCard";
 import { useSettings } from "../engines/Settings";
 import { useModalBanner } from "./ModalBanner";
-import { parseXML } from "../utils/utils";
+import { parseXML, toastError } from "../utils/utils";
 import { useRef } from "react";
 import { useSync } from "../sync/Nextcloud";
-import { toast } from "react-toastify";
 
 
 function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
@@ -27,17 +26,7 @@ function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
           if (!inputRef.current) return
 
           if (!inputRef.current.validity.valid) {
-            toast.error(t('please_indicate_url'), {
-              position: "top-center",
-              autoClose: 3000,
-              hideProgressBar: true,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "dark",
-            });
-
+            toastError(t('please_indicate_url'))
             return 'error'
           }
 
