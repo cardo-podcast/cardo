@@ -7,7 +7,7 @@
                 "width": 900,
                 "height": 675,
                 "decorations": false,
-                "transparent": false, // not needed as rounded corners is disabled on mac (https://github.com/agmmnn/tauri-controls/issues/10)
+                "transparent": false,
                 "minWidth": 700,
                 "minHeight": 500
             }
