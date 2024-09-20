@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Database from "tauri-plugin-sql-api";
 import { EpisodeData, NewEpisodeData, PodcastData, RawEpisodeData } from "..";
-import { parseXML } from "../utils/utils";
+import { parseXML, toastError } from "../utils/utils";
 import { useSettings } from "../engines/Settings";
 
 
@@ -55,10 +55,17 @@ export function useSubscriptionsEpisodes(db: Database, subscriptions: PodcastDat
 
   async function updateFeed(subscription: PodcastData) {
     setUpdatingFeeds(subscription.id!)
-    const [episodes,] = await parseXML(subscription.feedUrl)
-    await save(episodes)
-    setUpdatingFeeds(null)
-    return episodes
+    try{
+      const [episodes,] = await parseXML(subscription.feedUrl)
+      await save(episodes)
+      setUpdatingFeeds(null)
+      return episodes
+    } catch (e) {
+      toastError(`Error updating feed ${subscription.feedUrl}: ${e}`)
+      setUpdatingFeeds(null)
+      return []
+    }
+
   }
 
   async function updateFeeds() {
