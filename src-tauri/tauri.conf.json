@@ -91,6 +91,10 @@
         "certificateThumbprint": "adc7a1a8a7219a69236cc8b14d061771154d68b3",
         "digestAlgorithm": "sha256",
         "timestampUrl": "http://timestamp.comodoca.com"
+      },
+      "macOS": {
+        "license": "LICENSE",
+        "signingIdentity": "-" // https://github.com/tauri-apps/tauri/issues/8763
       }
     }
   }
