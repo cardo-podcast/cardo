@@ -3,6 +3,7 @@ import { EpisodeData, PodcastData } from ".."
 import { createDir, exists, readTextFile, writeTextFile, removeFile, removeDir, readDir } from "@tauri-apps/api/fs"
 import { appCacheDir, dirname, join } from "@tauri-apps/api/path"
 import { invoke } from "@tauri-apps/api"
+import { toast } from "react-toastify"
 
 
 export function secondsToStr(seconds: number) {
@@ -213,4 +214,17 @@ export async function removeDownloadedEpisode(localFile: string) {
   if (downloadedPodcasts.length == 0) {
     removeDir(podcastDir)
   }
+}
+
+export function toastError(message: string) {
+  toast.error(message, {
+    position: "top-center",
+    autoClose: 3000,
+    hideProgressBar: true,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "dark",
+  });
 }

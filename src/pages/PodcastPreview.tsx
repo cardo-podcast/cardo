@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom";
 import { EpisodeData, PodcastData, SortCriterion } from "..";
 import { ReactNode, SyntheticEvent, useEffect, useMemo, useRef, useState } from "react";
 import * as icons from "../Icons"
-import { parseXML } from "../utils/utils";
+import { parseXML, toastError } from "../utils/utils";
 import EpisodeCard from "../components/EpisodeCard";
 import { useDB } from "../DB/DB";
 import { Switch, SwitchState } from "../components/Inputs";
@@ -107,10 +107,16 @@ function PodcastPreview() {
   async function getAllEpisodes(forceDownload = false) {
     async function downloadEpisodes() {
       setDownloading(true)
-      const [episodes, podcastDetails] = await parseXML(podcast.feedUrl)
-      podcast.description = podcastDetails.description
-      setDownloading(false)
-      return episodes
+      try {
+        const [episodes, podcastDetails] = await parseXML(podcast.feedUrl)
+        podcast.description = podcastDetails.description
+        setDownloading(false)
+        return episodes
+      } catch (e) {
+        toastError(e as string)
+        setDownloading(false)
+        return []
+      }
     }
 
     const isSubscribed = await subscriptions.get(podcast.feedUrl) !== undefined

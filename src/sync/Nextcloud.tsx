@@ -1,7 +1,7 @@
 import { http, invoke, shell } from "@tauri-apps/api"
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react"
 import { useDB, DB } from "../DB/DB"
-import { getCreds, parsePodcastDetails, removeCreds, saveCreds } from "../utils/utils"
+import { getCreds, parsePodcastDetails, removeCreds, saveCreds, toastError } from "../utils/utils"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { toast } from 'react-toastify';
@@ -79,16 +79,7 @@ export function NextcloudSettings() {
           try {
             interval.current = await login(urlRef.current.value, getSyncKey, setSyncKey, () => setLoggedIn(true))
           } catch (e) {
-            toast.error((e as Error).message, {
-              position: "top-center",
-              autoClose: 3000,
-              hideProgressBar: true,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "dark",
-            });
+            toastError((e as Error).message)
           }
         }
       }}>

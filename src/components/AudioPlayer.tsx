@@ -71,7 +71,6 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     } else {
       audioRef.current.src = episode.src
     }
-    console.log('SRC: ', audioRef.current.src)
     audioRef.current.load()
 
     const previousState = await history.get(episode?.src)
