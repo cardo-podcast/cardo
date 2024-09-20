@@ -94,7 +94,7 @@
       },
       "macOS": {
         "license": "LICENSE",
-        "signingIdentity": "-" // https://github.com/tauri-apps/tauri/issues/8763
+        "signingIdentity": "-"
       }
     }
   }
