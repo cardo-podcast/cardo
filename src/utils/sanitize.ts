@@ -11,5 +11,7 @@ DOMPurify.addHook('afterSanitizeAttributes', function (node) {
 
 
 export function sanitizeHTML(dirty: string){
-  return DOMPurify.sanitize(dirty)
+  return DOMPurify.sanitize(dirty, {
+    FORBID_ATTR: ['style']
+  })
 }
