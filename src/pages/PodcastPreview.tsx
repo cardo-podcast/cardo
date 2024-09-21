@@ -54,6 +54,7 @@ function SortButton({ children, podcastUrl, criterion }: { children: ReactNode, 
 function PodcastPreview() {
   const location = useLocation();
   const podcast = location.state.podcast as PodcastData
+
   const [episodes, setEpisodes] = useState<EpisodeData[]>([])
   const [downloading, setDownloading] = useState(false)
   const [subscribed, setSubscribed] = useState(false)
@@ -204,6 +205,11 @@ function PodcastPreview() {
       progress: undefined,
       theme: "dark",
     });
+  }
+
+  if (!podcast.feedUrl) {
+    toastError("Feed URL couldn't be empty") // this should never happen, just to avoid weird behaviour in case of a bug
+    return <></>
   }
 
   return (
