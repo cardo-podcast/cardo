@@ -5,7 +5,7 @@ import { sync, home, settings, queue, download } from '../Icons'
 import SubscriptionCard from "./SubscriptionCard";
 import { useSettings } from "../engines/Settings";
 import { useModalBanner } from "./ModalBanner";
-import { parseXML, toastError } from "../utils/utils";
+import { parsePodcastDetails, toastError } from "../utils/utils";
 import { useRef } from "react";
 import { useSync } from "../sync/Nextcloud";
 
@@ -30,7 +30,8 @@ function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
             return 'error'
           }
 
-          const [_episodes, podcast] = await parseXML(inputRef.current.value)
+
+          const podcast = await parsePodcastDetails(inputRef.current.value)
           loggedInSync && performSync({ add: [podcast.feedUrl] })
           subscriptions.add(podcast)
           navigate('/preview', {

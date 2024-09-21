@@ -65,7 +65,7 @@ export async function parseXML(url: string): Promise<[EpisodeData[], PodcastData
     }
   }
 
-  const podcastDetails = await parsePodcastDetails(xml)
+  const podcastDetails = await parsePodcastDetails(url, xml)
 
   const result = Array.from(items).map((item: Element, i) => {
 
@@ -89,15 +89,10 @@ export async function parseXML(url: string): Promise<[EpisodeData[], PodcastData
   return [result, podcastDetails]
 }
 
-export async function parsePodcastDetails(xml: Document | string) {
-  /*
-  xml:  string -> url to download xml
-        Document -> parsed downloaded xml
-  */
+export async function parsePodcastDetails(url: string, xml?: Document ) {
 
-
-  if (typeof xml === "string") {
-    const xmlString = await downloadXml(xml)
+  if (!xml) {
+    const xmlString = await downloadXml(url)
     const parser = new DOMParser()
     xml = parser.parseFromString(xmlString, "text/xml")
   }
@@ -113,7 +108,7 @@ export async function parsePodcastDetails(xml: Document | string) {
     artistName: getItunesTag(channel, 'author').textContent ?? '',
     coverUrl: coverUrl,
     coverUrlLarge: coverUrl,
-    feedUrl: channel.querySelector('link[rel="self"]')?.getAttribute('href') ?? '',
+    feedUrl: url,
     description: channel.querySelector('description')?.textContent ?? ''
   }
 
