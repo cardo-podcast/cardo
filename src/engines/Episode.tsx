@@ -88,11 +88,11 @@ export function useEpisode(episode: EpisodeData) {
   }, [playing?.src, episode.src, reprState.position, playingPosition])
 
   const inProgress = useCallback((mustBePlaying = false) => {
-    const isInPlayer = playing?.src == episode.src && (reprState.position > 0 && !reprState.complete)
+    const isStarted = playing?.src == episode.src || (reprState.position > 0 && !reprState.complete)
     if (mustBePlaying) {
-      return isInPlayer && !paused
+      return isStarted && !paused
     } else {
-      return isInPlayer
+      return isStarted
     }
   }, [playing?.src, episode.src, reprState.position, reprState.complete, paused])
 
