@@ -150,16 +150,30 @@ function PodcastPreview() {
   }
 
   const filterEpisodes = async (unfilteredEpisodes: EpisodeData[]) => {
-    const completedEpisodes = await getCompleted(podcast.feedUrl)
     const filter = podcastSettings.filter
+    let result: EpisodeData[] = []
+
+    // filter completed /uncompleted episodes
+    const completedEpisodes = await getCompleted(podcast.feedUrl)
 
     if (filter.played === SwitchState.True) {
-      return unfilteredEpisodes.filter(ep => completedEpisodes.includes(ep.src))
+      result = unfilteredEpisodes.filter(ep => completedEpisodes.includes(ep.src))
     } else if (filter.played === SwitchState.False) {
-      return unfilteredEpisodes.filter(ep => !completedEpisodes.includes(ep.src))
+      result = unfilteredEpisodes.filter(ep => !completedEpisodes.includes(ep.src))
     } else {
-      return unfilteredEpisodes
+      result = unfilteredEpisodes
     }
+
+    // filter by duration
+    if (filter.duration.min > 0) {
+      result = result.filter(ep => ep.duration >= filter.duration.min)
+    }
+
+    if (filter.duration.max > 0) {
+      result = result.filter(ep => ep.duration <= filter.duration.max)
+    }
+
+    return result
   }
 
   useEffect(() => {
