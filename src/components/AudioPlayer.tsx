@@ -397,7 +397,7 @@ function AudioPlayer({ className = '' }) {
       {
         playing &&
 
-        <div className={`w-full flex gap-3 bg-primary-10 border-t-2 border-primary-8 p-2 ${className}`}>
+        <div className={`w-full flex gap-3 bg-primary-10 p-2 ${className}`}>
           {/* COVER ON LEFT SIDE*/}
           <img
             className="w-24 z-10 aspect-square m-auto rounded-md cursor-pointer hover:p-1 transition-all"
