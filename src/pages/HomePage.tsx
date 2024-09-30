@@ -3,9 +3,10 @@ import { useDB } from "../DB/DB";
 import { useTranslation } from "react-i18next";
 import EpisodeOverview from "../components/EpisodeOverview";
 import appIcon from '../../src-tauri/icons/icon.png'
-import { useSettings } from "../engines/Settings";
+import { getPodcastSettings, useSettings } from "../engines/Settings";
 import { useEffect, useState } from "react";
-import { NewEpisodeData } from "..";
+import { EpisodeData, NewEpisodeData } from "..";
+import { settings } from "../Icons";
 
 
 function HomePage() {
@@ -13,7 +14,7 @@ function HomePage() {
   const { t } = useTranslation()
   const [newEpisodes, setNewEpisodes] = useState<NewEpisodeData[]>([])
   const {subscriptionsEpisodes, subscriptions} = useDB()
-  const [{ general: { numberOfDaysInNews } }, _] = useSettings()
+  const [{ general: { numberOfDaysInNews }, podcasts: podcastSettings }, _] = useSettings()
 
   const loadNewEpisodes = async () => {
     const minDate = Date.now() - (24 * 3600 * 1000 * numberOfDaysInNews)
@@ -21,7 +22,26 @@ function HomePage() {
 
     episodes.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime())
 
-    setNewEpisodes(episodes)
+
+    // filter by duration
+    function filterByDuration(episode: EpisodeData) {
+      if (episode.podcastUrl in podcastSettings){
+        const episodePodcastSettings = getPodcastSettings(episode.podcastUrl, podcastSettings)
+        let result = true
+
+        if (episodePodcastSettings.filter.duration.min > 0) {
+          result = result && episode.duration >= episodePodcastSettings.filter.duration.min
+        }
+
+        if (episodePodcastSettings.filter.duration.max > 0) {
+          result = result && episode.duration <= episodePodcastSettings.filter.duration.max
+        }
+
+        return result
+      }
+    }
+
+    setNewEpisodes(episodes.filter(filterByDuration))
   }
 
   useEffect(() => {
