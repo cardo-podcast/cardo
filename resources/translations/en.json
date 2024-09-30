@@ -80,5 +80,7 @@
   "please_indicate_url": "Please provide a valid URL",
   "open_web": "Open website",
   "copy_episode_url": "Copy episode URL",
-  "episode_url_copied": "Episode URL copied to clipboard"
+  "episode_url_copied": "Episode URL copied to clipboard",
+  "duration_greater_than": "Duration greater than",
+  "duration_less_than": "Duration less than"
 }

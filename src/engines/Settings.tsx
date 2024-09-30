@@ -10,11 +10,18 @@ import colors from "tailwindcss/colors"
 import { DefaultTheme, DefaultThemes } from "../DefaultThemes"
 
 
+type DurationFilter = {
+  min: number,
+  max: number
+}
+
 export class FilterCriterion {
   played: SwitchState
+  duration: DurationFilter
 
   constructor() {
     this.played = SwitchState.None
+    this.duration = {min: 0, max: 0}
   }
 }
 
@@ -50,6 +57,8 @@ export function usePodcastSettings(feedUrl: string): [PodcastSettings, typeof up
 
     if (!newSettings[feedUrl]) {
       newSettings[feedUrl] = new PodcastSettings()
+    } else {
+      newSettings[feedUrl] = merge((new PodcastSettings()), settings.podcasts[feedUrl]) // merge default settings (if any is missing)
     }
 
     merge(newSettings[feedUrl], newPodcastSettings)
@@ -63,7 +72,7 @@ export function usePodcastSettings(feedUrl: string): [PodcastSettings, typeof up
   }
 
 
-  return [settings.podcasts[feedUrl] ?? new PodcastSettings(), updatePodcastSettings]
+  return [merge((new PodcastSettings()), settings.podcasts[feedUrl]), updatePodcastSettings]
 }
 
 export function getColor(settingsColor: TailwindBaseColor | ColorTheme | DefaultTheme): ColorTheme {
