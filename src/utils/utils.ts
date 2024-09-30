@@ -6,7 +6,7 @@ import { invoke } from "@tauri-apps/api"
 import { toast } from "react-toastify"
 
 
-export function secondsToStr(seconds: number) {
+export function secondsToStr(seconds: number, alwaysShowHours = false) {
   const negative = seconds < 0
   if (negative) {
     seconds = Math.abs(seconds)
@@ -18,7 +18,7 @@ export function secondsToStr(seconds: number) {
 
   if (Number.isNaN(seconds)) return ''
 
-  if (hours > 0) {
+  if (hours > 0 || alwaysShowHours) {
     return `${negative ? '-' : ''}${hours}:${minutes.toString().padStart(2, '0')}:${secondsStr}`
   } else {
     return `${negative ? '-' : ''}${minutes}:${secondsStr}`
@@ -26,9 +26,15 @@ export function secondsToStr(seconds: number) {
 }
 
 export function strToSeconds(time: string) {
-  const [hours, minutes, seconds] = time.split(':')
-  const r = Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds)
-  return r
+  const values = time.split(':')
+
+  if (values.length == 1) {
+    return Number(values[0])
+  } else if (values.length == 2) {
+    return Number(values[0]) * 60 + Number(values[1])
+  } else {
+    return Number(values[0]) * 3600 + Number(values[1]) * 60 + Number(values[2])
+  }
 }
 
 async function downloadXml(url: string): Promise<string> {

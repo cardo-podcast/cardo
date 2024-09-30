@@ -5,7 +5,7 @@ import * as icons from "../Icons"
 import { parseXML, toastError } from "../utils/utils";
 import EpisodeCard from "../components/EpisodeCard";
 import { useDB } from "../DB/DB";
-import { Switch, SwitchState } from "../components/Inputs";
+import { Switch, SwitchState, TimeInput } from "../components/Inputs";
 import { usePodcastSettings } from "../engines/Settings";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
@@ -66,7 +66,7 @@ function PodcastPreview() {
   const { performSync } = useSync()
   const allEpisodes = useMemo(async () => await getAllEpisodes(), [podcast.feedUrl])
 
-  const [tweakMenu, setTweakMenu] = useState<ReactNode>(undefined)
+  const [tweakMenu, setTweakMenu] = useState<'sort' | 'filter' | undefined>(undefined)
   const { t } = useTranslation()
 
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -251,7 +251,41 @@ function PodcastPreview() {
 
             <div className="left-1/2 -translate-x-1/2 absolute w-4/5 top-0 rounded-b-3xl overflow-hidden bg-primary-9 border-[1px] border-t-0 border-primary-6 flex flex-col justify-between items-center transition-all duration-200 z-20">
               <div className="p-2 flex flex-col gap-1 items-center w-full">
-                {tweakMenu}
+                {
+                  tweakMenu === 'sort' &&
+
+                  <div className="w-4/5 flex flex-col gap-1 justify-center items-center">
+                    <SortButton podcastUrl={podcast.feedUrl} criterion="date">
+                      {t('date')}
+                    </SortButton>
+                    <SortButton podcastUrl={podcast.feedUrl} criterion="duration">
+                      {t('duration')}
+                    </SortButton>
+                  </div>
+                }
+
+                {
+                  tweakMenu === 'filter' &&
+
+                  <div className="flex flex-col justify-center items-center gap-0.5 w-full">
+
+                    <Switch state={podcastSettings.filter.played} setState={(value) => {
+                      updatePodcastSettings({ filter: { played: value } })
+                    }} labels={[t('not_played'), t('played')]} />
+
+                    <div>
+                      <label className="uppercase flex items-center gap-2 justify-between">{t('duration_less_than')}:
+                        <TimeInput value={podcastSettings.filter.duration.max} onChange={
+                          (v) => updatePodcastSettings({ filter: { duration: { max: v } } })} />
+                      </label>
+                      <label className="uppercase flex items-center gap-2 justify-between">{t('duration_greater_than')}:
+                        <TimeInput value={podcastSettings.filter.duration.min} onChange={
+                          (v) => updatePodcastSettings({ filter: { duration: { min: v } } })} />
+                      </label>
+                    </div>
+
+                  </div>
+                }
               </div>
 
               <button className="border-t-2 border-primary-8 p-2 h-5 w-4/5 flex justify-center items-center mt-1"
@@ -307,16 +341,7 @@ function PodcastPreview() {
               <button
                 className="hover:text-accent-6"
                 onClick={() => {
-                  setTweakMenu(
-                    <div className="w-4/5 flex flex-col gap-1 justify-center items-center">
-                      <SortButton podcastUrl={podcast.feedUrl} criterion="date">
-                        {t('date')}
-                      </SortButton>
-                      <SortButton podcastUrl={podcast.feedUrl} criterion="duration">
-                        {t('duration')}
-                      </SortButton>
-                    </div>
-                  )
+                  setTweakMenu('sort')
                 }
                 }>
                 {icons.sort}
@@ -324,13 +349,7 @@ function PodcastPreview() {
               <button
                 className="hover:text-accent-6"
                 onClick={() => {
-                  setTweakMenu(
-                    <div className="flex justify-center items-center">
-                      <Switch initialState={podcastSettings.filter.played} setState={async (value) => {
-                        updatePodcastSettings({ filter: { played: value } })
-                      }} labels={[t('not_played'), t('played')]} />
-                    </div>
-                  )
+                  setTweakMenu('filter')
                 }
                 }>
                 {icons.filter}

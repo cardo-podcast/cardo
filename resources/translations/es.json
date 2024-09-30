@@ -79,5 +79,7 @@
   "please_indicate_url": "Por favor indica una URL valida",
   "open_web": "Abrir sitio web",
   "copy_episode_url": "Copiar URL del episodio",
-  "episode_url_copied": "URL del episodio copiada al portapapeles"
+  "episode_url_copied": "URL del episodio copiada al portapapeles",
+  "duration_greater_than": "Duracion mayor que",
+  "duration_less_than": "Duracion menor que"
 }
