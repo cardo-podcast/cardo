@@ -45,7 +45,7 @@ function TitleBar() {
   }, [savePlayerStatus]) // reload when dependencies change
 
   return (
-    <div className={`bg-primary-10 border-b-2 border-primary-8 flex w-full h-10 justify-between px-2 py-1 items-center relative stroke-[1.5px]`} data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>
+    <div className={`bg-primary-10 flex w-full h-10 justify-between px-2 py-1 items-center relative stroke-[1.5px]`} data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>
       <div className='flex gap-2 items-center'>
 
         {ui.showPinWindowButton &&
