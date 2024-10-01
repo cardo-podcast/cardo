@@ -1,5 +1,7 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { secondsToStr, strToSeconds } from "../utils/utils"
+import { DndContext, useDraggable } from "@dnd-kit/core"
+import { restrictToParentElement } from "@dnd-kit/modifiers"
 
 
 export enum SwitchState {
@@ -128,5 +130,67 @@ export function TimeInput({ value, onChange }: { value: number, onChange: (t: nu
       }
       }
     />
+  )
+}
+
+
+function RangeBall({ position, className = '' }: { position: number, className?: string }) {
+  const { setNodeRef, attributes, listeners, transform } = useDraggable({ id: 'RangeBall' })
+
+  const xTransform = transform?.x ?? 0
+
+  const style = {
+    transform: `translate3d(${xTransform}px, -50%, 0) translateX(-50%)`,
+    left: `${position}%`,
+  }
+
+  return (
+    <div ref={setNodeRef} className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 left-0 bg-primary-3 w-3 h-3 rounded-full ${className}`}
+      style={style} {...listeners} {...attributes}
+    />
+  )
+}
+
+export function RangeInput({ min, max, value, onChange, className }: { min: number, max: number, value: number, onChange: (value: number) => void, className?: string }) {
+
+  const barRef = useRef<HTMLDivElement>(null)
+
+  const barWidth = barRef.current?.clientWidth ?? 0
+  const barOffsetLeft = barRef.current?.offsetLeft ?? 0
+  const [position, setPosition] = useState(0) // % of bar width
+
+  useEffect(() => {
+    if (max - min > 0) {
+      setPosition(value / (max - min) * 100)
+    }
+  }, [value])
+
+
+
+  return (
+    <div className="group py-1 w-full flex items-center"> {/* hover window is a bit higher than the bar */}
+      <div ref={barRef} className={`relative flex w-full h-1 rounded-md bg-primary-4 ${className}`}
+        onMouseMove={e => {
+          const seconds = (e.clientX - barOffsetLeft) / barWidth * (max - min)
+          if (barRef.current) {
+            barRef.current.title = secondsToStr(seconds)
+          }
+        }}
+        onClick={e => {
+          const seconds = (e.clientX - barOffsetLeft) / barWidth * (max - min)
+          const newPosition = seconds / (max - min) * 100
+          onChange(newPosition * (max - min) / 100)
+        }}
+      >
+        <DndContext onDragEnd={(e) => {
+          const newPosition = position + (e.delta.x / barWidth * 100)
+          onChange(newPosition * (max - min) / 100)
+        }} modifiers={[restrictToParentElement]}>
+          <RangeBall position={position} className="hidden group-hover:block" />
+        </DndContext>
+
+        <div className="bg-accent-7 h-full rounded-md" style={{ width: `${position}%` }} /> {/* progrss is colored */}
+      </div>
+    </div>
   )
 }
