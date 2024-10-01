@@ -6,7 +6,6 @@ import appIcon from '../../src-tauri/icons/icon.png'
 import { getPodcastSettings, useSettings } from "../engines/Settings";
 import { useEffect, useState } from "react";
 import { EpisodeData, NewEpisodeData } from "..";
-import { settings } from "../Icons";
 
 
 function HomePage() {

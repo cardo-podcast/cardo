@@ -10,6 +10,7 @@ import { globalShortcut } from "@tauri-apps/api";
 import appIcon from '../../src-tauri/icons/icon.png'
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import round from "lodash/round";
+import { RangeInput } from "./Inputs";
 
 
 
@@ -336,18 +337,6 @@ function AudioPlayer({ className = '' }) {
 
   }, [audioRef.current?.ended])
 
-  useEffect(() => {
-    if (audioRef.current) {
-      const intervalId = setInterval(() => {
-        if (audioRef.current) {
-          setPosition(audioRef.current.currentTime);
-        }
-      }, 1000);
-
-      return () => clearInterval(intervalId);
-    }
-  }, []);
-
   const handlePlayPause = () => {
     if (audioRef.current) {
       audioRef.current.paused ? audioRef.current.play() : audioRef.current.pause()
@@ -392,7 +381,10 @@ function AudioPlayer({ className = '' }) {
 
   return (
     <>
-      <audio ref={audioRef} onLoadedMetadata={handleLoadedMetadata} className="hidden" />
+      <audio ref={audioRef} className="hidden"
+        onLoadedMetadata={handleLoadedMetadata}
+        onTimeUpdate={(e: SyntheticEvent<HTMLAudioElement>) => setPosition(e.currentTarget.currentTime)}
+      />
 
       {
         playing &&
@@ -436,13 +428,12 @@ function AudioPlayer({ className = '' }) {
               {/* TIME BAR */}
               <div className="w-2/3 flex items-center justify-center">
                 <p className="select-none">{secondsToStr(position)}</p>
-                <input
-                  type="range"
-                  min="0"
+                <RangeInput
+                  min={0}
                   max={duration}
                   value={position}
-                  onChange={(event) => changeTime(Number(event.target.value))}
-                  className="w-full mx-1 h-[3px] bg-primary-3 accent-accent-6 stroke-white"
+                  onChange={(value) => changeTime(value)}
+                  className="mx-2"
                 />
                 <p className="select-none cursor-pointer"
                   title={t('toggle_remaining_time')}
