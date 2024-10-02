@@ -11,7 +11,7 @@ edition = "2021"
 tauri-build = { version = "1", features = [] }
 
 [dependencies]
-tauri = { version = "1", features = [ "shell-open", "protocol-asset", "updater", "global-shortcut-all", "fs-all", "os-all", "path-all", "http-all", "window-all"] }
+tauri = { version = "1", features = [ "shell-open", "protocol-asset", "global-shortcut-all", "fs-all", "os-all", "path-all", "http-all", "window-all"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 mio = {version = "1"}
