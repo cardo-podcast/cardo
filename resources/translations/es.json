@@ -16,7 +16,7 @@
   "connect": "Conectar",
   "log_out": "Cerrar sesión",
   "sync": "Sincronización",
-  "subscriptions": "Subscripciones",
+  "subscriptions": "Suscripciones",
   "open_podcast": "Abrir el podcast",
   "not_logged_sync": "Antes de sincronizar tienes que iniciar sesión en Nextcloud",
   "episodes": "episodios",
@@ -29,11 +29,11 @@
   "when_opening_app": "Tras abrir la aplicación",
   "when_closing_app": "Antes de cerrar la aplicación",
   "general": "General",
-  "fetch_subscriptions_startup": "Actualizar feeds de las subscripciones al inicio",
-  "number_days_news": "Numero de dias en novedades",
+  "fetch_subscriptions_startup": "Actualizar feeds de las suscripciones al inicio",
+  "number_days_news": "Numero de días en novedades",
   "news": "Novedades",
   "new": "Nuevo",
-  "update_subs_feeds": "Actualizar los feeds de las subscripciones",
+  "update_subs_feeds": "Actualizar los feeds de las suscripciones",
   "theme": "Tema",
   "base": "Base",
   "accent": "Color secundario",
@@ -76,16 +76,6 @@
   "cancel": "Cancelar",
   "add_subscription_url": "Añadir suscripción por dirección RSS",
   "feed_url": "URL del feed RSS",
-<<<<<<< HEAD
   "please_indicate_url": "Por favor, indica una URL valida",
   "open_web": "Abrir sitio web"
 }
-=======
-  "please_indicate_url": "Por favor indica una URL valida",
-  "open_web": "Abrir sitio web",
-  "copy_episode_url": "Copiar URL del episodio",
-  "episode_url_copied": "URL del episodio copiada al portapapeles",
-  "duration_greater_than": "Duracion mayor que",
-  "duration_less_than": "Duracion menor que"
-}
->>>>>>> cb777903cf963bc382e579b871dea84241d4fbfa
