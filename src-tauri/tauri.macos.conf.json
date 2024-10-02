@@ -1,0 +1,16 @@
+{
+    "tauri": {
+        "windows": [
+            {
+                "label": "main",
+                "title": "Cardo",
+                "width": 900,
+                "height": 675,
+                "decorations": false,
+                "transparent": false,
+                "minWidth": 700,
+                "minHeight": 500
+            }
+        ]
+    }
+}

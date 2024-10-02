@@ -16,15 +16,31 @@ import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { SyncProvider } from "./sync/Nextcloud";
 const DownloadsPage = lazy(() => import('./pages/DownloadsPage'));
+import { platform } from '@tauri-apps/api/os';
 
 
 const App = () => {
-  const [isMaximized, setIsMaximized] = useState(false)
+  const [roundedCorners, setRoundedCorners] = useState(false)
 
-  appWindow.onResized(async () => {
-    setIsMaximized(await appWindow.isMaximized())
-  })
+  // handle rounded corners when window is minimized, disabled on mac
+  useEffect(() => {
+    platform().then(p => {
+      if (p === 'darwin') {
+        return // no rounded corners on mac (https://github.com/agmmnn/tauri-controls/issues/10)
+      } else {
 
+        async function handleResize() {
+          const isMaximized = await appWindow.isMaximized()
+          setRoundedCorners(!isMaximized)
+        }
+
+        appWindow.onResized(handleResize)
+        handleResize()
+      }
+    })
+  }, [appWindow])
+
+  
   // prevent webview context menu
   useEffect(() => {
     document.addEventListener('contextmenu', event => event.preventDefault());
@@ -34,8 +50,8 @@ const App = () => {
 
 
   return (
-    <div className={`bg-primary-9 w-full h-screen flex flex-col border-primary-6 border-[1px]
-                         overflow-hidden ${isMaximized ? '' : 'rounded-lg'}`}>
+    <div className={`bg-primary-9 w-full h-screen flex flex-col border-primary-7 border-[1px]
+                         overflow-hidden ${roundedCorners && 'rounded-lg'}`}>
       <BrowserRouter>
         <SettingsProvider>
           <DBProvider>
@@ -47,7 +63,7 @@ const App = () => {
                   <LeftMenu />
                   <div className="flex flex-col overflow-y-hidden w-full h-full">
                     <SearchBar />
-                    <div className="flex h-full overflow-y-auto scroll-smooth border-t-2 border-primary-8">
+                    <div className="flex h-full overflow-y-auto scroll-smooth border-t border-primary-8">
                       <Suspense>
                         <Routes>
                           <Route path='/' element={<HomePage />} />

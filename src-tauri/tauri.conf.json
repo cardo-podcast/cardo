@@ -7,7 +7,7 @@
   },
   "package": {
     "productName": "Cardo",
-    "version": "1.5.0"
+    "version": "1.6.1"
   },
   "tauri": {
     "allowlist": {
@@ -43,6 +43,7 @@
     },
     "windows": [
       {
+        "label": "main",
         "title": "Cardo",
         "width": 900,
         "height": 675,
@@ -66,7 +67,22 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
+<<<<<<< HEAD
       "resources": ["../resources/**"]
+=======
+      "resources": [
+        "../resources/**"
+      ],
+      "windows": {
+        "certificateThumbprint": "adc7a1a8a7219a69236cc8b14d061771154d68b3",
+        "digestAlgorithm": "sha256",
+        "timestampUrl": "http://timestamp.comodoca.com"
+      },
+      "macOS": {
+        "license": "LICENSE",
+        "signingIdentity": "-"
+      }
+>>>>>>> cb777903cf963bc382e579b871dea84241d4fbfa
     }
   }
 }

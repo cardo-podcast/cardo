@@ -100,7 +100,7 @@ async fn download_file(url: String, destination: String, name:String, window: Wi
         payload.downloaded += chunk.len() as u64;
 
         i += 1;
-        if i == 50 { // reduce event emmisions
+        if i == 100 { // reduce event emmisions
             window.emit("downloading", payload.clone()).unwrap();
             i = 0;
         }
@@ -216,12 +216,12 @@ fn main() {
             let app_data_dir = app.path_resolver().app_data_dir().unwrap();
 
             let db_path = app_data_dir.join("db.sqlite");
-            let db_path_str = db_path.to_str().unwrap();
+            let db_path_str = String::from("sqlite:") + db_path.to_str().unwrap();
 
             app_handle
                 .plugin(
                     tauri_plugin_sql::Builder::default()
-                        .add_migrations(db_path_str, migrations)
+                        .add_migrations(&db_path_str, migrations)
                         .build(),
                 )
                 .expect("error while building sql plugin");

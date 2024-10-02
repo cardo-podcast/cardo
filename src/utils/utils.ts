@@ -3,9 +3,10 @@ import { EpisodeData, PodcastData } from ".."
 import { createDir, exists, readTextFile, writeTextFile, removeFile, removeDir, readDir } from "@tauri-apps/api/fs"
 import { appCacheDir, dirname, join } from "@tauri-apps/api/path"
 import { invoke } from "@tauri-apps/api"
+import { toast } from "react-toastify"
 
 
-export function secondsToStr(seconds: number) {
+export function secondsToStr(seconds: number, alwaysShowHours = false) {
   const negative = seconds < 0
   if (negative) {
     seconds = Math.abs(seconds)
@@ -17,7 +18,7 @@ export function secondsToStr(seconds: number) {
 
   if (Number.isNaN(seconds)) return ''
 
-  if (hours > 0) {
+  if (hours > 0 || alwaysShowHours) {
     return `${negative ? '-' : ''}${hours}:${minutes.toString().padStart(2, '0')}:${secondsStr}`
   } else {
     return `${negative ? '-' : ''}${minutes}:${secondsStr}`
@@ -25,9 +26,15 @@ export function secondsToStr(seconds: number) {
 }
 
 export function strToSeconds(time: string) {
-  const [hours, minutes, seconds] = time.split(':')
-  const r = Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds)
-  return r
+  const values = time.split(':')
+
+  if (values.length == 1) {
+    return Number(values[0])
+  } else if (values.length == 2) {
+    return Number(values[0]) * 60 + Number(values[1])
+  } else {
+    return Number(values[0]) * 3600 + Number(values[1]) * 60 + Number(values[2])
+  }
 }
 
 async function downloadXml(url: string): Promise<string> {
@@ -64,7 +71,7 @@ export async function parseXML(url: string): Promise<[EpisodeData[], PodcastData
     }
   }
 
-  const podcastDetails = await parsePodcastDetails(xml)
+  const podcastDetails = await parsePodcastDetails(url, xml)
 
   const result = Array.from(items).map((item: Element, i) => {
 
@@ -88,15 +95,10 @@ export async function parseXML(url: string): Promise<[EpisodeData[], PodcastData
   return [result, podcastDetails]
 }
 
-export async function parsePodcastDetails(xml: Document | string) {
-  /*
-  xml:  string -> url to download xml
-        Document -> parsed downloaded xml
-  */
+export async function parsePodcastDetails(url: string, xml?: Document ) {
 
-
-  if (typeof xml === "string") {
-    const xmlString = await downloadXml(xml)
+  if (!xml) {
+    const xmlString = await downloadXml(url)
     const parser = new DOMParser()
     xml = parser.parseFromString(xmlString, "text/xml")
   }
@@ -112,7 +114,7 @@ export async function parsePodcastDetails(xml: Document | string) {
     artistName: getItunesTag(channel, 'author').textContent ?? '',
     coverUrl: coverUrl,
     coverUrlLarge: coverUrl,
-    feedUrl: channel.querySelector('link[rel="self"]')?.getAttribute('href') ?? '',
+    feedUrl: url,
     description: channel.querySelector('description')?.textContent ?? ''
   }
 
@@ -213,4 +215,17 @@ export async function removeDownloadedEpisode(localFile: string) {
   if (downloadedPodcasts.length == 0) {
     removeDir(podcastDir)
   }
+}
+
+export function toastError(message: string) {
+  toast.error(message, {
+    position: "top-center",
+    autoClose: 3000,
+    hideProgressBar: true,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "dark",
+  });
 }

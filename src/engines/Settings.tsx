@@ -10,11 +10,18 @@ import colors from "tailwindcss/colors"
 import { DefaultTheme, DefaultThemes } from "../DefaultThemes"
 
 
+type DurationFilter = {
+  min: number,
+  max: number
+}
+
 export class FilterCriterion {
   played: SwitchState
+  duration: DurationFilter
 
   constructor() {
     this.played = SwitchState.None
+    this.duration = {min: 0, max: 0}
   }
 }
 
@@ -41,6 +48,9 @@ export function useSettings(): [Settings, (newSettings: RecursivePartial<Setting
   return useContext(SettingsContext) as [Settings, (newSettings: any) => void]
 }
 
+export function getPodcastSettings(feedUrl: string, podcastSettings: {[feedUrl: string]: PodcastSettings}): PodcastSettings {
+  return merge((new PodcastSettings()), podcastSettings[feedUrl])
+}
 
 export function usePodcastSettings(feedUrl: string): [PodcastSettings, typeof updatePodcastSettings] {
   const [settings, updateSettings] = useSettings()
@@ -50,6 +60,8 @@ export function usePodcastSettings(feedUrl: string): [PodcastSettings, typeof up
 
     if (!newSettings[feedUrl]) {
       newSettings[feedUrl] = new PodcastSettings()
+    } else {
+      newSettings[feedUrl] = merge((new PodcastSettings()), settings.podcasts[feedUrl]) // merge default settings (if any is missing)
     }
 
     merge(newSettings[feedUrl], newPodcastSettings)
@@ -63,7 +75,7 @@ export function usePodcastSettings(feedUrl: string): [PodcastSettings, typeof up
   }
 
 
-  return [settings.podcasts[feedUrl] ?? new PodcastSettings(), updatePodcastSettings]
+  return [getPodcastSettings(feedUrl, settings.podcasts), updatePodcastSettings]
 }
 
 export function getColor(settingsColor: TailwindBaseColor | ColorTheme | DefaultTheme): ColorTheme {
@@ -122,7 +134,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       displayRemainingTime: false,
       rateChangeStep: 0.05,
       playbackRate: 1,
-      playbackRatePresets: [1, 1.25, 1.50, 2]
+      playbackRatePresets: [1, 1.25, 1.50, 2],
+      volume: 1
     },
     ui: {
       showPinWindowButton: false,

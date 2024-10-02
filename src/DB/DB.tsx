@@ -32,7 +32,7 @@ function initDB() {
 
   async function init() {
     const dbPath = await join(await appDataDir(), "db.sqlite")
-    setDB(await Database.load(dbPath))
+    setDB(await Database.load('sqlite:' + dbPath))
     setDBLoaded(true)
   }
 

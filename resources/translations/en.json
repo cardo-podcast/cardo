@@ -62,7 +62,7 @@
   "later": "Later",
   "check_updates": "Check for updates",
   "show_pinWindow_button": "Show button to pin/unpin window",
-  "download": "Discharge",
+  "download": "Download",
   "remove_download": "Remove download",
   "downloads": "Downloads",
   "remove_all": "Delete all",
@@ -78,5 +78,9 @@
   "add_subscription_url": "Add subscription by RSS address",
   "feed_url": "RSS Feed URL",
   "please_indicate_url": "Please provide a valid URL",
-  "open_web": "Open website"
+  "open_web": "Open website",
+  "copy_episode_url": "Copy episode URL",
+  "episode_url_copied": "Episode URL copied to clipboard",
+  "duration_greater_than": "Duration greater than",
+  "duration_less_than": "Duration less than"
 }

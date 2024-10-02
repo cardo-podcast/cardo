@@ -9,6 +9,8 @@ import ProgressBar from "../components/ProgressBar"
 import appIcon from '../../src-tauri/icons/icon.png'
 import { useEpisode } from "../engines/Episode"
 import { sanitizeHTML } from "../utils/sanitize"
+import { showMenu } from "tauri-plugin-context-menu"
+import { toast } from "react-toastify"
 
 
 function EpisodePreview() {
@@ -18,7 +20,7 @@ function EpisodePreview() {
   const { subscriptions } = useDB()
   const { t } = useTranslation()
   const [podcastFetched, setPodcastFetched] = useState(false)
-  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, toggleDownload, downloadState, play } = useEpisode(episode)
+  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, toggleDownload, downloadState, play, pause } = useEpisode(episode)
 
 
   const fetchPodcastData = async (episode: EpisodeData) => {
@@ -43,6 +45,20 @@ function EpisodePreview() {
     fetchPodcastData(episode)
   }, [])
 
+  function copyEpisodeSrc() {
+    navigator.clipboard.writeText(episode.src)
+    toast.info(t('episode_url_copied'), {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
+  }
+
 
   return (
     <div className="p-2 w-full flex flex-col">
@@ -58,7 +74,7 @@ function EpisodePreview() {
               e.currentTarget.src = episode.podcast?.coverUrl ?? appIcon
             }
           }}
-          title={podcastFetched ? t('open_podcast') : ''}
+          title={podcastFetched ? t('open_podcast') + ' ' + episode.podcast?.podcastName : ''}
           onClick={() => {
             podcastFetched && // buton didn't work if podcast isn't loaded yet
               navigate('/preview', {
@@ -66,6 +82,20 @@ function EpisodePreview() {
                   podcast: episode.podcast
                 }
               })
+          }}
+          onContextMenu={() => {
+            if (!podcastFetched) return
+
+            showMenu(
+              {
+                items: [
+                  {
+                    label: t('copy_episode_url'),
+                    event: copyEpisodeSrc
+                  }
+                ]
+                }
+            )
           }}
         />
 
@@ -83,9 +113,9 @@ function EpisodePreview() {
                 : secondsToStr(episode.duration)
             }
             <button className="w-7 p-1 aspect-square shrink-0 flex justify-center items-center hover:text-accent-6 hover:p-[2px] bg-primary-7 rounded-full"
-              onClick={play}
+              onClick={() => inProgress(true)? pause(): play()}
             >
-              {icons.play}
+              <span className="w-5">{inProgress(true)? icons.pause: icons.play}</span>
             </button>
 
             <button className={`w-5 hover:text-accent-6 ${reprState.complete && 'text-primary-7'}`}
@@ -110,7 +140,7 @@ function EpisodePreview() {
         </div>
       </div>
       <div className="rounded-md p-3 whitespace-pre-line"
-        dangerouslySetInnerHTML={{ __html: sanitizeHTML(episode.description) }} />
+        dangerouslySetInnerHTML={{ __html: sanitizeHTML(episode.description) }}/>
     </div>
   )
 }

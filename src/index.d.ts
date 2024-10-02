@@ -1,4 +1,4 @@
-import { PodcastSettings } from "./Settings"
+import { PodcastSettings } from "./engines/Settings"
 import colors from "tailwindcss/colors"
 import { TailwindColor } from "./ThemeConfigurator"
 import { DefaultTheme } from "./DefaultThemes"
@@ -79,11 +79,12 @@ export interface Settings {
   playback: {
     stepForward: number
     stepBackwards: number
-    resumeBefore: number // resume playing some seconds before the last state
+    resumeBefore: number // resume playing some seconds before the last state // TODO
     displayRemainingTime: boolean //show -remaining time in player instead of total time
     rateChangeStep: number
     playbackRate: number
     playbackRatePresets: number[]
+    volume: number
   },
   ui: {
     showPinWindowButton: boolean,

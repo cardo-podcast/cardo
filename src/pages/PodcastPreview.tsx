@@ -2,16 +2,17 @@ import { useLocation } from "react-router-dom";
 import { EpisodeData, PodcastData, SortCriterion } from "..";
 import { ReactNode, SyntheticEvent, useEffect, useMemo, useRef, useState } from "react";
 import * as icons from "../Icons"
-import { parseXML } from "../utils/utils";
+import { parseXML, toastError } from "../utils/utils";
 import EpisodeCard from "../components/EpisodeCard";
 import { useDB } from "../DB/DB";
-import { Switch, SwitchState } from "../components/Inputs";
+import { Switch, SwitchState, TimeInput } from "../components/Inputs";
 import { usePodcastSettings } from "../engines/Settings";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { useSync } from "../sync/Nextcloud";
 import appIcon from '../../src-tauri/icons/icon.png'
 import { sanitizeHTML } from "../utils/sanitize";
+import { showMenu } from "tauri-plugin-context-menu";
 
 const EPISODE_CARD_HEIGHT = 80 // min height
 const PRELOADED_EPISODES = 10 //
@@ -53,6 +54,7 @@ function SortButton({ children, podcastUrl, criterion }: { children: ReactNode, 
 function PodcastPreview() {
   const location = useLocation();
   const podcast = location.state.podcast as PodcastData
+
   const [episodes, setEpisodes] = useState<EpisodeData[]>([])
   const [downloading, setDownloading] = useState(false)
   const [subscribed, setSubscribed] = useState(false)
@@ -62,9 +64,9 @@ function PodcastPreview() {
     subscriptionsEpisodes } = useDB()
   const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcast.feedUrl)
   const { performSync } = useSync()
-  const allEpisodes = useMemo(async() => await getAllEpisodes(), [podcast.feedUrl])
+  const allEpisodes = useMemo(async () => await getAllEpisodes(), [podcast.feedUrl])
 
-  const [tweakMenu, setTweakMenu] = useState<ReactNode>(undefined)
+  const [tweakMenu, setTweakMenu] = useState<'sort' | 'filter' | undefined>(undefined)
   const { t } = useTranslation()
 
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -103,13 +105,19 @@ function PodcastPreview() {
   }
 
 
-  async function getAllEpisodes(forceDownload = false){
+  async function getAllEpisodes(forceDownload = false) {
     async function downloadEpisodes() {
       setDownloading(true)
-      const [episodes, podcastDetails] = await parseXML(podcast.feedUrl)
-      podcast.description = podcastDetails.description
-      setDownloading(false)
-      return episodes
+      try {
+        const [episodes, podcastDetails] = await parseXML(podcast.feedUrl)
+        podcast.description = podcastDetails.description
+        setDownloading(false)
+        return episodes
+      } catch (e) {
+        toastError(e as string)
+        setDownloading(false)
+        return []
+      }
     }
 
     const isSubscribed = await subscriptions.get(podcast.feedUrl) !== undefined
@@ -135,23 +143,37 @@ function PodcastPreview() {
     return episodes
   }
 
-  async function loadEpisodes(forceDownload = false){
+  async function loadEpisodes(forceDownload = false) {
 
-    const episodes = await (forceDownload? getAllEpisodes(true): allEpisodes)
+    const episodes = await (forceDownload ? getAllEpisodes(true) : allEpisodes)
     setEpisodes(sortEpisodes(await filterEpisodes(episodes)))
   }
 
   const filterEpisodes = async (unfilteredEpisodes: EpisodeData[]) => {
-    const completedEpisodes = await getCompleted(podcast.feedUrl)
     const filter = podcastSettings.filter
+    let result: EpisodeData[] = []
+
+    // filter completed /uncompleted episodes
+    const completedEpisodes = await getCompleted(podcast.feedUrl)
 
     if (filter.played === SwitchState.True) {
-      return unfilteredEpisodes.filter(ep => completedEpisodes.includes(ep.src))
+      result = unfilteredEpisodes.filter(ep => completedEpisodes.includes(ep.src))
     } else if (filter.played === SwitchState.False) {
-      return unfilteredEpisodes.filter(ep => !completedEpisodes.includes(ep.src))
+      result = unfilteredEpisodes.filter(ep => !completedEpisodes.includes(ep.src))
     } else {
-      return unfilteredEpisodes
+      result = unfilteredEpisodes
     }
+
+    // filter by duration
+    if (filter.duration.min > 0) {
+      result = result.filter(ep => ep.duration >= filter.duration.min)
+    }
+
+    if (filter.duration.max > 0) {
+      result = result.filter(ep => ep.duration <= filter.duration.max)
+    }
+
+    return result
   }
 
   useEffect(() => {
@@ -162,7 +184,7 @@ function PodcastPreview() {
     setTweakMenu(undefined)
 
     if (scrollRef.current) {
-      scrollRef.current.scrollTo({top: 0, behavior: 'instant'})
+      scrollRef.current.scrollTo({ top: 0, behavior: 'instant' })
     }
   }, [podcast.feedUrl])
 
@@ -184,6 +206,25 @@ function PodcastPreview() {
       sessionStorage.removeItem(`scroll-${location.key}`)
     }
   }, [episodes])
+
+  function copyFeedUrl() {
+    navigator.clipboard.writeText(podcast.feedUrl)
+    toast.info(t('feed_url_copied'), {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
+  }
+
+  if (!podcast.feedUrl) {
+    toastError("Feed URL couldn't be empty") // this should never happen, just to avoid weird behaviour in case of a bug
+    return <></>
+  }
 
   return (
     <div className="relative w-full px-1">
@@ -224,7 +265,41 @@ function PodcastPreview() {
 
             <div className="left-1/2 -translate-x-1/2 absolute w-4/5 top-0 rounded-b-3xl overflow-hidden bg-primary-9 border-[1px] border-t-0 border-primary-6 flex flex-col justify-between items-center transition-all duration-200 z-20">
               <div className="p-2 flex flex-col gap-1 items-center w-full">
-                {tweakMenu}
+                {
+                  tweakMenu === 'sort' &&
+
+                  <div className="w-4/5 flex flex-col gap-1 justify-center items-center">
+                    <SortButton podcastUrl={podcast.feedUrl} criterion="date">
+                      {t('date')}
+                    </SortButton>
+                    <SortButton podcastUrl={podcast.feedUrl} criterion="duration">
+                      {t('duration')}
+                    </SortButton>
+                  </div>
+                }
+
+                {
+                  tweakMenu === 'filter' &&
+
+                  <div className="flex flex-col justify-center items-center gap-0.5 w-full">
+
+                    <Switch state={podcastSettings.filter.played} setState={(value) => {
+                      updatePodcastSettings({ filter: { played: value } })
+                    }} labels={[t('not_played'), t('played')]} />
+
+                    <div>
+                      <label className="uppercase flex items-center gap-2 justify-between">{t('duration_less_than')}:
+                        <TimeInput value={podcastSettings.filter.duration.max} onChange={
+                          (v) => updatePodcastSettings({ filter: { duration: { max: v } } })} />
+                      </label>
+                      <label className="uppercase flex items-center gap-2 justify-between">{t('duration_greater_than')}:
+                        <TimeInput value={podcastSettings.filter.duration.min} onChange={
+                          (v) => updatePodcastSettings({ filter: { duration: { min: v } } })} />
+                      </label>
+                    </div>
+
+                  </div>
+                }
               </div>
 
               <button className="border-t-2 border-primary-8 p-2 h-5 w-4/5 flex justify-center items-center mt-1"
@@ -239,19 +314,15 @@ function PodcastPreview() {
         <div className='flex justify-left w-full gap-3 pb-3 border-b-2 border-primary-8 h-52 bg-primary-9 p-2 z-10'>
           <div className="flex flex-col gap-2 items-center shrink-0">
             <div className="h-40 aspect-square cursor-pointer"
-              title={t('copy_feed_url')}
-              onClick={() => {
-                navigator.clipboard.writeText(podcast.feedUrl)
-                toast.info(t('feed_url_copied'), {
-                  position: "top-center",
-                  autoClose: 3000,
-                  hideProgressBar: true,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                  theme: "dark",
-                });
+              onContextMenu={() => {
+                showMenu({
+                  items: [
+                    {
+                      label: t('copy_feed_url'),
+                      event: copyFeedUrl
+                    }
+                  ]
+                })
               }}
             >
               <img
@@ -284,16 +355,7 @@ function PodcastPreview() {
               <button
                 className="hover:text-accent-6"
                 onClick={() => {
-                  setTweakMenu(
-                    <div className="w-4/5 flex flex-col gap-1 justify-center items-center">
-                      <SortButton podcastUrl={podcast.feedUrl} criterion="date">
-                        {t('date')}
-                      </SortButton>
-                      <SortButton podcastUrl={podcast.feedUrl} criterion="duration">
-                        {t('duration')}
-                      </SortButton>
-                    </div>
-                  )
+                  setTweakMenu('sort')
                 }
                 }>
                 {icons.sort}
@@ -301,13 +363,7 @@ function PodcastPreview() {
               <button
                 className="hover:text-accent-6"
                 onClick={() => {
-                  setTweakMenu(
-                    <div className="flex justify-center items-center">
-                      <Switch initialState={podcastSettings.filter.played} setState={async (value) => {
-                        updatePodcastSettings({ filter: { played: value } })
-                      }} labels={[t('not_played'), t('played')]} />
-                    </div>
-                  )
+                  setTweakMenu('filter')
                 }
                 }>
                 {icons.filter}

@@ -22,7 +22,7 @@ function EpisodeCard({ episode, className = '', onImageClick = undefined, onClic
   const contextMenuTarget = useRef<HTMLDivElement>(null)
   const { t } = useTranslation();
 
-  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, play, toggleDownload, downloadState } = useEpisode(episode)
+  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, play, pause, toggleDownload, downloadState } = useEpisode(episode)
 
 
   return (
@@ -60,7 +60,7 @@ function EpisodeCard({ episode, className = '', onImageClick = undefined, onClic
       <>
         <div className="h-16 aspect-square rounded-md bg-primary-8">
             <img
-              className={`rounded-md ${onImageClick !== undefined ? 'cursor-pointer' : ''}`}
+              className={`rounded-md ${onImageClick !== undefined ? 'cursor-pointer hover:p-0.5' : ''}`}
               onClick={onImageClick}
               alt=""
               loading="lazy"
@@ -91,10 +91,10 @@ function EpisodeCard({ episode, className = '', onImageClick = undefined, onClic
             <button className="w-7 p-1 aspect-square shrink-0 flex justify-center items-center hover:text-accent-6 hover:p-[2px] border-2 border-primary-6 rounded-full"
               onClick={e => {
                 e.stopPropagation()
-                play()
+                inProgress(true)? pause(): play()
               }}
             >
-              {icons.play}
+              <span className="w-5">{inProgress(true)? icons.pause: icons.play}</span>
             </button>
           </div>
         </div>

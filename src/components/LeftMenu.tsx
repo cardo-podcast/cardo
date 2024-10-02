@@ -5,10 +5,9 @@ import { sync, home, settings, queue, download } from '../Icons'
 import SubscriptionCard from "./SubscriptionCard";
 import { useSettings } from "../engines/Settings";
 import { useModalBanner } from "./ModalBanner";
-import { parseXML } from "../utils/utils";
+import { parsePodcastDetails, toastError } from "../utils/utils";
 import { useRef } from "react";
 import { useSync } from "../sync/Nextcloud";
-import { toast } from "react-toastify";
 
 
 function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
@@ -27,21 +26,12 @@ function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
           if (!inputRef.current) return
 
           if (!inputRef.current.validity.valid) {
-            toast.error(t('please_indicate_url'), {
-              position: "top-center",
-              autoClose: 3000,
-              hideProgressBar: true,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "dark",
-            });
-
+            toastError(t('please_indicate_url'))
             return 'error'
           }
 
-          const [_episodes, podcast] = await parseXML(inputRef.current.value)
+
+          const podcast = await parsePodcastDetails(inputRef.current.value)
           loggedInSync && performSync({ add: [podcast.feedUrl] })
           subscriptions.add(podcast)
           navigate('/preview', {
@@ -89,11 +79,11 @@ function LeftMenu() {
 
 
   return (
-    <div className="flex">
-      <div className={`bg-primary-9 border-r-2 border-primary-8 h-full flex flex-col pt-4 overflow-x-hidden
+    <div className="flex relative">
+      <div className={`bg-primary-9 border-r border-primary-8 h-full flex flex-col pt-4 overflow-x-hidden
               ${collapsedLeftMenu ? 'w-16 p-0.5' : 'w-64 lg:w-80 p-3'}
               `}>
-        <div className={`flex flex-col uppercase mb-6 font-thin ${collapsedLeftMenu ? 'items-center gap-2' : 'gap-1'}`}>
+        <div className={`flex flex-col uppercase mb-6 font-light  ${collapsedLeftMenu ? 'items-center gap-2' : 'gap-1'}`}>
           <NavLink to='/' className={({ isActive }) => `flex transition-all ${isActive ? 'text-primary-4 cursor-default' : 'hover:text-accent-5 hover:pl-1'}`}
             title={t('home')}
           >
@@ -141,11 +131,9 @@ function LeftMenu() {
 
 
       {/* FOLD MENU TOGGLE ON BORDER */}
-      <div id="folder" className="h-full w-2 -ml-1 opacity-0 hover:opacity-100 cursor-w-resize" onDoubleClick={() => {
+      <div id="folder" className="absolute right-0 translate-x-1/2 h-full my-auto w-2 px-[3px] hover:bg-accent-8 cursor-w-resize bg-clip-content transition-colors" onDoubleClick={() => {
         updateSettings({ ui: { collapsedLeftMenu: !collapsedLeftMenu } })
-      }}>
-        <div className=" h-full w-0.5 bg-accent-8 m-auto" />
-      </div>
+      }}/>
     </div>
   )
 }

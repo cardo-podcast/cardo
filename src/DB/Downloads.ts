@@ -9,6 +9,7 @@ type DownloadedEpisode = EpisodeData & { localFile: string }
 
 export function useDownloads(db: Database) {
   const [downloads, setDownloads] = useState<DownloadedEpisode[]>([])
+  const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     if (!db) return
@@ -21,12 +22,16 @@ export function useDownloads(db: Database) {
   }, [downloads])
 
   const includes = useCallback(function(episodeSrc: string){
-    return indexOf(episodeSrc) > -1
+    const index = indexOf(episodeSrc)
+    if (index > -1) {
+      return downloads[index]
+    }
   }, [indexOf])
 
   const load = async function(){
     const downloadedEpisodes = await getDownloadedEpisodes()
     setDownloads(downloadedEpisodes)
+    setLoaded(true)
   }
 
   const getDownloadedEpisodes = useCallback(async function(){
@@ -87,7 +92,7 @@ export function useDownloads(db: Database) {
 
   return {
     downloads,
-    load,
+    loaded,
     includes,
     indexOf,
     getDownloadedEpisodes,
