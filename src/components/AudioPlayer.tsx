@@ -245,6 +245,7 @@ function VolumeControl({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) 
   const [isMuted, setIsMuted] = useState(false); // Control mute
 
   const changeVolume = (newVolume: number) => {
+    console.log('VOLUME', newVolume)
     setVolume(newVolume);
   }
 
@@ -272,17 +273,15 @@ function VolumeControl({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) 
         <span className="w-5 h-5">{isMuted ? muteIcon : volumeIcon}</span>
       </button>
 
-      <input
-        type="range"
-        min="0"
-        max="1"
-        step="0.01"
+      <RangeInput
+        min={0}
+        max={1}
         value={isMuted ? 0 : volume}
-        onChange={(e) => {
-          changeVolume(Number(e.target.value));
-        }}
-        title={`${Math.round(volume * 100)} %`}
-        className="ml-2 h-[3px] bg-primary-3 accent-accent-6 stroke-white w-24" />
+        step={0.01}
+        units="%"
+        onChange={changeVolume}
+        className="ml-2 w-24"
+        />
 
     </div>
   );
@@ -433,7 +432,7 @@ function AudioPlayer({ className = '' }) {
                   max={duration}
                   value={position}
                   onChange={(value) => changeTime(value)}
-                  className="mx-2"
+                  className="mx-4 w-full"
                 />
                 <p className="select-none cursor-pointer"
                   title={t('toggle_remaining_time')}
