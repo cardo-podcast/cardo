@@ -245,7 +245,6 @@ function VolumeControl({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) 
   const [isMuted, setIsMuted] = useState(false); // Control mute
 
   const changeVolume = (newVolume: number) => {
-    console.log('VOLUME', newVolume)
     setVolume(newVolume);
   }
 

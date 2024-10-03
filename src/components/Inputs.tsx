@@ -158,12 +158,11 @@ const restrictToParentElement: Modifier = ({
 
   // ball is visually centered, but value is get from the left side of the ball
   const leftSidePosition = draggingNodeRect.left + transform.x
-  const centerPosition = leftSidePosition + (draggingNodeRect.width / 2)
 
   if (leftSidePosition <= containerNodeRect.left) {
     transform.x = containerNodeRect.left - draggingNodeRect.left
   } else if (
-    centerPosition >= containerNodeRect.left + containerNodeRect.width
+    leftSidePosition >= containerNodeRect.left + containerNodeRect.width
   ) {
     transform.x = containerNodeRect.left + containerNodeRect.width - draggingNodeRect.left;
   }
@@ -215,7 +214,7 @@ export function RangeInput({ min, max, value, onChange, step=undefined, units='s
       <div ref={barRef} className={`relative flex h-1 rounded-md bg-primary-7 ${className}`}
         onMouseMove={e => {
           const progress = (e.clientX - barOffsetLeft) / barWidth * (max - min)
-          setTitle(progress)
+          setTitle(Math.max(min, Math.min(progress, max)))
         }}
         onClick={e => {
           const progress = (e.clientX - barOffsetLeft) / barWidth * (max - min)
@@ -231,6 +230,8 @@ export function RangeInput({ min, max, value, onChange, step=undefined, units='s
             onDragMove={e => {
               const newPosition = startDraggingPos + (e.delta.x / barWidth * 100)
               setPosition(newPosition)
+              change(newPosition)
+
             }}
             onDragEnd={(e) => {
               setDragging(false)
