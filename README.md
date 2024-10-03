@@ -32,6 +32,9 @@ Cardo is a podcast client for desktop, inspired on Android's [Antennapod](https:
 - [ ] Keep your favorite episodes
 - [ ] Audio manipulation, speed, silenze skip & normalization
 - [ ] Synchronization using [Opodsync](https://github.com/kd2org/opodsync)
+- [ ] Add podcasts from sources other than i-tunes
+- [ ] Support for self-signed / invalid Nextcloud ssl certificates
+- [ ] Windows taskbar play/pause button
 
 ### Compatible clients (from nextcloud-gpodder)
 
