@@ -1,7 +1,7 @@
 {
   "name": "cardo",
   "private": true,
-  "version": "1.6.1",
+  "version": "1.7",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -37,7 +37,7 @@
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.19",
     "dotenv-cli": "^7.4.2",
-    "eslint": "^8.0.0",
+    "eslint": "^8.57.0",
     "eslint-config-react-app": "^7.0.1",
     "postcss": "^8.4.40",
     "rollup-plugin-visualizer": "^5.12.0",
