@@ -174,7 +174,7 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
         <p className="text-[10px] text-center -mt-[6px]">{playbackRate.toFixed(2)}</p>
       </button>
 
-      {showMenu && <div className="fixed z-10 top-0 left-0 w-full h-full" onClick={() => setShowMenu(false)} />}
+      {showMenu && <div className="fixed z-10 bottom-0 left-0 w-full h-screen" onClick={() => setShowMenu(false)} />}
       <div className={`${showMenu ? 'flex' : 'hidden'} flex-col absolute z-20 gap-1 items-center justify-center bottom-10 left-1/2 -translate-x-1/2 rounded-md bg-primary-9 border-2 border-primary-7 p-2 w-32`}>
         <div className="flex items-center gap-2">
           <button className="flex items-center text-xl mb-1 hover:text-accent-6"

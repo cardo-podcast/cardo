@@ -187,7 +187,7 @@ export function RangeInput({ min, max, value, onChange, step=undefined, units='s
     if (max - min > 0 && !dragging) {
       setPosition(value / (max - min) * 100)
     }
-  }, [value])
+  }, [value, max, min])
 
   function setTitle(progress: number) {
     if (barRef.current) {
