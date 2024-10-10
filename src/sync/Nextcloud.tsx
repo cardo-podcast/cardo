@@ -1,24 +1,25 @@
-import { http, invoke, shell } from "@tauri-apps/api"
-import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react"
-import { useDB, DB } from "../DB/DB"
-import { getCreds, parsePodcastDetails, removeCreds, saveCreds, toastError } from "../utils/utils"
-import { useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
-import { toast } from 'react-toastify';
-import { EpisodeState } from ".."
-import { Checkbox } from "../components/Inputs"
-import { useSettings } from "../engines/Settings"
-
+import { http, invoke, shell } from '@tauri-apps/api'
+import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react'
+import { useDB, DB } from '../DB/DB'
+import { getCreds, parsePodcastDetails, removeCreds, saveCreds, toastError } from '../utils/utils'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { EpisodeState } from '..'
+import { Checkbox } from '../components/Inputs'
+import { useSettings } from '../engines/Settings'
 
 export function NextcloudSettings() {
   const urlRef = useRef<HTMLInputElement>(null)
   const interval = useRef(0)
-  const { misc: { getSyncKey, setSyncKey, loggedInSync: loggedIn, setLoggedInSync: setLoggedIn } } = useDB()
+  const {
+    misc: { getSyncKey, setSyncKey, loggedInSync: loggedIn, setLoggedInSync: setLoggedIn },
+  } = useDB()
   const { t } = useTranslation()
   const [{ sync: syncSettings }, updateSettings] = useSettings()
 
   useEffect(() => {
-    getCreds('nextcloud').then(r => {
+    getCreds('nextcloud').then((r) => {
       setLoggedIn(r !== undefined)
     })
 
@@ -28,15 +29,12 @@ export function NextcloudSettings() {
   if (loggedIn) {
     return (
       <div className="flex flex-col gap-3 p-1">
-        <div className="flex gap-2 items-center">
-          <img
-            className="h-24 shrink-0"
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/141px-Nextcloud_Logo.svg.png"
-            alt="Nextcloud logo"
-          />
+        <div className="flex items-center gap-2">
+          <img className="h-24 shrink-0" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/141px-Nextcloud_Logo.svg.png" alt="Nextcloud logo" />
           <div className="flex flex-col gap-2">
             <p className="text-lg">{t('logged_in')}</p>
-            <button className="uppercase bg-accent-6 w-fit px-4 hover:bg-accent-7 rounded-md p-1"
+            <button
+              className="w-fit rounded-md bg-accent-6 p-1 px-4 uppercase hover:bg-accent-7"
               onClick={async () => {
                 removeCreds('nextcloud')
                 setLoggedIn(false)
@@ -50,15 +48,13 @@ export function NextcloudSettings() {
         <div className="flex flex-col gap-1">
           <h2 className="uppercase">{t('automatic_sync')}</h2>
           <div className="flex gap-3">
-            <label className="w-fit flex gap-1">
+            <label className="flex w-fit gap-1">
               {t('when_opening_app')}:
-              <Checkbox defaultChecked={syncSettings.syncAfterAppStart}
-                onChange={(value) => updateSettings({ sync: { syncAfterAppStart: value } })} />
+              <Checkbox defaultChecked={syncSettings.syncAfterAppStart} onChange={(value) => updateSettings({ sync: { syncAfterAppStart: value } })} />
             </label>
-            <label className="w-fit flex gap-1">
+            <label className="flex w-fit gap-1">
               {t('when_closing_app')}:
-              <Checkbox defaultChecked={syncSettings.syncBeforeAppClose}
-                onChange={(value) => updateSettings({ sync: { syncBeforeAppClose: value } })} />
+              <Checkbox defaultChecked={syncSettings.syncBeforeAppClose} onChange={(value) => updateSettings({ sync: { syncBeforeAppClose: value } })} />
             </label>
           </div>
         </div>
@@ -67,42 +63,33 @@ export function NextcloudSettings() {
   }
 
   return (
-    <div className="flex gap-2 p-1 w-full h-full">
-      <img
-        className="h-24 shrink-0"
-        src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/141px-Nextcloud_Logo.svg.png"
-        alt="Nextcloud logo"
-      />
-      <form className="flex flex-col gap-2 items-center w-full" onSubmit={async (e) => {
-        e.preventDefault()
-        if (urlRef.current) {
-          try {
-            interval.current = await login(urlRef.current.value, getSyncKey, setSyncKey, () => setLoggedIn(true))
-          } catch (e) {
-            toastError((e as Error).message)
+    <div className="flex h-full w-full gap-2 p-1">
+      <img className="h-24 shrink-0" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/141px-Nextcloud_Logo.svg.png" alt="Nextcloud logo" />
+      <form
+        className="flex w-full flex-col items-center gap-2"
+        onSubmit={async (e) => {
+          e.preventDefault()
+          if (urlRef.current) {
+            try {
+              interval.current = await login(urlRef.current.value, getSyncKey, setSyncKey, () => setLoggedIn(true))
+            } catch (e) {
+              toastError((e as Error).message)
+            }
           }
-        }
-      }}>
-        <label className="w-full flex gap-1 flex-col">
+        }}
+      >
+        <label className="flex w-full flex-col gap-1">
           {t('nextcloud_server_url')}
-          <input
-            type="url"
-            className="py-1 px-2 bg-primary-8 rounded-md focus:outline-none"
-            ref={urlRef}
-            placeholder={t('nextcloud_server_url_example')}
-          />
+          <input type="url" className="rounded-md bg-primary-8 px-2 py-1 focus:outline-none" ref={urlRef} placeholder={t('nextcloud_server_url_example')} />
         </label>
 
-        <button className="uppercase bg-accent-6 w-fit px-4 hover:bg-accent-7 rounded-md p-1">
-          {t('connect')}
-        </button>
+        <button className="w-fit rounded-md bg-accent-6 p-1 px-4 uppercase hover:bg-accent-7">{t('connect')}</button>
       </form>
     </div>
   )
 }
 
-async function login(url: string, getSyncKey: () => Promise<string | undefined>,
-  setSyncKey: (key: string) => Promise<void>, onSucess: () => void) {
+async function login(url: string, getSyncKey: () => Promise<string | undefined>, setSyncKey: (key: string) => Promise<void>, onSucess: () => void) {
   // nextcloud flow v2 o-auth login
   // https://docs.nextcloud.com/server/latest/developer_manual/client_apis/LoginFlow/index.html#login-flow-v2
 
@@ -110,10 +97,13 @@ async function login(url: string, getSyncKey: () => Promise<string | undefined>,
 
   const r = await http.fetch(baseUrl + '/index.php/login/v2', {
     method: 'POST',
-    responseType: http.ResponseType.JSON
+    responseType: http.ResponseType.JSON,
   })
 
-  const { login, poll: { token, endpoint } } = r.data as { login: string, poll: { token: string, endpoint: string } }
+  const {
+    login,
+    poll: { token, endpoint },
+  } = r.data as { login: string; poll: { token: string; endpoint: string } }
 
   shell.open(login) // throw explorer with nextcloud login page
 
@@ -125,15 +115,15 @@ async function login(url: string, getSyncKey: () => Promise<string | undefined>,
       body: {
         type: 'Json',
         payload: {
-          token: token
-        }
-      }
+          token: token,
+        },
+      },
     })
 
     if (!r.ok) return // poll again
 
     // get credentials from response
-    const { loginName, appPassword } = r.data as { server: string, loginName: string, appPassword: string }
+    const { loginName, appPassword } = r.data as { server: string; loginName: string; appPassword: string }
 
     /// Encrypt credentials before saving ///
 
@@ -146,13 +136,11 @@ async function login(url: string, getSyncKey: () => Promise<string | undefined>,
     }
 
     // encrypt user and password with keys and save credentials
-    saveCreds('nextcloud',
-      {
-        server: baseUrl,
-        loginName: await invoke('encrypt', { text: loginName, base64Key: key }),
-        appPassword: await invoke('encrypt', { text: appPassword, base64Key: key })
-      }
-    )
+    saveCreds('nextcloud', {
+      server: baseUrl,
+      loginName: await invoke('encrypt', { text: loginName, base64Key: key }),
+      appPassword: await invoke('encrypt', { text: appPassword, base64Key: key }),
+    })
 
     onSucess()
     clearInterval(interval)
@@ -161,15 +149,15 @@ async function login(url: string, getSyncKey: () => Promise<string | undefined>,
 }
 
 interface GpodderUpdate {
-  podcast: string,
-  episode: string,
-  position: number,
-  total: number,
+  podcast: string
+  episode: string
+  position: number
+  total: number
   timestamp: string
   action: 'DOWNLOAD' | 'PLAY' | 'DELETE' | 'NEW'
 }
 
-async function getNextcloudCreds(syncKey: string): Promise<{ server: string, loginName: string, appPassword: string }> {
+async function getNextcloudCreds(syncKey: string): Promise<{ server: string; loginName: string; appPassword: string }> {
   const creds: any = await getCreds('nextcloud')
 
   const { server, loginName: encryptedLoginName, appPassword: encryptedAppPassword } = creds
@@ -178,17 +166,16 @@ async function getNextcloudCreds(syncKey: string): Promise<{ server: string, log
   return { server: server, loginName: loginName, appPassword: appPassword }
 }
 
-
 async function pullUpdates(server: string, request: string, loginName: string, appPassword: string, since?: number) {
-  const url = server + `/index.php/apps/gpoddersync/${request}?since=${(since === undefined) ? '0' : since?.toString()}`
+  const url = server + `/index.php/apps/gpoddersync/${request}?since=${since === undefined ? '0' : since?.toString()}`
 
   const r: { data: any } = await http.fetch(url, {
     method: 'GET',
     responseType: http.ResponseType.JSON,
     headers: {
       'OCS-APIRequest': 'true',
-      'Authorization': 'Basic ' + btoa(loginName + ':' + appPassword)
-    }
+      Authorization: 'Basic ' + btoa(loginName + ':' + appPassword),
+    },
   })
 
   return r.data
@@ -202,12 +189,12 @@ async function pushUpdates(server: string, request: string, loginName: string, a
     responseType: http.ResponseType.JSON,
     headers: {
       'OCS-APIRequest': 'true',
-      'Authorization': 'Basic ' + btoa(loginName + ':' + appPassword)
+      Authorization: 'Basic ' + btoa(loginName + ':' + appPassword),
     },
     body: {
       type: 'Json',
-      payload: updates
-    }
+      payload: updates,
+    },
   })
 
   if (!r.ok) {
@@ -215,26 +202,17 @@ async function pushUpdates(server: string, request: string, loginName: string, a
   }
 }
 
+type updateEpisodeStateType = (episodeUrl: string, podcastUrl: string, position: number, total: number, timestamp?: number) => Promise<void>
 
-type updateEpisodeStateType = (episodeUrl: string, podcastUrl: string, position: number, total: number, timestamp?: number,) => Promise<void>
-
-async function sync(syncKey: string, updateEpisodeState: updateEpisodeStateType,
-  getLastSync: () => Promise<number>,
-  getEpisodesStates: (timestamp?: number) => Promise<EpisodeState[]>,
-  subscriptions: DB['subscriptions'],
-  updateSubscriptions?: { add?: string[], remove?: string[] }
-) {
-
+async function sync(syncKey: string, updateEpisodeState: updateEpisodeStateType, getLastSync: () => Promise<number>, getEpisodesStates: (timestamp?: number) => Promise<EpisodeState[]>, subscriptions: DB['subscriptions'], updateSubscriptions?: { add?: string[]; remove?: string[] }) {
   if (syncKey === '') return
 
   const { server, loginName, appPassword } = await getNextcloudCreds(syncKey)
-  const lastSync = await getLastSync() / 1000 // nextcloud server uses seconds
-
+  const lastSync = (await getLastSync()) / 1000 // nextcloud server uses seconds
 
   // #region subscriptions
-  const subsServerUpdates: { add: string[], remove: string[] } = await pullUpdates(server, 'subscriptions', loginName, appPassword, lastSync)
-  const localSubscriptions = subscriptions.subscriptions.map(sub => sub.feedUrl)
-
+  const subsServerUpdates: { add: string[]; remove: string[] } = await pullUpdates(server, 'subscriptions', loginName, appPassword, lastSync)
+  const localSubscriptions = subscriptions.subscriptions.map((sub) => sub.feedUrl)
 
   // add new subscriptions
   for (const feedUrl of subsServerUpdates.add) {
@@ -243,7 +221,6 @@ async function sync(syncKey: string, updateEpisodeState: updateEpisodeStateType,
       subscriptions.add(podcastData)
     }
   }
-
 
   // remove subscriptions
   for (const feedUrl of subsServerUpdates.remove) {
@@ -258,7 +235,6 @@ async function sync(syncKey: string, updateEpisodeState: updateEpisodeStateType,
 
   // #endregion
 
-
   const serverUpdates: { actions: GpodderUpdate[] } = await pullUpdates(server, 'episode_action', loginName, appPassword, lastSync)
 
   if (serverUpdates.actions.length > 0) {
@@ -266,27 +242,20 @@ async function sync(syncKey: string, updateEpisodeState: updateEpisodeStateType,
       const timestamp = new Date(update.timestamp + '+00:00').getTime() //timestamp in epoch format (server is in utc ISO format)
       if (update.action !== 'PLAY') continue
 
-      await updateEpisodeState(
-        update.episode,
-        update.podcast,
-        update.position,
-        update.total,
-        timestamp
-      )
+      await updateEpisodeState(update.episode, update.podcast, update.position, update.total, timestamp)
     }
   }
 
-
   const localUpdates = await getEpisodesStates(lastSync)
 
-  const gpodderLocalUpdates: GpodderUpdate[] = localUpdates.map(update => {
+  const gpodderLocalUpdates: GpodderUpdate[] = localUpdates.map((update) => {
     return {
       ...update,
       position: update.position,
       started: update.position,
       total: update.total,
       action: 'PLAY',
-      timestamp: (new Date(update.timestamp)).toISOString().split('.')[0]
+      timestamp: new Date(update.timestamp).toISOString().split('.')[0],
     }
   })
 
@@ -297,19 +266,21 @@ enum SyncStatus {
   Standby,
   Synchronizing,
   Ok,
-  Error
+  Error,
 }
-
 
 export function initSync() {
   const [status, setStatus] = useState<SyncStatus>(SyncStatus.Standby)
   const [error, setError] = useState('')
-  const { dbLoaded, misc: { getSyncKey, setLastSync, getLastSync, loggedInSync: loggedIn, setLoggedInSync: setLoggedIn },
-    history, subscriptions } = useDB()
+  const {
+    dbLoaded,
+    misc: { getSyncKey, setLastSync, getLastSync, loggedInSync: loggedIn, setLoggedInSync: setLoggedIn },
+    history,
+    subscriptions,
+  } = useDB()
   const [{ sync: syncSettings }, _] = useSettings()
   const { t } = useTranslation()
   const navigate = useNavigate()
-
 
   const load = async () => {
     const creds = await getCreds('nextcloud')
@@ -326,21 +297,18 @@ export function initSync() {
     }
   }, [loggedIn])
 
-
-  const performSync = async (updateSubscriptions?: { add?: string[], remove?: string[] }) => {
-
-
+  const performSync = async (updateSubscriptions?: { add?: string[]; remove?: string[] }) => {
     if (!loggedIn) {
       toast.info(t('not_logged_sync'), {
-        position: "top-center",
+        position: 'top-center',
         autoClose: 3000,
         hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: "dark",
-      });
+        theme: 'dark',
+      })
       navigate('/settings')
       return
     }
@@ -370,16 +338,12 @@ export function initSync() {
   return { status, error, performSync }
 }
 
-
 export function SyncButton() {
   const { t } = useTranslation()
   const { status, error, performSync } = useSync()
 
-
   return (
-    <button className={`w-6 hover:text-accent-4 outline-none ${status === SyncStatus.Synchronizing && 'animate-[spin_2s_linear_infinite_reverse]'}`}
-      onClick={() => performSync()} title={error == '' ? t('sync') : error}
-    >
+    <button className={`w-6 outline-none hover:text-accent-4 ${status === SyncStatus.Synchronizing && 'animate-[spin_2s_linear_infinite_reverse]'}`} onClick={() => performSync()} title={error == '' ? t('sync') : error}>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-refresh">
         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
         <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
@@ -390,7 +354,6 @@ export function SyncButton() {
   )
 }
 
-
 const SyncContext = createContext<ReturnType<typeof initSync> | undefined>(undefined)
 
 export const useSync = () => useContext(SyncContext) as ReturnType<typeof initSync>
@@ -398,9 +361,5 @@ export const useSync = () => useContext(SyncContext) as ReturnType<typeof initSy
 export function SyncProvider({ children }: { children: ReactNode }) {
   const sync = initSync()
 
-  return (
-    <SyncContext.Provider value={sync}>
-      {children}
-    </SyncContext.Provider>
-  )
+  return <SyncContext.Provider value={sync}>{children}</SyncContext.Provider>
 }

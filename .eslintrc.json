@@ -1,9 +1,9 @@
 {
-    "extends": "react-app",
+  "extends": "react-app",
 
-    "plugins": ["react-hooks"],
-    // ...
-    "rules": {
-      "react-hooks/exhaustive-deps": "false" // <--- THIS IS THE NEW RULE
-    }
+  "plugins": ["react-hooks"],
+  // ...
+  "rules": {
+    "react-hooks/exhaustive-deps": "false" // <--- THIS IS THE NEW RULE
   }
+}

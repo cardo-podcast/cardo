@@ -1,10 +1,9 @@
-import { ResponseType, fetch as tauriFetch } from "@tauri-apps/api/http"
-import { EpisodeData, PodcastData } from ".."
-import { createDir, exists, readTextFile, writeTextFile, removeFile, removeDir, readDir } from "@tauri-apps/api/fs"
-import { appCacheDir, dirname, join } from "@tauri-apps/api/path"
-import { invoke } from "@tauri-apps/api"
-import { toast } from "react-toastify"
-
+import { ResponseType, fetch as tauriFetch } from '@tauri-apps/api/http'
+import { EpisodeData, PodcastData } from '..'
+import { createDir, exists, readTextFile, writeTextFile, removeFile, removeDir, readDir } from '@tauri-apps/api/fs'
+import { appCacheDir, dirname, join } from '@tauri-apps/api/path'
+import { invoke } from '@tauri-apps/api'
+import { toast } from 'react-toastify'
 
 export function secondsToStr(seconds: number, alwaysShowHours = false) {
   const negative = seconds < 0
@@ -14,7 +13,9 @@ export function secondsToStr(seconds: number, alwaysShowHours = false) {
 
   const hours = Math.floor(seconds / 3600)
   const minutes = Math.floor(seconds / 60) - hours * 60
-  const secondsStr = Math.floor(seconds % 60).toString().padStart(2, '0')
+  const secondsStr = Math.floor(seconds % 60)
+    .toString()
+    .padStart(2, '0')
 
   if (Number.isNaN(seconds)) return ''
 
@@ -40,7 +41,7 @@ export function strToSeconds(time: string) {
 async function downloadXml(url: string): Promise<string> {
   const response = await tauriFetch(url, {
     method: 'GET',
-    responseType: ResponseType.Text
+    responseType: ResponseType.Text,
   })
   return response.data as string
 }
@@ -49,12 +50,10 @@ function getItunesTag(item: Element, tag: string) {
   return item.getElementsByTagNameNS('http://www.itunes.com/dtds/podcast-1.0.dtd', tag)[0]
 }
 
-
 export async function parseXML(url: string): Promise<[EpisodeData[], PodcastData]> {
-
   const xmlString = await downloadXml(url)
   const parser = new DOMParser()
-  const xml = parser.parseFromString(xmlString, "text/xml")
+  const xml = parser.parseFromString(xmlString, 'text/xml')
   const items = xml.querySelectorAll('item')
 
   const parseDuration = (duration: string | null): number => {
@@ -74,7 +73,6 @@ export async function parseXML(url: string): Promise<[EpisodeData[], PodcastData
   const podcastDetails = await parsePodcastDetails(url, xml)
 
   const result = Array.from(items).map((item: Element, i) => {
-
     const duration = parseDuration(getItunesTag(item, 'duration')?.textContent) ?? 0
     const size = Number(item.querySelector('enclosure')?.getAttribute('length')) / 1000000
 
@@ -85,9 +83,9 @@ export async function parseXML(url: string): Promise<[EpisodeData[], PodcastData
       src: item.querySelector('enclosure')?.getAttribute('url') ?? '',
       pubDate: new Date(item.querySelector('pubDate')?.textContent ?? 0),
       coverUrl: getItunesTag(item, 'image')?.getAttribute('href') ?? podcastDetails.coverUrl,
-      duration: duration > 0 ? duration : size * 1024 * 8 / 128, // if duration isn't especified on xml use estimated size suposing a 128kb/s bitrate
-      size: Math.round(size > 0 ? size : duration * 128 / 8 / 1024), // if size isn't especified on xml use estimated size suposing a 128kb/s bitrate
-      podcastUrl: podcastDetails.feedUrl
+      duration: duration > 0 ? duration : (size * 1024 * 8) / 128, // if duration isn't especified on xml use estimated size suposing a 128kb/s bitrate
+      size: Math.round(size > 0 ? size : (duration * 128) / 8 / 1024), // if size isn't especified on xml use estimated size suposing a 128kb/s bitrate
+      podcastUrl: podcastDetails.feedUrl,
     }
     return episode
   })
@@ -95,12 +93,11 @@ export async function parseXML(url: string): Promise<[EpisodeData[], PodcastData
   return [result, podcastDetails]
 }
 
-export async function parsePodcastDetails(url: string, xml?: Document ) {
-
+export async function parsePodcastDetails(url: string, xml?: Document) {
   if (!xml) {
     const xmlString = await downloadXml(url)
     const parser = new DOMParser()
-    xml = parser.parseFromString(xmlString, "text/xml")
+    xml = parser.parseFromString(xmlString, 'text/xml')
   }
 
   const channel = xml.querySelector('channel')
@@ -115,17 +112,16 @@ export async function parsePodcastDetails(url: string, xml?: Document ) {
     coverUrl: coverUrl,
     coverUrlLarge: coverUrl,
     feedUrl: url,
-    description: channel.querySelector('description')?.textContent ?? ''
+    description: channel.querySelector('description')?.textContent ?? '',
   }
 
   return podcast
 }
 
 export async function getAllCreds(): Promise<any | undefined> {
+  const file = await join(await appCacheDir(), 'creds.json')
 
-  const file = await join(await appCacheDir(), 'creds.json');
-
-  if (!await exists(file)) return
+  if (!(await exists(file))) return
 
   try {
     const data = JSON.parse(await readTextFile(file))
@@ -133,7 +129,6 @@ export async function getAllCreds(): Promise<any | undefined> {
   } catch {
     return {}
   }
-
 }
 
 export async function getCreds(name: string): Promise<any | undefined> {
@@ -144,10 +139,10 @@ export async function getCreds(name: string): Promise<any | undefined> {
 }
 
 export async function saveCreds(name: string, value: any) {
-  const file = await join(await appCacheDir(), 'creds.json');
+  const file = await join(await appCacheDir(), 'creds.json')
 
-  let data: any;
-  if (! await exists(file)) {
+  let data: any
+  if (!(await exists(file))) {
     data = {}
   } else {
     data = await getAllCreds()
@@ -159,10 +154,10 @@ export async function saveCreds(name: string, value: any) {
 }
 
 export async function removeCreds(name: string) {
-  const file = await join(await appCacheDir(), 'creds.json');
+  const file = await join(await appCacheDir(), 'creds.json')
 
-  let data: any;
-  if (! await exists(file)) {
+  let data: any
+  if (!(await exists(file))) {
     return
   }
 
@@ -173,7 +168,7 @@ export async function removeCreds(name: string) {
 }
 
 export function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
+  return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
 function makeSafeFilename(name: string) {
@@ -181,7 +176,6 @@ function makeSafeFilename(name: string) {
 }
 
 export async function downloadEpisode(episode: EpisodeData) {
-
   const podcastName = episode.podcast?.podcastName ?? 'unknown'
   const destFolder = await join(await appCacheDir(), 'Downloads', makeSafeFilename(podcastName))
 
@@ -193,11 +187,9 @@ export async function downloadEpisode(episode: EpisodeData) {
 
   const filename = `${makeSafeFilename(episode.title.slice(0, maxFilenameLenght))}_${episode.id}.${extension}`
 
-
   const destination = await join(destFolder, filename)
 
-
-  if (!await exists(destFolder)) {
+  if (!(await exists(destFolder))) {
     await createDir(destFolder, { recursive: true })
   }
 
@@ -219,13 +211,13 @@ export async function removeDownloadedEpisode(localFile: string) {
 
 export function toastError(message: string) {
   toast.error(message, {
-    position: "top-center",
+    position: 'top-center',
     autoClose: 3000,
     hideProgressBar: true,
     closeOnClick: true,
     pauseOnHover: true,
     draggable: true,
     progress: undefined,
-    theme: "dark",
-  });
+    theme: 'dark',
+  })
 }

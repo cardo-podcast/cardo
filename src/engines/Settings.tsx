@@ -1,17 +1,16 @@
-import { os } from "@tauri-apps/api"
-import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react"
-import { appConfigDir, join } from "@tauri-apps/api/path"
-import { readTextFile, writeTextFile } from "@tauri-apps/api/fs"
-import { RecursivePartial, Settings, SortCriterion, TailwindBaseColor, ColorTheme } from ".."
-import { SwitchState } from "../components/Inputs"
-import { changeLanguage } from "./translations"
-import merge from "lodash/merge"
-import colors from "tailwindcss/colors"
-import { DefaultTheme, DefaultThemes } from "../DefaultThemes"
-
+import { os } from '@tauri-apps/api'
+import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react'
+import { appConfigDir, join } from '@tauri-apps/api/path'
+import { readTextFile, writeTextFile } from '@tauri-apps/api/fs'
+import { RecursivePartial, Settings, SortCriterion, TailwindBaseColor, ColorTheme } from '..'
+import { SwitchState } from '../components/Inputs'
+import { changeLanguage } from './translations'
+import merge from 'lodash/merge'
+import colors from 'tailwindcss/colors'
+import { DefaultTheme, DefaultThemes } from '../DefaultThemes'
 
 type DurationFilter = {
-  min: number,
+  min: number
   max: number
 }
 
@@ -21,7 +20,7 @@ export class FilterCriterion {
 
   constructor() {
     this.played = SwitchState.None
-    this.duration = {min: 0, max: 0}
+    this.duration = { min: 0, max: 0 }
   }
 }
 
@@ -35,21 +34,18 @@ export class PodcastSettings {
   }
 
   public static isDefault = (settings: PodcastSettings) => {
-
     return JSON.stringify(settings) == JSON.stringify(new PodcastSettings())
   }
 }
 
-
 const SettingsContext = createContext<[Settings, (newSettings: RecursivePartial<Settings>) => void] | undefined>(undefined)
-
 
 export function useSettings(): [Settings, (newSettings: RecursivePartial<Settings>) => void] {
   return useContext(SettingsContext) as [Settings, (newSettings: any) => void]
 }
 
-export function getPodcastSettings(feedUrl: string, podcastSettings: {[feedUrl: string]: PodcastSettings}): PodcastSettings {
-  return merge((new PodcastSettings()), podcastSettings[feedUrl])
+export function getPodcastSettings(feedUrl: string, podcastSettings: { [feedUrl: string]: PodcastSettings }): PodcastSettings {
+  return merge(new PodcastSettings(), podcastSettings[feedUrl])
 }
 
 export function usePodcastSettings(feedUrl: string): [PodcastSettings, typeof updatePodcastSettings] {
@@ -61,19 +57,18 @@ export function usePodcastSettings(feedUrl: string): [PodcastSettings, typeof up
     if (!newSettings[feedUrl]) {
       newSettings[feedUrl] = new PodcastSettings()
     } else {
-      newSettings[feedUrl] = merge((new PodcastSettings()), settings.podcasts[feedUrl]) // merge default settings (if any is missing)
+      newSettings[feedUrl] = merge(new PodcastSettings(), settings.podcasts[feedUrl]) // merge default settings (if any is missing)
     }
 
     merge(newSettings[feedUrl], newPodcastSettings)
 
-    if (PodcastSettings.isDefault((newSettings[feedUrl]))) {
+    if (PodcastSettings.isDefault(newSettings[feedUrl])) {
       // default settings aren't stored on json
       delete newSettings[feedUrl]
     }
 
     updateSettings({ podcasts: newSettings })
   }
-
 
   return [getPodcastSettings(feedUrl, settings.podcasts), updatePodcastSettings]
 }
@@ -103,29 +98,27 @@ export function getColor(settingsColor: TailwindBaseColor | ColorTheme | Default
   } else {
     // settings define a complete color palette
     return settingsColor as unknown as ColorTheme
-
   }
 }
 
-
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  let settingsFile = useRef('');
+  let settingsFile = useRef('')
 
   const [settings, setSettings] = useState<Settings>({
     globals: { locale: 'en-US', language: 'en' },
     podcasts: {},
     sync: {
       syncAfterAppStart: false,
-      syncBeforeAppClose: false
+      syncBeforeAppClose: false,
     },
     general: {
       numberOfDaysInNews: 15,
       fetchSubscriptionsAtStartup: true,
-      checkUpdates: true
+      checkUpdates: true,
     },
     colors: {
       primary: 'dark',
-      accent: 'purple'
+      accent: 'purple',
     },
     playback: {
       stepForward: 30,
@@ -134,13 +127,13 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       displayRemainingTime: false,
       rateChangeStep: 0.05,
       playbackRate: 1,
-      playbackRatePresets: [1, 1.25, 1.50, 2],
-      volume: 1
+      playbackRatePresets: [1, 1.25, 1.5, 2],
+      volume: 1,
     },
     ui: {
       showPinWindowButton: false,
-      collapsedLeftMenu: false
-    }
+      collapsedLeftMenu: false,
+    },
   })
 
   // #region colors
@@ -199,7 +192,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   }
 
   const setOSInfo = async () => {
-    const locale: string = await os.locale() || 'en-US'
+    const locale: string = (await os.locale()) || 'en-US'
 
     settings.globals.locale = locale
     settings.globals.language = locale.split('-')[0]
@@ -228,11 +221,5 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     init()
   }, [])
 
-  return (
-    <SettingsContext.Provider value={[settings, updateSettings]}>
-      {children}
-    </SettingsContext.Provider>
-  )
-
+  return <SettingsContext.Provider value={[settings, updateSettings]}>{children}</SettingsContext.Provider>
 }
-

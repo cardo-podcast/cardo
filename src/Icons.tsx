@@ -1,5 +1,3 @@
-
-
 export const play = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="icon icon-tabler icons-tabler-filled icon-tabler-player-play">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -30,15 +28,29 @@ export const backwards = (
 )
 
 export const pin = (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M9 4v6l-2 4v2h10v-2l-2 -4v-6" /><path d="M12 16l0 5" /><path d="M8 4l8 0" /></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M9 4v6l-2 4v2h10v-2l-2 -4v-6" />
+    <path d="M12 16l0 5" />
+    <path d="M8 4l8 0" />
+  </svg>
 )
 
 export const unpin = (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M3 3l18 18" /><path d="M15 4.5l-3.249 3.249m-2.57 1.433l-2.181 .818l-1.5 1.5l7 7l1.5 -1.5l.82 -2.186m1.43 -2.563l3.25 -3.251" /><path d="M9 15l-4.5 4.5" /><path d="M14.5 4l5.5 5.5" /></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M3 3l18 18" />
+    <path d="M15 4.5l-3.249 3.249m-2.57 1.433l-2.181 .818l-1.5 1.5l7 7l1.5 -1.5l.82 -2.186m1.43 -2.563l3.25 -3.251" />
+    <path d="M9 15l-4.5 4.5" />
+    <path d="M14.5 4l5.5 5.5" />
+  </svg>
 )
 
 export const minus = (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M5 12l14 0" /></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M5 12l14 0" />
+  </svg>
 )
 
 export const maximize = (
@@ -57,7 +69,11 @@ export const unmaximize = (
 )
 
 export const close = (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"  ><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M18 6l-12 12" />
+    <path d="M6 6l12 12" />
+  </svg>
 )
 
 export const photo = (
@@ -153,7 +169,6 @@ export const check = (
   </svg>
 )
 
-
 export const filter = (
   <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-filter">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -204,17 +219,18 @@ export const speedometer = (
 export const volume = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2">
     <path d="M11 5 L7 9 H3 V15 H7 L11 19 V5 Z" />
-    <path d="M15 9 C17 10 17 14 15 15" />36
+    <path d="M15 9 C17 10 17 14 15 15" />
+    36
     <path d="M19 7 C21.5 10 21.5 14 19 17" />
   </svg>
-);
+)
 
-export const mute = ( 
+export const mute = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2">
-    <path d="M11 5L7 9H3V15H7L11 19V5Z"/>
+    <path d="M11 5L7 9H3V15H7L11 19V5Z" />
     <path d="M19 5L5 19" />
   </svg>
-);
+)
 
 export const home = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" className="icon-tabler">

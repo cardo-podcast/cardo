@@ -1,30 +1,31 @@
 // useful functions for episode management
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { EpisodeData } from "..";
-import { useDB } from "../DB/DB";
-import { useSettings } from "./Settings";
-import { usePlayer } from "../components/AudioPlayer";
-import { downloadEpisode, removeDownloadedEpisode } from "../utils/utils";
-
-
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { EpisodeData } from '..'
+import { useDB } from '../DB/DB'
+import { useSettings } from './Settings'
+import { usePlayer } from '../components/AudioPlayer'
+import { downloadEpisode, removeDownloadedEpisode } from '../utils/utils'
 
 export function useEpisode(episode: EpisodeData) {
   const { queue, history, downloads } = useDB()
   const [inQueue, setInqueue] = useState(queue.includes(episode.src))
   const [downloadState, setDownloadState] = useState<'downloaded' | ['downloading', number] | undefined>()
   const [reprState, setReprState] = useState({ position: 0, total: episode.duration, complete: false })
-  const [{ globals: { locale } },] = useSettings()
+  const [
+    {
+      globals: { locale },
+    },
+  ] = useSettings()
   const { play: playEpisode, pause, paused, playing, position: playingPosition, quit: quitPlayer } = usePlayer()
   const downloadedFile = useRef('')
 
   useEffect(() => {
-    if (episode.src) { // avoid extra computing on db on large lists
+    if (episode.src) {
+      // avoid extra computing on db on large lists
       load()
     }
-
   }, [episode.src, playing?.src])
-
 
   const load = async () => {
     // update reproduction state
@@ -43,7 +44,6 @@ export function useEpisode(episode: EpisodeData) {
       setDownloadState('downloaded')
       downloadedFile.current = downloads.downloads[downloadIndex].localFile
     }
-
   }
 
   const getDateString = useCallback(() => {
@@ -51,13 +51,11 @@ export function useEpisode(episode: EpisodeData) {
     const episodeYear = episode.pubDate.getFullYear()
     const actualYear = new Date().getFullYear()
 
-    return episode.pubDate
-      .toLocaleDateString(locale, {
-        day: 'numeric',
-        month: 'short',
-        year: episodeYear < actualYear ? 'numeric' : undefined
-      }
-      )
+    return episode.pubDate.toLocaleDateString(locale, {
+      day: 'numeric',
+      month: 'short',
+      year: episodeYear < actualYear ? 'numeric' : undefined,
+    })
   }, [episode.pubDate])
 
   const togglePlayed = () => {
@@ -87,19 +85,21 @@ export function useEpisode(episode: EpisodeData) {
     return playing?.src == episode.src ? playingPosition : reprState.position
   }, [playing?.src, episode.src, reprState.position, playingPosition])
 
-  const inProgress = useCallback((mustBePlaying = false) => {
-    const isStarted =  reprState.position > 0 && !reprState.complete
-    if (mustBePlaying) {
-      return isStarted && playing?.src == episode.src && !paused
-    } else {
-      return isStarted
-    }
-  }, [playing?.src, episode.src, reprState.position, reprState.complete, paused])
+  const inProgress = useCallback(
+    (mustBePlaying = false) => {
+      const isStarted = reprState.position > 0 && !reprState.complete
+      if (mustBePlaying) {
+        return isStarted && playing?.src == episode.src && !paused
+      } else {
+        return isStarted
+      }
+    },
+    [playing?.src, episode.src, reprState.position, reprState.complete, paused],
+  )
 
   const download = async () => {
-
     setDownloadState(['downloading', 0])
-    downloadEpisode(episode).then(localFile => {
+    downloadEpisode(episode).then((localFile) => {
       // unlisten()
       setDownloadState('downloaded')
       downloadedFile.current = localFile
@@ -112,7 +112,6 @@ export function useEpisode(episode: EpisodeData) {
     //     setDownloadState(['downloading', downloaded / total * 100])
     //   }
     // })
-
   }
 
   const removeDownload = async () => {
@@ -138,7 +137,6 @@ export function useEpisode(episode: EpisodeData) {
       playEpisode(episode)
     }
   }
-
 
   return { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, toggleDownload, downloadState, play, pause }
 }
