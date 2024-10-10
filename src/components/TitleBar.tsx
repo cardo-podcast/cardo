@@ -12,7 +12,7 @@ function TitleBar() {
   const [windowPinned, setWindowPinned] = useState(false)
   const [maximized, setMaximized] = useState(false)
   const { onExit: savePlayerStatus } = usePlayer()
-  const { performSync } = useSync()
+  const { sync } = useSync()
   const [
     {
       sync: { syncBeforeAppClose },
@@ -28,7 +28,7 @@ function TitleBar() {
 
     if (syncBeforeAppClose) {
       // nextcloud sync
-      await performSync()
+      await sync()
     }
   }
 

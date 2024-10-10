@@ -53,11 +53,10 @@ function PodcastPreview() {
   const {
     subscriptions,
     history: { getCompleted },
-    misc: { loggedInSync },
     subscriptionsEpisodes,
   } = useDB()
   const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcast.feedUrl)
-  const { performSync } = useSync()
+  const { sync, loggedIn: loggedInSync } = useSync()
   const allEpisodes = useMemo(async () => await getAllEpisodes(), [podcast.feedUrl])
 
   const [tweakMenu, setTweakMenu] = useState<'sort' | 'filter' | undefined>(undefined)
@@ -313,11 +312,11 @@ function PodcastPreview() {
                 title={t(subscribed ? 'remove_from_subscriptions' : 'add_to_subscriptions')}
                 onClick={async () => {
                   if (subscribed) {
-                    loggedInSync && performSync({ remove: [podcast.feedUrl] })
+                    loggedInSync && sync({ remove: [podcast.feedUrl] })
                     await subscriptions.remove(podcast.feedUrl)
                     setSubscribed(false)
                   } else {
-                    loggedInSync && performSync({ add: [podcast.feedUrl] })
+                    loggedInSync && sync({ add: [podcast.feedUrl] })
                     podcast.id = await subscriptions.add(podcast)
                     setSubscribed(true)
                     await subscriptionsEpisodes.save(episodes)

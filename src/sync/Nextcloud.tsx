@@ -1,18 +1,17 @@
 import { http, invoke, shell } from '@tauri-apps/api'
 import { useEffect, useRef } from 'react'
-import { useDB, DB } from '../DB/DB'
-import { getCreds, parsePodcastDetails, saveCreds, toastError } from '../utils/utils'
+import { useDB } from '../DB/DB'
+import { getCreds, saveCreds, toastError } from '../utils/utils'
 import { useTranslation } from 'react-i18next'
-import { EpisodeState } from '..'
-import { GpodderUpdate } from '.'
+import { Credentials, SyncProtocol } from '.'
+import { useSync } from './Sync'
 
 export function NextcloudSettings() {
   const urlRef = useRef<HTMLInputElement>(null)
   const interval = useRef(0)
-  const {
-    misc: { getSyncKey, setSyncKey, setLoggedInSync: setLoggedIn },
-  } = useDB()
   const { t } = useTranslation()
+  const { loggedIn, setLoggedIn } = useSync()
+  const { login } = useNextcloud(loggedIn, setLoggedIn)
 
   useEffect(() => {
     return () => clearInterval(interval.current)
@@ -27,7 +26,7 @@ export function NextcloudSettings() {
           e.preventDefault()
           if (urlRef.current) {
             try {
-              interval.current = await login(urlRef.current.value, getSyncKey, setSyncKey, () => setLoggedIn('nextcloud'))
+              interval.current = await login(urlRef.current.value)
             } catch (e) {
               toastError((e as Error).message)
             }
@@ -45,166 +44,132 @@ export function NextcloudSettings() {
   )
 }
 
-async function login(url: string, getSyncKey: () => Promise<string | undefined>, setSyncKey: (key: string) => Promise<void>, onSucess: () => void) {
-  // nextcloud flow v2 o-auth login
-  // https://docs.nextcloud.com/server/latest/developer_manual/client_apis/LoginFlow/index.html#login-flow-v2
-
-  const baseUrl = url.split('index.php')[0] // clean possible extra paths in url, cannot guess subpaths without index.php
-
-  const r = await http.fetch(baseUrl + '/index.php/login/v2', {
-    method: 'POST',
-    responseType: http.ResponseType.JSON,
-  })
-
+export function useNextcloud(loggedIn: SyncProtocol, setLoggedIn: (value: SyncProtocol) => void) {
   const {
-    login,
-    poll: { token, endpoint },
-  } = r.data as { login: string; poll: { token: string; endpoint: string } }
+    misc: { getSyncKey, setSyncKey },
+  } = useDB()
+  const creds = useRef<Credentials>()
 
-  shell.open(login) // throw explorer with nextcloud login page
+  useEffect(() => {
+    if (loggedIn === 'nextcloud') {
+      getNextcloudCreds().then((c) => {
+        creds.current = c
+      })
+    }
+  }, [loggedIn])
 
-  // start polling for a sucessful response of nextcloud
-  const interval = setInterval(async () => {
-    const r = await http.fetch(endpoint, {
+  async function getNextcloudCreds(): Promise<Credentials> {
+    const creds: any = await getCreds('nextcloud')
+    const syncKey = await getSyncKey()
+
+    const { server, loginName: encryptedLoginName, appPassword: encryptedAppPassword } = creds
+    const loginName: string = await invoke('decrypt', { encryptedText: encryptedLoginName, base64Key: syncKey })
+    const appPassword: string = await invoke('decrypt', { encryptedText: encryptedAppPassword, base64Key: syncKey })
+    return { server: server, user: loginName, password: appPassword }
+  }
+
+  async function login(url: string) {
+    // nextcloud flow v2 o-auth login
+    // https://docs.nextcloud.com/server/latest/developer_manual/client_apis/LoginFlow/index.html#login-flow-v2
+
+    const baseUrl = url.split('index.php')[0] // clean possible extra paths in url, cannot guess subpaths without index.php
+
+    const r = await http.fetch(baseUrl + '/index.php/login/v2', {
       method: 'POST',
       responseType: http.ResponseType.JSON,
-      body: {
-        type: 'Json',
-        payload: {
-          token: token,
+    })
+
+    const {
+      login,
+      poll: { token, endpoint },
+    } = r.data as { login: string; poll: { token: string; endpoint: string } }
+
+    shell.open(login) // throw explorer with nextcloud login page
+
+    // start polling for a sucessful response of nextcloud
+    const interval = setInterval(async () => {
+      const r = await http.fetch(endpoint, {
+        method: 'POST',
+        responseType: http.ResponseType.JSON,
+        body: {
+          type: 'Json',
+          payload: {
+            token: token,
+          },
         },
+      })
+
+      if (!r.ok) return // poll again
+
+      // get credentials from response
+      const { loginName, appPassword } = r.data as { server: string; loginName: string; appPassword: string }
+
+      /// Encrypt credentials before saving ///
+
+      // get key from db
+      let key = await getSyncKey()
+
+      if (key === undefined) {
+        const key: string = await invoke('generate_key')
+        setSyncKey(key)
+      }
+
+      // encrypt user and password with keys and save credentials
+      saveCreds('nextcloud', {
+        server: baseUrl,
+        loginName: await invoke('encrypt', { text: loginName, base64Key: key }),
+        appPassword: await invoke('encrypt', { text: appPassword, base64Key: key }),
+      })
+
+      setLoggedIn('nextcloud')
+      clearInterval(interval)
+    }, 1000)
+    return interval
+  }
+
+  async function pullUpdates(request: string, since?: number) {
+    if (!creds.current) return
+
+    const { server, user, password } = creds.current
+
+    const url = server + `/index.php/apps/gpoddersync/${request}?since=${since === undefined ? '0' : since?.toString()}`
+
+    const r: { data: any } = await http.fetch(url, {
+      method: 'GET',
+      responseType: http.ResponseType.JSON,
+      headers: {
+        'OCS-APIRequest': 'true',
+        Authorization: 'Basic ' + btoa(user + ':' + password),
       },
     })
 
-    if (!r.ok) return // poll again
+    return r.data
+  }
 
-    // get credentials from response
-    const { loginName, appPassword } = r.data as { server: string; loginName: string; appPassword: string }
+  async function pushUpdates(request: string, updates: any) {
+    if (!creds.current) return
 
-    /// Encrypt credentials before saving ///
+    const { server, user, password } = creds.current
 
-    // get key from db
-    let key = await getSyncKey()
+    const url = server + `/index.php/apps/gpoddersync/${request}/create`
 
-    if (key === undefined) {
-      const key: string = await invoke('generate_key')
-      setSyncKey(key)
-    }
-
-    // encrypt user and password with keys and save credentials
-    saveCreds('nextcloud', {
-      server: baseUrl,
-      loginName: await invoke('encrypt', { text: loginName, base64Key: key }),
-      appPassword: await invoke('encrypt', { text: appPassword, base64Key: key }),
+    const r = await http.fetch(url, {
+      method: 'POST',
+      responseType: http.ResponseType.JSON,
+      headers: {
+        'OCS-APIRequest': 'true',
+        Authorization: 'Basic ' + btoa(user + ':' + password),
+      },
+      body: {
+        type: 'Json',
+        payload: updates,
+      },
     })
 
-    onSucess()
-    clearInterval(interval)
-  }, 1000)
-  return interval
-}
-
-async function getNextcloudCreds(syncKey: string): Promise<{ server: string; loginName: string; appPassword: string }> {
-  const creds: any = await getCreds('nextcloud')
-
-  const { server, loginName: encryptedLoginName, appPassword: encryptedAppPassword } = creds
-  const loginName: string = await invoke('decrypt', { encryptedText: encryptedLoginName, base64Key: syncKey })
-  const appPassword: string = await invoke('decrypt', { encryptedText: encryptedAppPassword, base64Key: syncKey })
-  return { server: server, loginName: loginName, appPassword: appPassword }
-}
-
-async function pullUpdates(server: string, request: string, loginName: string, appPassword: string, since?: number) {
-  const url = server + `/index.php/apps/gpoddersync/${request}?since=${since === undefined ? '0' : since?.toString()}`
-
-  const r: { data: any } = await http.fetch(url, {
-    method: 'GET',
-    responseType: http.ResponseType.JSON,
-    headers: {
-      'OCS-APIRequest': 'true',
-      Authorization: 'Basic ' + btoa(loginName + ':' + appPassword),
-    },
-  })
-
-  return r.data
-}
-
-async function pushUpdates(server: string, request: string, loginName: string, appPassword: string, updates: any) {
-  const url = server + `/index.php/apps/gpoddersync/${request}/create`
-
-  const r = await http.fetch(url, {
-    method: 'POST',
-    responseType: http.ResponseType.JSON,
-    headers: {
-      'OCS-APIRequest': 'true',
-      Authorization: 'Basic ' + btoa(loginName + ':' + appPassword),
-    },
-    body: {
-      type: 'Json',
-      payload: updates,
-    },
-  })
-
-  if (!r.ok) {
-    throw Error('Failed pushing data to nextcloud server')
-  }
-}
-
-type updateEpisodeStateType = (episodeUrl: string, podcastUrl: string, position: number, total: number, timestamp?: number) => Promise<void>
-
-export async function sync(syncKey: string, updateEpisodeState: updateEpisodeStateType, getLastSync: () => Promise<number>, getEpisodesStates: (timestamp?: number) => Promise<EpisodeState[]>, subscriptions: DB['subscriptions'], updateSubscriptions?: { add?: string[]; remove?: string[] }) {
-  if (syncKey === '') return
-
-  const { server, loginName, appPassword } = await getNextcloudCreds(syncKey)
-  const lastSync = (await getLastSync()) / 1000 // nextcloud server uses seconds
-
-  // #region subscriptions
-  const subsServerUpdates: { add: string[]; remove: string[] } = await pullUpdates(server, 'subscriptions', loginName, appPassword, lastSync)
-  const localSubscriptions = subscriptions.subscriptions.map((sub) => sub.feedUrl)
-
-  // add new subscriptions
-  for (const feedUrl of subsServerUpdates.add) {
-    if (!localSubscriptions.includes(feedUrl)) {
-      const podcastData = await parsePodcastDetails(feedUrl)
-      subscriptions.add(podcastData)
+    if (!r.ok) {
+      throw Error('Failed pushing data to nextcloud server')
     }
   }
 
-  // remove subscriptions
-  for (const feedUrl of subsServerUpdates.remove) {
-    if (localSubscriptions.includes(feedUrl)) {
-      subscriptions.remove(feedUrl)
-    }
-  }
-
-  if (updateSubscriptions !== undefined) {
-    await pushUpdates(server, 'subscription_change', loginName, appPassword, { add: [], remove: [], ...updateSubscriptions })
-  }
-
-  // #endregion
-
-  const serverUpdates: { actions: GpodderUpdate[] } = await pullUpdates(server, 'episode_action', loginName, appPassword, lastSync)
-
-  if (serverUpdates.actions.length > 0) {
-    for (const update of serverUpdates.actions) {
-      const timestamp = new Date(update.timestamp + '+00:00').getTime() //timestamp in epoch format (server is in utc ISO format)
-      if (update.action !== 'PLAY') continue
-
-      await updateEpisodeState(update.episode, update.podcast, update.position, update.total, timestamp)
-    }
-  }
-
-  const localUpdates = await getEpisodesStates(lastSync)
-
-  const gpodderLocalUpdates: GpodderUpdate[] = localUpdates.map((update) => {
-    return {
-      ...update,
-      position: update.position,
-      started: update.position,
-      total: update.total,
-      action: 'PLAY',
-      timestamp: new Date(update.timestamp).toISOString().split('.')[0],
-    }
-  })
-
-  await pushUpdates(server, 'episode_action', loginName, appPassword, gpodderLocalUpdates)
+  return { login, pushUpdates, pullUpdates }
 }
