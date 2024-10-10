@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { NextcloudSettings } from '../sync/Nextcloud'
+import { SyncSettings } from '../sync/Sync'
 import { Checkbox } from '../components/Inputs'
 import { getColor, useSettings } from '../engines/Settings'
 import { useEffect, useState } from 'react'
@@ -86,7 +86,7 @@ function Settings() {
 
       <div className="flex flex-col gap-1 rounded-md border-[2px] border-primary-8 p-2">
         <h1 className="mb-2 border-b-2 border-primary-8 uppercase">{t('sync')}</h1>
-        <NextcloudSettings />
+        <SyncSettings />
       </div>
 
       <div className="flex flex-col gap-1 rounded-md border-[2px] border-primary-8 p-2">

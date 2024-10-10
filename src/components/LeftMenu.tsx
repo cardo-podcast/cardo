@@ -7,7 +7,7 @@ import { useSettings } from '../engines/Settings'
 import { useModalBanner } from './ModalBanner'
 import { parsePodcastDetails, toastError } from '../utils/utils'
 import { useRef } from 'react'
-import { useSync } from '../sync/Nextcloud'
+import { useSync } from '../sync/Sync'
 
 function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
   const { t } = useTranslation()
