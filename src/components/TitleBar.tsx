@@ -1,7 +1,7 @@
 import { appWindow } from '@tauri-apps/api/window'
 import * as icons from '../Icons'
 import { useEffect, useRef, useState } from 'react'
-import { SyncButton, useSync } from '../sync/Nextcloud'
+import { SyncButton, useSync } from '../sync/Sync'
 import { usePlayer } from './AudioPlayer'
 import { UnlistenFn } from '@tauri-apps/api/event'
 import { useSettings } from '../engines/Settings'

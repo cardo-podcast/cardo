@@ -14,7 +14,7 @@ const QueuePage = lazy(() => import('./pages/QueuePage'))
 import { appWindow } from '@tauri-apps/api/window'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { SyncProvider } from './sync/Nextcloud'
+import { SyncProvider } from './sync/Sync'
 const DownloadsPage = lazy(() => import('./pages/DownloadsPage'))
 import { platform } from '@tauri-apps/api/os'
 

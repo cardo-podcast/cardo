@@ -3,7 +3,7 @@ import Database from 'tauri-plugin-sql-api'
 import { EpisodeData } from '..'
 
 export function useMisc(db: Database) {
-  const [loggedInSync, setLoggedInSync] = useState(false)
+  const [loggedInSync, setLoggedInSync] = useState<'nextcloud' | 'gpodder' | false>(false)
 
   // #region COMMON INTERNAL FUNCTIONS
   const getMiscKey = async (key: string): Promise<string | undefined> => {

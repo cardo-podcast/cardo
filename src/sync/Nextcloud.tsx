@@ -1,66 +1,22 @@
 import { http, invoke, shell } from '@tauri-apps/api'
-import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useDB, DB } from '../DB/DB'
-import { getCreds, parsePodcastDetails, removeCreds, saveCreds, toastError } from '../utils/utils'
+import { getCreds, parsePodcastDetails, saveCreds, toastError } from '../utils/utils'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-import { toast } from 'react-toastify'
 import { EpisodeState } from '..'
-import { Checkbox } from '../components/Inputs'
-import { useSettings } from '../engines/Settings'
+import { GpodderUpdate } from '.'
 
 export function NextcloudSettings() {
   const urlRef = useRef<HTMLInputElement>(null)
   const interval = useRef(0)
   const {
-    misc: { getSyncKey, setSyncKey, loggedInSync: loggedIn, setLoggedInSync: setLoggedIn },
+    misc: { getSyncKey, setSyncKey, setLoggedInSync: setLoggedIn },
   } = useDB()
   const { t } = useTranslation()
-  const [{ sync: syncSettings }, updateSettings] = useSettings()
 
   useEffect(() => {
-    getCreds('nextcloud').then((r) => {
-      setLoggedIn(r !== undefined)
-    })
-
     return () => clearInterval(interval.current)
   }, [])
-
-  if (loggedIn) {
-    return (
-      <div className="flex flex-col gap-3 p-1">
-        <div className="flex items-center gap-2">
-          <img className="h-24 shrink-0" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/141px-Nextcloud_Logo.svg.png" alt="Nextcloud logo" />
-          <div className="flex flex-col gap-2">
-            <p className="text-lg">{t('logged_in')}</p>
-            <button
-              className="w-fit rounded-md bg-accent-6 p-1 px-4 uppercase hover:bg-accent-7"
-              onClick={async () => {
-                removeCreds('nextcloud')
-                setLoggedIn(false)
-              }}
-            >
-              {t('log_out')}
-            </button>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <h2 className="uppercase">{t('automatic_sync')}</h2>
-          <div className="flex gap-3">
-            <label className="flex w-fit gap-1">
-              {t('when_opening_app')}:
-              <Checkbox defaultChecked={syncSettings.syncAfterAppStart} onChange={(value) => updateSettings({ sync: { syncAfterAppStart: value } })} />
-            </label>
-            <label className="flex w-fit gap-1">
-              {t('when_closing_app')}:
-              <Checkbox defaultChecked={syncSettings.syncBeforeAppClose} onChange={(value) => updateSettings({ sync: { syncBeforeAppClose: value } })} />
-            </label>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="flex h-full w-full gap-2 p-1">
@@ -71,7 +27,7 @@ export function NextcloudSettings() {
           e.preventDefault()
           if (urlRef.current) {
             try {
-              interval.current = await login(urlRef.current.value, getSyncKey, setSyncKey, () => setLoggedIn(true))
+              interval.current = await login(urlRef.current.value, getSyncKey, setSyncKey, () => setLoggedIn('nextcloud'))
             } catch (e) {
               toastError((e as Error).message)
             }
@@ -148,15 +104,6 @@ async function login(url: string, getSyncKey: () => Promise<string | undefined>,
   return interval
 }
 
-interface GpodderUpdate {
-  podcast: string
-  episode: string
-  position: number
-  total: number
-  timestamp: string
-  action: 'DOWNLOAD' | 'PLAY' | 'DELETE' | 'NEW'
-}
-
 async function getNextcloudCreds(syncKey: string): Promise<{ server: string; loginName: string; appPassword: string }> {
   const creds: any = await getCreds('nextcloud')
 
@@ -204,7 +151,7 @@ async function pushUpdates(server: string, request: string, loginName: string, a
 
 type updateEpisodeStateType = (episodeUrl: string, podcastUrl: string, position: number, total: number, timestamp?: number) => Promise<void>
 
-async function sync(syncKey: string, updateEpisodeState: updateEpisodeStateType, getLastSync: () => Promise<number>, getEpisodesStates: (timestamp?: number) => Promise<EpisodeState[]>, subscriptions: DB['subscriptions'], updateSubscriptions?: { add?: string[]; remove?: string[] }) {
+export async function sync(syncKey: string, updateEpisodeState: updateEpisodeStateType, getLastSync: () => Promise<number>, getEpisodesStates: (timestamp?: number) => Promise<EpisodeState[]>, subscriptions: DB['subscriptions'], updateSubscriptions?: { add?: string[]; remove?: string[] }) {
   if (syncKey === '') return
 
   const { server, loginName, appPassword } = await getNextcloudCreds(syncKey)
@@ -260,106 +207,4 @@ async function sync(syncKey: string, updateEpisodeState: updateEpisodeStateType,
   })
 
   await pushUpdates(server, 'episode_action', loginName, appPassword, gpodderLocalUpdates)
-}
-
-enum SyncStatus {
-  Standby,
-  Synchronizing,
-  Ok,
-  Error,
-}
-
-export function initSync() {
-  const [status, setStatus] = useState<SyncStatus>(SyncStatus.Standby)
-  const [error, setError] = useState('')
-  const {
-    dbLoaded,
-    misc: { getSyncKey, setLastSync, getLastSync, loggedInSync: loggedIn, setLoggedInSync: setLoggedIn },
-    history,
-    subscriptions,
-  } = useDB()
-  const [{ sync: syncSettings }, _] = useSettings()
-  const { t } = useTranslation()
-  const navigate = useNavigate()
-
-  const load = async () => {
-    const creds = await getCreds('nextcloud')
-    setLoggedIn(creds !== undefined)
-  }
-
-  useEffect(() => {
-    dbLoaded && load()
-  }, [dbLoaded])
-
-  useEffect(() => {
-    if (loggedIn && syncSettings.syncAfterAppStart) {
-      performSync()
-    }
-  }, [loggedIn])
-
-  const performSync = async (updateSubscriptions?: { add?: string[]; remove?: string[] }) => {
-    if (!loggedIn) {
-      toast.info(t('not_logged_sync'), {
-        position: 'top-center',
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'dark',
-      })
-      navigate('/settings')
-      return
-    }
-
-    if (status === SyncStatus.Synchronizing) return
-
-    setError('')
-    setStatus(SyncStatus.Synchronizing)
-
-    try {
-      const key = await getSyncKey()
-      if (!key) {
-        throw 'Error obtaining cipher key, please log-in again on Nextcloud'
-      }
-
-      await sync(key, history.update, getLastSync, history.getAll, subscriptions, updateSubscriptions)
-
-      await setLastSync(Date.now())
-      setStatus(SyncStatus.Ok)
-    } catch (e) {
-      console.error(e)
-      setError(e as string)
-      setStatus(SyncStatus.Error)
-    }
-  }
-
-  return { status, error, performSync }
-}
-
-export function SyncButton() {
-  const { t } = useTranslation()
-  const { status, error, performSync } = useSync()
-
-  return (
-    <button className={`w-6 outline-none hover:text-accent-4 ${status === SyncStatus.Synchronizing && 'animate-[spin_2s_linear_infinite_reverse]'}`} onClick={() => performSync()} title={error == '' ? t('sync') : error}>
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-refresh">
-        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-        <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
-        <circle cx="12" cy="12" r="2" fill={status === SyncStatus.Error ? 'red' : status === SyncStatus.Ok ? 'green' : 'none'} stroke="none" />
-        <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
-      </svg>
-    </button>
-  )
-}
-
-const SyncContext = createContext<ReturnType<typeof initSync> | undefined>(undefined)
-
-export const useSync = () => useContext(SyncContext) as ReturnType<typeof initSync>
-
-export function SyncProvider({ children }: { children: ReactNode }) {
-  const sync = initSync()
-
-  return <SyncContext.Provider value={sync}>{children}</SyncContext.Provider>
 }
