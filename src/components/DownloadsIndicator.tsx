@@ -1,12 +1,10 @@
-import { listen, UnlistenFn } from "@tauri-apps/api/event";
-import { useEffect, useRef, useState } from "react";
-import { DownloadPayload } from "..";
-
+import { listen, UnlistenFn } from '@tauri-apps/api/event'
+import { useEffect, useRef, useState } from 'react'
+import { DownloadPayload } from '..'
 
 type DownloadsList = {
-  [src: string]: Omit<DownloadPayload, "src" | "complete">
+  [src: string]: Omit<DownloadPayload, 'src' | 'complete'>
 }
-
 
 export default function DownloadsIndicator() {
   const unlisten = useRef<UnlistenFn>()
@@ -23,10 +21,11 @@ export default function DownloadsIndicator() {
         }
       } else {
         downloads.current[src] = {
-          name, downloaded, total
+          name,
+          downloaded,
+          total,
         }
       }
-
 
       let totalFilesSize = 0
       let totalDownloadedSize = 0
@@ -36,7 +35,6 @@ export default function DownloadsIndicator() {
       }
 
       setProgress(totalDownloadedSize / totalFilesSize)
-
     })
   }
 
@@ -49,41 +47,19 @@ export default function DownloadsIndicator() {
   if (progress == 0) return <></>
 
   return (
-    <div className="w-6 h-6 group relative">
+    <div className="group relative h-6 w-6">
       <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <circle
-          className="stroke-primary-8"
-          cx="50"
-          cy="50"
-          r="35"
-          fill="none"
-          strokeWidth="15"
-        />
+        <circle className="stroke-primary-8" cx="50" cy="50" r="35" fill="none" strokeWidth="15" />
 
-        <circle
-          className="stroke-accent-6"
-          cx="50"
-          cy="50"
-          r="35"
-          fill="none"
-          strokeWidth="15"
-          transform="rotate(-90)"
-          transform-origin="50 50"
-          strokeDasharray={2 * Math.PI * 35}
-          strokeDashoffset={2 * Math.PI * 35 * (1 - progress)}
-        />
+        <circle className="stroke-accent-6" cx="50" cy="50" r="35" fill="none" strokeWidth="15" transform="rotate(-90)" transform-origin="50 50" strokeDasharray={2 * Math.PI * 35} strokeDashoffset={2 * Math.PI * 35 * (1 - progress)} />
       </svg>
-      <div className="absolute top-7 hidden group-hover:flex hover:flex
-                bg-primary-9 border-2 border-primary-6 py-1 px-2 rounded-md text-xs z-20 flex-col max-w-96">
-          {
-            Object.keys(downloads.current).map(src => (
-              <div className="flex p-1 gap-3 justify-between items-center border-b-2 border-primary-8 last:border-0">
-                <p className="text-ellipsis line-clamp-2 w-max">{downloads.current[src].name}</p>
-                <p className="text-sm">{(downloads.current[src].downloaded / downloads.current[src].total * 100).toFixed(1)}%</p>
-              </div>
-            )
-            )
-          }
+      <div className="absolute top-7 z-20 hidden max-w-96 flex-col rounded-md border-2 border-primary-6 bg-primary-9 px-2 py-1 text-xs hover:flex group-hover:flex">
+        {Object.keys(downloads.current).map((src) => (
+          <div className="flex items-center justify-between gap-3 border-b-2 border-primary-8 p-1 last:border-0">
+            <p className="line-clamp-2 w-max text-ellipsis">{downloads.current[src].name}</p>
+            <p className="text-sm">{((downloads.current[src].downloaded / downloads.current[src].total) * 100).toFixed(1)}%</p>
+          </div>
+        ))}
       </div>
     </div>
   )

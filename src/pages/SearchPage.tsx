@@ -1,18 +1,11 @@
-import { PodcastData } from "..";
+import { PodcastData } from '..'
 import appIcon from '../../src-tauri/icons/icon.png'
-import { SyntheticEvent } from "react";
-
+import { SyntheticEvent } from 'react'
 
 function PodcastPreview({ result }: { result: PodcastData }) {
-
   return (
-    <div className="flex bg-primary-8 rounded-md h-20 p-2 justify-between gap-4">
-      <img
-        className="bg-primary-7 h-full aspect-square rounded-md"
-        alt=""
-        src={result.coverUrl}
-        onError={(e: SyntheticEvent<HTMLImageElement>) => e.currentTarget.src = appIcon}
-      />
+    <div className="flex h-20 justify-between gap-4 rounded-md bg-primary-8 p-2">
+      <img className="aspect-square h-full rounded-md bg-primary-7" alt="" src={result.coverUrl} onError={(e: SyntheticEvent<HTMLImageElement>) => (e.currentTarget.src = appIcon)} />
 
       <div className="flex flex-col text-right">
         <p>{result.podcastName}</p>
@@ -23,18 +16,15 @@ function PodcastPreview({ result }: { result: PodcastData }) {
 }
 
 function SearchPage({ results }: { results: Array<PodcastData> }) {
-
   return (
-    <div className="w-full h-full p-2 overflow-y-auto flex justify-center">
-      <div className="grid px-2 gap-1 w-[80%]">
-        {
-          results.map(result => {
-            return <PodcastPreview result={result} />
-          })
-        }
+    <div className="flex h-full w-full justify-center overflow-y-auto p-2">
+      <div className="grid w-[80%] gap-1 px-2">
+        {results.map((result) => {
+          return <PodcastPreview result={result} />
+        })}
       </div>
     </div>
   )
 }
 
-export default SearchPage;
+export default SearchPage

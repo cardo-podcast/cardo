@@ -1,20 +1,19 @@
-import { useCallback, useEffect, useState } from "react"
-import Database from "tauri-plugin-sql-api"
-import { EpisodeData, RawEpisodeData } from ".."
-
+import { useCallback, useEffect, useState } from 'react'
+import Database from 'tauri-plugin-sql-api'
+import { EpisodeData, RawEpisodeData } from '..'
 
 export function useQueue(db: Database) {
   const [queue, setQueue] = useState<EpisodeData[]>([]) // list of queue sqlite id's
 
   useEffect(() => {
     if (!db) return
-    
+
     load()
   }, [db])
 
   useEffect(() => {
     if (queue.length > 0) {
-      updateOrder(queue.map(episode => episode.id))
+      updateOrder(queue.map((episode) => episode.id))
     }
   }, [queue])
 
@@ -27,17 +26,17 @@ export function useQueue(db: Database) {
             subscriptions.podcastName
             FROM queue
         LEFT JOIN subscriptions ON queue.podcastUrl = subscriptions.feedUrl
-      `)
+      `,
+    )
 
-
-    return r.map(episode => ({
+    return r.map((episode) => ({
       ...episode,
       pubDate: new Date(episode.pubDate),
-      podcast: { coverUrl: episode.podcastCover, podcastName: episode.podcastName }
+      podcast: { coverUrl: episode.podcastCover, podcastName: episode.podcastName },
     }))
   }
 
-  async function load(){
+  async function load() {
     // load queue from sqlite db
     const loadedQueue = await getAll()
     const order = await readOrder()
@@ -46,7 +45,7 @@ export function useQueue(db: Database) {
 
     setQueue(loadedQueue)
   }
-  
+
   const readOrder = async (): Promise<number[]> => {
     const query: { value: string }[] = await db.select(`
       SELECT value FROM misc
@@ -76,88 +75,93 @@ export function useQueue(db: Database) {
       return
     }
 
-    const query = await db.execute(
-      "INSERT into queue (title, description, src, pubDate, duration, size, podcastUrl, coverUrl) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
-      [episode.title, episode.description, episode.src, episode.pubDate.getTime(), episode.duration, episode.size, episode.podcastUrl, episode.coverUrl || ''],
-    );
+    const query = await db.execute('INSERT into queue (title, description, src, pubDate, duration, size, podcastUrl, coverUrl) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [episode.title, episode.description, episode.src, episode.pubDate.getTime(), episode.duration, episode.size, episode.podcastUrl, episode.coverUrl || ''])
 
     return query.lastInsertId
   }
 
   const indexOf = (episodeSrc: string) => {
-    return queue.findIndex(episode => episode.src == episodeSrc)
+    return queue.findIndex((episode) => episode.src == episodeSrc)
   }
 
   // #endregion
 
+  const unshift = useCallback(
+    async function (episode: EpisodeData) {
+      const id = await insertOnDb(episode)
 
-  const unshift = useCallback(async function (episode: EpisodeData){
-    const id = await insertOnDb(episode)
+      if (id !== undefined) {
+        // episode appended to queue
+        setQueue((prev) => [{ ...episode, id: id }, ...prev])
+      }
+    },
+    [insertOnDb],
+  )
 
-    if (id !== undefined) { // episode appended to queue
-      setQueue(prev => [{ ...episode, id: id }, ...prev])
-    }
-  }, [insertOnDb])
+  const push = useCallback(
+    async function (episode: EpisodeData) {
+      const id = await insertOnDb(episode)
 
-  const push = useCallback(async function (episode: EpisodeData){
-    const id = await insertOnDb(episode)
+      if (id !== undefined) {
+        // episode appended to queue
+        setQueue((prev) => [...prev, { ...episode, id: id }])
+      }
+    },
+    [db],
+  )
 
-    if (id !== undefined) { // episode appended to queue
-      setQueue(prev => [...prev, { ...episode, id: id }])
-    }
-  }, [db])
+  const includes = useCallback(
+    function (episodeSrc: string) {
+      return indexOf(episodeSrc) > -1
+    },
+    [indexOf],
+  )
 
-  const includes = useCallback(function(episodeSrc: string) {
-    return indexOf(episodeSrc) > -1
-  }, [indexOf])
+  const next = useCallback(
+    function (episode: EpisodeData) {
+      const nextIndex = queue.findIndex((ep) => ep.id == episode.id) + 1
+      return queue[nextIndex]
+    },
+    [queue],
+  )
 
+  const remove = useCallback(
+    async function (episodeSrc: string) {
+      // delete from queue
+      setQueue((prev) => prev.filter((episode) => episode.src != episodeSrc))
 
-  const next = useCallback(function(episode: EpisodeData){
-    const nextIndex = queue.findIndex(ep => ep.id == episode.id) + 1
-    return queue[nextIndex]
-  }, [queue])
+      await db.execute('DELETE FROM queue WHERE src = $1', [episodeSrc])
+    },
+    [db],
+  )
 
-  const remove = useCallback(async function(episodeSrc: string){
-    // delete from queue
-    setQueue(prev => prev.filter(episode => episode.src != episodeSrc))
+  const batchRemove = useCallback(
+    async function (episodesSrc: string[]) {
+      // delete from queue
 
-    await db.execute(
-      "DELETE FROM queue WHERE src = $1",
-      [episodeSrc],
-    )
-  }, [db])
+      if (!episodesSrc.length) return
 
-  const batchRemove = useCallback(async function(episodesSrc: string[]){
-    // delete from queue
+      setQueue((prev) => prev.filter((episode) => !episodesSrc.includes(episode.src)))
 
-    if (!episodesSrc.length) return
+      // delete from db
+      const placeholders = episodesSrc.map((_, i) => '$' + (i + 1)).join(',')
 
-    setQueue(prev => prev.filter(episode => !episodesSrc.includes(episode.src)))
+      await db.execute(`DELETE FROM queue WHERE src IN (${placeholders})`, [...episodesSrc])
+    },
+    [db],
+  )
 
-    // delete from db
-    const placeholders = episodesSrc.map((_, i) => '$' + (i + 1)).join(',');
-  
-    await db.execute(
-      `DELETE FROM queue WHERE src IN (${placeholders})`,
-      [...episodesSrc],
-    )
+  const move = useCallback(
+    function (from: number, to: number) {
+      const newQueue = [...queue]
+      const fromElement = newQueue.splice(from, 1)
 
-  }, [db])
+      newQueue.splice(to, 0, fromElement[0])
 
+      setQueue(newQueue)
+    },
+    [queue],
+  )
 
-
-  const move = useCallback(function(from: number, to: number){
-
-    const newQueue = [...queue]
-    const fromElement = newQueue.splice(from, 1)
-
-    newQueue.splice(to, 0, fromElement[0])
-
-    setQueue(newQueue)
-  }, [queue])
-
-
-  return {queue, unshift, push, next, remove, batchRemove, move, includes}
-
+  return { queue, unshift, push, next, remove, batchRemove, move, includes }
 }
-

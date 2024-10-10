@@ -1,12 +1,9 @@
-import { ReactNode, useEffect, useRef, useState } from "react"
-import * as icons from "../Icons"
-
-
+import { ReactNode, useEffect, useRef, useState } from 'react'
+import * as icons from '../Icons'
 
 export default function EpisodeOverview({ children }: { children: ReactNode }) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [showButtons, setShowButtons] = useState(false)
-
 
   useEffect(() => {
     if (!scrollRef.current) return
@@ -22,34 +19,26 @@ export default function EpisodeOverview({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="flex flex-col p-2 w-full h-fit relative">
-      {
-        showButtons &&
+    <div className="relative flex h-fit w-full flex-col p-2">
+      {showButtons && (
         <>
-          <div className="fixed z-10 flex items-center h-24">
-            <button
-              className="bg-accent-5 w-10 rounded-r-full h-20 opacity-0 peer-hover:opacity-60 hover:opacity-90 transition-opacity duration-200"
-              onClick={() => manageScroll(-200)}
-            >
+          <div className="fixed z-10 flex h-24 items-center">
+            <button className="h-20 w-10 rounded-r-full bg-accent-5 opacity-0 transition-opacity duration-200 hover:opacity-90 peer-hover:opacity-60" onClick={() => manageScroll(-200)}>
               {icons.arrowLeft}
             </button>
           </div>
 
-          <div className="fixed z-10 right-4 flex items-center h-24">
-            <button
-              className="bg-accent-5 w-10 rounded-l-full h-20 opacity-0 hover:opacity-90 transition-opacity duration-200"
-              onClick={() => manageScroll(200)}
-            >
+          <div className="fixed right-4 z-10 flex h-24 items-center">
+            <button className="h-20 w-10 rounded-l-full bg-accent-5 opacity-0 transition-opacity duration-200 hover:opacity-90" onClick={() => manageScroll(200)}>
               {icons.arrowRight}
             </button>
           </div>
         </>
-      }
+      )}
 
       <div ref={scrollRef} className="flex gap-2 overflow-x-auto scroll-smooth">
         {children}
       </div>
-
     </div>
   )
 }
