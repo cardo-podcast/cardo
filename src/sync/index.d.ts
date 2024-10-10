@@ -10,3 +10,11 @@ export interface GpodderUpdate {
   timestamp: string
   action: 'DOWNLOAD' | 'PLAY' | 'DELETE' | 'NEW'
 }
+
+export interface Credentials {
+  server: string,
+  user: string,
+  password: string
+}
+
+export type SyncProtocol = 'nextcloud' | 'gpodder' | false

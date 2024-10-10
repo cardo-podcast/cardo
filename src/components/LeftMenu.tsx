@@ -13,12 +13,9 @@ function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
   const { t } = useTranslation()
   const [showBanner, Banner] = useModalBanner()
   const inputRef = useRef<HTMLInputElement>(null)
-  const {
-    subscriptions,
-    misc: { loggedInSync },
-  } = useDB()
+  const { subscriptions } = useDB()
   const navigate = useNavigate()
-  const { performSync } = useSync()
+  const { sync, loggedIn: loggedInSync } = useSync()
 
   return (
     <>
@@ -33,7 +30,7 @@ function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
           }
 
           const podcast = await parsePodcastDetails(inputRef.current.value)
-          loggedInSync && performSync({ add: [podcast.feedUrl] })
+          loggedInSync && sync({ add: [podcast.feedUrl] })
           subscriptions.add(podcast)
           navigate('/preview', {
             state: {

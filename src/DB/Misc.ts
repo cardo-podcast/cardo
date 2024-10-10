@@ -1,9 +1,8 @@
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import Database from 'tauri-plugin-sql-api'
 import { EpisodeData } from '..'
 
 export function useMisc(db: Database) {
-  const [loggedInSync, setLoggedInSync] = useState<'nextcloud' | 'gpodder' | false>(false)
 
   // #region COMMON INTERNAL FUNCTIONS
   const getMiscKey = async (key: string): Promise<string | undefined> => {
@@ -106,5 +105,5 @@ export function useMisc(db: Database) {
     [db],
   )
 
-  return { getSyncKey, setSyncKey, getLastSync, setLastSync, getLastPlayed, setLastPlaying, getLastUpdate, setLastUpdate, loggedInSync, setLoggedInSync }
+  return { getSyncKey, setSyncKey, getLastSync, setLastSync, getLastPlayed, setLastPlaying, getLastUpdate, setLastUpdate }
 }

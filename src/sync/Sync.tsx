@@ -2,24 +2,22 @@ import { useTranslation } from 'react-i18next'
 import { useDB } from '../DB/DB'
 import { Checkbox } from '../components/Inputs'
 import { useSettings } from '../engines/Settings'
-import { getCreds, removeCreds } from '../utils/utils'
+import { getCreds, parsePodcastDetails, removeCreds } from '../utils/utils'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
-import { SyncStatus } from '.'
-import { NextcloudSettings, sync } from './Nextcloud'
+import { GpodderUpdate, SyncProtocol, SyncStatus } from '.'
+import { NextcloudSettings, useNextcloud } from './Nextcloud'
 
 export function SyncSettings() {
-  const {
-    misc: { loggedInSync, setLoggedInSync },
-  } = useDB()
   const [{ sync: syncSettings }, updateSettings] = useSettings()
+  const { loggedIn, setLoggedIn } = useSync()
 
   const { t } = useTranslation()
 
   return (
     <div className="flex flex-col gap-3 p-1">
-      {loggedInSync && (
+      {loggedIn && (
         <div className="flex items-center gap-2">
           <img className="h-24 shrink-0" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/141px-Nextcloud_Logo.svg.png" alt="Nextcloud logo" /> {/* TODO use proper image for gpodder */}
           <div className="flex flex-col gap-2">
@@ -27,8 +25,8 @@ export function SyncSettings() {
             <button
               className="w-fit rounded-md bg-accent-6 p-1 px-4 uppercase hover:bg-accent-7"
               onClick={async () => {
-                removeCreds(loggedInSync)
-                setLoggedInSync(false)
+                removeCreds(loggedIn)
+                setLoggedIn(false)
               }}
             >
               {t('log_out')}
@@ -37,11 +35,7 @@ export function SyncSettings() {
         </div>
       )}
 
-      {
-        !loggedInSync &&
-
-        <NextcloudSettings/>
-      }
+      {!loggedIn && <NextcloudSettings />}
 
       {/* SYNC BEHAVIOUR SETTINGS */}
       <div className="flex flex-col gap-1">
@@ -63,10 +57,30 @@ export function SyncSettings() {
 
 export function SyncButton() {
   const { t } = useTranslation()
-  const { status, error, performSync } = useSync()
+  const { status, error, sync, loggedIn } = useSync()
+  const navigate = useNavigate()
+
+  function handleClick() {
+    if (!loggedIn) {
+      toast.info(t('not_logged_sync'), {
+        position: 'top-center',
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'dark',
+      })
+      navigate('/settings')
+      return
+    }
+
+    status != 'synchronizing' && sync()
+  }
 
   return (
-    <button className={`w-6 outline-none hover:text-accent-4 ${status === 'synchronizing' && 'animate-[spin_2s_linear_infinite_reverse]'}`} onClick={() => performSync()} title={error == '' ? t('sync') : error}>
+    <button className={`w-6 outline-none hover:text-accent-4 ${status === 'synchronizing' && 'animate-[spin_2s_linear_infinite_reverse]'}`} onClick={handleClick} title={error == '' ? t('sync') : error}>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-refresh">
         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
         <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
@@ -82,19 +96,19 @@ export function initSync() {
   const [error, setError] = useState('')
   const {
     dbLoaded,
-    misc: { getSyncKey, setLastSync, getLastSync, loggedInSync, setLoggedInSync },
+    misc: { setLastSync, getLastSync },
     history,
     subscriptions,
   } = useDB()
-  const [{ sync: syncSettings }, _] = useSettings()
-  const { t } = useTranslation()
-  const navigate = useNavigate()
+  const [loggedIn, setLoggedIn] = useState<SyncProtocol>(false)
+  const [{ sync: syncSettings }] = useSettings()
+  const provider = useNextcloud(loggedIn, setLoggedIn) // TODO this could be gpodder
 
   const load = async () => {
     if (await getCreds('nextcloud')) {
-      setLoggedInSync('nextcloud')
+      setLoggedIn('nextcloud')
     } else if (await getCreds('gpodder')) {
-      setLoggedInSync('gpodder')
+      setLoggedIn('gpodder')
     }
   }
 
@@ -103,39 +117,67 @@ export function initSync() {
   }, [dbLoaded])
 
   useEffect(() => {
-    if (loggedInSync && syncSettings.syncAfterAppStart) {
-      performSync()
+    if (loggedIn && syncSettings.syncAfterAppStart) {
+      sync()
     }
-  }, [loggedInSync])
+  }, [loggedIn])
 
-  const performSync = async (updateSubscriptions?: { add?: string[]; remove?: string[] }) => {
-    if (!loggedInSync) {
-      toast.info(t('not_logged_sync'), {
-        position: 'top-center',
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'dark',
-      })
-      navigate('/settings')
-      return
-    }
-
-    if (status === 'synchronizing') return
-
+  const sync = async (updateSubscriptions?: { add?: string[]; remove?: string[] }) => {
     setError('')
     setStatus('synchronizing')
 
     try {
-      const key = await getSyncKey()
-      if (!key) {
-        throw 'Error obtaining cipher key, please log-in again on Nextcloud'
+      const lastSync = (await getLastSync()) / 1000 // gpodder api uses seconds
+
+      // #region subscriptions
+      const subsServerUpdates: { add: string[]; remove: string[] } = await provider.pullUpdates('subscriptions', lastSync)
+      const localSubscriptions = subscriptions.subscriptions.map((sub) => sub.feedUrl)
+
+      // add new subscriptions
+      for (const feedUrl of subsServerUpdates.add) {
+        if (!localSubscriptions.includes(feedUrl)) {
+          const podcastData = await parsePodcastDetails(feedUrl)
+          subscriptions.add(podcastData)
+        }
       }
 
-      await sync(key, history.update, getLastSync, history.getAll, subscriptions, updateSubscriptions) // TODO
+      // remove subscriptions
+      for (const feedUrl of subsServerUpdates.remove) {
+        if (localSubscriptions.includes(feedUrl)) {
+          subscriptions.remove(feedUrl)
+        }
+      }
+
+      if (updateSubscriptions !== undefined) {
+        await provider.pushUpdates('subscription_change', { add: [], remove: [], ...updateSubscriptions })
+      }
+      // #endregion
+
+      // #region episodes
+      const serverUpdates: { actions: GpodderUpdate[] } = await provider.pullUpdates('episode_action', lastSync)
+
+      if (serverUpdates.actions.length > 0) {
+        for (const update of serverUpdates.actions) {
+          const timestamp = new Date(update.timestamp + '+00:00').getTime() //timestamp in epoch format (server is in utc ISO format)
+          if (update.action.toUpperCase() !== 'PLAY') continue
+
+          await history.update(update.episode, update.podcast, update.position, update.total, timestamp)
+        }
+      }
+
+      const localUpdates = await history.getAll(lastSync)
+
+      const gpodderLocalUpdates: GpodderUpdate[] = localUpdates.map((update) => ({
+        ...update,
+        position: update.position,
+        started: update.position,
+        total: update.total,
+        action: 'PLAY',
+        timestamp: new Date(update.timestamp).toISOString().split('.')[0],
+      }))
+
+      await provider.pushUpdates('episode_action', gpodderLocalUpdates)
+      // #endregion
 
       await setLastSync(Date.now())
       setStatus('ok')
@@ -146,7 +188,7 @@ export function initSync() {
     }
   }
 
-  return { status, error, performSync }
+  return { status, error, sync, loggedIn, setLoggedIn }
 }
 
 const SyncContext = createContext<ReturnType<typeof initSync> | undefined>(undefined)
