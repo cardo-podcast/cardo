@@ -9,10 +9,10 @@ import { Switch, SwitchState, TimeInput } from '../components/Inputs'
 import { usePodcastSettings } from '../engines/Settings'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
-import { useSync } from '../sync/Sync'
 import appIcon from '../../src-tauri/icons/icon.png'
 import { sanitizeHTML } from '../utils/sanitize'
 import { showMenu } from 'tauri-plugin-context-menu'
+import { useSync } from '../ContextProviders'
 
 const EPISODE_CARD_HEIGHT = 80 // min height
 const PRELOADED_EPISODES = 10 //
@@ -23,13 +23,13 @@ function SortButton({ children, podcastUrl, criterion }: { children: ReactNode; 
 
   return (
     <button
-      className={`flex w-2/3 items-center justify-center rounded-md bg-primary-8 hover:bg-primary-7 ${sort.criterion == criterion ? '.text-accent-6' : ''}`}
+      className={`flex w-2/3 items-center justify-center rounded-md bg-primary-8 hover:bg-primary-7 ${sort.criterion === criterion ? '.text-accent-6' : ''}`}
       onClick={() => {
-        if (sort.criterion == criterion) {
+        if (sort.criterion === criterion) {
           updatePodcastSettings({
             sort: {
               criterion,
-              mode: sort.mode == 'asc' ? 'desc' : 'asc',
+              mode: sort.mode === 'asc' ? 'desc' : 'asc',
             },
           })
         } else {
@@ -37,7 +37,7 @@ function SortButton({ children, podcastUrl, criterion }: { children: ReactNode; 
         }
       }}
     >
-      {sort.criterion == criterion && <div className="h-5 w-5">{sort.mode === 'asc' ? icons.upArrow : icons.downArrow}</div>}
+      {sort.criterion === criterion && <div className="h-5 w-5">{sort.mode === 'asc' ? icons.upArrow : icons.downArrow}</div>}
       {children}
     </button>
   )
