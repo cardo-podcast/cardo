@@ -1,3 +1,4 @@
+import { set } from "lodash"
 
 
 export type SyncStatus = 'standby' | 'synchronizing' | 'ok' | 'error'
@@ -18,3 +19,11 @@ export interface Credentials {
 }
 
 export type SyncProtocol = 'nextcloud' | 'gpodder' | false
+
+export interface SyncContextType {
+  status: SyncStatus
+  error: string
+  sync: (updateSubscriptions?: { add?: string[]; remove?: string[] }) => Promise<void>
+  loggedIn: SyncProtocol
+  setLoggedIn: (value: SyncProtocol) => void
+}

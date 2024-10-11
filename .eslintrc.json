@@ -1,9 +1,12 @@
 {
   "extends": "react-app",
-
-  "plugins": ["react-hooks"],
+  "plugins": [
+    "react-hooks",
+    "react-refresh"
+  ],
   // ...
   "rules": {
-    "react-hooks/exhaustive-deps": "false" // <--- THIS IS THE NEW RULE
+    "react-hooks/exhaustive-deps": 0,
+    "react-refresh/only-export-components": "warn"
   }
 }

@@ -1,5 +1,4 @@
 import { PodcastSettings } from './engines/Settings'
-import colors from 'tailwindcss/colors'
 import { TailwindColor } from './ThemeConfigurator'
 import { DefaultTheme } from './DefaultThemes'
 

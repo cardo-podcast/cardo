@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { SyncSettings } from '../sync/Sync'
 import { Checkbox } from '../components/Inputs'
 import { getColor, useSettings } from '../engines/Settings'
 import { useEffect, useState } from 'react'
@@ -11,6 +10,7 @@ import { appConfigDir, join, resolveResource } from '@tauri-apps/api/path'
 import { readDir } from '@tauri-apps/api/fs'
 import tauriConfig from '../../src-tauri/tauri.conf.json'
 import { useModalBanner } from '../components/ModalBanner'
+import { SyncSettings } from '../components/sync/SyncSettings'
 
 function AccentColorSelector() {
   const [
