@@ -1,5 +1,5 @@
 import { http, shell } from '@tauri-apps/api'
-import { ProtocolFn } from '.'
+import { GpodderUpdate, ProtocolFn, ServerGpodderUpdate, SubscriptionsUpdate } from '.'
 
 export async function login(url: string, onSucess: (user: string, password: string) => void) {
   // nextcloud flow v2 o-auth login
@@ -43,14 +43,33 @@ export async function login(url: string, onSucess: (user: string, password: stri
   return interval
 }
 
-export const nextcloudProtocol: ProtocolFn =  function(creds) {
-
-  async function pullUpdates(request: string, since?: number) {
+export const nextcloudProtocol: ProtocolFn = function (creds) {
+  async function pullEpisodes(since?: number) {
     const { server, user, password } = creds
 
-    const url = server + `/index.php/apps/gpoddersync/${request}?since=${since === undefined ? '0' : since?.toString()}`
+    const url = server + `/index.php/apps/gpoddersync/episode_action?since=${since === undefined ? '0' : since?.toString()}`
 
-    const r: { data: any } = await http.fetch(url, {
+    const r: { data: { actions: ServerGpodderUpdate[] } } = await http.fetch(url, {
+      method: 'GET',
+      responseType: http.ResponseType.JSON,
+      headers: {
+        'OCS-APIRequest': 'true',
+        Authorization: 'Basic ' + btoa(user + ':' + password),
+      },
+    })
+
+    return r.data.actions.map((update: ServerGpodderUpdate) => ({
+      ...update,
+      timestamp: new Date(update.timestamp + '+00:00').getTime(), //timestamp in epoch format (server is in utc ISO format)
+    })) as GpodderUpdate[]
+  }
+
+  async function pullSubscriptions(since?: number) {
+    const { server, user, password } = creds
+
+    const url = server + `/index.php/apps/gpoddersync/subscriptions?since=${since === undefined ? '0' : since?.toString()}`
+
+    const r: { data: SubscriptionsUpdate } = await http.fetch(url, {
       method: 'GET',
       responseType: http.ResponseType.JSON,
       headers: {
@@ -62,10 +81,36 @@ export const nextcloudProtocol: ProtocolFn =  function(creds) {
     return r.data
   }
 
-  async function pushUpdates(request: string, updates: any) {
+  async function pushEpisodes(updates: GpodderUpdate[]) {
     const { server, user, password } = creds
 
-    const url = server + `/index.php/apps/gpoddersync/${request}/create`
+    const url = server + `/index.php/apps/gpoddersync/episodes/create`
+
+    const r = await http.fetch(url, {
+      method: 'POST',
+      responseType: http.ResponseType.JSON,
+      headers: {
+        'OCS-APIRequest': 'true',
+        Authorization: 'Basic ' + btoa(user + ':' + password),
+      },
+      body: {
+        type: 'Json',
+        payload: updates.map((update) => ({
+          ...update,
+          timestamp: new Date(update.timestamp).toISOString().split('.')[0],
+        })),
+      },
+    })
+
+    if (!r.ok) {
+      throw Error('Failed pushing data to nextcloud server')
+    }
+  }
+
+  async function pushSubscriptions(updates: SubscriptionsUpdate) {
+    const { server, user, password } = creds
+
+    const url = server + `/index.php/apps/gpoddersync/subscription_change/create`
 
     const r = await http.fetch(url, {
       method: 'POST',
@@ -85,5 +130,5 @@ export const nextcloudProtocol: ProtocolFn =  function(creds) {
     }
   }
 
-  return { login, pushUpdates, pullUpdates }
+  return { login, pullEpisodes, pullSubscriptions, pushEpisodes, pushSubscriptions }
 }

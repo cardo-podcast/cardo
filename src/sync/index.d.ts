@@ -7,12 +7,17 @@ export interface GpodderUpdate {
   episode: string
   position: number
   total: number
-  timestamp: string
+  timestamp: number
   action: 'DOWNLOAD' | 'PLAY' | 'DELETE' | 'NEW'
 }
 
+export interface ServerGpodderUpdate extends GpodderUpdate {
+  timestamp: string
+}
+
+export type SubscriptionsUpdate = { add: string[]; remove: string[] }
+
 export interface Credentials {
-  protocol: SyncProtocol
   server: string,
   user: string,
   password: string
@@ -29,6 +34,9 @@ export interface SyncContextType {
 }
 
 export type ProtocolFn = (creds: Credentials) => {
-  pullUpdates(request: string, since?: number): Promise<any>
-  pushUpdates(request: string, updates: any): Promise<void>
+  pullEpisodes(since?: number): Promise<GpodderUpdate[]>
+  pullSubscriptions(since?: number): Promise<SubscriptionsUpdate>
+
+  pushEpisodes(updates: GpodderUpdate[]): Promise<void>
+  pushSubscriptions(updates: SubscriptionsUpdate): Promise<void>
 }
