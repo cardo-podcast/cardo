@@ -1,23 +1,46 @@
 import { useDB } from '../DB/DB'
 import { useSettings } from '../engines/Settings'
 import { getCreds, parsePodcastDetails } from '../utils/utils'
-import { useEffect, useState } from 'react'
-import { GpodderUpdate, SyncProtocol, SyncStatus } from '.'
-import { useNextcloud } from './Nextcloud'
+import { useEffect, useRef, useState } from 'react'
+import { Credentials, GpodderUpdate, ProtocolFn, SyncProtocol, SyncStatus } from '.'
 import { SyncContext } from '../ContextProviders'
+import { invoke } from '@tauri-apps/api'
+import { nextcloudProtocol } from './Nextcloud'
 
 export function SyncProvider({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<SyncStatus>('standby')
   const [error, setError] = useState('')
   const {
     dbLoaded,
-    misc: { setLastSync, getLastSync },
+    misc: { setLastSync, getLastSync, getSyncKey },
     history,
     subscriptions,
   } = useDB()
-  const [loggedIn, setLoggedIn] = useState<SyncProtocol>(false)
+  const [loggedIn, setLoggedIn] = useState<SyncProtocol>(null)
   const [{ sync: syncSettings }] = useSettings()
-  const provider = useNextcloud(loggedIn, setLoggedIn) // TODO this could be gpodder
+  const provider = useRef<ReturnType<ProtocolFn>>()
+
+  useEffect(() => {
+    if (loggedIn === 'nextcloud') {
+      getProviderCreds(loggedIn).then((creds) => {
+        provider.current = nextcloudProtocol(creds)
+      })
+    } else if (loggedIn === 'gpodder') {
+      getProviderCreds(loggedIn).then((creds) => {
+        provider.current = nextcloudProtocol(creds)
+      })
+    }
+  }, [loggedIn])
+
+  async function getProviderCreds(protocol: Exclude<SyncProtocol, null>): Promise<Credentials> {
+    const creds: any = await getCreds(protocol)
+    const syncKey = await getSyncKey()
+
+    const { server, loginName: encryptedLoginName, appPassword: encryptedAppPassword } = creds
+    const loginName: string = await invoke('decrypt', { encryptedText: encryptedLoginName, base64Key: syncKey })
+    const appPassword: string = await invoke('decrypt', { encryptedText: encryptedAppPassword, base64Key: syncKey })
+    return { server: server, user: loginName, password: appPassword, protocol }
+  }
 
   const load = async () => {
     if (await getCreds('nextcloud')) {
@@ -38,6 +61,8 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
   }, [loggedIn])
 
   const sync = async (updateSubscriptions?: { add?: string[]; remove?: string[] }) => {
+    if (!provider.current) return
+
     setError('')
     setStatus('synchronizing')
 
@@ -45,7 +70,7 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
       const lastSync = (await getLastSync()) / 1000 // gpodder api uses seconds
 
       // #region subscriptions
-      const subsServerUpdates: { add: string[]; remove: string[] } = await provider.pullUpdates('subscriptions', lastSync)
+      const subsServerUpdates: { add: string[]; remove: string[] } = await provider.current.pullUpdates('subscriptions', lastSync)
       const localSubscriptions = subscriptions.subscriptions.map((sub) => sub.feedUrl)
 
       // add new subscriptions
@@ -64,12 +89,12 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (updateSubscriptions !== undefined) {
-        await provider.pushUpdates('subscription_change', { add: [], remove: [], ...updateSubscriptions })
+        await provider.current.pushUpdates('subscription_change', { add: [], remove: [], ...updateSubscriptions })
       }
       // #endregion
 
       // #region episodes
-      const serverUpdates: { actions: GpodderUpdate[] } = await provider.pullUpdates('episode_action', lastSync)
+      const serverUpdates: { actions: GpodderUpdate[] } = await provider.current.pullUpdates('episode_action', lastSync)
 
       if (serverUpdates.actions.length > 0) {
         for (const update of serverUpdates.actions) {
@@ -91,7 +116,7 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
         timestamp: new Date(update.timestamp).toISOString().split('.')[0],
       }))
 
-      await provider.pushUpdates('episode_action', gpodderLocalUpdates)
+      await provider.current.pushUpdates('episode_action', gpodderLocalUpdates)
       // #endregion
 
       await setLastSync(Date.now())

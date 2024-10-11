@@ -24,7 +24,7 @@ export function SyncSettings() {
               className="w-fit rounded-md bg-accent-6 p-1 px-4 uppercase hover:bg-accent-7"
               onClick={async () => {
                 removeCreds(loggedIn)
-                setLoggedIn(false)
+                setLoggedIn(null)
               }}
             >
               {t('log_out')}

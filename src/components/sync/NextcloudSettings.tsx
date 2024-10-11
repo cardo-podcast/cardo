@@ -1,20 +1,44 @@
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNextcloud } from '../../sync/Nextcloud'
-import { toastError } from '../../utils/utils'
+import { login } from '../../sync/Nextcloud'
+import { saveCreds, toastError } from '../../utils/utils'
 import { useSync } from '../../ContextProviders'
-
+import { useDB } from '../../DB/DB'
+import { invoke } from '@tauri-apps/api'
 
 export function NextcloudSettings() {
   const urlRef = useRef<HTMLInputElement>(null)
   const interval = useRef(0)
   const { t } = useTranslation()
-  const { loggedIn, setLoggedIn } = useSync()
-  const { login } = useNextcloud(loggedIn, setLoggedIn)
+  const { setLoggedIn } = useSync()
+  const {
+    misc: { getSyncKey, setSyncKey },
+  } = useDB()
 
   useEffect(() => {
     return () => clearInterval(interval.current)
   }, [])
+
+  async function handleLogin(user: string, password: string, baseUrl: string) {
+    /// Encrypt credentials before saving ///
+
+    // get key from db
+    let key = await getSyncKey()
+
+    if (key === undefined) {
+      const key: string = await invoke('generate_key')
+      setSyncKey(key)
+    }
+
+    // encrypt user and password with keys and save credentials
+    saveCreds('nextcloud', {
+      server: baseUrl,
+      loginName: await invoke('encrypt', { text: user, base64Key: key }),
+      appPassword: await invoke('encrypt', { text: password, base64Key: key }),
+    })
+
+    setLoggedIn('nextcloud')
+  }
 
   return (
     <div className="flex h-full w-full gap-2 p-1">
@@ -25,7 +49,9 @@ export function NextcloudSettings() {
           e.preventDefault()
           if (urlRef.current) {
             try {
-              interval.current = await login(urlRef.current.value)
+              interval.current = await login(urlRef.current.value, (user, password) => {
+                handleLogin(user, password, urlRef.current?.value.split('index.php')[0] ?? '')
+              })
             } catch (e) {
               toastError((e as Error).message)
             }
