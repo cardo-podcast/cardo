@@ -12,7 +12,6 @@
   "date": "Fecha",
   "duration": "Duración",
   "logged_in": "Ya has iniciado sesión",
-  "nextcloud_server_url_example": "https://nextcloud.example.com",
   "connect": "Conectar",
   "log_out": "Cerrar sesión",
   "sync": "Sincronización",
@@ -81,5 +80,9 @@
   "copy_episode_url": "Copiar URL del episodio",
   "episode_url_copied": "URL del episodio copiada al portapapeles",
   "duration_greater_than": "Duracion mayor que",
-  "duration_less_than": "Duracion menor que"
+  "duration_less_than": "Duracion menor que",
+  "gpodder_server_url": "URL del servidor Gpodder",
+  "username": "Usuario",
+  "password": "Contraseña",
+  "login_failed": "Fallo al iniciar sesión"
 }

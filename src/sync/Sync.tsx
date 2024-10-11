@@ -2,10 +2,11 @@ import { useDB } from '../DB/DB'
 import { useSettings } from '../engines/Settings'
 import { getCreds, parsePodcastDetails } from '../utils/utils'
 import { useEffect, useRef, useState } from 'react'
-import { Credentials, GpodderUpdate, ProtocolFn, SyncProtocol, SyncStatus } from '.'
+import { Credentials, GpodderUpdate, ProtocolFn, SubscriptionsUpdate, SyncProtocol, SyncStatus } from '.'
 import { SyncContext } from '../ContextProviders'
 import { invoke } from '@tauri-apps/api'
 import { nextcloudProtocol } from './Nextcloud'
+import { gpodderProtocol } from './Gpodder'
 
 export function SyncProvider({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<SyncStatus>('standby')
@@ -22,12 +23,12 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (loggedIn === 'nextcloud') {
-      getProviderCreds(loggedIn).then((creds) => {
+      getProviderCreds('nextcloud').then((creds) => {
         provider.current = nextcloudProtocol(creds)
       })
     } else if (loggedIn === 'gpodder') {
-      getProviderCreds(loggedIn).then((creds) => {
-        provider.current = nextcloudProtocol(creds)
+      getProviderCreds('gpodder').then((creds) => {
+        provider.current = gpodderProtocol(creds)
       })
     }
   }, [loggedIn])
@@ -39,7 +40,7 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
     const { server, loginName: encryptedLoginName, appPassword: encryptedAppPassword } = creds
     const loginName: string = await invoke('decrypt', { encryptedText: encryptedLoginName, base64Key: syncKey })
     const appPassword: string = await invoke('decrypt', { encryptedText: encryptedAppPassword, base64Key: syncKey })
-    return { server: server, user: loginName, password: appPassword, protocol }
+    return { server: server, user: loginName, password: appPassword }
   }
 
   const load = async () => {
@@ -60,24 +61,29 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
     }
   }, [loggedIn])
 
-  const sync = async (updateSubscriptions?: { add?: string[]; remove?: string[] }) => {
+  const sync = async (updateSubscriptions?: Partial<SubscriptionsUpdate>) => {
     if (!provider.current) return
 
     setError('')
     setStatus('synchronizing')
 
     try {
-      const lastSync = (await getLastSync()) / 1000 // gpodder api uses seconds
+      const lastSync = Math.floor((await getLastSync()) / 1000) -600// gpodder api uses seconds
+
 
       // #region subscriptions
-      const subsServerUpdates: { add: string[]; remove: string[] } = await provider.current.pullUpdates('subscriptions', lastSync)
+      const subsServerUpdates: SubscriptionsUpdate = await provider.current.pullSubscriptions(lastSync)
       const localSubscriptions = subscriptions.subscriptions.map((sub) => sub.feedUrl)
 
       // add new subscriptions
       for (const feedUrl of subsServerUpdates.add) {
         if (!localSubscriptions.includes(feedUrl)) {
-          const podcastData = await parsePodcastDetails(feedUrl)
-          subscriptions.add(podcastData)
+          try {
+            const podcastData = await parsePodcastDetails(feedUrl)
+            subscriptions.add(podcastData)
+          } catch (e) {
+            console.error('Failed fetching podcast: ', feedUrl)
+          }
         }
       }
 
@@ -89,23 +95,24 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (updateSubscriptions !== undefined) {
-        await provider.current.pushUpdates('subscription_change', { add: [], remove: [], ...updateSubscriptions })
+        await provider.current.pushSubscriptions({ add: [], remove: [], ...updateSubscriptions })
       }
       // #endregion
 
       // #region episodes
-      const serverUpdates: { actions: GpodderUpdate[] } = await provider.current.pullUpdates('episode_action', lastSync)
+      const serverUpdates = await provider.current.pullEpisodes(lastSync)
 
-      if (serverUpdates.actions.length > 0) {
-        for (const update of serverUpdates.actions) {
-          const timestamp = new Date(update.timestamp + '+00:00').getTime() //timestamp in epoch format (server is in utc ISO format)
+      if (serverUpdates.length > 0) {
+        for (const update of serverUpdates) {
           if (update.action.toUpperCase() !== 'PLAY') continue
 
-          await history.update(update.episode, update.podcast, update.position, update.total, timestamp)
+          await history.update(update.episode, update.podcast, update.position, update.total, update.timestamp)
         }
       }
 
-      const localUpdates = await history.getAll(lastSync)
+      const localUpdates = await history.getAll(lastSync * 1000)
+
+      console.log(localUpdates)
 
       const gpodderLocalUpdates: GpodderUpdate[] = localUpdates.map((update) => ({
         ...update,
@@ -113,10 +120,11 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
         started: update.position,
         total: update.total,
         action: 'PLAY',
-        timestamp: new Date(update.timestamp).toISOString().split('.')[0],
+        timestamp: update.timestamp,
       }))
 
-      await provider.current.pushUpdates('episode_action', gpodderLocalUpdates)
+
+      await provider.current.pushEpisodes(gpodderLocalUpdates)
       // #endregion
 
       await setLastSync(Date.now())

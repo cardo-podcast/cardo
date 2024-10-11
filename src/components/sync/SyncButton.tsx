@@ -27,6 +27,7 @@ export function SyncButton() {
       return
     }
 
+
     status !== 'synchronizing' && sync()
   }
 

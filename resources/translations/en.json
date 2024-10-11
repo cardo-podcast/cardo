@@ -24,7 +24,6 @@
   "hours": "hours",
   "hour": "hour",
   "minutes": "minutes",
-  "nextcloud_server_url_example": "https://nextcloud.example.com",
   "automatic_sync": "Automatically sync",
   "when_opening_app": "After opening the application",
   "when_closing_app": "Before closing the application",
@@ -82,5 +81,9 @@
   "copy_episode_url": "Copy episode URL",
   "episode_url_copied": "Episode URL copied to clipboard",
   "duration_greater_than": "Duration greater than",
-  "duration_less_than": "Duration less than"
+  "duration_less_than": "Duration less than",
+  "gpodder_server_url": "Gpodder Server URL",
+  "username": "User",
+  "password": "Password",
+  "login_failed": "Failed to log in"
 }
