@@ -29,7 +29,7 @@ function SearchBar() {
   }
 
   const setSearchMode = (mode: typeof searchMode) => {
-    if (mode != searchMode) {
+    if (mode !== searchMode) {
       setResults([])
       setSearchMode_(mode)
     }
@@ -48,7 +48,7 @@ function SearchBar() {
     }
 
     setResults(newResults)
-    setNoResults(newResults.length == 0)
+    setNoResults(newResults.length === 0)
   }
 
   useEffect(() => {
@@ -62,7 +62,7 @@ function SearchBar() {
     if (inputRef.current) {
       inputRef.current.value = ''
     }
-    if (location.pathname != '/preview' && searchMode === 'current') {
+    if (location.pathname !== '/preview' && searchMode === 'current') {
       setSearchMode(subscriptions.length > 0 ? 'subscriptions' : 'podcasts')
     }
   }, [location])
@@ -86,7 +86,7 @@ function SearchBar() {
     <div className="relative flex w-full">
       <div className="flex h-8 w-fit gap-1 p-1 text-primary-4">
         <button
-          className={`w-5 ${window.history.state.idx < 1 && results.length == 0 ? 'cursor-default text-primary-8' : 'hover:text-accent-5'}`}
+          className={`w-5 ${window.history.state.idx < 1 && results.length === 0 ? 'cursor-default text-primary-8' : 'hover:text-accent-5'}`}
           onClick={() => {
             if (results.length > 0) {
               setResults([])
@@ -127,7 +127,7 @@ function SearchBar() {
         />
         <div className="mr-2 hidden items-center gap-2 whitespace-nowrap active:flex peer-focus:flex">
           <button
-            className={`${searchMode == 'subscriptions' ? 'bg-accent-7' : ''} flex items-center rounded-md border-2 border-accent-7 px-1 py-[1px] text-xs uppercase`}
+            className={`${searchMode === 'subscriptions' ? 'bg-accent-7' : ''} flex items-center rounded-md border-2 border-accent-7 px-1 py-[1px] text-xs uppercase`}
             type="button"
             onClick={() => {
               setSearchMode('subscriptions')
@@ -138,7 +138,7 @@ function SearchBar() {
           </button>
 
           <button
-            className={`${searchMode == 'podcasts' ? 'bg-accent-7' : ''} flex items-center rounded-md border-2 border-accent-7 px-1 py-[1px] text-xs uppercase`}
+            className={`${searchMode === 'podcasts' ? 'bg-accent-7' : ''} flex items-center rounded-md border-2 border-accent-7 px-1 py-[1px] text-xs uppercase`}
             type="button"
             onClick={() => {
               setSearchMode('podcasts')
@@ -148,9 +148,9 @@ function SearchBar() {
             {t('podcasts')}
           </button>
 
-          {location.pathname == '/preview' && (
+          {location.pathname === '/preview' && (
             <button
-              className={`${searchMode == 'current' ? 'bg-accent-7' : ''} flex items-center rounded-md border-2 border-accent-7 px-1 py-[1px] text-xs uppercase`}
+              className={`${searchMode === 'current' ? 'bg-accent-7' : ''} flex items-center rounded-md border-2 border-accent-7 px-1 py-[1px] text-xs uppercase`}
               type="button"
               onClick={() => {
                 setSearchMode('current')
@@ -168,8 +168,8 @@ function SearchBar() {
           {/* close with click outside */}
           <div className="absolute left-0 top-0 z-10 mt-10 h-screen w-screen" onClick={() => setResults([])} />
 
-          <div className="absolute left-1/2 top-0 z-30 mt-[32px] flex max-h-[400px] w-4/5 -translate-x-1/2 justify-center overflow-hidden overflow-y-auto scroll-smooth rounded-b-md border-x-2 border-primary-8 bg-primary-9 shadow-md shadow-primary-8" ref={resultsRef}>
-            <div className="grid w-full">
+          <div className="absolute left-1/2 top-0 z-30 mt-[32px] max-h-[400px] w-4/5 -translate-x-1/2 justify-center overflow-hidden overflow-y-auto scroll-smooth rounded-b-md border-x-2 border-primary-8 bg-primary-9 shadow-md shadow-primary-8" ref={resultsRef}>
+            <div className="flex flex-col w-full">
               {results.map((result, i) => {
                 if (searchMode === 'podcasts') {
                   return <PodcastCard key={i} podcast={result as PodcastData} />
