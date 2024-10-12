@@ -7,7 +7,7 @@
 
 ## Overview
 
-Cardo is a podcast client for desktop, inspired on Android's [Antennapod](https://antennapod.org/). Cardo could be synchonized with Antennapod and other apps using [Nextcloud Gppoder](https://github.com/thrillfall/nextcloud-gpodder/).
+Cardo is a podcast client for desktop, inspired on Android's [Antennapod](https://antennapod.org/). Cardo could be synchonized with Antennapod and other apps using [Nextcloud Gppoder](https://github.com/thrillfall/nextcloud-gpodder/) and [Gpodder/Opodsync](https://github.com/kd2org/opodsync).
 
 ![1](assets/readme/1.png)
 
@@ -21,29 +21,28 @@ Cardo is a podcast client for desktop, inspired on Android's [Antennapod](https:
 
 ### Features
 
-- [X] Search podcasts online
-- [X] Manage your subscriptions
-- [X] Look at new episodes of your subscriptions with a glance
-- [X] Synchronizing episodes state and subscriptions using Nexcloud Gpodder
-- [X] Lightweight app (thanks to Tauri)
-- [X] Customizable themes
-- [X] Download episodes to listen them offline
-- [X] Add podcast from feed url
+- [x] Search podcasts online
+- [x] Manage your subscriptions
+- [x] Look at new episodes of your subscriptions with a glance
+- [x] Synchronizing episodes state and subscriptions using Nexcloud Gpodder
+- [x] Lightweight app (thanks to Tauri)
+- [x] Customizable themes
+- [x] Download episodes to listen them offline
+- [x] Add podcast from feed url
+- [x] Synchronization using [Opodsync](https://github.com/kd2org/opodsync)
 - [ ] Keep your favorite episodes
 - [ ] Audio manipulation, speed, silenze skip & normalization
-- [ ] Synchronization using [Opodsync](https://github.com/kd2org/opodsync)
 - [ ] Add podcasts from sources other than i-tunes
-- [ ] Support for self-signed / invalid Nextcloud ssl certificates
 - [ ] Windows taskbar play/pause button
 
 ### Compatible clients (from nextcloud-gpodder)
 
-| client | support status |
-| :- | :- |
-| [AntennaPod](https://antennapod.org) | Initial purpose for this project, as a synchronization endpoint for this client.<br> Support is available [as of version 2.5.1](https://github.com/AntennaPod/AntennaPod/pull/5243/). |
-| [KDE Kasts](https://apps.kde.org/de/kasts/) | Supported since version 21.12 |
-| [Podcast Merlin](https://github.com/yoyoooooooooo/Podcast-Merlin--Nextcloud-Gpodder-Client-For-Windows) | Full sync support podcast client for Windows |
-| [RePod](https://apps.nextcloud.com/apps/repod) | Nextcloud app for playing and managing podcasts with sync support |
+| client                                                                                                  | support status                                                                                                                                                                        |
+| :------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [AntennaPod](https://antennapod.org)                                                                    | Initial purpose for this project, as a synchronization endpoint for this client.<br> Support is available [as of version 2.5.1](https://github.com/AntennaPod/AntennaPod/pull/5243/). |
+| [KDE Kasts](https://apps.kde.org/de/kasts/)                                                             | Supported since version 21.12                                                                                                                                                         |
+| [Podcast Merlin](https://github.com/yoyoooooooooo/Podcast-Merlin--Nextcloud-Gpodder-Client-For-Windows) | Full sync support podcast client for Windows                                                                                                                                          |
+| [RePod](https://apps.nextcloud.com/apps/repod)                                                          | Nextcloud app for playing and managing podcasts with sync support                                                                                                                     |
 
 ## Contributing
 
