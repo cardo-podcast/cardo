@@ -47,10 +47,10 @@ export function GpodderSettings() {
         }}
       >
         <div className="flex w-11/12 flex-col items-end gap-2">
-          <input id="server" type="url" className="w-full rounded-md bg-primary-8 px-2 py-1 focus:outline-none" placeholder={t('gpodder_server_url')} />
+          <input id="server" required type="url" className="w-full rounded-md bg-primary-8 px-2 py-1 focus:outline-none" placeholder={t('gpodder_server_url')} />
           <div className="flex w-3/4 gap-1.5">
-            <input type="text" className="w-full rounded-md bg-primary-8 px-2 py-1 focus:outline-none" placeholder={t('username')} />
-            <input type="password" className="w-full rounded-md bg-primary-8 px-2 py-1 focus:outline-none" placeholder={t('password')} />
+            <input type="text" required className="w-full rounded-md bg-primary-8 px-2 py-1 focus:outline-none" placeholder={t('username')} />
+            <input type="password" required className="w-full rounded-md bg-primary-8 px-2 py-1 focus:outline-none" placeholder={t('password')} />
           </div>
           <button className="w-fit rounded-md bg-accent-6 p-1 px-4 uppercase hover:bg-accent-7">{t('connect')}</button>
         </div>

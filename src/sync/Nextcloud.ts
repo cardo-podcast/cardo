@@ -84,7 +84,7 @@ export const nextcloudProtocol: ProtocolFn = function (creds) {
   async function pushEpisodes(updates: GpodderUpdate[]) {
     const { server, user, password } = creds
 
-    const url = server + `/index.php/apps/gpoddersync/episodes/create`
+    const url = server + `/index.php/apps/gpoddersync/episode_action/create`
 
     const r = await http.fetch(url, {
       method: 'POST',
@@ -103,7 +103,7 @@ export const nextcloudProtocol: ProtocolFn = function (creds) {
     })
 
     if (!r.ok) {
-      throw Error('Failed pushing data to nextcloud server')
+      throw Error('Failed pushing episodes to nextcloud server')
     }
   }
 
@@ -126,7 +126,7 @@ export const nextcloudProtocol: ProtocolFn = function (creds) {
     })
 
     if (!r.ok) {
-      throw Error('Failed pushing data to nextcloud server')
+      throw Error('Failed pushing subcriptions to nextcloud server')
     }
   }
 
