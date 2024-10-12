@@ -23,16 +23,20 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
   const provider = useRef<ReturnType<ProtocolFn>>()
   const { playing, reload } = usePlayer()
 
-  useEffect(() => {
+  async function logIn() {
     if (loggedIn === 'nextcloud') {
-      getProviderCreds('nextcloud').then((creds) => {
-        provider.current = nextcloudProtocol(creds)
-      })
+      provider.current = await nextcloudProtocol(await getProviderCreds('nextcloud'))
     } else if (loggedIn === 'gpodder') {
-      getProviderCreds('gpodder').then((creds) => {
-        provider.current = gpodderProtocol(creds)
-      })
+      provider.current = await gpodderProtocol(await getProviderCreds('gpodder'))
     }
+
+    if (loggedIn && syncSettings.syncAfterAppStart) {
+      sync()
+    }
+  }
+
+  useEffect(() => {
+    logIn()
   }, [loggedIn])
 
   async function getProviderCreds(protocol: Exclude<SyncProtocol, null>): Promise<Credentials> {
@@ -56,12 +60,6 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     dbLoaded && load()
   }, [dbLoaded])
-
-  useEffect(() => {
-    if (loggedIn && syncSettings.syncAfterAppStart) {
-      sync()
-    }
-  }, [loggedIn])
 
   const sync = async (updateSubscriptions?: Partial<SubscriptionsUpdate>) => {
     try {
