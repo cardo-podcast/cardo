@@ -7,7 +7,6 @@ import { useDB } from '../../DB/DB'
 import { invoke } from '@tauri-apps/api'
 
 export function NextcloudSettings() {
-  const urlRef = useRef<HTMLInputElement>(null)
   const interval = useRef(0)
   const { t } = useTranslation()
   const { setLoggedIn } = useSync()
@@ -47,19 +46,20 @@ export function NextcloudSettings() {
         className="flex w-full flex-col items-center gap-2"
         onSubmit={async (e) => {
           e.preventDefault()
-          if (urlRef.current) {
-            try {
-              interval.current = await login(urlRef.current.value, (user, password) => {
-                handleLogin(user, password, urlRef.current?.value.split('index.php')[0] ?? '')
-              })
-            } catch (e) {
-              toastError((e as Error).message)
-            }
+          // @ts-ignore
+          const url = e.target.server.value as string
+
+          try {
+            interval.current = await login(url, (user, password) => {
+              handleLogin(user, password, url.split('index.php')[0] ?? '')
+            })
+          } catch (e) {
+            toastError((e as Error).message)
           }
         }}
       >
         <div className="flex w-full flex-col items-end gap-2">
-          <input type="url" className="w-11/12 rounded-md bg-primary-8 px-2 py-1 focus:outline-none" ref={urlRef} placeholder={t('nextcloud_server_url')} />
+          <input name="server" type="url" required className="w-11/12 rounded-md bg-primary-8 px-2 py-1 focus:outline-none" placeholder={t('nextcloud_server_url')} />
           <button className="w-fit rounded-md bg-accent-6 p-1 px-4 uppercase hover:bg-accent-7">{t('connect')}</button>
         </div>
       </form>

@@ -90,7 +90,7 @@ export const gpodderProtocol: ProtocolFn = function (creds) {
     })
 
     if (!r.ok) {
-      throw Error('Failed pushing data to gpodder server')
+      throw Error('Failed pushing episodes to gpodder server')
     }
   }
 
@@ -114,7 +114,7 @@ export const gpodderProtocol: ProtocolFn = function (creds) {
     })
 
     if (!r.ok) {
-      throw Error('Failed pushing data to gpodder server')
+      throw Error('Failed pushing subscriptions to gpodder server')
     }
   }
 
