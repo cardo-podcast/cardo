@@ -62,14 +62,16 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
   }, [loggedIn])
 
   const sync = async (updateSubscriptions?: Partial<SubscriptionsUpdate>) => {
-    if (!provider.current) return
-
-    setError('')
-    setStatus('synchronizing')
-
     try {
-      const lastSync = Math.floor((await getLastSync()) / 1000) -600// gpodder api uses seconds
 
+      if (!provider.current) {
+        throw(new Error('Provider not initialized'))
+      }
+
+      setError('')
+      setStatus('synchronizing')
+
+      const lastSync = Math.floor((await getLastSync()) / 1000) // gpodder api uses seconds
 
       // #region subscriptions
       const subsServerUpdates: SubscriptionsUpdate = await provider.current.pullSubscriptions(lastSync)
@@ -112,8 +114,6 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
 
       const localUpdates = await history.getAll(lastSync * 1000)
 
-      console.log(localUpdates)
-
       const gpodderLocalUpdates: GpodderUpdate[] = localUpdates.map((update) => ({
         ...update,
         position: update.position,
@@ -122,7 +122,6 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
         action: 'PLAY',
         timestamp: update.timestamp,
       }))
-
 
       await provider.current.pushEpisodes(gpodderLocalUpdates)
       // #endregion
