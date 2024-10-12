@@ -15,6 +15,7 @@ import { RangeInput } from './Inputs'
 export type AudioPlayerRef = {
   audioRef: RefObject<HTMLAudioElement>
   play: (episode?: EpisodeData | undefined, localSrc?: string) => void
+  reload: () => void
   pause: () => void
   paused: boolean
   playing: EpisodeData | undefined
@@ -115,6 +116,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
       value={{
         audioRef,
         play,
+        reload: () => playing && load(playing),
         pause,
         paused: audioRef.current?.paused ?? false,
         playing,
