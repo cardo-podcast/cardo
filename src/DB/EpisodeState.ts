@@ -46,7 +46,7 @@ export function useEpisodeState(db: Database) {
         VALUES ($1, $2, $3, $4, $5)
         ON CONFLICT (episode) DO UPDATE
         SET position = $3, total = $4, timestamp = $5
-        WHERE episode = $1 AND timestamp < $5`,
+        WHERE episode = $1 AND timestamp < $5 AND position <> $3`,
         [episodeUrl, podcastUrl, Math.min(position, total), Math.max(position, total), timestamp ?? Date.now()],
       )
     },
