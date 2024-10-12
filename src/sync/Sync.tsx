@@ -7,6 +7,7 @@ import { SyncContext } from '../ContextProviders'
 import { invoke } from '@tauri-apps/api'
 import { nextcloudProtocol } from './Nextcloud'
 import { gpodderProtocol } from './Gpodder'
+import { usePlayer } from '../components/AudioPlayer'
 
 export function SyncProvider({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<SyncStatus>('standby')
@@ -20,6 +21,7 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
   const [loggedIn, setLoggedIn] = useState<SyncProtocol>(null)
   const [{ sync: syncSettings }] = useSettings()
   const provider = useRef<ReturnType<ProtocolFn>>()
+  const { playing, reload } = usePlayer()
 
   useEffect(() => {
     if (loggedIn === 'nextcloud') {
@@ -63,9 +65,8 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
 
   const sync = async (updateSubscriptions?: Partial<SubscriptionsUpdate>) => {
     try {
-
       if (!provider.current) {
-        throw(new Error('Provider not initialized'))
+        throw new Error('Provider not initialized')
       }
 
       setError('')
@@ -109,6 +110,10 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
           if (update.action.toUpperCase() !== 'PLAY') continue
 
           await history.update(update.episode, update.podcast, update.position, update.total, update.timestamp)
+
+          if (playing?.src === update.episode) {
+            reload() // force reload episode
+          }
         }
       }
 
