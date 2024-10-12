@@ -34,7 +34,7 @@ export function GpodderSettings() {
             }
 
             // encrypt user and password with keys and save credentials
-            saveCreds('gpodder', {
+            await saveCreds('gpodder', {
               server: new URL(server.value).origin,
               loginName: await invoke('encrypt', { text: user.value, base64Key: key }),
               appPassword: await invoke('encrypt', { text: password.value, base64Key: key }),

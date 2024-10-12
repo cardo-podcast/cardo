@@ -31,7 +31,7 @@ export function NextcloudSettings() {
     }
 
     // encrypt user and password with keys and save credentials
-    saveCreds('nextcloud', {
+    await saveCreds('nextcloud', {
       server: baseUrl,
       loginName: await invoke('encrypt', { text: user, base64Key: key }),
       appPassword: await invoke('encrypt', { text: password, base64Key: key }),
