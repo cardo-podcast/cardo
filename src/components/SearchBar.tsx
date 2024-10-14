@@ -168,7 +168,7 @@ function SearchBar() {
           {/* close with click outside */}
           <div className="absolute left-0 top-0 z-10 mt-10 h-screen w-screen" onClick={() => setResults([])} />
 
-          <div className="absolute left-1/2 top-0 z-30 mt-[32px] max-h-[400px] w-4/5 -translate-x-1/2 justify-center overflow-hidden overflow-y-auto scroll-smooth rounded-b-md border-x-2 border-primary-8 bg-primary-9 shadow-md shadow-primary-8" ref={resultsRef}>
+          <div className="absolute left-1/2 top-0 z-30 mt-[32px] max-h-[60dvh] w-4/5 -translate-x-1/2 justify-center overflow-hidden overflow-y-auto scroll-smooth rounded-b-md border-x-2 border-primary-8 bg-primary-9 shadow-md shadow-primary-8" ref={resultsRef}>
             <div className="flex flex-col w-full">
               {results.map((result, i) => {
                 if (searchMode === 'podcasts') {
