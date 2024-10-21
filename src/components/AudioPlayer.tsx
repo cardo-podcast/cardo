@@ -2,7 +2,6 @@ import { useRef, useEffect, useState, RefObject, createContext, ReactNode, useCo
 import { secondsToStr } from '../utils/utils'
 import { play as playIcon, pause as pauseIcon, forward as forwardIcon, backwards as backwardsIcon, close as closeIcon, speedometer, volume as volumeIcon, mute as muteIcon } from '../Icons'
 import { EpisodeData } from '..'
-import { useDB } from '../DB/DB'
 import { useNavigate } from 'react-router-dom'
 import { useSettings } from '../engines/Settings'
 import { useTranslation } from 'react-i18next'
@@ -11,6 +10,7 @@ import appIcon from '../../src-tauri/icons/icon.png'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import round from 'lodash/round'
 import { RangeInput } from './Inputs'
+import { useDB } from '../ContextProviders'
 
 export type AudioPlayerRef = {
   audioRef: RefObject<HTMLAudioElement>

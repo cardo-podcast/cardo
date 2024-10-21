@@ -4,7 +4,6 @@ import { ReactNode, SyntheticEvent, useEffect, useMemo, useRef, useState } from 
 import * as icons from '../Icons'
 import { parseXML, toastError } from '../utils/utils'
 import EpisodeCard from '../components/EpisodeCard'
-import { useDB } from '../DB/DB'
 import { Switch, SwitchState, TimeInput } from '../components/Inputs'
 import { usePodcastSettings } from '../engines/Settings'
 import { useTranslation } from 'react-i18next'
@@ -12,7 +11,7 @@ import { toast } from 'react-toastify'
 import appIcon from '../../src-tauri/icons/icon.png'
 import { sanitizeHTML } from '../utils/sanitize'
 import { showMenu } from 'tauri-plugin-context-menu'
-import { useSync } from '../ContextProviders'
+import { useSync, useDB } from '../ContextProviders'
 
 const EPISODE_CARD_HEIGHT = 80 // min height
 const PRELOADED_EPISODES = 10 //
