@@ -2,8 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { login } from '../../sync/Nextcloud'
 import { saveCreds, toastError } from '../../utils/utils'
-import { useSync } from '../../ContextProviders'
-import { useDB } from '../../DB/DB'
+import { useDB, useSync } from '../../ContextProviders'
 import { invoke } from '@tauri-apps/api'
 
 export function NextcloudSettings() {

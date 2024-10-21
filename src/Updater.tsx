@@ -2,11 +2,11 @@ import { checkUpdate, installUpdate } from '@tauri-apps/api/updater'
 import { relaunch } from '@tauri-apps/api/process'
 import { useEffect, useRef, useState } from 'react'
 import { UnlistenFn } from '@tauri-apps/api/event'
-import { useDB } from './DB/DB'
 import { parse } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import { upArrow } from './Icons'
 import { useModalBanner } from './components/ModalBanner'
+import { useDB } from './ContextProviders'
 
 export default function Updater() {
   const unlistenCeckUpdates = useRef<UnlistenFn>()

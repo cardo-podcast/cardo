@@ -1,10 +1,10 @@
 import EpisodeCard from '../components/EpisodeCard'
-import { useDB } from '../DB/DB'
 import { EpisodeData } from '..'
 import { capitalize, parsePodcastDetails, removeDownloadedEpisode } from '../utils/utils'
 import { useNavigate } from 'react-router-dom'
 import { Suspense, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDB } from '../ContextProviders'
 
 export default function DownloadsPage() {
   const {

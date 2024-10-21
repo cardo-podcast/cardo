@@ -1,11 +1,11 @@
 import EpisodePreviewCard from '../components/EpisodePreviewCard'
-import { useDB } from '../DB/DB'
 import { useTranslation } from 'react-i18next'
 import EpisodeOverview from '../components/EpisodeOverview'
 import appIcon from '../../src-tauri/icons/icon.png'
 import { getPodcastSettings, useSettings } from '../engines/Settings'
 import { useEffect, useState } from 'react'
 import { EpisodeData, NewEpisodeData } from '..'
+import { useDB } from '../ContextProviders'
 
 function HomePage() {
   const { queue } = useDB()

@@ -5,8 +5,8 @@ import PodcastCard from './PodcastCard'
 import { useTranslation } from 'react-i18next'
 import { arrowLeft, arrowRight } from '../Icons'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useDB } from '../DB/DB'
 import EpisodeCard from './EpisodeCard'
+import { useDB } from '../ContextProviders'
 
 function SearchBar() {
   const [results, setResults] = useState<PodcastData[] | EpisodeData[]>([])

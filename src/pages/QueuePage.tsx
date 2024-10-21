@@ -1,6 +1,5 @@
 import EpisodeCard from '../components/EpisodeCard'
 import SortEpisodeGrip from '../components/SortEpisodeGrip'
-import { useDB } from '../DB/DB'
 import { EpisodeData } from '..'
 import { DndContext, DragEndEvent } from '@dnd-kit/core'
 import { SortableContext } from '@dnd-kit/sortable'
@@ -8,6 +7,7 @@ import { capitalize, parsePodcastDetails } from '../utils/utils'
 import { useNavigate } from 'react-router-dom'
 import { Suspense, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDB } from '../ContextProviders'
 
 export default function QueuePage() {
   const {
