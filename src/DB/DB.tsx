@@ -14,8 +14,8 @@ export function DBProvider({ children }: { children: ReactNode }) {
   // provider containing groups of variables / methods related to database
   const [db, setDB] = useState<Database>()
   const [dbLoaded, setDBLoaded] = useState(false)
-  const subscriptions = useSubscriptions(db!)
-  const subscriptionsEpisodes = useSubscriptionsEpisodes(db!, subscriptions.subscriptions)
+  const subscriptionsEpisodes = useSubscriptionsEpisodes(db!)
+  const subscriptions = useSubscriptions(db!, subscriptionsEpisodes)
   const history = useEpisodeState(db!)
   const misc = useMisc(db!)
   const queue = useQueue(db!)

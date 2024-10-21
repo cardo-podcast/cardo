@@ -1,12 +1,21 @@
 import Database from 'tauri-plugin-sql-api'
 import { PodcastData } from '..'
 import { useCallback, useEffect, useState } from 'react'
+import { useSettings } from '../engines/Settings'
+import { DB } from '.'
 
-export function useSubscriptions(db: Database) {
+export function useSubscriptions(db: Database, subcriptionEpisodes: DB['subscriptionsEpisodes']) {
   const [subscriptions, setSubscriptions] = useState<PodcastData[]>([])
+  const [
+    {
+      general: { fetchSubscriptionsAtStartup },
+    },
+  ] = useSettings()
 
   useEffect(() => {
     if (!db) return
+
+    fetchSubscriptionsAtStartup && updateFeeds()
 
     getAll().then((r) => {
       setSubscriptions(r)
@@ -16,6 +25,7 @@ export function useSubscriptions(db: Database) {
   const add = useCallback(
     async function add(podcast: PodcastData) {
       setSubscriptions((prev) => [...prev, podcast])
+      await subcriptionEpisodes.updateFeed(podcast)
       // returns subscription id on database
       const r = await db.execute(
         `INSERT into subscriptions (podcastName, artistName, coverUrl, coverUrlLarge, feedUrl, description)
@@ -40,7 +50,8 @@ export function useSubscriptions(db: Database) {
 
   const remove = useCallback(
     async function remove(feedUrl: string) {
-      setSubscriptions((prev) => prev.filter((podcast) => podcast.feedUrl != feedUrl))
+      await subcriptionEpisodes.remove(feedUrl)
+      setSubscriptions((prev) => prev.filter((podcast) => podcast.feedUrl !== feedUrl))
       return await db.execute('DELETE FROM subscriptions WHERE feedUrl = $1', [feedUrl])
     },
     [db],
@@ -55,5 +66,11 @@ export function useSubscriptions(db: Database) {
     [db],
   )
 
-  return { subscriptions, add, get, remove, getAll }
+  async function updateFeeds() {
+    for (const subscription of subscriptions) {
+      await subcriptionEpisodes.updateFeed(subscription)
+    }
+  }
+
+  return { subscriptions, add, get, remove, getAll, updateFeeds }
 }

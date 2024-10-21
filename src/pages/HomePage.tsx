@@ -17,7 +17,6 @@ function HomePage() {
       general: { numberOfDaysInNews },
       podcasts: podcastSettings,
     },
-    _,
   ] = useSettings()
 
   const loadNewEpisodes = async () => {
@@ -48,9 +47,7 @@ function HomePage() {
 
   useEffect(() => {
     // extract episodes newer than setting
-    if (subscriptionsEpisodes.updatingFeeds == null) {
-      loadNewEpisodes()
-    }
+    loadNewEpisodes()
   }, [numberOfDaysInNews, subscriptionsEpisodes.updatingFeeds, subscriptions.subscriptions])
 
   return (
@@ -81,7 +78,7 @@ function HomePage() {
         // welcome message
         queue.queue.length === 0 && newEpisodes.length === 0 && (
           <div className="flex flex-col items-center gap-4 p-2 px-4">
-            <img className="w-36" src={appIcon} />
+            <img className="w-36" alt="" src={appIcon} />
             <h1 className="text-center text-lg text-primary-3">{t('welcome_message')}</h1>
           </div>
         )
