@@ -1,77 +1,22 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useState } from 'react'
 import Database from 'tauri-plugin-sql-api'
 import { EpisodeData, NewEpisodeData, PodcastData, RawEpisodeData } from '..'
 import { parseXML, toastError } from '../utils/utils'
-import { useSettings } from '../engines/Settings'
 
-export function useSubscriptionsEpisodes(db: Database, subscriptions: PodcastData[]) {
-  const [updatingFeeds, setUpdatingFeeds] = useState<number | null>(null) //id of the feed that it's been updated
-  const [
-    {
-      general: { fetchSubscriptionsAtStartup },
-    },
-    _,
-  ] = useSettings()
-  const savedSubscriptions = useRef<PodcastData[]>()
-
-  useEffect(() => {
-    if (db && fetchSubscriptionsAtStartup) {
-      updateFeeds()
-    }
-  }, [db])
-
-  useEffect(() => {
-    // when a new subscription is added load new episodes
-    // when a subscription is removed remove saved episode data
-    if (subscriptions.length > 0 && savedSubscriptions.current === undefined) {
-      savedSubscriptions.current = subscriptions //when subscriptions are loaded save array only
-    } else {
-      updateSubscriptions()
-    }
-  }, [subscriptions])
-
-  async function updateSubscriptions() {
-    if (savedSubscriptions.current === undefined) return
-
-    function includes(source: PodcastData[], element: PodcastData) {
-      return source.findIndex((s) => s.feedUrl == element.feedUrl) > -1
-    }
-
-    for (const subscription of subscriptions) {
-      if (!includes(savedSubscriptions.current, subscription)) {
-        // a subscription has been added
-        const [episodes] = await parseXML(subscription.feedUrl)
-        await save(episodes)
-      }
-    }
-
-    for (const savedSubscription of savedSubscriptions.current) {
-      if (!includes(subscriptions, savedSubscription)) {
-        // a subscription has been removed
-        await remove(savedSubscription.feedUrl)
-      }
-    }
-
-    savedSubscriptions.current = subscriptions
-  }
+export function useSubscriptionsEpisodes(db: Database) {
+  const [updatingFeeds, setUpdatingFeeds] = useState<number[]>([]) //id of the feed that it's been updated
 
   async function updateFeed(subscription: PodcastData) {
-    setUpdatingFeeds(subscription.id!)
+    setUpdatingFeeds((prev) => [...prev, subscription.id!])
     try {
       const [episodes] = await parseXML(subscription.feedUrl)
       await save(episodes)
-      setUpdatingFeeds(null)
+      setUpdatingFeeds((prev) => prev.filter((id) => id !== subscription.id!))
       return episodes
     } catch (e) {
       toastError(`Error updating feed ${subscription.feedUrl}: ${e}`)
-      setUpdatingFeeds(null)
+      setUpdatingFeeds((prev) => prev.filter((id) => id !== subscription.id!))
       return []
-    }
-  }
-
-  async function updateFeeds() {
-    for (const subscription of subscriptions) {
-      await updateFeed(subscription)
     }
   }
 
@@ -177,5 +122,5 @@ export function useSubscriptionsEpisodes(db: Database, subscriptions: PodcastDat
     [db],
   )
 
-  return { save, getAll, remove, loadNew, updatingFeeds, updateFeed, updateFeeds }
+  return { save, getAll, remove, loadNew, updatingFeeds, updateFeed }
 }
