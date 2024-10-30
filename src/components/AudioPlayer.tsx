@@ -327,13 +327,10 @@ function AudioPlayer({ className = '' }) {
       }
 
       newTime = Math.max(newTime, 0)
+      newTime = Math.min(newTime, audioRef.current.duration - 0.01)
 
-      if (newTime >= audioRef.current.duration) {
-        playNextInQueue() ?? quit()
-      } else {
-        audioRef.current.currentTime = newTime
-        setPosition(newTime)
-      }
+      audioRef.current.currentTime = newTime
+      setPosition(newTime)
     }
   }
 
