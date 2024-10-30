@@ -4,18 +4,17 @@ import { EpisodeData, NewEpisodeData, PodcastData, RawEpisodeData } from '..'
 import { parseXML, toastError } from '../utils/utils'
 
 export function useSubscriptionsEpisodes(db: Database) {
-  const [updatingFeeds, setUpdatingFeeds] = useState<number[]>([]) //id of the feed that it's been updated
+  const [fetchingFeeds, setFetchingFeeds] = useState<number[]>([]) //id of the feed that it's been downloaded
 
-  async function updateFeed(subscription: PodcastData) {
-    setUpdatingFeeds((prev) => [...prev, subscription.id!])
+  async function fetchFeed(subscription: PodcastData) {
+    setFetchingFeeds((prev) => [...prev, subscription.id!])
     try {
       const [episodes] = await parseXML(subscription.feedUrl)
-      await save(episodes)
-      setUpdatingFeeds((prev) => prev.filter((id) => id !== subscription.id!))
+      setFetchingFeeds((prev) => prev.filter((id) => id !== subscription.id!))
       return episodes
     } catch (e) {
       toastError(`Error updating feed ${subscription.feedUrl}: ${e}`)
-      setUpdatingFeeds((prev) => prev.filter((id) => id !== subscription.id!))
+      setFetchingFeeds((prev) => prev.filter((id) => id !== subscription.id!))
       return []
     }
   }
@@ -33,7 +32,6 @@ export function useSubscriptionsEpisodes(db: Database) {
       }
 
       for (const group of queryGroups) {
-        console.log(group)
         const placeholders = group.map((_, i) => `($${i * 8 + 1}, $${i * 8 + 2}, $${i * 8 + 3}, $${i * 8 + 4}, $${i * 8 + 5}, $${i * 8 + 6}, $${i * 8 + 7}, $${i * 8 + 8})`).join(', ')
 
         const values = group.flatMap((episode) => [episode.title, episode.description, episode.src, episode.pubDate.getTime(), episode.duration, episode.size, episode.podcastUrl, episode.coverUrl || ''])
@@ -129,5 +127,5 @@ export function useSubscriptionsEpisodes(db: Database) {
     [db],
   )
 
-  return { save, getAll, remove, loadNew, updatingFeeds, updateFeed }
+  return { save, getAll, remove, loadNew, fetchingFeeds, fetchFeed }
 }
