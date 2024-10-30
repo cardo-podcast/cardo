@@ -85,7 +85,7 @@ function LeftMenu() {
 
         <div className={`mb-1 flex items-center gap-2 ${collapsedLeftMenu && 'justify-center'}`}>
           {!collapsedLeftMenu && <h1 className="mb-0.5 uppercase">{t('subscriptions')}</h1>}
-          <button className={`flex justify-center hover:text-accent-5 ${subscriptionsEpisodes.fetchingFeeds.length && 'animate-[spin_1.5s_linear_reverse_infinite]'}`} onClick={subscriptions.updateFeeds} title={t('update_subs_ feeds')}>
+          <button className={`flex justify-center hover:text-accent-5 ${subscriptionsEpisodes.fetchingFeeds.length && 'animate-[spin_1.5s_linear_reverse_infinite]'}`} onClick={() => subscriptions.updateFeeds()} title={t('update_subs_ feeds')}>
             <span className={`${collapsedLeftMenu ? 'w-6' : 'w-5'}`}>{sync}</span>
           </button>
         </div>
