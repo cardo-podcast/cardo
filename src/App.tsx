@@ -5,18 +5,19 @@ import LeftMenu from './components/LeftMenu'
 import TitleBar from './components/TitleBar'
 import HomePage from './pages/HomePage'
 import SearchBar from './components/SearchBar'
-const PodcastPreview = lazy(() => import('./pages/PodcastPreview'))
 import { DBProvider } from './DB/DB'
-const EpisodePreview = lazy(() => import('./pages/EpisodePreview'))
-const Settings = lazy(() => import('./pages/Settings'))
 import { SettingsProvider } from './engines/Settings'
-const QueuePage = lazy(() => import('./pages/QueuePage'))
 import { appWindow } from '@tauri-apps/api/window'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { SyncProvider } from './sync/Sync'
-const DownloadsPage = lazy(() => import('./pages/DownloadsPage'))
 import { platform } from '@tauri-apps/api/os'
+const PodcastPreview = lazy(() => import('./pages/PodcastPreview'))
+const EpisodePreview = lazy(() => import('./pages/EpisodePreview'))
+const Settings = lazy(() => import('./pages/Settings'))
+const QueuePage = lazy(() => import('./pages/QueuePage'))
+const DownloadsPage = lazy(() => import('./pages/DownloadsPage'))
+
 
 const App = () => {
   const [roundedCorners, setRoundedCorners] = useState(false)
