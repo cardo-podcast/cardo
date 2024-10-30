@@ -25,7 +25,11 @@ export function useSubscriptions(db: Database, subcriptionEpisodes: DB['subscrip
   const add = useCallback(
     async function add(podcast: PodcastData) {
       setSubscriptions((prev) => [...prev, podcast])
-      await subcriptionEpisodes.updateFeed(podcast)
+
+      // subscription_episodes are download and saved on DB also
+      const episodes = await subcriptionEpisodes.fetchFeed(podcast)
+      await subcriptionEpisodes.save(episodes)
+
       // returns subscription id on database
       const r = await db.execute(
         `INSERT into subscriptions (podcastName, artistName, coverUrl, coverUrlLarge, feedUrl, description)
@@ -67,9 +71,11 @@ export function useSubscriptions(db: Database, subcriptionEpisodes: DB['subscrip
   )
 
   async function updateFeeds() {
-    for (const subscription of subscriptions) {
-      await subcriptionEpisodes.updateFeed(subscription)
-    }
+    // fetch all subscriptions at once
+    const subsEpisodes = await Promise.all(subscriptions.map((subscription) => subcriptionEpisodes.fetchFeed(subscription)))
+
+    // save after all feeds are downloaded, db operations are executed on a single thread
+    await subcriptionEpisodes.save(subsEpisodes.flat())
   }
 
   return { subscriptions, add, get, remove, getAll, updateFeeds }
