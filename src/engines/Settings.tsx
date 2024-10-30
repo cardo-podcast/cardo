@@ -129,6 +129,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       playbackRate: 1,
       playbackRatePresets: [1, 1.25, 1.5, 2],
       volume: 1,
+      removeFromQueueAtEnd: false,
+      removeFromDownloadsAtEnd: false
     },
     ui: {
       showPinWindowButton: false,

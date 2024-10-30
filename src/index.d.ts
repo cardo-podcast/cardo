@@ -83,6 +83,8 @@ export interface Settings {
     playbackRate: number
     playbackRatePresets: number[]
     volume: number
+    removeFromQueueAtEnd: boolean
+    removeFromDownloadsAtEnd: boolean
   }
   ui: {
     showPinWindowButton: boolean

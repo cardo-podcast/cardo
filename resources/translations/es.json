@@ -84,5 +84,7 @@
   "gpodder_server_url": "URL del servidor Gpodder",
   "username": "Usuario",
   "password": "Contraseña",
-  "login_failed": "Fallo al iniciar sesión"
+  "login_failed": "Fallo al iniciar sesión",
+  "remove_from_queue_end": "Borrar episodio de la cola al terminar",
+  "remove_from_downloads_end": "Borrar el episodio descargado al terminar"
 }

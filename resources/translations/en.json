@@ -85,5 +85,7 @@
   "gpodder_server_url": "Gpodder Server URL",
   "username": "User",
   "password": "Password",
-  "login_failed": "Failed to log in"
+  "login_failed": "Failed to log in",
+  "remove_from_queue_end": "Delete episode from queue when finished",
+  "remove_from_downloads_end": "Delete downloaded episode after finishing"
 }

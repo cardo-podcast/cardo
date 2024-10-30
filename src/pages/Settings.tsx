@@ -171,37 +171,50 @@ function Settings() {
 
       <div className="flex flex-col gap-1 rounded-md border-[2px] border-primary-8 p-2">
         <h1 className="mb-2 border-b-2 border-primary-8 uppercase">{t('playback')}</h1>
-        <div className="flex gap-6">
-          <label className="flex w-fit items-center gap-2">
-            {t('step_backwards')}:
-            <input
-              type="text"
-              className="w-12 rounded-md bg-primary-8 px-2 py-1 focus:outline-none"
-              value={playback.stepBackwards}
-              onChange={(e) => {
-                const value = Number(e.target.value)
-                if (!Number.isNaN(value)) {
-                  updateSettings({ playback: { stepBackwards: value } })
-                }
-              }}
-            />
-            <p className="-ml-1">s</p>
-          </label>
-          <label className="flex w-fit items-center gap-2">
-            {t('step_forward')}:
-            <input
-              type="text"
-              className="w-12 rounded-md bg-primary-8 px-2 py-1 focus:outline-none"
-              value={playback.stepForward}
-              onChange={(e) => {
-                const value = Number(e.target.value)
-                if (!Number.isNaN(value)) {
-                  updateSettings({ playback: { stepForward: value } })
-                }
-              }}
-            />
-            <p className="-ml-1">s</p>
-          </label>
+        <div className="flex gap-8 items-center">
+          <div className='flex flex-col gap-2 items-end'>
+            <label className="flex w-fit items-center gap-2">
+              {t('step_backwards')}:
+              <input
+                type="text"
+                className="w-12 rounded-md bg-primary-8 px-2 py-1 focus:outline-none"
+                value={playback.stepBackwards}
+                onChange={(e) => {
+                  const value = Number(e.target.value)
+                  if (!Number.isNaN(value)) {
+                    updateSettings({ playback: { stepBackwards: value } })
+                  }
+                }}
+              />
+              <p className="-ml-1">s</p>
+            </label>
+            <label className="flex w-fit items-center gap-2">
+              {t('step_forward')}:
+              <input
+                type="text"
+                className="w-12 rounded-md bg-primary-8 px-2 py-1 focus:outline-none"
+                value={playback.stepForward}
+                onChange={(e) => {
+                  const value = Number(e.target.value)
+                  if (!Number.isNaN(value)) {
+                    updateSettings({ playback: { stepForward: value } })
+                  }
+                }}
+              />
+              <p className="-ml-1">s</p>
+            </label>
+          </div>
+
+          <div className='flex flex-col gap-2 items-end'>
+            <label className="flex w-fit gap-1">
+              {t('remove_from_queue_end')}:
+              <Checkbox defaultChecked={playback.removeFromQueueAtEnd} onChange={(value) => updateSettings({ playback: { removeFromQueueAtEnd: value } })} />
+            </label>
+            <label className="flex w-fit gap-1">
+              {t('remove_from_downloads_end')}:
+              <Checkbox defaultChecked={playback.removeFromDownloadsAtEnd} onChange={(value) => updateSettings({ playback: { removeFromDownloadsAtEnd: value } })} />
+            </label>
+          </div>
         </div>
       </div>
 

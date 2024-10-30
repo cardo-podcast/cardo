@@ -263,12 +263,12 @@ function VolumeControl({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) 
 
 function AudioPlayer({ className = '' }) {
   const [duration, setDuration] = useState(0)
-  const { history, queue } = useDB()
+  const { history, queue, downloads } = useDB()
   const { audioRef, play, playing, position, setPosition, quit } = usePlayer()
   const navigate = useNavigate()
   const [
     {
-      playback: { stepForward, stepBackwards, displayRemainingTime },
+      playback: { stepForward, stepBackwards, displayRemainingTime, removeFromQueueAtEnd, removeFromDownloadsAtEnd },
     },
     updateSettings,
   ] = useSettings()
@@ -312,6 +312,10 @@ function AudioPlayer({ className = '' }) {
 
   const playNextInQueue = () => {
     if (audioRef.current && playing) {
+
+      removeFromQueueAtEnd && queue.remove(playing.src)
+      removeFromDownloadsAtEnd && downloads.removeFromDownloadList(playing.src)
+
       if (queue.includes(playing.src)) {
         const next = queue.next(playing)
         play(next)
