@@ -8,7 +8,6 @@ export function useSubscriptions(db: Database, subcriptionEpisodes: DB['subscrip
   const [subscriptions, setSubscriptions] = useState<PodcastData[]>([])
   const [updateFeedsCount, setUpdateFeedsCount] = useState(0) // variable used to refresh app after all feeds are fetched (db isn't reactive)
 
-
   const [
     {
       general: { fetchSubscriptionsAtStartup },
@@ -18,10 +17,9 @@ export function useSubscriptions(db: Database, subcriptionEpisodes: DB['subscrip
   useEffect(() => {
     if (!db) return
 
-    fetchSubscriptionsAtStartup && updateFeeds()
-
-    getAll().then((r) => {
-      setSubscriptions(r)
+    getAll().then((dbSubscriptions) => {
+      setSubscriptions(dbSubscriptions)
+      fetchSubscriptionsAtStartup && updateFeeds(dbSubscriptions)
     })
   }, [db])
 
@@ -73,13 +71,13 @@ export function useSubscriptions(db: Database, subcriptionEpisodes: DB['subscrip
     [db],
   )
 
-  async function updateFeeds() {
+  async function updateFeeds(feeds = subscriptions) {
     // fetch all subscriptions at once
-    const subsEpisodes = await Promise.all(subscriptions.map((subscription) => subcriptionEpisodes.fetchFeed(subscription)))
+    const subsEpisodes = await Promise.all(feeds.map((subscription) => subcriptionEpisodes.fetchFeed(subscription)))
 
     // save after all feeds are downloaded, db operations are executed on a single thread
     await subcriptionEpisodes.save(subsEpisodes.flat())
-    setUpdateFeedsCount(prev => prev + 1)
+    setUpdateFeedsCount((prev) => prev + 1)
   }
 
   return { subscriptions, add, get, remove, getAll, updateFeeds, updateFeedsCount }
