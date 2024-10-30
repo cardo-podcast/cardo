@@ -26,18 +26,25 @@ export function useSubscriptionsEpisodes(db: Database) {
 
       sortedEpisodes.sort((a, b) => a.pubDate.getTime() - b.pubDate.getTime())
 
-      //
-      const placeholders = sortedEpisodes.map((_, i) => `($${i * 8 + 1}, $${i * 8 + 2}, $${i * 8 + 3}, $${i * 8 + 4}, $${i * 8 + 5}, $${i * 8 + 6}, $${i * 8 + 7}, $${i * 8 + 8})`).join(', ')
+      // group queries in chunks, avoiding exceed limits and incrementing speed
+      const queryGroups: EpisodeData[][] = []
+      for (let i = 0; i < sortedEpisodes.length; i += 999) {
+        queryGroups.push(sortedEpisodes.slice(i, i + 999))
+      }
 
-      const values = sortedEpisodes.flatMap((episode) => [episode.title, episode.description, episode.src, episode.pubDate.getTime(), episode.duration, episode.size, episode.podcastUrl, episode.coverUrl || ''])
+      for (const group of queryGroups) {
+        console.log(group)
+        const placeholders = group.map((_, i) => `($${i * 8 + 1}, $${i * 8 + 2}, $${i * 8 + 3}, $${i * 8 + 4}, $${i * 8 + 5}, $${i * 8 + 6}, $${i * 8 + 7}, $${i * 8 + 8})`).join(', ')
 
-      const query = `
-      INSERT INTO subscriptions_episodes (title, description, src, pubDate, duration, size, podcastUrl, coverUrl) 
-      VALUES ${placeholders} 
-      ON CONFLICT (src) DO NOTHING
-  `
+        const values = group.flatMap((episode) => [episode.title, episode.description, episode.src, episode.pubDate.getTime(), episode.duration, episode.size, episode.podcastUrl, episode.coverUrl || ''])
 
-      return await db.execute(query, values)
+        const query = `
+        INSERT INTO subscriptions_episodes (title, description, src, pubDate, duration, size, podcastUrl, coverUrl) 
+        VALUES ${placeholders} 
+        ON CONFLICT (src) DO NOTHING`
+
+        await db.execute(query, values)
+      }
     },
     [db],
   )
