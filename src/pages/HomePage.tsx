@@ -48,7 +48,7 @@ function HomePage() {
   useEffect(() => {
     // extract episodes newer than setting
     loadNewEpisodes()
-  }, [numberOfDaysInNews, subscriptionsEpisodes.fetchingFeeds, subscriptions.subscriptions])
+  }, [numberOfDaysInNews, subscriptions.subscriptions, subscriptions.updateFeedsCount])
 
   return (
     <div className="mt-1 flex h-fit w-full flex-col gap-3 p-2">
