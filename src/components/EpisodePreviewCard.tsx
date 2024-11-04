@@ -39,6 +39,7 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
     >
       <div className="relative flex flex-col overflow-hidden rounded-md">
         <img
+          title={episode.podcast?.podcastName}
           className="w-full bg-purple-950"
           onClick={() => {
             navigate('/episode-preview', {
