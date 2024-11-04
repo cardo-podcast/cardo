@@ -48,7 +48,6 @@ function PodcastPreview() {
 
   const [episodes, setEpisodes] = useState<EpisodeData[]>([])
   const [downloading, setDownloading] = useState(false)
-  const [subscribed, setSubscribed] = useState(false)
   const {
     subscriptions,
     history: { getCompleted },
@@ -56,6 +55,7 @@ function PodcastPreview() {
   } = useDB()
   const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcast.feedUrl)
   const { sync, loggedIn: loggedInSync } = useSync()
+  const isSubscribed =  subscriptions.includes(podcast.feedUrl)
   const allEpisodes = useMemo(async () => await getAllEpisodes(), [podcast.feedUrl])
 
   const [tweakMenu, setTweakMenu] = useState<'sort' | 'filter' | undefined>(undefined)
@@ -110,9 +110,6 @@ function PodcastPreview() {
         return []
       }
     }
-
-    const isSubscribed = (await subscriptions.get(podcast.feedUrl)) !== undefined
-    setSubscribed(isSubscribed)
 
     let episodes: EpisodeData[] = []
     if (!isSubscribed || forceDownload) {
@@ -308,21 +305,19 @@ function PodcastPreview() {
             <div className="flex gap-2">
               <button
                 className="w-6 hover:text-accent-6"
-                title={t(subscribed ? 'remove_from_subscriptions' : 'add_to_subscriptions')}
+                title={t(isSubscribed ? 'remove_from_subscriptions' : 'add_to_subscriptions')}
                 onClick={async () => {
-                  if (subscribed) {
+                  if (isSubscribed) {
                     loggedInSync && sync({ remove: [podcast.feedUrl] })
                     await subscriptions.remove(podcast.feedUrl)
-                    setSubscribed(false)
                   } else {
                     loggedInSync && sync({ add: [podcast.feedUrl] })
                     podcast.id = await subscriptions.add(podcast)
-                    setSubscribed(true)
                     await subscriptionsEpisodes.save(episodes)
                   }
                 }}
               >
-                {subscribed ? icons.starFilled : icons.star}
+                {isSubscribed ? icons.starFilled : icons.star}
               </button>
 
               <button
