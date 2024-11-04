@@ -15,6 +15,23 @@ export function useSubscriptions(db: Database, subscriptionsEpisodes: DB['subscr
     },
   ] = useSettings()
 
+  const indexOf = useCallback(
+    function (feedUrl: string) {
+      return subscriptions.findIndex((subscription) => subscription.feedUrl === feedUrl)
+    },
+    [subscriptions],
+  )
+
+  const includes = useCallback(
+    function (feedUrl: string) {
+      const index = indexOf(feedUrl)
+      if (index > -1) {
+        return subscriptions[index]
+      }
+    },
+    [indexOf],
+  )
+
   const loadLatestEpisodes = async () => {
     const minDate = Date.now() - 24 * 3600 * 1000 * numberOfDaysInNews
     const episodes = await subscriptionsEpisodes.loadNew(minDate)
@@ -116,5 +133,5 @@ export function useSubscriptions(db: Database, subscriptionsEpisodes: DB['subscr
     setUpdateFeedsCount((prev) => prev + 1)
   }
 
-  return { subscriptions, add, get, remove, getAll, updateFeeds, latestEpisodes }
+  return { subscriptions, add, get, remove, getAll, updateFeeds, latestEpisodes, includes }
 }
