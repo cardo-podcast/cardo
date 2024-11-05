@@ -115,32 +115,12 @@ function Settings() {
           </label>
 
           <label className="flex w-fit gap-1">
-            {t('fetch_subscriptions_startup')}:
-            <Checkbox defaultChecked={general.fetchSubscriptionsAtStartup} onChange={(value) => updateSettings({ general: { fetchSubscriptionsAtStartup: value } })} />
-          </label>
-
-          <label className="flex w-fit gap-1">
             {t('check_updates')}:
             <Checkbox defaultChecked={general.checkUpdates} onChange={(value) => updateSettings({ general: { checkUpdates: value } })} />
           </label>
 
-          <label className="flex w-full items-center gap-2">
-            {t('number_days_news')}:
-            <input
-              type="text"
-              className="w-14 rounded-md bg-primary-8 px-2 py-1 focus:outline-none"
-              value={general.numberOfDaysInNews}
-              onChange={(e) => {
-                const value = Number(e.target.value)
-                if (!Number.isNaN(value)) {
-                  updateSettings({ general: { numberOfDaysInNews: value } })
-                }
-              }}
-            />
-          </label>
-
-          <div className="">
-            <h2 className="uppercase">{t('theme')}</h2>
+          <div className="border-t-2 border-primary-8">
+            <h2 className="mt-1 uppercase">{t('theme')}</h2>
             <div className="flex gap-10">
               <label className="flex items-center gap-2 uppercase">
                 {t('base')}:
@@ -170,9 +150,33 @@ function Settings() {
       </div>
 
       <div className="flex flex-col gap-1 rounded-md border-[2px] border-primary-8 p-2">
+        <h1 className="mb-2 border-b-2 border-primary-8 uppercase">{t('news')}</h1>
+
+        <label className="flex w-fit gap-1">
+          {t('fetch_subscriptions_startup')}:
+          <Checkbox defaultChecked={general.fetchSubscriptionsAtStartup} onChange={(value) => updateSettings({ general: { fetchSubscriptionsAtStartup: value } })} />
+        </label>
+
+        <label className="flex w-full items-center gap-2">
+          {t('number_days_news')}:
+          <input
+            type="text"
+            className="w-14 rounded-md bg-primary-8 px-2 py-1 focus:outline-none"
+            value={general.numberOfDaysInNews}
+            onChange={(e) => {
+              const value = Number(e.target.value)
+              if (!Number.isNaN(value)) {
+                updateSettings({ general: { numberOfDaysInNews: value } })
+              }
+            }}
+          />
+        </label>
+      </div>
+
+      <div className="flex flex-col gap-1 rounded-md border-[2px] border-primary-8 p-2">
         <h1 className="mb-2 border-b-2 border-primary-8 uppercase">{t('playback')}</h1>
-        <div className="flex gap-8 items-center">
-          <div className='flex flex-col gap-2 items-end'>
+        <div className="flex items-center gap-8">
+          <div className="flex flex-col items-end gap-2">
             <label className="flex w-fit items-center gap-2">
               {t('step_backwards')}:
               <input
@@ -205,7 +209,7 @@ function Settings() {
             </label>
           </div>
 
-          <div className='flex flex-col gap-2 items-end'>
+          <div className="flex flex-col items-end gap-2">
             <label className="flex w-fit gap-1">
               {t('remove_from_queue_end')}:
               <Checkbox defaultChecked={playback.removeFromQueueAtEnd} onChange={(value) => updateSettings({ playback: { removeFromQueueAtEnd: value } })} />
@@ -231,7 +235,7 @@ function Settings() {
       <div className="flex flex-col gap-1 rounded-md border-[2px] border-primary-8 p-2">
         <h1 className="mb-2 border-b-2 border-primary-8 uppercase">{t('about')}</h1>
         <div className="flex gap-2">
-          <img className="w-36 cursor-pointer transition-all hover:p-2" title={t('open_web')} src={appIcon} onClick={() => shell.open('https://cardo-podcast.github.io')} />
+          <img alt="" className="w-36 cursor-pointer transition-all hover:p-2" title={t('open_web')} src={appIcon} onClick={() => shell.open('https://cardo-podcast.github.io')} />
           <div className="flex flex-col justify-between">
             <h1 className="UPPERCASE">
               Cardo - {t('podcast_player')} (v{tauriConfig.package.version})
@@ -242,10 +246,10 @@ function Settings() {
               <img className="w-5 cursor-pointer rounded-full bg-white p-[1px]" src="https://github.githubassets.com/favicons/favicon.png" alt="Github" title="https://github.com/cardo-podcast/cardo" onClick={() => shell.open('https://github.com/cardo-podcast/cardo')} />
             </div>
             <div className="flex h-12 items-center gap-2">
-              <a href="https://www.buymeacoffee.com/n0vella" target="_blank">
+              <a href="https://www.buymeacoffee.com/n0vella" target="_blank" rel="noreferrer">
                 <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" className="h-12" />
               </a>
-              <a href="https://www.paypal.com/paypalme/adriannovella" target="_blank">
+              <a href="https://www.paypal.com/paypalme/adriannovella" target="_blank" rel="noreferrer">
                 <img src="https://www.paypalobjects.com/webstatic/icon/pp196.png" alt="Paypal" className="h-12 rounded-md" />
               </a>
             </div>
