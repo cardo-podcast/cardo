@@ -4,7 +4,7 @@ import { ReactNode, SyntheticEvent, useEffect, useMemo, useRef, useState } from 
 import * as icons from '../Icons'
 import { parseXML, toastError } from '../utils/utils'
 import EpisodeCard from '../components/EpisodeCard'
-import { Switch, SwitchState, TimeInput } from '../components/Inputs'
+import { Checkbox, Switch, SwitchState, TimeInput } from '../components/Inputs'
 import { usePodcastSettings } from '../engines/Settings'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
@@ -55,10 +55,10 @@ function PodcastPreview() {
   } = useDB()
   const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcast.feedUrl)
   const { sync, loggedIn: loggedInSync } = useSync()
-  const isSubscribed =  subscriptions.includes(podcast.feedUrl)
+  const isSubscribed = subscriptions.includes(podcast.feedUrl)
   const allEpisodes = useMemo(async () => await getAllEpisodes(), [podcast.feedUrl])
 
-  const [tweakMenu, setTweakMenu] = useState<'sort' | 'filter' | undefined>(undefined)
+  const [tweakMenu, setTweakMenu] = useState<'sort' | 'filter' | 'settings' | undefined>(undefined)
   const { t } = useTranslation()
 
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -274,6 +274,22 @@ function PodcastPreview() {
                     </div>
                   </div>
                 )}
+
+                {tweakMenu === 'settings' && (
+                  <div className="flex w-4/5 justify-center gap-1">
+                    <div className='flex flex-col items-end'>
+                      <label className="flex w-fit gap-1">
+                        {t('download_new')}:
+                        <Checkbox defaultChecked={podcastSettings.downloadNew} onChange={(value) => updatePodcastSettings({ downloadNew: value })} />
+                      </label>
+
+                      <label className="flex w-fit gap-1">
+                        {t('queue_new')}:
+                        <Checkbox defaultChecked={podcastSettings.queueNew} onChange={(value) => updatePodcastSettings({ queueNew: value })} />
+                      </label>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <button className="mt-1 flex h-5 w-4/5 items-center justify-center border-t-2 border-primary-8 p-2" onClick={() => setTweakMenu(undefined)}>
@@ -335,6 +351,14 @@ function PodcastPreview() {
                 }}
               >
                 {icons.filter}
+              </button>
+              <button
+                className="h-6 w-6 hover:text-accent-6"
+                onClick={() => {
+                  setTweakMenu('settings')
+                }}
+              >
+                {icons.settings}
               </button>
               <button
                 className={`w-6 hover:text-accent-6 ${downloading && 'animate-[spin_2s_linear_reverse_infinite]'}`}
