@@ -15,11 +15,11 @@ export function DBProvider({ children }: { children: ReactNode }) {
   const [db, setDB] = useState<Database>()
   const [dbLoaded, setDBLoaded] = useState(false)
   const subscriptionsEpisodes = useSubscriptionsEpisodes(db!)
-  const subscriptions = useSubscriptions(db!, subscriptionsEpisodes)
-  const history = useEpisodeState(db!)
-  const misc = useMisc(db!)
   const queue = useQueue(db!)
   const downloads = useDownloads(db!)
+  const subscriptions = useSubscriptions(db!, subscriptionsEpisodes, downloads, queue)
+  const history = useEpisodeState(db!)
+  const misc = useMisc(db!)
 
   async function init() {
     const dbPath = await join(await appDataDir(), 'db.sqlite')

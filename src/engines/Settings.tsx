@@ -27,14 +27,18 @@ export class FilterCriterion {
 export class PodcastSettings {
   filter: FilterCriterion
   sort: SortCriterion
+  downloadNew: boolean
+  queueNew: boolean
 
   constructor() {
     this.filter = new FilterCriterion()
     this.sort = { criterion: 'date', mode: 'desc' }
+    this.downloadNew = false
+    this.queueNew = false
   }
 
   public static isDefault = (settings: PodcastSettings) => {
-    return JSON.stringify(settings) == JSON.stringify(new PodcastSettings())
+    return JSON.stringify(settings) === JSON.stringify(new PodcastSettings())
   }
 }
 
