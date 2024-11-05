@@ -87,5 +87,7 @@
   "password": "Password",
   "login_failed": "Failed to log in",
   "remove_from_queue_end": "Delete episode from queue when finished",
-  "remove_from_downloads_end": "Delete downloaded episode after finishing"
+  "remove_from_downloads_end": "Delete downloaded episode after finishing",
+  "download_new": "Download new episodes automatically",
+  "queue_new": "Add new episodes to queue automatically"
 }
