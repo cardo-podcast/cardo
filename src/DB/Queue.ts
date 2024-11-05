@@ -70,12 +70,13 @@ export function useQueue(db: Database) {
   const insertOnDb = async (episode: EpisodeData): Promise<number | undefined> => {
     // returns id in sql table if item is appended
 
-    if (includes(episode.src)) {
-      // only add episode if not is in queue yet
-      return
-    }
-
-    const query = await db.execute('INSERT into queue (title, description, src, pubDate, duration, size, podcastUrl, coverUrl) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [episode.title, episode.description, episode.src, episode.pubDate.getTime(), episode.duration, episode.size, episode.podcastUrl, episode.coverUrl || ''])
+    const query = await db.execute(
+      `INSERT into queue (title, description, src, pubDate, duration, size, podcastUrl, coverUrl)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      ON CONFLICT (src) DO NOTHING 
+      `,
+      [episode.title, episode.description, episode.src, episode.pubDate.getTime(), episode.duration, episode.size, episode.podcastUrl, episode.coverUrl || ''],
+    )
 
     return query.lastInsertId
   }
@@ -88,6 +89,8 @@ export function useQueue(db: Database) {
 
   const unshift = useCallback(
     async function (episode: EpisodeData) {
+      if (includes(episode.src)) return
+
       const id = await insertOnDb(episode)
 
       if (id !== undefined) {
@@ -100,6 +103,8 @@ export function useQueue(db: Database) {
 
   const push = useCallback(
     async function (episode: EpisodeData) {
+      if (includes(episode.src)) return
+
       const id = await insertOnDb(episode)
 
       if (id !== undefined) {

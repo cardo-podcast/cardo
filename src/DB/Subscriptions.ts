@@ -3,10 +3,10 @@ import { EpisodeData, NewEpisodeData, PodcastData } from '..'
 import { useCallback, useEffect, useState } from 'react'
 import { getPodcastSettings, useSettings } from '../engines/Settings'
 import { DB } from '.'
+import { downloadEpisode } from '../utils/utils'
 
-export function useSubscriptions(db: Database, subscriptionsEpisodes: DB['subscriptionsEpisodes']) {
+export function useSubscriptions(db: Database, subscriptionsEpisodes: DB['subscriptionsEpisodes'], downloads: DB['downloads'], queue: DB['queue']) {
   const [subscriptions, setSubscriptions] = useState<PodcastData[]>([])
-  const [updateFeedsCount, setUpdateFeedsCount] = useState(0) // variable used to refresh app after all feeds are fetched (db isn't reactive)
   const [latestEpisodes, setLatestEpisodes] = useState<NewEpisodeData[]>([])
   const [
     {
@@ -32,36 +32,53 @@ export function useSubscriptions(db: Database, subscriptionsEpisodes: DB['subscr
     [indexOf],
   )
 
+  function filterByDuration(episode: EpisodeData) {
+    let result = true
+    if (episode.podcastUrl in podcastSettings) {
+      const episodePodcastSettings = getPodcastSettings(episode.podcastUrl, podcastSettings)
+
+      if (episodePodcastSettings.filter.duration.min > 0) {
+        result = result && episode.duration >= episodePodcastSettings.filter.duration.min
+      }
+
+      if (episodePodcastSettings.filter.duration.max > 0) {
+        result = result && episode.duration <= episodePodcastSettings.filter.duration.max
+      }
+    }
+    return result
+  }
+
   const loadLatestEpisodes = async () => {
     const minDate = Date.now() - 24 * 3600 * 1000 * numberOfDaysInNews
-    const episodes = await subscriptionsEpisodes.loadNew(minDate)
+    let episodes = await subscriptionsEpisodes.loadNew(minDate)
 
+    episodes = episodes.filter(filterByDuration) // discard episodes that don't meet the duration conditions (podcast's setting)
     episodes.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime())
 
-    // filter by duration
-    function filterByDuration(episode: EpisodeData) {
-      let result = true
+    setLatestEpisodes(episodes)
+
+    // download / add to queue new episodes (filtered episodes aren't processed)
+    for (const episode of episodes.filter((episode) => episode.new)) {
       if (episode.podcastUrl in podcastSettings) {
         const episodePodcastSettings = getPodcastSettings(episode.podcastUrl, podcastSettings)
 
-        if (episodePodcastSettings.filter.duration.min > 0) {
-          result = result && episode.duration >= episodePodcastSettings.filter.duration.min
+        // we are suposing that, as the episodes are new, they can't be either on downloads or queue
+        // if that fails then we must wait till both queue and downloads are loaded
+
+        if (episodePodcastSettings.downloadNew) {
+          downloadEpisode(episode).then((destination) => downloads.addToDownloadList(episode, destination))
         }
 
-        if (episodePodcastSettings.filter.duration.max > 0) {
-          result = result && episode.duration <= episodePodcastSettings.filter.duration.max
+        if (episodePodcastSettings.queueNew) {
+          await queue.push(episode)
         }
       }
-      return result
     }
-
-    setLatestEpisodes(episodes.filter(filterByDuration))
   }
 
   useEffect(() => {
-    // extract episodes newer than setting
     db && loadLatestEpisodes()
-  }, [numberOfDaysInNews, subscriptions, updateFeedsCount])
+  }, [db, numberOfDaysInNews])
 
   useEffect(() => {
     if (!db) return
@@ -130,7 +147,7 @@ export function useSubscriptions(db: Database, subscriptionsEpisodes: DB['subscr
 
     // save after all feeds are downloaded, db operations are executed on a single thread
     await subscriptionsEpisodes.save(subsEpisodes.flat())
-    setUpdateFeedsCount((prev) => prev + 1)
+    loadLatestEpisodes() // TODO: load latest episodes (home) as feeds are updated
   }
 
   return { subscriptions, add, get, remove, getAll, updateFeeds, latestEpisodes, includes }
