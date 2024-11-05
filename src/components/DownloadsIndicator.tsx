@@ -15,7 +15,7 @@ export default function DownloadsIndicator() {
     unlisten.current = await listen<DownloadPayload>('downloading', ({ payload: { src, downloaded, total, name, complete } }) => {
       if (src in downloads.current && complete) {
         delete downloads.current[src]
-        if (Object.keys(downloads.current).length == 0) {
+        if (Object.keys(downloads.current).length === 0) {
           setProgress(0)
           return
         }
@@ -55,7 +55,7 @@ export default function DownloadsIndicator() {
       </svg>
       <div className="absolute top-7 z-20 hidden max-w-96 flex-col rounded-md border-2 border-primary-6 bg-primary-9 px-2 py-1 text-xs hover:flex group-hover:flex">
         {Object.keys(downloads.current).map((src) => (
-          <div className="flex items-center justify-between gap-3 border-b-2 border-primary-8 p-1 last:border-0">
+          <div key={src} className="flex items-center justify-between gap-3 border-b-2 border-primary-8 p-1 last:border-0">
             <p className="line-clamp-2 w-max text-ellipsis">{downloads.current[src].name}</p>
             <p className="text-sm">{((downloads.current[src].downloaded / downloads.current[src].total) * 100).toFixed(1)}%</p>
           </div>

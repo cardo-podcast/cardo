@@ -23,8 +23,8 @@ export default function QueuePage() {
 
     if (over == null) return
 
-    const activePosition = queue.findIndex((episode) => episode.id == (active.id as number))
-    const overPosition = queue.findIndex((episode) => episode.id == (over.id as number))
+    const activePosition = queue.findIndex((episode) => episode.id === (active.id as number))
+    const overPosition = queue.findIndex((episode) => episode.id === (over.id as number))
 
     move(activePosition, overPosition)
   }
@@ -41,9 +41,7 @@ export default function QueuePage() {
 
   useEffect(() => {
     // asynchronously fetch podcast data to allow loadig podcast page clicking on cover
-    queue.map((episode) => {
-      fetchPodcastData(episode)
-    })
+    queue.map((episode) => fetchPodcastData(episode))
 
     //sum items and total time
     const items = queue.length
