@@ -4,11 +4,9 @@ on:
   push:
     # Sequence of patterns matched against refs/tags
     tags:
-      - "*" # Push events to matching any tag format, i.e. 1.0, 20.15.10
-
+      - '*' # Push events to matching any tag format, i.e. 1.0, 20.15.10
 
 jobs:
-  
   publish-tauri:
     permissions:
       contents: write
@@ -44,7 +42,7 @@ jobs:
         run: npm install -g pnpm
 
       - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-20.04' # This must match the platform value defined above.
+        if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
@@ -55,11 +53,11 @@ jobs:
         id: tag_description
         run: |
           TAG_SHA=$(curl -s -X GET -H "Authorization: Bearer ${{secrets.GITHUB_TOKEN}}" "https://api.github.com/repos/${{ github.repository }}/git/matching-refs/tags/${{github.ref_name}}" | jq '.[0].object.sha' -r)
-  
+
           TAG_INFO=$(curl -s -X GET -H "Authorization: Bearer ${{secrets.GITHUB_TOKEN}}" "https://api.github.com/repos/${{ github.repository }}/git/tags/$TAG_SHA")
-  
+
           MESSAGE=$(echo $TAG_INFO | jq -r '.message')
-          
+
           # multiline GIHUB_OUTPUT variable
           echo "MESSAGE<<EOF" >> $GITHUB_OUTPUT
           echo "$MESSAGE" >> $GITHUB_OUTPUT
