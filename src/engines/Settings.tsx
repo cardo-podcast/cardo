@@ -134,11 +134,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       playbackRatePresets: [1, 1.25, 1.5, 2],
       volume: 1,
       removeFromQueueAtEnd: false,
-      removeFromDownloadsAtEnd: false
+      removeFromDownloadsAtEnd: false,
     },
     ui: {
       showPinWindowButton: false,
-      collapsedLeftMenu: false,
+      collapsedLeftMenu: true,
     },
   })
 
