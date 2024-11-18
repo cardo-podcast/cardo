@@ -65,14 +65,14 @@ If you like this app you can contribute buying me a cofee or whatever you want, 
 It's also nice if you want to improve the app. The stack is Tauri v1 + React + Typescript + Tailwind.
 
 To install dependencies `pnpm i` command should be enough. To setup a Tauri development environment check their [docs](https://tauri.app/v1/guides/getting-started/prerequisites), are pretty good.
-In src-tauritauri-conf.json you should remove the updater configuration and windows certificate settings, or you will experiment errors of missing private key / certificate.
+In [tauri-conf.json](/src-tauri/tauri.conf.json) you should remove the updater configuration and windows certificate settings, or you will experiment errors of missing private key / certificate.
 
 Be free of summiting a PR if you get something good!
 
 ### Translations
 
 You can contribute with translations if you speak some other languages.
-It's only needed to replicate json's files in resources / translations. There is a tool on scripts to auto translate it using Google Translate, but I didn't want to leave a bad translations, even english could be badly translated as it isn't my mother language.
+It's only needed to replicate json's files in [folder](resources/translations). There is a tool on scripts to auto translate it using Google Translate, but I didn't want to leave a bad translations, even english could be badly translated as it isn't my mother language.
 
 ## Troubleshooting
 
