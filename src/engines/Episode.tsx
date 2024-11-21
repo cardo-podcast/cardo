@@ -16,7 +16,7 @@ export function useEpisode(episode: EpisodeData) {
       globals: { locale },
     },
   ] = useSettings()
-  const { play: playEpisode, pause, paused, playing, position: playingPosition, quit: quitPlayer } = usePlayer()
+  const { play: playEpisode, pause, paused, playing, quit: quitPlayer } = usePlayer()
   const downloadedFile = useRef('')
 
   useEffect(() => {
@@ -64,7 +64,7 @@ export function useEpisode(episode: EpisodeData) {
     } else {
       history.update(episode.src, episode.podcastUrl, reprState.total, reprState.total)
       setReprState({ complete: true, position: reprState.total, total: reprState.total })
-      if (playing?.src == episode.src) {
+      if (playing?.src === episode.src) {
         quitPlayer()
       }
     }
@@ -80,15 +80,11 @@ export function useEpisode(episode: EpisodeData) {
     }
   }
 
-  const getPosition = useCallback(() => {
-    return playing?.src == episode.src ? playingPosition : reprState.position
-  }, [playing?.src, episode.src, reprState.position, playingPosition])
-
   const inProgress = useCallback(
     (mustBePlaying = false) => {
       const isStarted = reprState.position > 0 && !reprState.complete
       if (mustBePlaying) {
-        return isStarted && playing?.src == episode.src && !paused
+        return isStarted && playing?.src === episode.src && !paused
       } else {
         return isStarted
       }
@@ -130,12 +126,12 @@ export function useEpisode(episode: EpisodeData) {
   }
 
   const play = () => {
-    if (downloadState == 'downloaded') {
+    if (downloadState === 'downloaded') {
       playEpisode(episode, downloadedFile.current)
     } else {
       playEpisode(episode)
     }
   }
 
-  return { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, toggleDownload, downloadState, play, pause }
+  return { reprState, inQueue, getDateString, togglePlayed, toggleQueue, position: reprState.position, inProgress, toggleDownload, downloadState, play, pause }
 }
