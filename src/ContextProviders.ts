@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react'
 import { SyncContextType } from './sync'
 import { DB } from './DB'
-import { AudioPlayerRef } from './components/AudioPlayer'
+import { AudioPlayerRef } from '.'
 
 export const SyncContext = createContext<SyncContextType | null>(null)
 export const useSync = () => useContext(SyncContext) as SyncContextType
