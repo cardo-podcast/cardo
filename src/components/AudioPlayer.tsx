@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, RefObject, createContext, ReactNode, useContext, Dispatch, SetStateAction, useCallback, SyntheticEvent } from 'react'
+import { useRef, useEffect, useState, RefObject, ReactNode, Dispatch, SetStateAction, useCallback, SyntheticEvent } from 'react'
 import { secondsToStr } from '../utils/utils'
 import { play as playIcon, pause as pauseIcon, forward as forwardIcon, backwards as backwardsIcon, close as closeIcon, speedometer, volume as volumeIcon, mute as muteIcon } from '../Icons'
 import { EpisodeData } from '..'
@@ -10,7 +10,7 @@ import appIcon from '../../src-tauri/icons/icon.png'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import round from 'lodash/round'
 import { RangeInput } from './Inputs'
-import { useDB } from '../ContextProviders'
+import { PlayerContext, useDB, usePlayer } from '../ContextProviders'
 
 export type AudioPlayerRef = {
   audioRef: RefObject<HTMLAudioElement>
@@ -24,10 +24,6 @@ export type AudioPlayerRef = {
   onExit: () => Promise<void>
   quit: () => void
 }
-
-const PlayerContext = createContext<AudioPlayerRef | undefined>(undefined)
-
-export const usePlayer = () => useContext(PlayerContext) as AudioPlayerRef
 
 export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(null)
@@ -312,7 +308,6 @@ function AudioPlayer({ className = '' }) {
 
   const playNextInQueue = () => {
     if (audioRef.current && playing) {
-
       removeFromQueueAtEnd && queue.remove(playing.src)
       removeFromDownloadsAtEnd && downloads.removeFromDownloadList(playing.src)
 
