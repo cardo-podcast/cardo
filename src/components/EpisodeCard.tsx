@@ -48,7 +48,7 @@ function EpisodeCard({ episode, className = '', onImageClick = undefined, onClic
       }}
     >
       <>
-        <div className="aspect-square h-16 rounded-md bg-primary-8">
+        <div className="aspect-square h-16 rounded-md bg-primary-8 flex items-center justify-center">
           <img
             className={`rounded-md ${onImageClick !== undefined ? 'cursor-pointer hover:p-0.5' : ''}`}
             onClick={onImageClick}
