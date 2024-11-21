@@ -16,7 +16,6 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playing, setPlaying] = useState<EpisodeData>()
   const { history, misc, downloads } = useDB()
-  const [position, setPosition] = useState(0)
 
 
   const loadLastPlayed = async () => {
@@ -55,7 +54,6 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
 
     if (previousState !== undefined && previousState.position < previousState.total) {
       audioRef.current.currentTime = previousState.position
-      setPosition(previousState.position)
     }
   }
 
@@ -104,8 +102,6 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
         pause,
         paused: audioRef.current?.paused ?? false,
         playing,
-        position,
-        setPosition,
         onExit,
         quit,
       }}
@@ -246,9 +242,10 @@ function VolumeControl({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) 
 }
 
 function AudioPlayer({ className = '' }) {
+  const [position, setPosition] = useState(0)
   const [duration, setDuration] = useState(0)
   const { history, queue, downloads } = useDB()
-  const { audioRef, play, playing, position, setPosition, quit } = usePlayer()
+  const { audioRef, play, playing, quit } = usePlayer()
   const navigate = useNavigate()
   const [
     {

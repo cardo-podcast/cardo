@@ -130,8 +130,6 @@ export type AudioPlayerRef = {
   pause: () => void
   paused: boolean
   playing: EpisodeData | undefined
-  position: number
-  setPosition: Dispatch<SetStateAction<number>>
   onExit: () => Promise<void>
   quit: () => void
 }

@@ -14,7 +14,7 @@ function EpisodeCard({ episode, className = '', onImageClick = undefined, onClic
   const contextMenuTarget = useRef<HTMLDivElement>(null)
   const { t } = useTranslation()
 
-  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, getPosition, inProgress, play, pause, toggleDownload, downloadState } = useEpisode(episode)
+  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, position, inProgress, play, pause, toggleDownload, downloadState } = useEpisode(episode)
 
   return (
     <div
@@ -75,7 +75,7 @@ function EpisodeCard({ episode, className = '', onImageClick = undefined, onClic
             {episode.title}
           </h2>
           <div className="flex w-full items-center justify-end gap-2">
-            {inProgress() ? <ProgressBar position={getPosition()} total={reprState.total} className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }} /> : secondsToStr(reprState.total)}
+            {inProgress() ? <ProgressBar position={position} total={reprState.total} className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }} /> : secondsToStr(reprState.total)}
             <button
               className="flex aspect-square w-7 shrink-0 items-center justify-center rounded-full border-2 border-primary-6 p-1 hover:p-[2px] hover:text-accent-6"
               onClick={(e) => {
