@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, RefObject, ReactNode, Dispatch, SetStateAction, useCallback, SyntheticEvent } from 'react'
+import { useRef, useEffect, useState, RefObject, ReactNode, useCallback, SyntheticEvent } from 'react'
 import { secondsToStr } from '../utils/utils'
 import { play as playIcon, pause as pauseIcon, forward as forwardIcon, backwards as backwardsIcon, close as closeIcon, speedometer, volume as volumeIcon, mute as muteIcon } from '../Icons'
 import { EpisodeData } from '..'
@@ -12,24 +12,12 @@ import round from 'lodash/round'
 import { RangeInput } from './Inputs'
 import { PlayerContext, useDB, usePlayer } from '../ContextProviders'
 
-export type AudioPlayerRef = {
-  audioRef: RefObject<HTMLAudioElement>
-  play: (episode?: EpisodeData | undefined, localSrc?: string) => void
-  reload: () => void
-  pause: () => void
-  paused: boolean
-  playing: EpisodeData | undefined
-  position: number
-  setPosition: Dispatch<SetStateAction<number>>
-  onExit: () => Promise<void>
-  quit: () => void
-}
-
 export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playing, setPlaying] = useState<EpisodeData>()
   const { history, misc, downloads } = useDB()
   const [position, setPosition] = useState(0)
+
 
   const loadLastPlayed = async () => {
     if (audioRef.current == null) return

@@ -122,3 +122,16 @@ export type TailwindBaseColor = 'slate' | 'gray' | 'zinc' | 'neutral' | 'stone' 
 export type TailwindColor = `${TailwindBaseColor}-${50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 950}`
 
 // #endregion
+
+export type AudioPlayerRef = {
+  audioRef: RefObject<HTMLAudioElement>
+  play: (episode?: EpisodeData | undefined, localSrc?: string) => void
+  reload: () => void
+  pause: () => void
+  paused: boolean
+  playing: EpisodeData | undefined
+  position: number
+  setPosition: Dispatch<SetStateAction<number>>
+  onExit: () => Promise<void>
+  quit: () => void
+}
