@@ -30,14 +30,14 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
               event: toggleQueue,
             },
             {
-              label: t(downloadState == 'downloaded' ? 'remove_download' : 'download'),
+              label: t(downloadState === 'downloaded' ? 'remove_download' : 'download'),
               event: toggleDownload,
             },
           ],
         })
       }}
     >
-      <div className="relative flex flex-col overflow-hidden rounded-md">
+      <div className="relative flex aspect-square w-full flex-col items-center justify-center overflow-hidden rounded-md bg-primary-8">
         <img
           title={episode.podcast?.podcastName}
           className="w-full bg-purple-950"

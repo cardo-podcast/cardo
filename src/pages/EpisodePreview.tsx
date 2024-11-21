@@ -61,39 +61,41 @@ function EpisodePreview() {
   return (
     <div className="flex w-full flex-col p-2">
       <div className="justify-left mb-2 flex w-full gap-3 border-b-2 border-primary-8 p-2 pb-3">
-        <img
-          className={`aspect-square h-28 rounded-md transition-all ${podcastFetched ? 'cursor-pointer hover:p-1' : ''}`}
-          src={episode.coverUrl}
-          alt=""
-          onError={(e: SyntheticEvent<HTMLImageElement>) => {
-            if (e.currentTarget.src === episode.podcast?.coverUrl) {
-              e.currentTarget.src = appIcon
-            } else {
-              e.currentTarget.src = episode.podcast?.coverUrl ?? appIcon
-            }
-          }}
-          title={podcastFetched ? t('open_podcast') + ' ' + episode.podcast?.podcastName : ''}
-          onClick={() => {
-            podcastFetched && // buton didn't work if podcast isn't loaded yet
-              navigate('/preview', {
-                state: {
-                  podcast: episode.podcast,
-                },
-              })
-          }}
-          onContextMenu={() => {
-            if (!podcastFetched) return
+        <div className={`flex aspect-square h-28 items-center justify-center rounded-md bg-primary-8 transition-all ${podcastFetched ? 'cursor-pointer hover:scale-95' : ''}`}>
+          <img
+            className="rounded-md"
+            src={episode.coverUrl}
+            alt=""
+            onError={(e: SyntheticEvent<HTMLImageElement>) => {
+              if (e.currentTarget.src === episode.podcast?.coverUrl) {
+                e.currentTarget.src = appIcon
+              } else {
+                e.currentTarget.src = episode.podcast?.coverUrl ?? appIcon
+              }
+            }}
+            title={podcastFetched ? t('open_podcast') + ' ' + episode.podcast?.podcastName : ''}
+            onClick={() => {
+              podcastFetched && // buton didn't work if podcast isn't loaded yet
+                navigate('/preview', {
+                  state: {
+                    podcast: episode.podcast,
+                  },
+                })
+            }}
+            onContextMenu={() => {
+              if (!podcastFetched) return
 
-            showMenu({
-              items: [
-                {
-                  label: t('copy_episode_url'),
-                  event: copyEpisodeSrc,
-                },
-              ],
-            })
-          }}
-        />
+              showMenu({
+                items: [
+                  {
+                    label: t('copy_episode_url'),
+                    event: copyEpisodeSrc,
+                  },
+                ],
+              })
+            }}
+          />
+        </div>
 
         <div className="flex w-full flex-col justify-between gap-2 p-1">
           <div className="flex flex-col">

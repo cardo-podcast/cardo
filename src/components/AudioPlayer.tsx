@@ -17,7 +17,6 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const [playing, setPlaying] = useState<EpisodeData>()
   const { history, misc, downloads } = useDB()
 
-
   const loadLastPlayed = async () => {
     if (audioRef.current == null) return
 
@@ -331,25 +330,28 @@ function AudioPlayer({ className = '' }) {
       {playing && (
         <div className={`flex w-full gap-3 bg-primary-10 p-2 ${className}`}>
           {/* COVER ON LEFT SIDE*/}
-          <img
-            className="z-10 m-auto aspect-square w-24 cursor-pointer rounded-md transition-all hover:p-1"
-            src={playing.coverUrl}
-            alt=""
-            onClick={() => {
-              navigate('/episode-preview', {
-                state: {
-                  episode: playing,
-                },
-              })
-            }}
-            onError={(e: SyntheticEvent<HTMLImageElement>) => {
-              if (e.currentTarget.src === playing.podcast?.coverUrl) {
-                e.currentTarget.src = appIcon
-              } else {
-                e.currentTarget.src = playing.podcast?.coverUrl ?? appIcon
-              }
-            }}
-          />
+
+          <div className="z-10 m-auto flex aspect-square w-24 cursor-pointer items-center justify-center rounded-md bg-primary-9 transition-transform hover:scale-95">
+            <img
+              className="rounded-md"
+              src={playing.coverUrl}
+              alt=""
+              onClick={() => {
+                navigate('/episode-preview', {
+                  state: {
+                    episode: playing,
+                  },
+                })
+              }}
+              onError={(e: SyntheticEvent<HTMLImageElement>) => {
+                if (e.currentTarget.src === playing.podcast?.coverUrl) {
+                  e.currentTarget.src = appIcon
+                } else {
+                  e.currentTarget.src = playing.podcast?.coverUrl ?? appIcon
+                }
+              }}
+            />
+          </div>
 
           <div className="flex w-full flex-col">
             {/* TITLE ON THE TOP NEXT TO COVER */}
