@@ -227,5 +227,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     init()
   }, [])
 
+  if (!loaded) return // app renders before settings are loaded
+
   return <SettingsContext.Provider value={[settings, updateSettings]}>{children}</SettingsContext.Provider>
 }
