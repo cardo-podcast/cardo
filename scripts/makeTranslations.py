@@ -28,5 +28,8 @@ for destLang in DEST:
         if not key in dest.keys():
             dest[key] = translate(value, src=SRC, dest=destLang)
 
+    # delete removed keys from dest
+    dest = {key: value for key, value in dest.items() if key in src}
+
     with open(destFile, 'w', encoding='utf-8') as f:
         dest = json.dump(dest, f, indent=2, ensure_ascii=False)
