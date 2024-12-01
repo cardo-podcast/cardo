@@ -134,7 +134,8 @@ function PodcastPreview() {
   async function loadEpisodes(forceDownload = false) {
     const episodes = await (forceDownload ? getAllEpisodes(true) : allEpisodes)
     setEpisodes(sortEpisodes(await filterEpisodes(episodes)))
-    subscriptions.loadLatestEpisodes()
+
+    forceDownload && subscriptions.loadLatestEpisodes() // when updating feed from button on podcast page latest episodes are refreshed
   }
 
   const filterEpisodes = async (unfilteredEpisodes: EpisodeData[]) => {
