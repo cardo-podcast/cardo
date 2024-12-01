@@ -134,6 +134,7 @@ function PodcastPreview() {
   async function loadEpisodes(forceDownload = false) {
     const episodes = await (forceDownload ? getAllEpisodes(true) : allEpisodes)
     setEpisodes(sortEpisodes(await filterEpisodes(episodes)))
+    subscriptions.loadLatestEpisodes()
   }
 
   const filterEpisodes = async (unfilteredEpisodes: EpisodeData[]) => {
@@ -277,7 +278,7 @@ function PodcastPreview() {
 
                 {tweakMenu === 'settings' && (
                   <div className="flex w-4/5 justify-center gap-1">
-                    <div className='flex flex-col items-end'>
+                    <div className="flex flex-col items-end">
                       <label className="flex w-fit gap-1">
                         {t('download_new')}:
                         <Checkbox defaultChecked={podcastSettings.downloadNew} onChange={(value) => updatePodcastSettings({ downloadNew: value })} />

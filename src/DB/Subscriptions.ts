@@ -150,5 +150,5 @@ export function useSubscriptions(db: Database, subscriptionsEpisodes: DB['subscr
     loadLatestEpisodes() // TODO: load latest episodes (home) as feeds are updated
   }
 
-  return { subscriptions, add, get, remove, getAll, updateFeeds, latestEpisodes, includes }
+  return { subscriptions, add, get, remove, getAll, updateFeeds, latestEpisodes, includes, loadLatestEpisodes }
 }
