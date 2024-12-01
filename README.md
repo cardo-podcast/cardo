@@ -75,6 +75,37 @@ Be free of summiting a PR if you get something good!
 
 <!-- TRANSLATION-TABLE-START -->
 
+<table>
+  <thead>
+    <tr>
+      <th>Language</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+     <tr>
+      <td>es</td>
+      <td style="color: green;">100%</td>
+    </tr>
+     <tr>
+      <td>cn</td>
+      <td style="color: green;">100%</td>
+    </tr>
+     <tr>
+      <td>en</td>
+      <td style="color: green;">100%</td>
+    </tr>
+     <tr>
+      <td>de</td>
+      <td style="color: green;">100%</td>
+    </tr>
+     <tr>
+      <td>pt</td>
+      <td style="color: yellow;">87%</td>
+    </tr>
+  </tbody>
+</table>
+
 <!-- TRANSLATION-TABLE-END -->
 
 #### Contributing
