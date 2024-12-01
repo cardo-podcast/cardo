@@ -1,11 +1,11 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-use std::fs::File;
-use std::io::Write;
 use aes_gcm::aead::{generic_array::GenericArray, Aead, KeyInit, OsRng};
 use aes_gcm::{Aes256Gcm, Nonce};
 use base64::{engine::general_purpose, Engine as _};
 use rand::RngCore;
+use std::fs::File;
+use std::io::Write;
 use tauri::{command, Window};
 use tauri_plugin_sql::{Migration, MigrationKind};
 
@@ -75,23 +75,28 @@ struct DownloadPayload {
     name: String,
     downloaded: u64,
     total: u64,
-    complete: bool
+    complete: bool,
 }
 
 #[command]
-async fn download_file(url: String, destination: String, name:String, window: Window) -> Result<(), String> {
+async fn download_file(
+    url: String,
+    destination: String,
+    name: String,
+    window: Window,
+) -> Result<(), String> {
     let mut response = reqwest::get(&url).await.map_err(|e| e.to_string())?;
 
     let total_size = response.content_length().unwrap();
 
     let mut file = File::create(&destination).map_err(|e| e.to_string())?;
 
-    let mut payload =  DownloadPayload {
+    let mut payload = DownloadPayload {
         src: url,
         name: name,
         downloaded: 0,
         total: total_size,
-        complete: false
+        complete: false,
     };
 
     let mut i: u8 = 0;
@@ -100,7 +105,8 @@ async fn download_file(url: String, destination: String, name:String, window: Wi
         payload.downloaded += chunk.len() as u64;
 
         i += 1;
-        if i == 100 { // reduce event emmisions
+        if i == 100 {
+            // reduce event emmisions
             window.emit("downloading", payload.clone()).unwrap();
             i = 0;
         }
@@ -199,6 +205,23 @@ fn main() {
                                         coverUrl TEXT,
                                         localFile TEXT
             );",
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 8,
+            description: "Episodes count for each subscription to detect new episodes",
+            sql: "
+            DELETE FROM misc WHERE description = 'lastFeedDownload';
+            
+            ALTER TABLE subscriptions ADD COLUMN episode_count INTEGER DEFAULT 0;
+
+            UPDATE subscriptions
+            SET episode_count = (
+                SELECT COUNT(se.src)
+                FROM subscriptions_episodes se
+                WHERE se.podcastUrl = subscriptions.feedUrl
+            );
+            ",
             kind: MigrationKind::Up,
         },
     ];

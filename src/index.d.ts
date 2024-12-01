@@ -39,6 +39,8 @@ export interface NewEpisodeData extends EpisodeData {
 
 export interface RawEpisodeData extends EpisodeData {
   pubDate: number
+  count: number
+  countCurrent: number
   podcastCover?: string
   podcastName?: string
 }

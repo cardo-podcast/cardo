@@ -81,46 +81,43 @@ export function useSubscriptionsEpisodes(db: Database) {
     async function (pubdate_gt: number): Promise<NewEpisodeData[]> {
       // get all uncompleted episodes since a pubDate
 
-      // get last feed dowload sync to highlight the new fetched episodes
-      const r: { value: number }[] = await db.select(
-        `SELECT value from misc
-        WHERE description = "lastFeedDownload"`,
-      )
-
-      const lastSync = r[0]?.value ?? 0
-
-      // set current time as last
-      db.execute(
-        `
-        INSERT into misc (description, value)
-        VALUES ('lastFeedDownload', $1)
-        ON CONFLICT (description) DO UPDATE
-        SET value = $1
-        WHERE description = 'lastFeedDownload'
-      `,
-        [Date.now()],
-      )
-
       // get all episodes of the database, filter by pubdate
       const r2: RawEpisodeData[] = await db.select(
         `
-      SELECT subscriptions_episodes.*,
-            subscriptions.coverUrl AS podcastCover,
-            subscriptions.podcastName
-            FROM subscriptions_episodes
-      LEFT JOIN episodes_history ON subscriptions_episodes.src = episodes_history.episode
-      LEFT JOIN subscriptions ON subscriptions_episodes.podcastUrl = subscriptions.feedUrl
-      WHERE pubDate > $1
-      AND (episodes_history.position IS NULL
-      OR episodes_history.position < episodes_history.total)
+      SELECT se.*,
+            s.coverUrl AS podcastCover,
+            s.podcastName,
+            s.episode_count AS count,
+            (SELECT COUNT(se2.src) 
+              FROM subscriptions_episodes se2 
+              WHERE se2.podcastUrl = se.podcastUrl) AS countCurrent -- se2 is not affected by final where clause
+      FROM
+        subscriptions_episodes se
+      LEFT JOIN
+        episodes_history eh ON se.src = eh.episode
+      LEFT JOIN
+        subscriptions s ON se.podcastUrl = s.feedUrl
+      WHERE
+        pubDate > $1
+        AND (eh.position IS NULL OR eh.position < eh.total)
       `,
         [pubdate_gt],
       )
 
+      // update episode count after checking which episodes are new
+      await db.execute(`
+        UPDATE subscriptions
+        SET episode_count = (
+          SELECT COUNT(se.src)
+          FROM subscriptions_episodes se
+          WHERE se.podcastUrl = subscriptions.feedUrl
+        );
+      `)
+
       return r2.map((episode) => ({
         ...episode,
         pubDate: new Date(episode.pubDate),
-        new: episode.pubDate > lastSync, // is new if it's just discovered
+        new: episode.count > 0 && episode.countCurrent > episode.count, // is new if it's just discovered
         podcast: { coverUrl: episode.podcastCover, podcastName: episode.podcastName },
       }))
     },
