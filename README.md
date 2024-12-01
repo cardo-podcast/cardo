@@ -71,6 +71,14 @@ Be free of summiting a PR if you get something good!
 
 ### Translations
 
+#### Current status
+
+<!-- TRANSLATION-TABLE-START -->
+
+<!-- TRANSLATION-TABLE-END -->
+
+#### Contributing
+
 You can contribute with translations if you speak some other languages.
 It's only needed to replicate json's files in [folder](resources/translations). There is a tool on scripts to auto translate it using Google Translate, but I didn't want to leave a bad translations, even english could be badly translated as it isn't my mother language.
 
