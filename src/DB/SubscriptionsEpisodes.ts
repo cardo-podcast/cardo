@@ -84,19 +84,26 @@ export function useSubscriptionsEpisodes(db: Database) {
       // get all episodes of the database, filter by pubdate
       const r2: RawEpisodeData[] = await db.select(
         `
-      SELECT se.*,
+      WITH episodes_with_count AS ( -- subquery not constrained by pubdate
+        SELECT
+          se.*,
+          ROW_NUMBER() OVER (
+          PARTITION BY se.podcastUrl 
+          ORDER BY se.pubDate ASC
+            ) AS countCurrent -- incremental count thought episodes of same podcast
+        FROM subscriptions_episodes se
+      )
+      SELECT
+            ec.*,
             s.coverUrl AS podcastCover,
             s.podcastName,
-            s.episode_count AS count,
-            (SELECT COUNT(se2.src) 
-              FROM subscriptions_episodes se2 
-              WHERE se2.podcastUrl = se.podcastUrl) AS countCurrent -- se2 is not affected by final where clause
+            s.episode_count AS count
       FROM
-        subscriptions_episodes se
+        episodes_with_count ec
       LEFT JOIN
-        episodes_history eh ON se.src = eh.episode
+        episodes_history eh ON ec.src = eh.episode
       LEFT JOIN
-        subscriptions s ON se.podcastUrl = s.feedUrl
+        subscriptions s ON ec.podcastUrl = s.feedUrl
       WHERE
         pubDate > $1
         AND (eh.position IS NULL OR eh.position < eh.total)
@@ -114,12 +121,16 @@ export function useSubscriptionsEpisodes(db: Database) {
         );
       `)
 
-      return r2.map((episode) => ({
-        ...episode,
-        pubDate: new Date(episode.pubDate),
-        new: episode.count > 0 && episode.countCurrent > episode.count, // is new if it's just discovered
-        podcast: { coverUrl: episode.podcastCover, podcastName: episode.podcastName },
-      }))
+      return r2.map((episode) => {
+        console.log(episode, episode.countCurrent)
+
+        return {
+          ...episode,
+          pubDate: new Date(episode.pubDate),
+          new: episode.count > 0 && episode.countCurrent > episode.count, // is new if it's just discovered
+          podcast: { coverUrl: episode.podcastCover, podcastName: episode.podcastName },
+        }
+      })
     },
     [db],
   )
