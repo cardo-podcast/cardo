@@ -96,12 +96,12 @@ Be free of summiting a PR if you get something good!
       <td style="color: green;">100%</td>
     </tr>
      <tr>
-      <td>de</td>
+      <td>pt</td>
       <td style="color: green;">100%</td>
     </tr>
      <tr>
-      <td>pt</td>
-      <td style="color: yellow;">87%</td>
+      <td>de</td>
+      <td style="color: green;">100%</td>
     </tr>
   </tbody>
 </table>
