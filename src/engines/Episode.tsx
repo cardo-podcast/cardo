@@ -16,8 +16,21 @@ export function useEpisode(episode: EpisodeData) {
       globals: { locale },
     },
   ] = useSettings()
-  const { play: playEpisode, pause, paused, playing, quit: quitPlayer } = usePlayer()
+  const { play: playEpisode, pause, paused, playing, quit: quitPlayer, audioRef } = usePlayer()
   const downloadedFile = useRef('')
+
+  useEffect(() => {
+    function updatePosition(e: React.SyntheticEvent<HTMLAudioElement>) {
+      setReprState({ ...reprState, position: e.currentTarget.currentTime })
+    }
+
+    // when this episode is playing
+    if (episode.src === playing?.src) {
+      if (audioRef.current) {
+        audioRef.current.ontimeupdate = updatePosition
+      }
+    }
+  }, [episode.src, playing?.src])
 
   useEffect(() => {
     if (episode.src) {
