@@ -16,7 +16,7 @@ function SearchBar() {
   } = useDB()
   const [searchMode, setSearchMode_] = useState<'subscriptions' | 'podcasts' | 'current'>(subscriptions.length > 0 ? 'subscriptions' : 'podcasts')
   const [noResults, setNoResults] = useState(false)
-  const timeout = useRef(0)
+  const timeout = useRef<ReturnType<typeof setInterval>>()
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
   const { t } = useTranslation()
@@ -169,7 +169,7 @@ function SearchBar() {
           <div className="absolute left-0 top-0 z-10 mt-10 h-screen w-screen" onClick={() => setResults([])} />
 
           <div className="absolute left-1/2 top-0 z-30 mt-[32px] max-h-[60dvh] w-4/5 -translate-x-1/2 justify-center overflow-hidden overflow-y-auto scroll-smooth rounded-b-md border-x-2 border-primary-8 bg-primary-9 shadow-md shadow-primary-8" ref={resultsRef}>
-            <div className="flex flex-col w-full">
+            <div className="flex w-full flex-col">
               {results.map((result, i) => {
                 if (searchMode === 'podcasts') {
                   return <PodcastCard key={i} podcast={result as PodcastData} />

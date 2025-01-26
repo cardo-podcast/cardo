@@ -6,7 +6,7 @@ import { useDB, useSync } from '../../ContextProviders'
 import { invoke } from '@tauri-apps/api'
 
 export function NextcloudSettings() {
-  const interval = useRef(0)
+  const interval = useRef<ReturnType<typeof setInterval>>()
   const { t } = useTranslation()
   const { setLoggedIn } = useSync()
   const {
