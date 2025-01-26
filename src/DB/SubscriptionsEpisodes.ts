@@ -122,8 +122,6 @@ export function useSubscriptionsEpisodes(db: Database) {
       `)
 
       return r2.map((episode) => {
-        console.log(episode, episode.countCurrent)
-
         return {
           ...episode,
           pubDate: new Date(episode.pubDate),
