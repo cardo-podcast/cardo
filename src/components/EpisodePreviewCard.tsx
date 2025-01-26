@@ -58,7 +58,8 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
             }
           }}
         />
-        <ProgressBar position={position} total={episode.duration} showTime={false} className={{ div: 'h-[5px]' }} />
+        <ProgressBar position={position} total={episode.duration} showTime={false} className={{ div: 'h-2 shrink-0' }} />
+
         <button
           className="absolute bottom-2 right-2 flex aspect-square w-7 items-center justify-center rounded-full border-2 border-accent-8 bg-accent-7 p-[3px] pl-[4px] transition-all hover:p-[1px]"
           onClick={(e) => {
