@@ -36,7 +36,17 @@ export default function EpisodeOverview({ children }: { children: ReactNode }) {
         </div>
       )}
 
-      <div ref={scrollRef} className="flex gap-2 overflow-x-auto scroll-smooth">
+      <div
+        ref={scrollRef}
+        className="flex gap-2 overflow-x-auto scroll-smooth"
+        onWheel={(e) => {
+          e.preventDefault()
+
+          const deltaX = e.deltaY * 0.5 // deltaY is too fast
+
+          e.currentTarget.scrollBy({ left: deltaX, behavior: 'instant' }) // smooth behaviour is clunky 
+        }}
+      >
         {children}
       </div>
     </div>
