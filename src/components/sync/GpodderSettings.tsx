@@ -51,7 +51,7 @@ export function GpodderSettings() {
             <input type="text" required className="w-full rounded-md bg-primary-8 px-2 py-1 focus:outline-none" placeholder={t('username')} />
             <input type="password" required className="w-full rounded-md bg-primary-8 px-2 py-1 focus:outline-none" placeholder={t('password')} />
           </div>
-          <button className="w-fit rounded-md bg-accent-6 p-1 px-4 uppercase hover:bg-accent-7">{t('connect')}</button>
+          <button className="filled-button p-1 px-4 uppercase">{t('connect')}</button>
         </div>
       </form>
     </div>

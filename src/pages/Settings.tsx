@@ -11,7 +11,7 @@ import { readDir } from '@tauri-apps/api/fs'
 import tauriConfig from '../../src-tauri/tauri.conf.json'
 import { useModalBanner } from '../components/ModalBanner'
 import { SyncSettings } from '../components/sync/SyncSettings'
-import { importOPML, useOPML } from '../utils/opml'
+import { useOPML } from '../utils/opml'
 
 function AccentColorSelector() {
   const [
@@ -71,7 +71,7 @@ function Settings() {
     <div className="flex w-full flex-col gap-2 p-2">
       <div className="flex justify-between rounded-md border-[2px] border-primary-8 p-2">
         <h2>{t('open_settings_file')}:</h2>
-        <button className="rounded-md bg-accent-7 px-2 py-1 text-sm hover:bg-accent-8" onClick={() => showBanner()}>
+        <button className="filled-button text-sm" onClick={() => showBanner()}>
           config.json
         </button>
 
@@ -159,6 +159,7 @@ function Settings() {
             <input
               type="file"
               accept=".opml"
+              className=""
               onChange={(e) => {
                 const files = e.target.files
                 if (files?.length) {

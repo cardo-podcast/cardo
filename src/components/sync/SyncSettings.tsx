@@ -22,7 +22,7 @@ export function SyncSettings() {
           <div className="flex flex-col gap-2">
             <p className="text-lg">{t('logged_in')}</p>
             <button
-              className="w-fit rounded-md bg-accent-6 p-1 px-4 uppercase hover:bg-accent-7"
+              className="filled-button uppercase"
               onClick={async () => {
                 removeCreds(loggedIn)
                 setLoggedIn(null)

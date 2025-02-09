@@ -1,29 +1,5 @@
-@import url("text-auto.css"); /* auto text colors could be overwriten by tailwind more specific classes*/
+@import url('text-auto.css'); /* auto text colors could be overwriten by tailwind more specific classes*/
+@import url('custom-styles.css');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-::-webkit-scrollbar {
-    display: none;
-}
-
-button {
-    @apply transition-colors;
-}
-
-h1, h2{
-    @apply font-light;
-}
-
-.external-link {
-    @apply text-accent-6
-}
-
-input[type="range"]::-webkit-slider-runnable-track {
-    background-color: var(--color-primary-3);
-    height: 2px;
-  }
-
-input[type="range"]::-webkit-slider-thumb {
-    margin-top: -7px;
-}

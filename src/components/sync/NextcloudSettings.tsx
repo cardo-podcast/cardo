@@ -59,7 +59,7 @@ export function NextcloudSettings() {
       >
         <div className="flex w-full flex-col items-end gap-2">
           <input name="server" type="url" required className="w-11/12 rounded-md bg-primary-8 px-2 py-1 focus:outline-none" placeholder={t('nextcloud_server_url')} />
-          <button className="w-fit rounded-md bg-accent-6 p-1 px-4 uppercase hover:bg-accent-7">{t('connect')}</button>
+          <button className="filled-button p-1 px-4 uppercase">{t('connect')}</button>
         </div>
       </form>
     </div>
