@@ -12,6 +12,7 @@ import { sanitizeHTML } from '../utils/sanitize'
 import { showMenu } from 'tauri-plugin-context-menu'
 import { useSync, useDB } from '../ContextProviders'
 import { PodcastCover } from '../components/Cover'
+import { useModalBanner } from '../components/ModalBanner'
 
 const EPISODE_CARD_HEIGHT = 80 // min height
 const PRELOADED_EPISODES = 10 //
@@ -70,6 +71,7 @@ function PodcastPreview() {
 
   const [tweakMenu, setTweakMenu] = useState<'sort' | 'filter' | 'settings' | undefined>(undefined)
   const { t } = useTranslation()
+  const [showChangeCoverBanner, ChangeCoverBanner] = useModalBanner()
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const [visibleItems, setVisibleItems] = useState(() => {
@@ -225,6 +227,23 @@ function PodcastPreview() {
 
   return (
     <>
+      <ChangeCoverBanner
+        onSubmit={(e) => {
+          const input: HTMLInputElement = e.currentTarget.url
+
+          podcast.coverUrl = podcast.coverUrlLarge = input.value
+        }}
+      >
+        <h1>{t('change_podcast_cover')}</h1>
+        <input
+          type="url"
+          name="url"
+          placeholder={t('podcast_cover_url')}
+          autoFocus
+          className="w-96 rounded-md bg-primary-8 px-2 py-1 focus:outline-none"
+        />
+      </ChangeCoverBanner>
+
       <div className="relative w-full px-1">
         {/* sticky bar that appears when scrolling */}
         <div className="group absolute top-0 z-10 flex w-full cursor-default items-center gap-2 border-b-2 border-primary-8 bg-primary-9 p-1">
@@ -340,6 +359,10 @@ function PodcastPreview() {
                       {
                         label: t('copy_feed_url'),
                         event: copyFeedUrl,
+                      },
+                      {
+                        label: t('change_podcast_cover'),
+                        event: () => showChangeCoverBanner(),
                       },
                     ],
                   })

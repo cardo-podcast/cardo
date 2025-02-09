@@ -14,7 +14,7 @@ export function useModalBanner(): [typeof showBanner, typeof Banner] {
     labels = ['ok', 'cancel'],
   }: {
     children: ReactNode
-    onSubmit: () => void | Promise<void | 'error'>
+    onSubmit: (e: FormEvent<HTMLFormElement>) => void | Promise<void | 'error'>
     labels?: [string, string]
   }) {
     return ModalBanner({ children, onSubmit: onSubmit, showDialog, setShowDialog, labels })
@@ -31,7 +31,7 @@ function ModalBanner({
   labels,
 }: {
   children: ReactNode
-  onSubmit: (e: FormEvent) => void | Promise<void | 'error'>
+  onSubmit: (e: FormEvent<HTMLFormElement>) => void | Promise<void | 'error'>
   showDialog: boolean
   setShowDialog: (value: boolean) => void
   labels?: [string, string]
