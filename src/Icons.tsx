@@ -246,3 +246,9 @@ export const settings = (
     <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
   </svg>
 )
+
+export const heart = (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" className="icon-tabler">
+    <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
+  </svg>
+)
