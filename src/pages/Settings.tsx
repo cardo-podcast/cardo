@@ -81,7 +81,7 @@ function Settings() {
 
         <Banner
           labels={[t('ok'), t('cancel')]}
-          onAccepted={async () => {
+          onSubmit={async () => {
             const confFile = await join(await appConfigDir(), 'config.json')
             shell.open(confFile)
           }}

@@ -61,7 +61,7 @@ export default function Updater() {
 
       <Banner
         labels={[t('install'), t('later')]}
-        onAccepted={async () => {
+        onSubmit={async () => {
           try {
             // Install the update. This will also restart the app on Windows!
             await installUpdate()

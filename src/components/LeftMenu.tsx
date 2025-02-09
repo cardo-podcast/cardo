@@ -18,7 +18,7 @@ function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
     <>
       <Banner
         labels={[t('ok'), t('cancel')]}
-        onAccepted={async () => {
+        onSubmit={async () => {
           if (!inputRef.current) return
 
           if (!inputRef.current.validity.valid) {
