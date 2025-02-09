@@ -88,5 +88,8 @@
   "remove_from_queue_end": "Borrar episodio de la cola al terminar",
   "remove_from_downloads_end": "Borrar el episodio descargado al terminar",
   "download_new": "Descargar nuevos episodios automáticamente",
-  "queue_new": "Añadir nuevos episodios a la cola automáticamente"
+  "queue_new": "Añadir nuevos episodios a la cola automáticamente",
+  "import/export": "Importar / Exportar",
+  "import_opml": "Importar subscripciones de archivo OPML",
+  "export_opml": "Exportar subscripciones a archivo OPML"
 }

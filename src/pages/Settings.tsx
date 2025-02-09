@@ -11,6 +11,7 @@ import { readDir } from '@tauri-apps/api/fs'
 import tauriConfig from '../../src-tauri/tauri.conf.json'
 import { useModalBanner } from '../components/ModalBanner'
 import { SyncSettings } from '../components/sync/SyncSettings'
+import { importOPML, useOPML } from '../utils/opml'
 
 function AccentColorSelector() {
   const [
@@ -55,6 +56,7 @@ function Settings() {
   const [{ globals, general, colors: colorSettings, playback, ui }, updateSettings] = useSettings()
   const [languages, setLanguages] = useState<string[]>()
   const [showBanner, Banner] = useModalBanner()
+  const [importOPML] = useOPML()
 
   useEffect(() => {
     const loadLocales = async () => {
@@ -146,6 +148,25 @@ function Settings() {
               </label>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-1 rounded-md border-[2px] border-primary-8 p-2">
+        <h1 className="mb-2 border-b-2 border-primary-8 uppercase">{t('import/export')}</h1>
+        <div className="flex gap-10">
+          <label>
+            {t('import_opml')}
+            <input
+              type="file"
+              accept=".opml"
+              onChange={(e) => {
+                const files = e.target.files
+                if (files?.length) {
+                  importOPML(files[0])
+                }
+              }}
+            />
+          </label>
         </div>
       </div>
 
