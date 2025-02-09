@@ -46,7 +46,7 @@ async function downloadXml(url: string): Promise<string> {
   return response.data as string
 }
 
-function getItunesTag(item: Element, tag: string) {
+function getItunesTag(item: Element, tag: string): Element | null {
   return item.getElementsByTagNameNS('http://www.itunes.com/dtds/podcast-1.0.dtd', tag)[0]
 }
 
@@ -56,7 +56,7 @@ export async function parseXML(url: string): Promise<[EpisodeData[], PodcastData
   const xml = parser.parseFromString(xmlString, 'text/xml')
   const items = xml.querySelectorAll('item')
 
-  const parseDuration = (duration: string | null): number => {
+  const parseDuration = (duration: string | null | undefined): number => {
     if (!duration) return 0
 
     const durationNumber = Number(duration)
@@ -112,7 +112,7 @@ export async function parsePodcastDetails(url: string, xml?: Document) {
 
   const podcast: PodcastData = {
     podcastName: capitalize(channel?.querySelector('title')?.textContent ?? ''),
-    artistName: getItunesTag(channel, 'author').textContent ?? '',
+    artistName: getItunesTag(channel, 'author')?.textContent ?? '',
     coverUrl: coverUrl,
     coverUrlLarge: coverUrl,
     feedUrl: url,
