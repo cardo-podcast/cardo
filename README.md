@@ -93,15 +93,15 @@ Be free of summiting a PR if you get something good!
     </tr>
      <tr>
       <td>de</td>
-      <td style="color: green;">97%</td>
+      <td style="color: green;">95%</td>
     </tr>
      <tr>
       <td>cn</td>
-      <td style="color: green;">97%</td>
+      <td style="color: green;">95%</td>
     </tr>
      <tr>
       <td>pt</td>
-      <td style="color: green;">96%</td>
+      <td style="color: green;">94%</td>
     </tr>
   </tbody>
 </table>
