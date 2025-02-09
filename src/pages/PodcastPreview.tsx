@@ -232,6 +232,8 @@ function PodcastPreview() {
           const input: HTMLInputElement = e.currentTarget.url
 
           podcast.coverUrl = podcast.coverUrlLarge = input.value
+
+          updatePodcastSettings({ coverUrl: input.value })
         }}
       >
         <h1>{t('change_podcast_cover')}</h1>
@@ -449,6 +451,7 @@ function PodcastPreview() {
                     // not including all vars to save some memory
                     coverUrl: podcast.coverUrl,
                     podcastName: podcast.podcastName,
+                    feedUrl: podcast.feedUrl
                   },
                 }}
                 className="border-b-[1px] border-primary-8 transition-colors hover:bg-primary-8"

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { EpisodeData, PodcastData } from '..'
 import appIcon from '../../src-tauri/icons/icon.png'
+import { usePodcastSettings } from '../engines/Settings'
 
 interface PodcastCoverProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   podcast: Partial<PodcastData>
@@ -11,7 +12,9 @@ interface EpisodeCoverProps extends React.ImgHTMLAttributes<HTMLImageElement> {
 }
 
 export function PodcastCover({ podcast, ...props }: PodcastCoverProps) {
-  let coverUrl = podcast.coverUrlLarge ?? podcast.coverUrl
+  const [podcastSettings] = usePodcastSettings(podcast.feedUrl!)
+
+  let coverUrl = podcastSettings.coverUrl ? podcastSettings.coverUrl : (podcast.coverUrlLarge ?? podcast.coverUrl)
 
   if (!coverUrl?.length) {
     coverUrl = appIcon

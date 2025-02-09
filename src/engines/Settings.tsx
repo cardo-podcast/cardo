@@ -29,6 +29,7 @@ export class PodcastSettings {
   sort: SortCriterion
   downloadNew: boolean
   queueNew: boolean
+  coverUrl?: string
 
   constructor() {
     this.filter = new FilterCriterion()

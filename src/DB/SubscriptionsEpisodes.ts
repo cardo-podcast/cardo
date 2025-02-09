@@ -144,7 +144,7 @@ export function useSubscriptionsEpisodes(db: Database) {
           ...episode,
           pubDate: new Date(episode.pubDate),
           new: episode.count > 0 && episode.countCurrent > episode.count, // is new if it's just discovered
-          podcast: { coverUrl: episode.podcastCover, podcastName: episode.podcastName },
+          podcast: { coverUrl: episode.podcastCover, podcastName: episode.podcastName, feedUrl: episode.podcastUrl },
         }
       })
     },

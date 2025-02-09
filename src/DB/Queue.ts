@@ -32,7 +32,7 @@ export function useQueue(db: Database) {
     return r.map((episode) => ({
       ...episode,
       pubDate: new Date(episode.pubDate),
-      podcast: { coverUrl: episode.podcastCover, podcastName: episode.podcastName },
+      podcast: { coverUrl: episode.podcastCover, podcastName: episode.podcastName, feedUrl: episode.podcastUrl },
     }))
   }
 
@@ -91,7 +91,7 @@ export function useQueue(db: Database) {
   }
 
   const indexOf = (episodeSrc: string) => {
-    return queue.findIndex((episode) => episode.src == episodeSrc)
+    return queue.findIndex((episode) => episode.src === episodeSrc)
   }
 
   // #endregion
@@ -133,7 +133,7 @@ export function useQueue(db: Database) {
 
   const next = useCallback(
     function (episode: EpisodeData) {
-      const nextIndex = queue.findIndex((ep) => ep.id == episode.id) + 1
+      const nextIndex = queue.findIndex((ep) => ep.id === episode.id) + 1
       return queue[nextIndex]
     },
     [queue],
@@ -142,7 +142,7 @@ export function useQueue(db: Database) {
   const remove = useCallback(
     async function (episodeSrc: string) {
       // delete from queue
-      setQueue((prev) => prev.filter((episode) => episode.src != episodeSrc))
+      setQueue((prev) => prev.filter((episode) => episode.src !== episodeSrc))
 
       await db.execute('DELETE FROM queue WHERE src = $1', [episodeSrc])
     },
