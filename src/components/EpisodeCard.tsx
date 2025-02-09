@@ -1,4 +1,4 @@
-import { MouseEventHandler, SyntheticEvent, useRef } from 'react'
+import { MouseEventHandler, useRef } from 'react'
 import { EpisodeData } from '..'
 import * as icons from '../Icons'
 import { useNavigate } from 'react-router-dom'
@@ -6,7 +6,6 @@ import { secondsToStr } from '../utils/utils'
 import ProgressBar from './ProgressBar'
 import { useTranslation } from 'react-i18next'
 import { showMenu } from 'tauri-plugin-context-menu'
-import appIcon from '../../src-tauri/icons/icon.png'
 import { useEpisode } from '../engines/Episode'
 import { EpisodeCover } from './Cover'
 

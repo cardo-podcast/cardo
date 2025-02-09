@@ -1,5 +1,3 @@
-import appIcon from '../../src-tauri/icons/icon.png'
-import { SyntheticEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { showMenu } from 'tauri-plugin-context-menu'
