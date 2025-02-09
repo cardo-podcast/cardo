@@ -1,4 +1,5 @@
 import { FormEvent, ReactNode, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function useModalBanner(): [typeof showBanner, typeof Banner] {
   const [showDialog, setShowDialog] = useState(false)
@@ -33,8 +34,13 @@ function ModalBanner({
   onSubmit: (e: FormEvent) => void | Promise<void | 'error'>
   showDialog: boolean
   setShowDialog: (value: boolean) => void
-  labels: [string, string]
+  labels?: [string, string]
 }) {
+  const { t } = useTranslation()
+
+  if (!labels) {
+    labels = [t('ok'), t('cancel')]
+  }
   return (
     <form
       className={`fixed left-1/2 top-1/2 z-40 min-w-64 max-w-[70%] -translate-x-1/2 -translate-y-1/2 flex-col justify-between gap-1 rounded-md border-2 border-primary-6 bg-primary-9 px-3 py-1.5 shadow-md shadow-primary-8 transition-all ${showDialog ? 'flex' : 'hidden'} `}
