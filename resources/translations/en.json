@@ -92,5 +92,6 @@
   "import/export": "Import / export",
   "import_opml": "Import OPML file subscriptions",
   "export_opml": "Export subscriptions to OPML file",
-  "change_podcast_cover": "Change the podcast cover"
+  "change_podcast_cover": "Change the podcast cover",
+  "introduce_podcast_cover": "Enter a URL for the podcast cover"
 }

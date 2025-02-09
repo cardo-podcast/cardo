@@ -6,15 +6,13 @@ import { useSettings } from '../engines/Settings'
 import { useModalBanner } from './ModalBanner'
 import { parsePodcastDetails, toastError } from '../utils/utils'
 import { useRef } from 'react'
-import { useDB, useSync } from '../ContextProviders'
+import { useDB } from '../ContextProviders'
 
 function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
   const { t } = useTranslation()
   const [showBanner, Banner] = useModalBanner()
   const inputRef = useRef<HTMLInputElement>(null)
-  const { subscriptions } = useDB()
   const navigate = useNavigate()
-  const { sync, loggedIn: loggedInSync } = useSync()
 
   return (
     <>
@@ -29,8 +27,6 @@ function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
           }
 
           const podcast = await parsePodcastDetails(inputRef.current.value)
-          loggedInSync && sync({ add: [podcast.feedUrl] })
-          subscriptions.add(podcast)
           navigate('/preview', {
             state: {
               podcast,
