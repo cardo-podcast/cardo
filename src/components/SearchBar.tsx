@@ -14,7 +14,9 @@ function SearchBar() {
     subscriptionsEpisodes,
     subscriptions: { subscriptions },
   } = useDB()
-  const [searchMode, setSearchMode_] = useState<'subscriptions' | 'podcasts' | 'current'>(subscriptions.length > 0 ? 'subscriptions' : 'podcasts')
+  const [searchMode, setSearchMode_] = useState<'subscriptions' | 'podcasts' | 'current'>(
+    subscriptions.length > 0 ? 'subscriptions' : 'podcasts',
+  )
   const [noResults, setNoResults] = useState(false)
   const timeout = useRef<ReturnType<typeof setInterval>>()
   const inputRef = useRef<HTMLInputElement>(null)
@@ -71,7 +73,11 @@ function SearchBar() {
     const episodes = location.state.currentPodcastEpisodes as EpisodeData[]
     if (!episodes) return []
 
-    return episodes.filter((episode) => episode.title.toLowerCase().includes(term.toLowerCase()) || episode.description.toLowerCase().includes(term.toLowerCase()))
+    return episodes.filter(
+      (episode) =>
+        episode.title.toLowerCase().includes(term.toLowerCase()) ||
+        episode.description.toLowerCase().includes(term.toLowerCase()),
+    )
   }
 
   const handleChange = async (term: string) => {
@@ -97,7 +103,10 @@ function SearchBar() {
         >
           {arrowLeft}
         </button>
-        <button className={`w-5 ${window.history.state.idx >= window.history.length - 1 ? 'cursor-default text-primary-8' : 'hover:text-accent-5'}`} onClick={() => navigate(1)}>
+        <button
+          className={`w-5 ${window.history.state.idx >= window.history.length - 1 ? 'cursor-default text-primary-8' : 'hover:text-accent-5'}`}
+          onClick={() => navigate(1)}
+        >
           {arrowRight}
         </button>
       </div>
@@ -168,13 +177,22 @@ function SearchBar() {
           {/* close with click outside */}
           <div className="absolute left-0 top-0 z-10 mt-10 h-screen w-screen" onClick={() => setResults([])} />
 
-          <div className="absolute left-1/2 top-0 z-30 mt-[32px] max-h-[60dvh] w-4/5 -translate-x-1/2 justify-center overflow-hidden overflow-y-auto scroll-smooth rounded-b-md border-x-2 border-primary-8 bg-primary-9 shadow-md shadow-primary-8" ref={resultsRef}>
+          <div
+            className="absolute left-1/2 top-0 z-30 mt-[32px] max-h-[60dvh] w-4/5 -translate-x-1/2 justify-center overflow-hidden overflow-y-auto scroll-smooth rounded-b-md border-x-2 border-primary-8 bg-primary-9 shadow-md shadow-primary-8"
+            ref={resultsRef}
+          >
             <div className="flex w-full flex-col">
               {results.map((result, i) => {
                 if (searchMode === 'podcasts') {
                   return <PodcastCard key={i} podcast={result as PodcastData} />
                 } else {
-                  return <EpisodeCard key={result.id} episode={result as EpisodeData} className="border-b-[1px] border-primary-8 transition-colors hover:bg-primary-8" />
+                  return (
+                    <EpisodeCard
+                      key={result.id}
+                      episode={result as EpisodeData}
+                      className="border-b-[1px] border-primary-8 transition-colors hover:bg-primary-8"
+                    />
+                  )
                 }
               })}
             </div>

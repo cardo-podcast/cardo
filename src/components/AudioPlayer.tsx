@@ -1,6 +1,15 @@
 import { useRef, useEffect, useState, RefObject, ReactNode, useCallback, SyntheticEvent } from 'react'
 import { secondsToStr } from '../utils/utils'
-import { play as playIcon, pause as pauseIcon, forward as forwardIcon, backwards as backwardsIcon, close as closeIcon, speedometer, volume as volumeIcon, mute as muteIcon } from '../Icons'
+import {
+  play as playIcon,
+  pause as pauseIcon,
+  forward as forwardIcon,
+  backwards as backwardsIcon,
+  close as closeIcon,
+  speedometer,
+  volume as volumeIcon,
+  mute as muteIcon,
+} from '../Icons'
 import { EpisodeData } from '..'
 import { useNavigate } from 'react-router-dom'
 import { useSettings } from '../engines/Settings'
@@ -136,13 +145,18 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
 
   return (
     <div className="relative">
-      <button className="hover: flex w-7 flex-col items-center hover:text-accent-6 focus:outline-none" onClick={() => setShowMenu(!showMenu)}>
+      <button
+        className="hover: flex w-7 flex-col items-center hover:text-accent-6 focus:outline-none"
+        onClick={() => setShowMenu(!showMenu)}
+      >
         {speedometer}
         <p className="-mt-[6px] text-center text-[10px]">{playbackRate.toFixed(2)}</p>
       </button>
 
       {showMenu && <div className="fixed bottom-0 left-0 z-10 h-screen w-full" onClick={() => setShowMenu(false)} />}
-      <div className={`${showMenu ? 'flex' : 'hidden'} absolute bottom-10 left-1/2 z-20 w-32 -translate-x-1/2 flex-col items-center justify-center gap-1 rounded-md border-2 border-primary-7 bg-primary-9 p-2`}>
+      <div
+        className={`${showMenu ? 'flex' : 'hidden'} absolute bottom-10 left-1/2 z-20 w-32 -translate-x-1/2 flex-col items-center justify-center gap-1 rounded-md border-2 border-primary-7 bg-primary-9 p-2`}
+      >
         <div className="flex items-center gap-2">
           <button
             className="mb-1 flex items-center text-xl hover:text-accent-6"
@@ -238,7 +252,15 @@ function VolumeControl({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) 
         <span className="h-5 w-5">{isMuted ? muteIcon : volumeIcon}</span>
       </button>
 
-      <RangeInput min={0} max={1} value={isMuted ? 0 : volume} step={0.01} units="%" onChange={changeVolume} className="ml-2 w-24" />
+      <RangeInput
+        min={0}
+        max={1}
+        value={isMuted ? 0 : volume}
+        step={0.01}
+        units="%"
+        onChange={changeVolume}
+        className="ml-2 w-24"
+      />
     </div>
   )
 }
@@ -328,7 +350,12 @@ function AudioPlayer({ className = '' }) {
 
   return (
     <>
-      <audio ref={audioRef} className="hidden" onLoadedMetadata={handleLoadedMetadata} onTimeUpdate={(e: SyntheticEvent<HTMLAudioElement>) => setPosition(e.currentTarget.currentTime)} />
+      <audio
+        ref={audioRef}
+        className="hidden"
+        onLoadedMetadata={handleLoadedMetadata}
+        onTimeUpdate={(e: SyntheticEvent<HTMLAudioElement>) => setPosition(e.currentTarget.currentTime)}
+      />
 
       {playing && (
         <div className={`flex w-full gap-3 bg-primary-10 p-2 ${className}`}>
@@ -370,8 +397,18 @@ function AudioPlayer({ className = '' }) {
               {/* TIME BAR */}
               <div className="flex w-2/3 items-center justify-center">
                 <p className="select-none">{secondsToStr(position)}</p>
-                <RangeInput min={0} max={duration} value={position} onChange={(value) => changeTime(value)} className="mx-4 w-full" />
-                <p className="cursor-pointer select-none" title={t('toggle_remaining_time')} onClick={() => updateSettings({ playback: { displayRemainingTime: !displayRemainingTime } })}>
+                <RangeInput
+                  min={0}
+                  max={duration}
+                  value={position}
+                  onChange={(value) => changeTime(value)}
+                  className="mx-4 w-full"
+                />
+                <p
+                  className="cursor-pointer select-none"
+                  title={t('toggle_remaining_time')}
+                  onClick={() => updateSettings({ playback: { displayRemainingTime: !displayRemainingTime } })}
+                >
                   {secondsToStr(displayRemainingTime ? position - duration : duration)}
                 </p>
               </div>
@@ -392,7 +429,10 @@ function AudioPlayer({ className = '' }) {
                     <p className="-mt-[6px] text-center text-[10px]">{stepBackwards}</p>
                   </button>
 
-                  <button className="hover: mb-2 flex w-9 items-center hover:text-accent-6 focus:outline-none" onClick={handlePlayPause}>
+                  <button
+                    className="hover: mb-2 flex w-9 items-center hover:text-accent-6 focus:outline-none"
+                    onClick={handlePlayPause}
+                  >
                     <span className="w-9">{audioRef.current?.paused ? playIcon : pauseIcon}</span>
                   </button>
 

@@ -79,7 +79,8 @@ export async function parseXML(url: string): Promise<[EpisodeData[], PodcastData
     const episode: EpisodeData = {
       id: i, //
       title: item.querySelector('title')?.textContent ?? '',
-      description: item.querySelector('description')?.textContent ?? item.querySelector('itunes\\:summary')?.textContent ?? '',
+      description:
+        item.querySelector('description')?.textContent ?? item.querySelector('itunes\\:summary')?.textContent ?? '',
       src: item.querySelector('enclosure')?.getAttribute('url') ?? '',
       pubDate: new Date(item.querySelector('pubDate')?.textContent ?? 0),
       coverUrl: getItunesTag(item, 'image')?.getAttribute('href') ?? podcastDetails.coverUrl,
@@ -104,7 +105,10 @@ export async function parsePodcastDetails(url: string, xml?: Document) {
 
   if (channel == null) return { podcastName: '', artistName: '', coverUrl: '', coverUrlLarge: '', feedUrl: '' }
 
-  const coverUrl = channel.querySelector('image')?.getAttribute('href') ?? channel.querySelector('image')?.querySelector('url')?.textContent ?? ''
+  const coverUrl =
+    channel.querySelector('image')?.getAttribute('href') ??
+    channel.querySelector('image')?.querySelector('url')?.textContent ??
+    ''
 
   const podcast: PodcastData = {
     podcastName: capitalize(channel?.querySelector('title')?.textContent ?? ''),

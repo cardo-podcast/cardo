@@ -1,5 +1,3 @@
-
-
 export type SyncStatus = 'standby' | 'synchronizing' | 'ok' | 'error'
 
 export interface GpodderUpdate {
@@ -18,8 +16,8 @@ export interface ServerGpodderUpdate extends GpodderUpdate {
 export type SubscriptionsUpdate = { add: string[]; remove: string[] }
 
 export interface Credentials {
-  server: string,
-  user: string,
+  server: string
+  user: string
   password: string
 }
 

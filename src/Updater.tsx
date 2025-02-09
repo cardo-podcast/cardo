@@ -51,7 +51,11 @@ export default function Updater() {
 
   return (
     <>
-      <button onClick={() => showBanner()} title={t('new_update_available')} className={`h-5 w-5 rounded-full bg-green-600 transition-all ${dialog ? 'flex' : 'hidden'}`}>
+      <button
+        onClick={() => showBanner()}
+        title={t('new_update_available')}
+        className={`h-5 w-5 rounded-full bg-green-600 transition-all ${dialog ? 'flex' : 'hidden'}`}
+      >
         {upArrow}
       </button>
 

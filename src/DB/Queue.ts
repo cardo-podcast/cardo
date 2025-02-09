@@ -75,7 +75,16 @@ export function useQueue(db: Database) {
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       ON CONFLICT (src) DO NOTHING 
       `,
-      [episode.title, episode.description, episode.src, episode.pubDate.getTime(), episode.duration, episode.size, episode.podcastUrl, episode.coverUrl || ''],
+      [
+        episode.title,
+        episode.description,
+        episode.src,
+        episode.pubDate.getTime(),
+        episode.duration,
+        episode.size,
+        episode.podcastUrl,
+        episode.coverUrl || '',
+      ],
     )
 
     return query.lastInsertId

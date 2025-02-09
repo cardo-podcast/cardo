@@ -13,7 +13,19 @@ import { useEpisode } from '../engines/Episode'
 export default function EpisodePreviewCard({ episode }: { episode: EpisodeData | NewEpisodeData }) {
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, position, play, toggleDownload, downloadState, inProgress, pause } = useEpisode(episode)
+  const {
+    reprState,
+    inQueue,
+    getDateString,
+    togglePlayed,
+    toggleQueue,
+    position,
+    play,
+    toggleDownload,
+    downloadState,
+    inProgress,
+    pause,
+  } = useEpisode(episode)
 
   return (
     <div
@@ -58,7 +70,12 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
             }
           }}
         />
-        <ProgressBar position={position} total={episode.duration} showTime={false} className={{ div: 'h-2 shrink-0' }} />
+        <ProgressBar
+          position={position}
+          total={episode.duration}
+          showTime={false}
+          className={{ div: 'h-2 shrink-0' }}
+        />
 
         <button
           className="absolute bottom-2 right-2 flex aspect-square w-7 items-center justify-center rounded-full border-2 border-accent-8 bg-accent-7 p-[3px] pl-[4px] transition-all hover:p-[1px]"

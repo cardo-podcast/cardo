@@ -39,13 +39,16 @@ export default function DownloadsPage() {
     const hours = Math.floor(time / 3600)
     const minutes = Math.round((time - hours * 3600) / 60)
 
-    setDownloadsInfo(`${items} ${t('episodes')} · ${capitalize(t('remaining_time'))}: ${hours} ${hours === 1 ? t('hour') : t('hours')} ${minutes} ${t('minutes')}`)
+    setDownloadsInfo(
+      `${items} ${t('episodes')} · ${capitalize(t('remaining_time'))}: ${hours} ${hours === 1 ? t('hour') : t('hours')} ${minutes} ${t('minutes')}`,
+    )
   }, [downloads])
 
   const clear = async (mode: 'completed' | 'all') => {
     const completedEpisodes = await history.getCompleted()
 
-    const deleteEpisodes = mode === 'completed' ? downloads.filter((episode) => completedEpisodes.includes(episode.src)) : downloads
+    const deleteEpisodes =
+      mode === 'completed' ? downloads.filter((episode) => completedEpisodes.includes(episode.src)) : downloads
 
     batchRemoveFromDownloadList(
       deleteEpisodes.map((episode) => {
@@ -65,10 +68,16 @@ export default function DownloadsPage() {
           </div>
 
           <div className="flex gap-2">
-            <button className="h-fit w-fit rounded-md bg-accent-7 px-2 py-1 hover:bg-accent-8" onClick={() => clear('completed')}>
+            <button
+              className="h-fit w-fit rounded-md bg-accent-7 px-2 py-1 hover:bg-accent-8"
+              onClick={() => clear('completed')}
+            >
               {t('remove_complete')}
             </button>
-            <button className="h-fit w-fit rounded-md bg-accent-7 px-2 py-1 hover:bg-accent-8" onClick={() => clear('all')}>
+            <button
+              className="h-fit w-fit rounded-md bg-accent-7 px-2 py-1 hover:bg-accent-8"
+              onClick={() => clear('all')}
+            >
               {t('remove_all')}
             </button>
           </div>

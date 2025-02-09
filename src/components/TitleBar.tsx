@@ -47,7 +47,11 @@ function TitleBar() {
   }, [savePlayerStatus]) // reload when dependencies change
 
   return (
-    <div className={`relative flex h-10 w-full items-center justify-between bg-primary-10 stroke-[1.5px] px-2 py-1`} data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>
+    <div
+      className={`relative flex h-10 w-full items-center justify-between bg-primary-10 stroke-[1.5px] px-2 py-1`}
+      data-tauri-drag-region={true}
+      onDragStart={appWindow.startDragging}
+    >
       <div className="flex items-center gap-2">
         {ui.showPinWindowButton && (
           <button
@@ -67,7 +71,11 @@ function TitleBar() {
         {checkUpdates && <Updater />}
       </div>
 
-      <h1 className="absolute left-1/2 -translate-x-1/2 cursor-default" data-tauri-drag-region={true} onDragStart={appWindow.startDragging}>
+      <h1
+        className="absolute left-1/2 -translate-x-1/2 cursor-default"
+        data-tauri-drag-region={true}
+        onDragStart={appWindow.startDragging}
+      >
         Cardo
       </h1>
 

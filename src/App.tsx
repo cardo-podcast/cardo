@@ -18,7 +18,6 @@ const Settings = lazy(() => import('./pages/Settings'))
 const QueuePage = lazy(() => import('./pages/QueuePage'))
 const DownloadsPage = lazy(() => import('./pages/DownloadsPage'))
 
-
 const App = () => {
   const [roundedCorners, setRoundedCorners] = useState(false)
 
@@ -47,7 +46,9 @@ const App = () => {
   }, [])
 
   return (
-    <div className={`flex h-screen w-full flex-col overflow-hidden border-[1px] border-primary-7 bg-primary-9 ${roundedCorners && 'rounded-lg'}`}>
+    <div
+      className={`flex h-screen w-full flex-col overflow-hidden border-[1px] border-primary-7 bg-primary-9 ${roundedCorners && 'rounded-lg'}`}
+    >
       <BrowserRouter>
         <SettingsProvider>
           <DBProvider>

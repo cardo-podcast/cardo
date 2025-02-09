@@ -47,7 +47,8 @@ export const nextcloudProtocol: ProtocolFn = function (creds) {
   async function pullEpisodes(since?: number) {
     const { server, user, password } = creds
 
-    const url = server + `/index.php/apps/gpoddersync/episode_action?since=${since === undefined ? '0' : since?.toString()}`
+    const url =
+      server + `/index.php/apps/gpoddersync/episode_action?since=${since === undefined ? '0' : since?.toString()}`
 
     const r: { data: { actions: ServerGpodderUpdate[] } } = await http.fetch(url, {
       method: 'GET',
@@ -67,7 +68,8 @@ export const nextcloudProtocol: ProtocolFn = function (creds) {
   async function pullSubscriptions(since?: number) {
     const { server, user, password } = creds
 
-    const url = server + `/index.php/apps/gpoddersync/subscriptions?since=${since === undefined ? '0' : since?.toString()}`
+    const url =
+      server + `/index.php/apps/gpoddersync/subscriptions?since=${since === undefined ? '0' : since?.toString()}`
 
     const r: { data: SubscriptionsUpdate } = await http.fetch(url, {
       method: 'GET',

@@ -1,6 +1,6 @@
 import Database from 'tauri-plugin-sql-api'
 import { join, appDataDir } from '@tauri-apps/api/path'
-import {ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { useSubscriptions } from './Subscriptions'
 import { useSubscriptionsEpisodes } from './SubscriptionsEpisodes'
 import { useEpisodeState } from './EpisodeState'
@@ -8,7 +8,6 @@ import { useMisc } from './Misc'
 import { useQueue } from './Queue'
 import { useDownloads } from './Downloads'
 import { DBContext } from '../ContextProviders'
-
 
 export function DBProvider({ children }: { children: ReactNode }) {
   // provider containing groups of variables / methods related to database
@@ -36,6 +35,9 @@ export function DBProvider({ children }: { children: ReactNode }) {
     return <></>
   }
 
-
-  return <DBContext.Provider value={{ dbLoaded, subscriptions, subscriptionsEpisodes, history, misc, queue, downloads }}>{children}</DBContext.Provider>
+  return (
+    <DBContext.Provider value={{ dbLoaded, subscriptions, subscriptionsEpisodes, history, misc, queue, downloads }}>
+      {children}
+    </DBContext.Provider>
+  )
 }

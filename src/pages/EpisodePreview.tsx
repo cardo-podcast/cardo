@@ -19,7 +19,19 @@ function EpisodePreview() {
   const { subscriptions } = useDB()
   const { t } = useTranslation()
   const [podcastFetched, setPodcastFetched] = useState(false)
-  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, position, inProgress, toggleDownload, downloadState, play, pause } = useEpisode(episode)
+  const {
+    reprState,
+    inQueue,
+    getDateString,
+    togglePlayed,
+    toggleQueue,
+    position,
+    inProgress,
+    toggleDownload,
+    downloadState,
+    play,
+    pause,
+  } = useEpisode(episode)
 
   const fetchPodcastData = async (episode: EpisodeData) => {
     if (episode.podcast?.description) {
@@ -61,7 +73,9 @@ function EpisodePreview() {
   return (
     <div className="flex w-full flex-col p-2">
       <div className="justify-left mb-2 flex w-full gap-3 border-b-2 border-primary-8 p-2 pb-3">
-        <div className={`flex aspect-square h-28 items-center justify-center rounded-md bg-primary-8 transition-all ${podcastFetched ? 'cursor-pointer hover:scale-95' : ''}`}>
+        <div
+          className={`flex aspect-square h-28 items-center justify-center rounded-md bg-primary-8 transition-all ${podcastFetched ? 'cursor-pointer hover:scale-95' : ''}`}
+        >
           <img
             className="rounded-md"
             src={episode.coverUrl}
@@ -105,25 +119,50 @@ function EpisodePreview() {
             <h1>{episode.title}</h1>
           </div>
           <div className="flex items-center justify-end gap-2">
-            {inProgress() ? <ProgressBar position={position} total={episode.duration} className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }} /> : secondsToStr(episode.duration)}
-            <button className="flex aspect-square w-7 shrink-0 items-center justify-center rounded-full bg-primary-7 p-1 hover:p-[2px] hover:text-accent-6" onClick={() => (inProgress(true) ? pause() : play())}>
+            {inProgress() ? (
+              <ProgressBar
+                position={position}
+                total={episode.duration}
+                className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }}
+              />
+            ) : (
+              secondsToStr(episode.duration)
+            )}
+            <button
+              className="flex aspect-square w-7 shrink-0 items-center justify-center rounded-full bg-primary-7 p-1 hover:p-[2px] hover:text-accent-6"
+              onClick={() => (inProgress(true) ? pause() : play())}
+            >
               <span className="w-5">{inProgress(true) ? icons.pause : icons.play}</span>
             </button>
 
-            <button className={`w-5 hover:text-accent-6 ${reprState.complete && 'text-primary-7'}`} title={reprState.complete ? t('mark_not_played') : t('mark_played')} onClick={togglePlayed}>
+            <button
+              className={`w-5 hover:text-accent-6 ${reprState.complete && 'text-primary-7'}`}
+              title={reprState.complete ? t('mark_not_played') : t('mark_played')}
+              onClick={togglePlayed}
+            >
               {icons.check}
             </button>
 
-            <button className={`w-7 hover:text-accent-6 ${inQueue && 'text-primary-7'}`} title={inQueue ? t('remove_queue') : t('add_queue')} onClick={toggleQueue}>
+            <button
+              className={`w-7 hover:text-accent-6 ${inQueue && 'text-primary-7'}`}
+              title={inQueue ? t('remove_queue') : t('add_queue')}
+              onClick={toggleQueue}
+            >
               {icons.queue}
             </button>
-            <button className={`w-7 hover:text-accent-6 ${downloadState == 'downloaded' && 'text-primary-7'}`} onClick={toggleDownload}>
+            <button
+              className={`w-7 hover:text-accent-6 ${downloadState == 'downloaded' && 'text-primary-7'}`}
+              onClick={toggleDownload}
+            >
               {icons.download}
             </button>
           </div>
         </div>
       </div>
-      <div className="whitespace-pre-line rounded-md p-3" dangerouslySetInnerHTML={{ __html: sanitizeHTML(episode.description) }} />
+      <div
+        className="whitespace-pre-line rounded-md p-3"
+        dangerouslySetInnerHTML={{ __html: sanitizeHTML(episode.description) }}
+      />
     </div>
   )
 }

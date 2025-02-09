@@ -9,12 +9,34 @@ import { showMenu } from 'tauri-plugin-context-menu'
 import appIcon from '../../src-tauri/icons/icon.png'
 import { useEpisode } from '../engines/Episode'
 
-function EpisodeCard({ episode, className = '', onImageClick = undefined, onClick = undefined }: { episode: EpisodeData; className?: string; onImageClick?: MouseEventHandler<HTMLImageElement>; onClick?: () => void }) {
+function EpisodeCard({
+  episode,
+  className = '',
+  onImageClick = undefined,
+  onClick = undefined,
+}: {
+  episode: EpisodeData
+  className?: string
+  onImageClick?: MouseEventHandler<HTMLImageElement>
+  onClick?: () => void
+}) {
   const navigate = useNavigate()
   const contextMenuTarget = useRef<HTMLDivElement>(null)
   const { t } = useTranslation()
 
-  const { reprState, inQueue, getDateString, togglePlayed, toggleQueue, position, inProgress, play, pause, toggleDownload, downloadState } = useEpisode(episode)
+  const {
+    reprState,
+    inQueue,
+    getDateString,
+    togglePlayed,
+    toggleQueue,
+    position,
+    inProgress,
+    play,
+    pause,
+    toggleDownload,
+    downloadState,
+  } = useEpisode(episode)
 
   return (
     <div
@@ -48,7 +70,7 @@ function EpisodeCard({ episode, className = '', onImageClick = undefined, onClic
       }}
     >
       <>
-        <div className="aspect-square h-16 rounded-md bg-primary-8 flex items-center justify-center">
+        <div className="flex aspect-square h-16 items-center justify-center rounded-md bg-primary-8">
           <img
             className={`rounded-md ${onImageClick !== undefined ? 'cursor-pointer hover:p-0.5' : ''}`}
             onClick={onImageClick}
@@ -75,7 +97,15 @@ function EpisodeCard({ episode, className = '', onImageClick = undefined, onClic
             {episode.title}
           </h2>
           <div className="flex w-full items-center justify-end gap-2">
-            {inProgress() ? <ProgressBar position={position} total={reprState.total} className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }} /> : secondsToStr(reprState.total)}
+            {inProgress() ? (
+              <ProgressBar
+                position={position}
+                total={reprState.total}
+                className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }}
+              />
+            ) : (
+              secondsToStr(reprState.total)
+            )}
             <button
               className="flex aspect-square w-7 shrink-0 items-center justify-center rounded-full border-2 border-primary-6 p-1 hover:p-[2px] hover:text-accent-6"
               onClick={(e) => {

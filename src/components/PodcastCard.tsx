@@ -8,7 +8,7 @@ function PodcastCard({ podcast }: { podcast: PodcastData }) {
 
   return (
     <div
-      className="flex gap-2 min-h-20 cursor-pointer justify-between border-b-2 border-primary-8 p-2 transition-colors hover:bg-primary-8"
+      className="flex min-h-20 cursor-pointer justify-between gap-2 border-b-2 border-primary-8 p-2 transition-colors hover:bg-primary-8"
       onClick={() => {
         navigate('/preview', {
           state: {
@@ -17,7 +17,12 @@ function PodcastCard({ podcast }: { podcast: PodcastData }) {
         })
       }}
     >
-      <img className="aspect-square h-20 rounded-md bg-primary-7" alt="" src={podcast.coverUrl} onError={(e: SyntheticEvent<HTMLImageElement>) => (e.currentTarget.src = appIcon)} />
+      <img
+        className="aspect-square h-20 rounded-md bg-primary-7"
+        alt=""
+        src={podcast.coverUrl}
+        onError={(e: SyntheticEvent<HTMLImageElement>) => (e.currentTarget.src = appIcon)}
+      />
 
       <div className="flex flex-col text-right">
         <p className="text-lg">{podcast.podcastName}</p>

@@ -32,9 +32,23 @@ export function useSubscriptionsEpisodes(db: Database) {
       }
 
       for (const group of queryGroups) {
-        const placeholders = group.map((_, i) => `($${i * 8 + 1}, $${i * 8 + 2}, $${i * 8 + 3}, $${i * 8 + 4}, $${i * 8 + 5}, $${i * 8 + 6}, $${i * 8 + 7}, $${i * 8 + 8})`).join(', ')
+        const placeholders = group
+          .map(
+            (_, i) =>
+              `($${i * 8 + 1}, $${i * 8 + 2}, $${i * 8 + 3}, $${i * 8 + 4}, $${i * 8 + 5}, $${i * 8 + 6}, $${i * 8 + 7}, $${i * 8 + 8})`,
+          )
+          .join(', ')
 
-        const values = group.flatMap((episode) => [episode.title, episode.description, episode.src, episode.pubDate.getTime(), episode.duration, episode.size, episode.podcastUrl, episode.coverUrl || ''])
+        const values = group.flatMap((episode) => [
+          episode.title,
+          episode.description,
+          episode.src,
+          episode.pubDate.getTime(),
+          episode.duration,
+          episode.size,
+          episode.podcastUrl,
+          episode.coverUrl || '',
+        ])
 
         const query = `
         INSERT INTO subscriptions_episodes (title, description, src, pubDate, duration, size, podcastUrl, coverUrl) 
@@ -55,7 +69,11 @@ export function useSubscriptionsEpisodes(db: Database) {
   )
 
   const getAll = useCallback(
-    async function (options: { pubdate_gt?: number; podcastUrl?: string; searchTerm?: string }): Promise<EpisodeData[]> {
+    async function (options: {
+      pubdate_gt?: number
+      podcastUrl?: string
+      searchTerm?: string
+    }): Promise<EpisodeData[]> {
       let query = 'SELECT * FROM subscriptions_episodes WHERE pubDate > $1'
 
       if (options.podcastUrl) {

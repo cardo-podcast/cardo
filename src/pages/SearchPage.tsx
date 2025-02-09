@@ -5,7 +5,12 @@ import { SyntheticEvent } from 'react'
 function PodcastPreview({ result }: { result: PodcastData }) {
   return (
     <div className="flex h-20 justify-between gap-4 rounded-md bg-primary-8 p-2">
-      <img className="aspect-square h-full rounded-md bg-primary-7" alt="" src={result.coverUrl} onError={(e: SyntheticEvent<HTMLImageElement>) => (e.currentTarget.src = appIcon)} />
+      <img
+        className="aspect-square h-full rounded-md bg-primary-7"
+        alt=""
+        src={result.coverUrl}
+        onError={(e: SyntheticEvent<HTMLImageElement>) => (e.currentTarget.src = appIcon)}
+      />
 
       <div className="flex flex-col text-right">
         <p>{result.podcastName}</p>

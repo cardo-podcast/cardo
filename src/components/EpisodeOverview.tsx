@@ -23,13 +23,19 @@ export default function EpisodeOverview({ children }: { children: ReactNode }) {
       {showButtons && (
         <div className="opacity-0 group-hover:opacity-100">
           <div className="fixed z-10 flex h-24 items-center">
-            <button className="h-20 w-6 rounded-r-full bg-accent-5 opacity-50 transition-opacity duration-200 hover:w-10 hover:opacity-90 peer-hover:opacity-60" onClick={() => manageScroll(-200)}>
+            <button
+              className="h-20 w-6 rounded-r-full bg-accent-5 opacity-50 transition-opacity duration-200 hover:w-10 hover:opacity-90 peer-hover:opacity-60"
+              onClick={() => manageScroll(-200)}
+            >
               {icons.arrowLeft}
             </button>
           </div>
 
           <div className="fixed right-4 z-10 flex h-24 items-center">
-            <button className="h-20 w-6 rounded-l-full bg-accent-5 opacity-50 transition-opacity duration-200 hover:w-10 hover:opacity-90" onClick={() => manageScroll(200)}>
+            <button
+              className="h-20 w-6 rounded-l-full bg-accent-5 opacity-50 transition-opacity duration-200 hover:w-10 hover:opacity-90"
+              onClick={() => manageScroll(200)}
+            >
               {icons.arrowRight}
             </button>
           </div>
@@ -44,7 +50,7 @@ export default function EpisodeOverview({ children }: { children: ReactNode }) {
 
           const deltaX = e.deltaY * 0.5 // deltaY is too fast
 
-          e.currentTarget.scrollBy({ left: deltaX, behavior: 'instant' }) // smooth behaviour is clunky 
+          e.currentTarget.scrollBy({ left: deltaX, behavior: 'instant' }) // smooth behaviour is clunky
         }}
       >
         {children}

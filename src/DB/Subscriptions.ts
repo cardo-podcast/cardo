@@ -5,7 +5,12 @@ import { getPodcastSettings, useSettings } from '../engines/Settings'
 import { DB } from '.'
 import { downloadEpisode } from '../utils/utils'
 
-export function useSubscriptions(db: Database, subscriptionsEpisodes: DB['subscriptionsEpisodes'], downloads: DB['downloads'], queue: DB['queue']) {
+export function useSubscriptions(
+  db: Database,
+  subscriptionsEpisodes: DB['subscriptionsEpisodes'],
+  downloads: DB['downloads'],
+  queue: DB['queue'],
+) {
   const [subscriptions, setSubscriptions] = useState<PodcastData[]>([])
   const [latestEpisodes, setLatestEpisodes] = useState<NewEpisodeData[]>([])
   const [
@@ -95,7 +100,14 @@ export function useSubscriptions(db: Database, subscriptionsEpisodes: DB['subscr
       const r = await db.execute(
         `INSERT into subscriptions (podcastName, artistName, coverUrl, coverUrlLarge, feedUrl, description)
         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [podcast.podcastName, podcast.artistName, podcast.coverUrl, podcast.coverUrlLarge, podcast.feedUrl, podcast.description ?? ''],
+        [
+          podcast.podcastName,
+          podcast.artistName,
+          podcast.coverUrl,
+          podcast.coverUrlLarge,
+          podcast.feedUrl,
+          podcast.description ?? '',
+        ],
       )
 
       podcast = { ...podcast, id: r.lastInsertId } // podcast id comes from database

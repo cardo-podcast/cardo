@@ -1,6 +1,29 @@
 import { ColorTheme, TailwindBaseColor } from '.'
 
-export const BasicColors: TailwindBaseColor[] = ['slate', 'gray', 'zinc', 'neutral', 'stone', 'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose']
+export const BasicColors: TailwindBaseColor[] = [
+  'slate',
+  'gray',
+  'zinc',
+  'neutral',
+  'stone',
+  'red',
+  'orange',
+  'amber',
+  'yellow',
+  'lime',
+  'green',
+  'emerald',
+  'teal',
+  'cyan',
+  'sky',
+  'blue',
+  'indigo',
+  'violet',
+  'purple',
+  'fuchsia',
+  'pink',
+  'rose',
+]
 
 export const DefaultThemes: { [name: string]: ColorTheme | TailwindBaseColor } = {
   dark: 'neutral',

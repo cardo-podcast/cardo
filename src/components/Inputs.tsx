@@ -8,21 +8,50 @@ export enum SwitchState {
   True,
 }
 
-export function Switch({ state, setState, labels }: { state: SwitchState; setState: (state: SwitchState) => void; labels: [string, string] }) {
+export function Switch({
+  state,
+  setState,
+  labels,
+}: {
+  state: SwitchState
+  setState: (state: SwitchState) => void
+  labels: [string, string]
+}) {
   return (
     <div className="grid grid-cols-3 items-center gap-1 align-middle uppercase">
       <p className="text-right">{labels[0]}</p>
       <div className="mx-auto flex h-5 w-fit overflow-hidden rounded-md border-2 border-zinc-800 bg-zinc-300">
-        <input type="radio" checked={state === SwitchState.False} onChange={() => setState(SwitchState.False)} className="h-full w-5 appearance-none checked:bg-blue-500" />
-        <input type="radio" checked={state === SwitchState.None} onChange={() => setState(SwitchState.None)} className="h-full w-5 appearance-none checked:bg-primary-5" />
-        <input type="radio" checked={state === SwitchState.True} onChange={() => setState(SwitchState.True)} className="h-full w-5 appearance-none checked:bg-green-500" />
+        <input
+          type="radio"
+          checked={state === SwitchState.False}
+          onChange={() => setState(SwitchState.False)}
+          className="h-full w-5 appearance-none checked:bg-blue-500"
+        />
+        <input
+          type="radio"
+          checked={state === SwitchState.None}
+          onChange={() => setState(SwitchState.None)}
+          className="h-full w-5 appearance-none checked:bg-primary-5"
+        />
+        <input
+          type="radio"
+          checked={state === SwitchState.True}
+          onChange={() => setState(SwitchState.True)}
+          className="h-full w-5 appearance-none checked:bg-green-500"
+        />
       </div>
       <p className="text-left">{labels[1]}</p>
     </div>
   )
 }
 
-export function Checkbox({ onChange, defaultChecked = false }: { onChange: (value: boolean) => void; defaultChecked?: boolean }) {
+export function Checkbox({
+  onChange,
+  defaultChecked = false,
+}: {
+  onChange: (value: boolean) => void
+  defaultChecked?: boolean
+}) {
   return (
     <div className="relative inline-flex cursor-pointer items-center">
       <input
@@ -33,12 +62,24 @@ export function Checkbox({ onChange, defaultChecked = false }: { onChange: (valu
           onChange(Boolean(e.target.checked))
         }}
       />
-      <span className="m-1 flex h-5 w-5 items-center justify-center rounded-md border-2 border-primary-2 bg-white text-center text-lg font-bold text-transparent transition duration-100 ease-in-out peer-checked:text-black">✓</span>
+      <span className="m-1 flex h-5 w-5 items-center justify-center rounded-md border-2 border-primary-2 bg-white text-center text-lg font-bold text-transparent transition duration-100 ease-in-out peer-checked:text-black">
+        ✓
+      </span>
     </div>
   )
 }
 
-export function AutocompleteInput({ value, callback, options, className }: { value: string; callback: (value: string) => void; options: (typeof value)[]; className?: string }) {
+export function AutocompleteInput({
+  value,
+  callback,
+  options,
+  className,
+}: {
+  value: string
+  callback: (value: string) => void
+  options: (typeof value)[]
+  className?: string
+}) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [showOptions, setShowOptions] = useState<(typeof value)[]>([])
 
@@ -105,7 +146,15 @@ export function TimeInput({ value, onChange }: { value: number; onChange: (t: nu
 function RangeBall({ position, className = '' }: { position: number; className?: string }) {
   const { setNodeRef, attributes, listeners } = useDraggable({ id: 'RangeBall' })
 
-  return <div ref={setNodeRef} className={`absolute left-0 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary-3 ${className}`} {...listeners} {...attributes} style={{ left: `${position}%` }} />
+  return (
+    <div
+      ref={setNodeRef}
+      className={`absolute left-0 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary-3 ${className}`}
+      {...listeners}
+      {...attributes}
+      style={{ left: `${position}%` }}
+    />
+  )
 }
 
 const restrictToParentElement: Modifier = ({ containerNodeRect, draggingNodeRect, transform }) => {
@@ -125,7 +174,23 @@ const restrictToParentElement: Modifier = ({ containerNodeRect, draggingNodeRect
   return transform
 }
 
-export function RangeInput({ min, max, value, onChange, step = undefined, units = 's', className }: { min: number; max: number; value: number; onChange: (value: number) => void; step?: number; units?: 's' | '%'; className?: string }) {
+export function RangeInput({
+  min,
+  max,
+  value,
+  onChange,
+  step = undefined,
+  units = 's',
+  className,
+}: {
+  min: number
+  max: number
+  value: number
+  onChange: (value: number) => void
+  step?: number
+  units?: 's' | '%'
+  className?: string
+}) {
   const barRef = useRef<HTMLDivElement>(null)
 
   const barWidth = barRef.current?.clientWidth ?? 0
@@ -194,7 +259,10 @@ export function RangeInput({ min, max, value, onChange, step = undefined, units 
           }}
           modifiers={[restrictToParentElement]}
         >
-          <RangeBall position={position} className={`${!dragging && 'opacity-0'} transition-opacity group-hover:opacity-100`} />
+          <RangeBall
+            position={position}
+            className={`${!dragging && 'opacity-0'} transition-opacity group-hover:opacity-100`}
+          />
         </DndContext>
         <div className="h-full rounded-md bg-accent-6" style={{ width: `${position}%` }} /> {/* progrss is colored */}
       </div>

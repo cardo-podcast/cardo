@@ -2,7 +2,7 @@
     "plugins": [
         "prettier-plugin-tailwindcss"
     ],
-    "printWidth": 800,
+    "printWidth": 120,
     "semi": false,
     "singleQuote": true
 }

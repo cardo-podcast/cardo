@@ -1,6 +1,16 @@
 import { secondsToStr } from '../utils/utils'
 
-const ProgressBar = ({ position, total, showTime = true, className }: { position: number; total: number; showTime?: boolean; className?: { div?: string; bar?: string; innerBar?: string } }) => {
+const ProgressBar = ({
+  position,
+  total,
+  showTime = true,
+  className,
+}: {
+  position: number
+  total: number
+  showTime?: boolean
+  className?: { div?: string; bar?: string; innerBar?: string }
+}) => {
   const progressStyle = {
     width: `${(position / total) * 100}%`,
   }

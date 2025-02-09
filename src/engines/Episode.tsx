@@ -146,5 +146,17 @@ export function useEpisode(episode: EpisodeData) {
     }
   }
 
-  return { reprState, inQueue, getDateString, togglePlayed, toggleQueue, position: reprState.position, inProgress, toggleDownload, downloadState, play, pause }
+  return {
+    reprState,
+    inQueue,
+    getDateString,
+    togglePlayed,
+    toggleQueue,
+    position: reprState.position,
+    inProgress,
+    toggleDownload,
+    downloadState,
+    play,
+    pause,
+  }
 }

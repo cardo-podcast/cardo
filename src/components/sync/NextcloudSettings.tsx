@@ -40,7 +40,11 @@ export function NextcloudSettings() {
 
   return (
     <div className="flex h-full w-full gap-2 p-1">
-      <img className="w-32 shrink-0" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/141px-Nextcloud_Logo.svg.png" alt="Nextcloud logo" />
+      <img
+        className="w-32 shrink-0"
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/141px-Nextcloud_Logo.svg.png"
+        alt="Nextcloud logo"
+      />
       <form
         className="flex w-full flex-col items-center gap-2"
         onSubmit={async (e) => {
@@ -58,7 +62,13 @@ export function NextcloudSettings() {
         }}
       >
         <div className="flex w-full flex-col items-end gap-2">
-          <input name="server" type="url" required className="w-11/12 rounded-md bg-primary-8 px-2 py-1 focus:outline-none" placeholder={t('nextcloud_server_url')} />
+          <input
+            name="server"
+            type="url"
+            required
+            className="w-11/12 rounded-md bg-primary-8 px-2 py-1 focus:outline-none"
+            placeholder={t('nextcloud_server_url')}
+          />
           <button className="filled-button p-1 px-4 uppercase">{t('connect')}</button>
         </div>
       </form>

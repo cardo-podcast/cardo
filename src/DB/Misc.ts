@@ -3,7 +3,6 @@ import Database from 'tauri-plugin-sql-api'
 import { EpisodeData } from '..'
 
 export function useMisc(db: Database) {
-
   // #region COMMON INTERNAL FUNCTIONS
   const getMiscKey = async (key: string): Promise<string | undefined> => {
     const r: { value: string }[] = await db.select(
@@ -105,5 +104,14 @@ export function useMisc(db: Database) {
     [db],
   )
 
-  return { getSyncKey, setSyncKey, getLastSync, setLastSync, getLastPlayed, setLastPlaying, getLastUpdate, setLastUpdate }
+  return {
+    getSyncKey,
+    setSyncKey,
+    getLastSync,
+    setLastSync,
+    getLastPlayed,
+    setLastPlaying,
+    getLastUpdate,
+    setLastUpdate,
+  }
 }

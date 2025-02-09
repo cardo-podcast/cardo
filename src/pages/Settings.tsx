@@ -26,7 +26,10 @@ function AccentColorSelector() {
   const selectedColor = getColor(accent)
   return (
     <div className="relative">
-      <button className={`h-10 w-16 rounded-md border-2 border-${selectedColor[4]}-800 bg-${selectedColor[5]}`} onClick={() => setShowSelector(true)} />
+      <button
+        className={`h-10 w-16 rounded-md border-2 border-${selectedColor[4]}-800 bg-${selectedColor[5]}`}
+        onClick={() => setShowSelector(true)}
+      />
 
       {showSelector && (
         <div className="absolute bottom-0 left-0 z-10 grid min-w-max grid-cols-5 gap-1 rounded-md bg-primary-2 p-1">
@@ -119,7 +122,10 @@ function Settings() {
 
           <label className="flex w-fit gap-1">
             {t('check_updates')}:
-            <Checkbox defaultChecked={general.checkUpdates} onChange={(value) => updateSettings({ general: { checkUpdates: value } })} />
+            <Checkbox
+              defaultChecked={general.checkUpdates}
+              onChange={(value) => updateSettings({ general: { checkUpdates: value } })}
+            />
           </label>
 
           <div className="border-t-2 border-primary-8">
@@ -136,7 +142,12 @@ function Settings() {
                       },
                     })
                   }
-                  defaultValue={(colorSettings.primary as string) in DefaultThemes || BasicColors.includes(colorSettings.primary as TailwindBaseColor) ? (colorSettings.primary as string) : 'CUSTOM'}
+                  defaultValue={
+                    (colorSettings.primary as string) in DefaultThemes ||
+                    BasicColors.includes(colorSettings.primary as TailwindBaseColor)
+                      ? (colorSettings.primary as string)
+                      : 'CUSTOM'
+                  }
                 >
                   <option value="dark">DARK</option>
                   <option value="light">LIGHT</option>
@@ -180,7 +191,10 @@ function Settings() {
 
         <label className="flex w-fit gap-1">
           {t('fetch_subscriptions_startup')}:
-          <Checkbox defaultChecked={general.fetchSubscriptionsAtStartup} onChange={(value) => updateSettings({ general: { fetchSubscriptionsAtStartup: value } })} />
+          <Checkbox
+            defaultChecked={general.fetchSubscriptionsAtStartup}
+            onChange={(value) => updateSettings({ general: { fetchSubscriptionsAtStartup: value } })}
+          />
         </label>
 
         <label className="flex w-full items-center gap-2">
@@ -238,11 +252,17 @@ function Settings() {
           <div className="flex flex-col items-end gap-2">
             <label className="flex w-fit gap-1">
               {t('remove_from_queue_end')}:
-              <Checkbox defaultChecked={playback.removeFromQueueAtEnd} onChange={(value) => updateSettings({ playback: { removeFromQueueAtEnd: value } })} />
+              <Checkbox
+                defaultChecked={playback.removeFromQueueAtEnd}
+                onChange={(value) => updateSettings({ playback: { removeFromQueueAtEnd: value } })}
+              />
             </label>
             <label className="flex w-fit gap-1">
               {t('remove_from_downloads_end')}:
-              <Checkbox defaultChecked={playback.removeFromDownloadsAtEnd} onChange={(value) => updateSettings({ playback: { removeFromDownloadsAtEnd: value } })} />
+              <Checkbox
+                defaultChecked={playback.removeFromDownloadsAtEnd}
+                onChange={(value) => updateSettings({ playback: { removeFromDownloadsAtEnd: value } })}
+              />
             </label>
           </div>
         </div>
@@ -253,7 +273,10 @@ function Settings() {
         <div>
           <label className="flex w-fit gap-1">
             {t('show_pinWindow_button')}:
-            <Checkbox defaultChecked={ui.showPinWindowButton} onChange={(value) => updateSettings({ ui: { showPinWindowButton: value } })} />
+            <Checkbox
+              defaultChecked={ui.showPinWindowButton}
+              onChange={(value) => updateSettings({ ui: { showPinWindowButton: value } })}
+            />
           </label>
         </div>
       </div>
@@ -261,7 +284,13 @@ function Settings() {
       <div className="flex flex-col gap-1 rounded-md border-[2px] border-primary-8 p-2">
         <h1 className="mb-2 border-b-2 border-primary-8 uppercase">{t('about')}</h1>
         <div className="flex gap-3">
-          <img alt="" className="w-28 cursor-pointer transition-all hover:scale-110" title={t('open_web')} src={appIcon} onClick={() => shell.open('https://cardo-podcast.github.io')} />
+          <img
+            alt=""
+            className="w-28 cursor-pointer transition-all hover:scale-110"
+            title={t('open_web')}
+            src={appIcon}
+            onClick={() => shell.open('https://cardo-podcast.github.io')}
+          />
           <div className="flex flex-col gap-2">
             <h1>
               Cardo - {t('podcast_player')} ( v{tauriConfig.package.version} )
@@ -276,19 +305,38 @@ function Settings() {
                 </h1>
                 <div className="flex h-fit items-center gap-1">
                   <p>{t('source_code')}: </p>
-                  <img className="w-5 cursor-pointer rounded-full bg-white p-[1px] transition-transform hover:scale-110" src="https://github.githubassets.com/favicons/favicon.png" alt="Github" title="https://github.com/cardo-podcast/cardo" onClick={() => shell.open('https://github.com/cardo-podcast/cardo')} />
+                  <img
+                    className="w-5 cursor-pointer rounded-full bg-white p-[1px] transition-transform hover:scale-110"
+                    src="https://github.githubassets.com/favicons/favicon.png"
+                    alt="Github"
+                    title="https://github.com/cardo-podcast/cardo"
+                    onClick={() => shell.open('https://github.com/cardo-podcast/cardo')}
+                  />
                 </div>
               </div>
               <div className="flex h-12 items-center gap-2">
                 <a href="https://www.buymeacoffee.com/n0vella" target="_blank" rel="noreferrer">
-                  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" className="animate-brightness h-12 transition-transform hover:scale-105" />
+                  <img
+                    src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+                    alt="Buy Me A Coffee"
+                    className="animate-brightness h-12 transition-transform hover:scale-105"
+                  />
                 </a>
-                <a href="https://github.com/sponsors/cardo-podcast" target="_blank" rel="noreferrer" className="animate-brightness flex h-12 items-center gap-1 rounded-md bg-primary-1 p-1 px-2 transition-transform hover:scale-105">
+                <a
+                  href="https://github.com/sponsors/cardo-podcast"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="animate-brightness flex h-12 items-center gap-1 rounded-md bg-primary-1 p-1 px-2 transition-transform hover:scale-105"
+                >
                   <span className="block aspect-square h-12 text-[#bf3989]">{heartIcon}</span>
                   <span className="text-lg">Sponsor</span>
                 </a>
                 <a href="https://www.paypal.com/paypalme/n0velladev" target="_blank" rel="noreferrer">
-                  <img src="https://www.paypalobjects.com/webstatic/icon/pp196.png" alt="Paypal" className="h-12 rounded-md transition-transform hover:scale-105" />
+                  <img
+                    src="https://www.paypalobjects.com/webstatic/icon/pp196.png"
+                    alt="Paypal"
+                    className="h-12 rounded-md transition-transform hover:scale-105"
+                  />
                 </a>
               </div>
             </div>

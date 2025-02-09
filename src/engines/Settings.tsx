@@ -42,13 +42,18 @@ export class PodcastSettings {
   }
 }
 
-const SettingsContext = createContext<[Settings, (newSettings: RecursivePartial<Settings>) => void] | undefined>(undefined)
+const SettingsContext = createContext<[Settings, (newSettings: RecursivePartial<Settings>) => void] | undefined>(
+  undefined,
+)
 
 export function useSettings(): [Settings, (newSettings: RecursivePartial<Settings>) => void] {
   return useContext(SettingsContext) as [Settings, (newSettings: any) => void]
 }
 
-export function getPodcastSettings(feedUrl: string, podcastSettings: { [feedUrl: string]: PodcastSettings }): PodcastSettings {
+export function getPodcastSettings(
+  feedUrl: string,
+  podcastSettings: { [feedUrl: string]: PodcastSettings },
+): PodcastSettings {
   return merge(new PodcastSettings(), podcastSettings[feedUrl])
 }
 

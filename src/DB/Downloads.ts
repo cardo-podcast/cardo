@@ -72,7 +72,17 @@ export function useDownloads(db: Database) {
         `INSERT into downloads (title, description, src, pubDate, duration, size, podcastUrl, coverUrl, localFile) 
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     ON CONFLICT (src) DO NOTHING`,
-        [episode.title, episode.description, episode.src, episode.pubDate, episode.duration, episode.size, episode.podcastUrl, episode.coverUrl, localFile],
+        [
+          episode.title,
+          episode.description,
+          episode.src,
+          episode.pubDate,
+          episode.duration,
+          episode.size,
+          episode.podcastUrl,
+          episode.coverUrl,
+          localFile,
+        ],
       )
     },
     [db],

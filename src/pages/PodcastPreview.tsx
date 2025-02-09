@@ -16,7 +16,15 @@ import { useSync, useDB } from '../ContextProviders'
 const EPISODE_CARD_HEIGHT = 80 // min height
 const PRELOADED_EPISODES = 10 //
 
-function SortButton({ children, podcastUrl, criterion }: { children: ReactNode; podcastUrl: string; criterion: SortCriterion['criterion'] }) {
+function SortButton({
+  children,
+  podcastUrl,
+  criterion,
+}: {
+  children: ReactNode
+  podcastUrl: string
+  criterion: SortCriterion['criterion']
+}) {
   const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcastUrl)
   const sort = podcastSettings.sort
 
@@ -36,7 +44,9 @@ function SortButton({ children, podcastUrl, criterion }: { children: ReactNode; 
         }
       }}
     >
-      {sort.criterion === criterion && <div className="h-5 w-5">{sort.mode === 'asc' ? icons.upArrow : icons.downArrow}</div>}
+      {sort.criterion === criterion && (
+        <div className="h-5 w-5">{sort.mode === 'asc' ? icons.upArrow : icons.downArrow}</div>
+      )}
       {children}
     </button>
   )
@@ -217,11 +227,19 @@ function PodcastPreview() {
     <div className="relative w-full px-1">
       {/* sticky bar that appears when scrolling */}
       <div className="group absolute top-0 z-10 flex w-full cursor-default items-center gap-2 border-b-2 border-primary-8 bg-primary-9 p-1">
-        <img className="aspect-square h-10 rounded-md bg-primary-7" src={podcast.coverUrlLarge} alt="" onError={(e: SyntheticEvent<HTMLImageElement>) => (e.currentTarget.src = appIcon)} />
+        <img
+          className="aspect-square h-10 rounded-md bg-primary-7"
+          src={podcast.coverUrlLarge}
+          alt=""
+          onError={(e: SyntheticEvent<HTMLImageElement>) => (e.currentTarget.src = appIcon)}
+        />
 
         <h1 className="text-xl group-hover:hidden">{podcast.podcastName}</h1>
 
-        <span className="absolute left-1/2 w-10 -translate-x-1/2 cursor-pointer opacity-0 transition-opacity group-hover:opacity-100" onClick={() => scrollRef.current && scrollRef.current.scrollTo({ top: 0 })}>
+        <span
+          className="absolute left-1/2 w-10 -translate-x-1/2 cursor-pointer opacity-0 transition-opacity group-hover:opacity-100"
+          onClick={() => scrollRef.current && scrollRef.current.scrollTo({ top: 0 })}
+        >
           {icons.upArrowSquare}
         </span>
       </div>
@@ -267,11 +285,17 @@ function PodcastPreview() {
                     <div>
                       <label className="flex items-center justify-between gap-2 uppercase">
                         {t('duration_less_than')}:
-                        <TimeInput value={podcastSettings.filter.duration.max} onChange={(v) => updatePodcastSettings({ filter: { duration: { max: v } } })} />
+                        <TimeInput
+                          value={podcastSettings.filter.duration.max}
+                          onChange={(v) => updatePodcastSettings({ filter: { duration: { max: v } } })}
+                        />
                       </label>
                       <label className="flex items-center justify-between gap-2 uppercase">
                         {t('duration_greater_than')}:
-                        <TimeInput value={podcastSettings.filter.duration.min} onChange={(v) => updatePodcastSettings({ filter: { duration: { min: v } } })} />
+                        <TimeInput
+                          value={podcastSettings.filter.duration.min}
+                          onChange={(v) => updatePodcastSettings({ filter: { duration: { min: v } } })}
+                        />
                       </label>
                     </div>
                   </div>
@@ -282,19 +306,28 @@ function PodcastPreview() {
                     <div className="flex flex-col items-end">
                       <label className="flex w-fit gap-1">
                         {t('download_new')}:
-                        <Checkbox defaultChecked={podcastSettings.downloadNew} onChange={(value) => updatePodcastSettings({ downloadNew: value })} />
+                        <Checkbox
+                          defaultChecked={podcastSettings.downloadNew}
+                          onChange={(value) => updatePodcastSettings({ downloadNew: value })}
+                        />
                       </label>
 
                       <label className="flex w-fit gap-1">
                         {t('queue_new')}:
-                        <Checkbox defaultChecked={podcastSettings.queueNew} onChange={(value) => updatePodcastSettings({ queueNew: value })} />
+                        <Checkbox
+                          defaultChecked={podcastSettings.queueNew}
+                          onChange={(value) => updatePodcastSettings({ queueNew: value })}
+                        />
                       </label>
                     </div>
                   </div>
                 )}
               </div>
 
-              <button className="mt-1 flex h-5 w-4/5 items-center justify-center border-t-2 border-primary-8 p-2" onClick={() => setTweakMenu(undefined)}>
+              <button
+                className="mt-1 flex h-5 w-4/5 items-center justify-center border-t-2 border-primary-8 p-2"
+                onClick={() => setTweakMenu(undefined)}
+              >
                 <span className="h-6 w-6">{icons.upArrow}</span>
               </button>
             </div>
@@ -316,7 +349,12 @@ function PodcastPreview() {
                 })
               }}
             >
-              <img className="aspect-square h-40 rounded-md bg-primary-7" src={podcast.coverUrlLarge} alt="" onError={(e: SyntheticEvent<HTMLImageElement>) => (e.currentTarget.src = appIcon)} />
+              <img
+                className="aspect-square h-40 rounded-md bg-primary-7"
+                src={podcast.coverUrlLarge}
+                alt=""
+                onError={(e: SyntheticEvent<HTMLImageElement>) => (e.currentTarget.src = appIcon)}
+              />
             </div>
 
             {/* #region BUTTONS */}
@@ -379,7 +417,10 @@ function PodcastPreview() {
             <h2 className="mb-2">{podcast.artistName}</h2>
 
             <div className="flex overflow-y-auto scroll-smooth rounded-md pr-2">
-              <div className="whitespace-pre-line text-sm text-primary-4" dangerouslySetInnerHTML={{ __html: sanitizeHTML(podcast.description ?? '') }} />
+              <div
+                className="whitespace-pre-line text-sm text-primary-4"
+                dangerouslySetInnerHTML={{ __html: sanitizeHTML(podcast.description ?? '') }}
+              />
             </div>
           </div>
         </div>
@@ -398,7 +439,10 @@ function PodcastPreview() {
               }}
               className="border-b-[1px] border-primary-8 transition-colors hover:bg-primary-8"
               onClick={() => {
-                sessionStorage.setItem(`scroll-${location.key}`, Math.floor(scrollRef.current?.scrollTop ?? 0).toString())
+                sessionStorage.setItem(
+                  `scroll-${location.key}`,
+                  Math.floor(scrollRef.current?.scrollTop ?? 0).toString(),
+                )
                 sessionStorage.setItem(`visibleItems-${location.key}`, visibleItems.toString())
               }}
             />
