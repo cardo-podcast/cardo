@@ -1,16 +1,16 @@
-import { SyntheticEvent, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import * as icons from '../Icons'
 import { EpisodeData } from '..'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { parsePodcastDetails, secondsToStr } from '../utils/utils'
 import { useTranslation } from 'react-i18next'
 import ProgressBar from '../components/ProgressBar'
-import appIcon from '../../src-tauri/icons/icon.png'
 import { useEpisode } from '../engines/Episode'
 import { sanitizeHTML } from '../utils/sanitize'
 import { showMenu } from 'tauri-plugin-context-menu'
 import { toast } from 'react-toastify'
 import { useDB } from '../ContextProviders'
+import { EpisodeCover } from '../components/Cover'
 
 function EpisodePreview() {
   const location = useLocation()
@@ -76,17 +76,9 @@ function EpisodePreview() {
         <div
           className={`flex aspect-square h-28 items-center justify-center rounded-md bg-primary-8 transition-all ${podcastFetched ? 'cursor-pointer hover:scale-95' : ''}`}
         >
-          <img
+          <EpisodeCover
             className="rounded-md"
-            src={episode.coverUrl}
-            alt=""
-            onError={(e: SyntheticEvent<HTMLImageElement>) => {
-              if (e.currentTarget.src === episode.podcast?.coverUrl) {
-                e.currentTarget.src = appIcon
-              } else {
-                e.currentTarget.src = episode.podcast?.coverUrl ?? appIcon
-              }
-            }}
+            episode={episode}
             title={podcastFetched ? t('open_podcast') + ' ' + episode.podcast?.podcastName : ''}
             onClick={() => {
               podcastFetched && // buton didn't work if podcast isn't loaded yet

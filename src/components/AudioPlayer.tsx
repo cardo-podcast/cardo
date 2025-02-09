@@ -20,6 +20,7 @@ import { convertFileSrc } from '@tauri-apps/api/tauri'
 import round from 'lodash/round'
 import { RangeInput } from './Inputs'
 import { PlayerContext, useDB, usePlayer } from '../ContextProviders'
+import { EpisodeCover } from './Cover'
 
 export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(null)
@@ -362,10 +363,9 @@ function AudioPlayer({ className = '' }) {
           {/* COVER ON LEFT SIDE*/}
 
           <div className="z-10 m-auto flex aspect-square w-24 cursor-pointer items-center justify-center rounded-md bg-primary-9 transition-transform hover:scale-95">
-            <img
+            <EpisodeCover
               className="rounded-md"
-              src={playing.coverUrl}
-              alt=""
+              episode={playing}
               onClick={() => {
                 navigate('/episode-preview', {
                   state: {

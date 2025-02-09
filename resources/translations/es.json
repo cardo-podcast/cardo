@@ -91,5 +91,6 @@
   "queue_new": "Añadir nuevos episodios a la cola automáticamente",
   "import/export": "Importar / Exportar",
   "import_opml": "Importar subscripciones de archivo OPML",
-  "export_opml": "Exportar subscripciones a archivo OPML"
+  "export_opml": "Exportar subscripciones a archivo OPML",
+  "change_podcast_cover": "Cambiar la cover del podcast"
 }

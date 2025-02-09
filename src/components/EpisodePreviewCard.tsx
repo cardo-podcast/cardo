@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { showMenu } from 'tauri-plugin-context-menu'
 import appIcon from '../../src-tauri/icons/icon.png'
 import { useEpisode } from '../engines/Episode'
+import { EpisodeCover } from './Cover'
 
 export default function EpisodePreviewCard({ episode }: { episode: EpisodeData | NewEpisodeData }) {
   const navigate = useNavigate()
@@ -50,7 +51,8 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
       }}
     >
       <div className="relative flex aspect-square w-full flex-col items-center justify-center overflow-hidden rounded-md bg-primary-8">
-        <img
+        <EpisodeCover
+          episode={episode}
           title={episode.podcast?.podcastName}
           className="w-full bg-purple-950"
           onClick={() => {
@@ -59,15 +61,6 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
                 episode: episode,
               },
             })
-          }}
-          alt=""
-          src={episode.coverUrl}
-          onError={(e: SyntheticEvent<HTMLImageElement>) => {
-            if (e.currentTarget.src === episode.podcast?.coverUrl) {
-              e.currentTarget.src = appIcon
-            } else {
-              e.currentTarget.src = episode.podcast?.coverUrl ?? appIcon
-            }
           }}
         />
         <ProgressBar

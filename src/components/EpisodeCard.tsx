@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { showMenu } from 'tauri-plugin-context-menu'
 import appIcon from '../../src-tauri/icons/icon.png'
 import { useEpisode } from '../engines/Episode'
+import { EpisodeCover } from './Cover'
 
 function EpisodeCard({
   episode,
@@ -71,21 +72,11 @@ function EpisodeCard({
     >
       <>
         <div className="flex aspect-square h-16 items-center justify-center rounded-md bg-primary-8">
-          <img
+          <EpisodeCover
             className={`rounded-md ${onImageClick !== undefined ? 'cursor-pointer hover:p-0.5' : ''}`}
             onClick={onImageClick}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            src={episode.coverUrl}
+            episode={episode}
             title={onImageClick !== undefined ? t('open_podcast') + ' ' + episode.podcast?.podcastName : ''}
-            onError={(e: SyntheticEvent<HTMLImageElement>) => {
-              if (e.currentTarget.src === episode.podcast?.coverUrl) {
-                e.currentTarget.src = appIcon
-              } else {
-                e.currentTarget.src = episode.podcast?.coverUrl ?? appIcon
-              }
-            }}
           />
         </div>
 
