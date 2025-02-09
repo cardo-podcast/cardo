@@ -57,7 +57,7 @@ function Settings() {
   const [{ globals, general, colors: colorSettings, playback, ui }, updateSettings] = useSettings()
   const [languages, setLanguages] = useState<string[]>()
   const [showBanner, Banner] = useModalBanner()
-  const [importOPML] = useOPML()
+  const [importOPML, exportOPML] = useOPML()
 
   useEffect(() => {
     const loadLocales = async () => {
@@ -154,7 +154,7 @@ function Settings() {
 
       <div className="flex flex-col gap-1 rounded-md border-[2px] border-primary-8 p-2">
         <h1 className="mb-2 border-b-2 border-primary-8 uppercase">{t('import/export')}</h1>
-        <div className="flex gap-10">
+        <div className="flex gap-3">
           <label>
             {t('import_opml')}
             <input
@@ -169,6 +169,9 @@ function Settings() {
               }}
             />
           </label>
+          <button className="filled-button" onClick={exportOPML}>
+            {t('export_opml')}
+          </button>
         </div>
       </div>
 
