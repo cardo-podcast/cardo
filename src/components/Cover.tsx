@@ -38,7 +38,7 @@ export function PodcastCover({ podcast, ...props }: PodcastCoverProps) {
 export function EpisodeCover({ episode, ...props }: EpisodeCoverProps) {
   const [error, setError] = useState(false)
 
-  if (error) return PodcastCover({ podcast: episode.podcast!, ...props })
+  if (error) return <PodcastCover podcast={episode.podcast!} {...props}/>
 
   return <img src={episode.coverUrl} alt="" loading="lazy" decoding="async" onError={() => setError(true)} {...props} />
 }
