@@ -74,21 +74,35 @@ export function useSubscriptionsEpisodes(db: Database) {
       podcastUrl?: string
       searchTerm?: string
     }): Promise<EpisodeData[]> {
-      let query = 'SELECT * FROM subscriptions_episodes WHERE pubDate > $1'
+      let query = `SELECT
+        se.*,
+        subscriptions.coverUrl
+      FROM
+        subscriptions_episodes se
+      LEFT JOIN
+        subscriptions ON subscriptions.feedUrl = se.podcastUrl
+      WHERE
+        se.pubDate > $1`
 
       if (options.podcastUrl) {
         query += ' AND podcastUrl = $2'
       }
 
       if (options.searchTerm) {
-        query += ` AND (lower(title) LIKE "%${options.searchTerm.toLowerCase()}%"
-                      OR lower(description) LIKE "%${options.searchTerm.toLocaleLowerCase()}%")`
+        query += ` AND (lower(se.title) LIKE "%${options.searchTerm.toLowerCase()}%"
+                      OR lower(se.description) LIKE "%${options.searchTerm.toLocaleLowerCase()}%")`
       }
 
-      const r: EpisodeData[] = await db.select(query, [options.pubdate_gt ?? 0, options.podcastUrl])
+      const r: (EpisodeData & { coverUrl: string })[] = await db.select(query, [
+        options.pubdate_gt ?? 0,
+        options.podcastUrl,
+      ])
+
+      console.log(r)
 
       return r.map((episode) => ({
         ...episode,
+        podcast: { feedUrl: episode.podcastUrl, coverUrl: episode.coverUrl },
         pubDate: new Date(episode.pubDate),
       }))
     },
