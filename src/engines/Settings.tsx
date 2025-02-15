@@ -171,7 +171,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   // #endregion
 
   useEffect(() => {
-    changeLanguage(settings.globals.language)
+    if (loaded) {
+      changeLanguage(settings.globals.language)
+    }
   }, [settings.globals.language])
 
   const [loaded, setLoaded] = useState(false)
