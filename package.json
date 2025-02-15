@@ -1,7 +1,7 @@
 {
   "name": "cardo",
   "private": true,
-  "version": "1.9.3",
+  "version": "1.10.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
