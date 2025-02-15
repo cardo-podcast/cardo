@@ -249,7 +249,7 @@ function PodcastPreview() {
       <div className="relative w-full px-1">
         {/* sticky bar that appears when scrolling */}
         <div className="group absolute top-0 z-10 flex w-full cursor-default items-center gap-2 border-b-2 border-primary-8 bg-primary-9 p-1">
-          <PodcastCover className="aspect-square h-10 rounded-md bg-primary-7" podcast={podcast} src="" />
+          <PodcastCover className="aspect-square h-10 rounded-md bg-primary-7" podcast={podcast} />
 
           <h1 className="text-xl group-hover:hidden">{podcast.podcastName}</h1>
 
