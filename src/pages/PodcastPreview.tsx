@@ -9,7 +9,6 @@ import { usePodcastSettings } from '../engines/Settings'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 import { sanitizeHTML } from '../utils/sanitize'
-import { showMenu } from 'tauri-plugin-context-menu'
 import { useSync, useDB } from '../ContextProviders'
 import { PodcastCover } from '../components/Cover'
 import { useModalBanner } from '../components/ModalBanner'
@@ -356,18 +355,19 @@ function PodcastPreview() {
               <div
                 className="aspect-square h-40 cursor-pointer"
                 onContextMenu={() => {
-                  showMenu({
-                    items: [
-                      {
-                        label: t('copy_feed_url'),
-                        event: copyFeedUrl,
-                      },
-                      {
-                        label: t('change_podcast_cover'),
-                        event: () => showChangeCoverBanner(),
-                      },
-                    ],
-                  })
+                  // TODO: Tauri V2 context menu
+                  // showMenu({
+                  //   items: [
+                  //     {
+                  //       label: t('copy_feed_url'),
+                  //       event: copyFeedUrl,
+                  //     },
+                  //     {
+                  //       label: t('change_podcast_cover'),
+                  //       event: () => showChangeCoverBanner(),
+                  //     },
+                  //   ],
+                  // })
                 }}
               >
                 <PodcastCover className="aspect-square h-40 rounded-md bg-primary-7" podcast={podcast} />
@@ -451,7 +451,7 @@ function PodcastPreview() {
                     // not including all vars to save some memory
                     coverUrl: podcast.coverUrl,
                     podcastName: podcast.podcastName,
-                    feedUrl: podcast.feedUrl
+                    feedUrl: podcast.feedUrl,
                   },
                 }}
                 className="border-b-[1px] border-primary-8 transition-colors hover:bg-primary-8"

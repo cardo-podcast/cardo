@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom'
 import { secondsToStr } from '../utils/utils'
 import ProgressBar from './ProgressBar'
 import { useTranslation } from 'react-i18next'
-import { showMenu } from 'tauri-plugin-context-menu'
 import { useEpisode } from '../engines/Episode'
 import { EpisodeCover } from './Cover'
 
@@ -51,22 +50,23 @@ function EpisodeCard({
         })
       }}
       onContextMenu={() => {
-        showMenu({
-          items: [
-            {
-              label: t(reprState.complete ? 'mark_not_played' : 'mark_played'),
-              event: togglePlayed,
-            },
-            {
-              label: t(inQueue ? 'remove_queue' : 'add_queue'),
-              event: toggleQueue,
-            },
-            {
-              label: t(downloadState == 'downloaded' ? 'remove_download' : 'download'),
-              event: toggleDownload,
-            },
-          ],
-        })
+        // TODO: Tauri V2 context menu
+        // showMenu({
+        //   items: [
+        //     {
+        //       label: t(reprState.complete ? 'mark_not_played' : 'mark_played'),
+        //       event: togglePlayed,
+        //     },
+        //     {
+        //       label: t(inQueue ? 'remove_queue' : 'add_queue'),
+        //       event: toggleQueue,
+        //     },
+        //     {
+        //       label: t(downloadState == 'downloaded' ? 'remove_download' : 'download'),
+        //       event: toggleDownload,
+        //     },
+        //   ],
+        // })
       }}
     >
       <>
