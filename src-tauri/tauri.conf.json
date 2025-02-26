@@ -48,9 +48,6 @@
       "os": {
         "all": true
       },
-      "globalShortcut": {
-        "all": true
-      },
       "protocol": {
         "asset": true,
         "assetScope": [

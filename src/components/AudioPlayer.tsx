@@ -14,7 +14,6 @@ import { EpisodeData } from '..'
 import { useNavigate } from 'react-router-dom'
 import { useSettings } from '../engines/Settings'
 import { useTranslation } from 'react-i18next'
-import { globalShortcut } from '@tauri-apps/api'
 import appIcon from '../../src-tauri/icons/icon.png'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import round from 'lodash/round'
@@ -147,7 +146,7 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
   return (
     <div className="relative">
       <button
-        className="hover: flex w-7 flex-col items-center hover:text-accent-6 focus:outline-none"
+        className="hover: hover:text-accent-6 flex w-7 flex-col items-center focus:outline-none"
         onClick={() => setShowMenu(!showMenu)}
       >
         {speedometer}
@@ -156,11 +155,11 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
 
       {showMenu && <div className="fixed bottom-0 left-0 z-10 h-screen w-full" onClick={() => setShowMenu(false)} />}
       <div
-        className={`${showMenu ? 'flex' : 'hidden'} absolute bottom-10 left-1/2 z-20 w-32 -translate-x-1/2 flex-col items-center justify-center gap-1 rounded-md border-2 border-primary-7 bg-primary-9 p-2`}
+        className={`${showMenu ? 'flex' : 'hidden'} border-primary-7 bg-primary-9 absolute bottom-10 left-1/2 z-20 w-32 -translate-x-1/2 flex-col items-center justify-center gap-1 rounded-md border-2 p-2`}
       >
         <div className="flex items-center gap-2">
           <button
-            className="mb-1 flex items-center text-xl hover:text-accent-6"
+            className="hover:text-accent-6 mb-1 flex items-center text-xl"
             onClick={() => {
               if (audioRef.current) {
                 setPlaybackRate((prev) => round(prev - settings.rateChangeStep, 2))
@@ -173,7 +172,7 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
           <span>{playbackRate.toFixed(2)}</span>
 
           <button
-            className="mb-1 flex items-center text-xl hover:text-accent-6"
+            className="hover:text-accent-6 mb-1 flex items-center text-xl"
             onClick={() => {
               if (audioRef.current) {
                 setPlaybackRate((prev) => round(prev + settings.rateChangeStep, 2))
@@ -188,7 +187,7 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
           {settings.playbackRatePresets.map((preset) => (
             <button
               key={preset}
-              className={`w-8 rounded-md bg-primary-7 p-1 hover:bg-primary-6 disabled:bg-primary-8`}
+              className={`bg-primary-7 hover:bg-primary-6 disabled:bg-primary-8 w-8 rounded-md p-1`}
               disabled={playbackRate === preset}
               title={t('right_click_remove_preset')}
               onContextMenu={() => {
@@ -205,7 +204,7 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
           ))}
 
           <button
-            className="rounded-md bg-primary-7 p-1 hover:bg-primary-6 disabled:hidden"
+            className="bg-primary-7 hover:bg-primary-6 rounded-md p-1 disabled:hidden"
             disabled={settings.playbackRatePresets.includes(playbackRate)}
             title={t('add')}
             onClick={() => {
@@ -249,7 +248,7 @@ function VolumeControl({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) 
 
   return (
     <div className="flex items-center">
-      <button className="flex hover:text-accent-6" onClick={() => setIsMuted(!isMuted)}>
+      <button className="hover:text-accent-6 flex" onClick={() => setIsMuted(!isMuted)}>
         <span className="h-5 w-5">{isMuted ? muteIcon : volumeIcon}</span>
       </button>
 
@@ -279,20 +278,6 @@ function AudioPlayer({ className = '' }) {
     updateSettings,
   ] = useSettings()
   const { t } = useTranslation()
-
-  // #region MEDIA_KEYS
-  useEffect(() => {
-    if (!globalShortcut.isRegistered('MediaPlayPause')) {
-      globalShortcut.register('MediaPlayPause', handlePlayPause)
-    }
-
-    if (!globalShortcut.isRegistered('MediaNextTrack')) {
-      globalShortcut.register('MediaNextTrack', () => playNextInQueue)
-    }
-
-    // MediaPreviousTrack
-  }, [])
-  // #endregion
 
   useEffect(() => {
     if (audioRef.current == null || playing == null) return
@@ -359,10 +344,10 @@ function AudioPlayer({ className = '' }) {
       />
 
       {playing && (
-        <div className={`flex w-full gap-3 bg-primary-10 p-2 ${className}`}>
+        <div className={`bg-primary-10 flex w-full gap-3 p-2 ${className}`}>
           {/* COVER ON LEFT SIDE*/}
 
-          <div className="z-10 m-auto flex aspect-square w-24 cursor-pointer items-center justify-center rounded-md bg-primary-9 transition-transform hover:scale-95">
+          <div className="bg-primary-9 z-10 m-auto flex aspect-square w-24 cursor-pointer items-center justify-center rounded-md transition-transform hover:scale-95">
             <EpisodeCover
               className="rounded-md"
               episode={playing}
@@ -420,7 +405,7 @@ function AudioPlayer({ className = '' }) {
                 {/* PLAYER BUTTONS ON THE MIDDLE */}
                 <div className="flex items-center justify-center gap-3">
                   <button
-                    className="hover: flex w-7 flex-col items-center hover:text-accent-6 focus:outline-none"
+                    className="hover: hover:text-accent-6 flex w-7 flex-col items-center focus:outline-none"
                     onClick={() => {
                       changeTime(-1 * stepBackwards, true)
                     }}
@@ -430,14 +415,14 @@ function AudioPlayer({ className = '' }) {
                   </button>
 
                   <button
-                    className="hover: mb-2 flex w-9 items-center hover:text-accent-6 focus:outline-none"
+                    className="hover: hover:text-accent-6 mb-2 flex w-9 items-center focus:outline-none"
                     onClick={handlePlayPause}
                   >
                     <span className="w-9">{audioRef.current?.paused ? playIcon : pauseIcon}</span>
                   </button>
 
                   <button
-                    className="hover: flex w-7 flex-col items-center hover:text-accent-6 focus:outline-none"
+                    className="hover: hover:text-accent-6 flex w-7 flex-col items-center focus:outline-none"
                     onClick={() => {
                       changeTime(stepForward, true)
                     }}
