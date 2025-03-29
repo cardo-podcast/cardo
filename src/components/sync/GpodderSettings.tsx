@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { saveCreds, toastError } from '../../utils/utils'
 import { useDB, useSync } from '../../ContextProviders'
-import { invoke } from '@tauri-apps/api'
+import { invoke } from '@tauri-apps/api/core'
 import { login } from '../../sync/Gpodder'
 
 export function GpodderSettings() {

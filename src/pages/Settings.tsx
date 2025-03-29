@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react'
 import { TailwindBaseColor } from '..'
 import { DefaultTheme, DefaultThemes, BasicColors } from '../DefaultThemes'
 import appIcon from '../../src-tauri/icons/icon.png'
-import {  } from '@tauri-apps/api'
 import { appConfigDir, join, resolveResource } from '@tauri-apps/api/path'
 import { readDir } from '@tauri-apps/plugin-fs'
 import tauriConfig from '../../src-tauri/tauri.conf.json'
@@ -294,7 +293,7 @@ function Settings() {
           />
           <div className="flex flex-col gap-2">
             <h1>
-              Cardo - {t('podcast_player')} ( v{tauriConfig.package.version} )
+              Cardo - {t('podcast_player')} ( v{tauriConfig.version} )
             </h1>
             <div className="flex gap-10">
               <div>

@@ -98,8 +98,6 @@ export function useSubscriptionsEpisodes(db: Database) {
         options.podcastUrl,
       ])
 
-      console.log(r)
-
       return r.map((episode) => ({
         ...episode,
         podcast: { feedUrl: episode.podcastUrl, coverUrl: episode.coverUrl },

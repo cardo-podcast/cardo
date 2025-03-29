@@ -1,4 +1,3 @@
-import {  } from '@tauri-apps/api'
 import { GpodderUpdate, ProtocolFn, ServerGpodderUpdate, SubscriptionsUpdate } from '.'
 import * as http from "@tauri-apps/plugin-http"
 
