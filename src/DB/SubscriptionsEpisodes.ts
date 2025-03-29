@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import Database from 'tauri-plugin-sql-api'
+import Database from '@tauri-apps/plugin-sql'
 import { EpisodeData, NewEpisodeData, PodcastData, RawEpisodeData } from '..'
 import { parseXML, toastError } from '../utils/utils'
 

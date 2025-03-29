@@ -1,6 +1,6 @@
 import { appConfigDir, join } from '@tauri-apps/api/path'
 import config from '../src-tauri/tauri.conf.json'
-import { exists, readTextFile, writeTextFile } from '@tauri-apps/api/fs'
+import { exists, readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
 
 // migrations in ascending order
 const migrations: { [version: string]: () => Promise<void> } = {
@@ -11,7 +11,7 @@ const migrations: { [version: string]: () => Promise<void> } = {
 
 export async function postupdate() {
   const updatesFile = await join(await appConfigDir(), 'updates.json')
-  const version = config.package.version
+  const version = config.version
 
   const appliedUpdates: string[] = (await exists(updatesFile)) ? JSON.parse(await readTextFile(updatesFile)) : []
 

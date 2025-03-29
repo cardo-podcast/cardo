@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import Database from 'tauri-plugin-sql-api'
+import Database from '@tauri-apps/plugin-sql'
 import { EpisodeData, RawEpisodeData } from '..'
 
 export function useQueue(db: Database) {

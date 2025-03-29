@@ -1,5 +1,5 @@
 import { PodcastData } from '../..'
-import { fetch as tauriFetch } from '@tauri-apps/api/http'
+import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 
 export async function SearchApple(term: string): Promise<Array<PodcastData>> {
   const url = `https://itunes.apple.com/search?limit=40&entity=podcast&term=${term.trim().replace(' ', '+')}`

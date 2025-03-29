@@ -7,6 +7,7 @@ use rand::RngCore;
 use std::fs::File;
 use std::io::Write;
 use tauri::{command, Window};
+use tauri::{Emitter, Manager};
 use tauri_plugin_sql::{Migration, MigrationKind};
 
 const NONCE_SIZE: usize = 12; // 96-bit nonce
@@ -227,6 +228,13 @@ fn main() {
     ];
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_http::init())
+        .plugin(tauri_plugin_sql::Builder::new().build())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_os::init())
+        .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             encrypt,
             decrypt,
@@ -236,7 +244,7 @@ fn main() {
         .setup(|app| {
             let app_handle = app.handle();
 
-            let app_data_dir = app.path_resolver().app_data_dir().unwrap();
+            let app_data_dir = app.handle().path().app_data_dir().unwrap();
 
             let db_path = app_data_dir.join("db.sqlite");
             let db_path_str = String::from("sqlite:") + db_path.to_str().unwrap();

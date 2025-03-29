@@ -1,5 +1,6 @@
-import { http } from '@tauri-apps/api'
+import {  } from '@tauri-apps/api'
 import { GpodderUpdate, ProtocolFn, ServerGpodderUpdate, SubscriptionsUpdate } from '.'
+import * as http from "@tauri-apps/plugin-http"
 
 export async function login(url: string, user: string, password: string): Promise<boolean> {
   // just eturns true if login was successful
@@ -8,7 +9,6 @@ export async function login(url: string, user: string, password: string): Promis
 
   const r = await http.fetch(loginUrl.href, {
     method: 'POST',
-    responseType: http.ResponseType.JSON,
     headers: {
       Authorization: 'Basic ' + btoa(user + ':' + password),
     },
@@ -32,7 +32,6 @@ export const gpodderProtocol: ProtocolFn = function (creds) {
 
     const r: { data: { actions: ServerGpodderUpdate[] } } = await http.fetch(url.href, {
       method: 'GET',
-      responseType: http.ResponseType.JSON,
       headers: {
         Authorization: 'Basic ' + btoa(user + ':' + password),
         'Content-Type': 'application/json',
@@ -57,7 +56,6 @@ export const gpodderProtocol: ProtocolFn = function (creds) {
 
     const r: { data: SubscriptionsUpdate } = await http.fetch(url.href, {
       method: 'GET',
-      responseType: http.ResponseType.JSON,
       headers: {
         Authorization: 'Basic ' + btoa(user + ':' + password),
         'Content-Type': 'application/json',
@@ -75,7 +73,6 @@ export const gpodderProtocol: ProtocolFn = function (creds) {
 
     const r = await http.fetch(url.href, {
       method: 'POST',
-      responseType: http.ResponseType.JSON,
       headers: {
         Authorization: 'Basic ' + btoa(user + ':' + password),
         'Content-Type': 'application/json',
@@ -102,7 +99,6 @@ export const gpodderProtocol: ProtocolFn = function (creds) {
 
     const r = await http.fetch(url.href, {
       method: 'POST',
-      responseType: http.ResponseType.JSON,
       headers: {
         Authorization: 'Basic ' + btoa(user + ':' + password),
         'Content-Type': 'application/json',
