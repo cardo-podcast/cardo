@@ -1,4 +1,4 @@
-import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
+import { fetch } from '@tauri-apps/plugin-http'
 import { EpisodeData, PodcastData } from '..'
 import { mkdir, exists, readTextFile, writeTextFile, remove, readDir } from '@tauri-apps/plugin-fs'
 import { appCacheDir, dirname, join } from '@tauri-apps/api/path'
@@ -39,7 +39,7 @@ export function strToSeconds(time: string) {
 }
 
 async function downloadXml(url: string): Promise<string> {
-  const response = await tauriFetch(url, {
+  const response = await fetch(url, {
     method: 'GET',
   })
   return await response.text()

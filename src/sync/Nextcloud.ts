@@ -1,5 +1,5 @@
 import { GpodderUpdate, ProtocolFn, ServerGpodderUpdate, SubscriptionsUpdate } from '.'
-import * as http from '@tauri-apps/plugin-http'
+import { fetch } from '@tauri-apps/plugin-http'
 import * as shell from '@tauri-apps/plugin-shell'
 
 export async function login(url: string, onSucess: (user: string, password: string) => void) {
@@ -8,33 +8,30 @@ export async function login(url: string, onSucess: (user: string, password: stri
 
   const baseUrl = url.split('index.php')[0] // clean possible extra paths in url, cannot guess subpaths without index.php
 
-  const r = await http.fetch(baseUrl + '/index.php/login/v2', {
+  const r = await fetch(baseUrl + '/index.php/login/v2', {
     method: 'POST',
   })
 
   const {
     login,
     poll: { token, endpoint },
-  } = r.data as { login: string; poll: { token: string; endpoint: string } }
+  } = await r.json() as { login: string; poll: { token: string; endpoint: string } }
 
   shell.open(login) // throw explorer with nextcloud login page
 
   // start polling for a sucessful response of nextcloud
   const interval = setInterval(async () => {
-    const r = await http.fetch(endpoint, {
+    const r = await fetch(endpoint, {
       method: 'POST',
-      body: {
-        type: 'Json',
-        payload: {
-          token: token,
-        },
-      },
+      body: JSON.stringify({
+        token: token,
+      }),
     })
 
     if (!r.ok) return // poll again
 
     // get credentials from response
-    const { loginName, appPassword } = r.data as { server: string; loginName: string; appPassword: string }
+    const { loginName, appPassword } = await r.json() as { server: string; loginName: string; appPassword: string }
 
     onSucess(loginName, appPassword)
     clearInterval(interval)
@@ -49,7 +46,7 @@ export const nextcloudProtocol: ProtocolFn = function (creds) {
     const url =
       server + `/index.php/apps/gpoddersync/episode_action?since=${since === undefined ? '0' : since?.toString()}`
 
-    const r: { body: { actions: ServerGpodderUpdate[] } } = await http.fetch(url, {
+    const r = await fetch(url, {
       method: 'GET',
       headers: {
         'OCS-APIRequest': 'true',
@@ -57,7 +54,9 @@ export const nextcloudProtocol: ProtocolFn = function (creds) {
       },
     })
 
-    return r.body.actions.map((update: ServerGpodderUpdate) => ({
+    const response: { actions: ServerGpodderUpdate[] } = await r.json()
+
+    return response.actions.map((update: ServerGpodderUpdate) => ({
       ...update,
       timestamp: new Date(update.timestamp + '+00:00').getTime(), //timestamp in epoch format (server is in utc ISO format)
     })) as GpodderUpdate[]
@@ -69,7 +68,7 @@ export const nextcloudProtocol: ProtocolFn = function (creds) {
     const url =
       server + `/index.php/apps/gpoddersync/subscriptions?since=${since === undefined ? '0' : since?.toString()}`
 
-    const r = await http.fetch(url, {
+    const r = await fetch(url, {
       method: 'GET',
       headers: {
         'OCS-APIRequest': 'true',
@@ -85,7 +84,7 @@ export const nextcloudProtocol: ProtocolFn = function (creds) {
 
     const url = server + `/index.php/apps/gpoddersync/episode_action/create`
 
-    const r = await http.fetch(url, {
+    const r = await fetch(url, {
       method: 'POST',
       headers: {
         'OCS-APIRequest': 'true',
@@ -109,7 +108,7 @@ export const nextcloudProtocol: ProtocolFn = function (creds) {
 
     const url = server + `/index.php/apps/gpoddersync/subscription_change/create`
 
-    const r = await http.fetch(url, {
+    const r = await fetch(url, {
       method: 'POST',
       headers: {
         'OCS-APIRequest': 'true',
