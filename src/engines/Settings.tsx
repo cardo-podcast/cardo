@@ -170,13 +170,13 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   }
   // #endregion
 
+  const [loaded, setLoaded] = useState(false)
+
   useEffect(() => {
     if (loaded) {
       changeLanguage(settings.globals.language)
     }
-  }, [settings.globals.language])
-
-  const [loaded, setLoaded] = useState(false)
+  }, [loaded])
 
   const updateSettings = (newSettings: RecursivePartial<Settings>) => {
     let settingsClone = { ...settings }

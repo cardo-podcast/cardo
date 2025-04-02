@@ -13,6 +13,7 @@ import { useModalBanner } from '../components/ModalBanner'
 import { SyncSettings } from '../components/sync/SyncSettings'
 import { useOPML } from '../utils/opml'
 import { heart as heartIcon } from '../Icons'
+import { changeLanguage } from '../engines/translations'
 
 function AccentColorSelector() {
   const [
@@ -103,12 +104,14 @@ function Settings() {
             {t('language')}:
             <select
               className="rounded-md bg-primary-8 px-2 py-[1px] text-center outline-none"
-              onChange={({ target: { value } }) =>
+              onChange={({ target: { value } }) => {
+                changeLanguage(value)
                 updateSettings({
                   globals: {
-                    language: value as string,
+                    language: value,
                   },
                 })
+              }
               }
               value={globals.language}
             >
