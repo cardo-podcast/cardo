@@ -124,7 +124,7 @@ function LeftMenu() {
           <button
             className={`flex justify-center hover:text-accent-5 ${subscriptionsEpisodes.fetchingFeeds.length && 'animate-[spin_1.5s_linear_reverse_infinite]'}`}
             onClick={() => subscriptions.updateFeeds()}
-            title={t('update_subs_ feeds')}
+            title={t('update_subs_feeds')}
           >
             <span className={`${collapsedLeftMenu ? 'w-6' : 'w-5'}`}>{sync}</span>
           </button>
