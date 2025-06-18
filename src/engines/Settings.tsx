@@ -142,6 +142,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       removeFromQueueAtEnd: false,
       removeFromDownloadsAtEnd: false,
     },
+    search: {
+      engine: 'apple'
+    },
     ui: {
       showPinWindowButton: false,
       collapsedLeftMenu: true,

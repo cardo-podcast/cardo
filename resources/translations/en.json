@@ -93,5 +93,7 @@
   "import_opml": "Import OPML file subscriptions",
   "export_opml": "Export subscriptions to OPML file",
   "change_podcast_cover": "Change the podcast cover",
-  "podcast_cover_url": "URL to the podcast cover"
+  "podcast_cover_url": "URL to the podcast cover",
+  "search_apple": "iTunes",
+  "search_fyyd": "fyyd"
 }

@@ -7,6 +7,7 @@ import { arrowLeft, arrowRight } from '../Icons'
 import { useLocation, useNavigate } from 'react-router-dom'
 import EpisodeCard from './EpisodeCard'
 import { useDB } from '../ContextProviders'
+import { useSettings } from '../engines/Settings'
 
 function SearchBar() {
   const [results, setResults] = useState<PodcastData[] | EpisodeData[]>([])
@@ -18,22 +19,42 @@ function SearchBar() {
     subscriptions.length > 0 ? 'subscriptions' : 'podcasts',
   )
   const [noResults, setNoResults] = useState(false)
+  const { t } = useTranslation()
+  const searchEngineOptions = [
+    {
+      value: 'apple',
+      label: t('search_apple')
+    },
+    {
+      value: 'fyyd',
+      label: t('search_fyyd')
+    }
+  ];
+  const searchEngineOrDefault = (searchEngine: string) => searchEngine in searchEngineOptions.values ? searchEngine : 'apple'
+  const [{ search: searchSettings }, updateSettings] = useSettings()
+  const [searchEngine, setSearchEngine_] = useState(searchEngineOrDefault(searchSettings.engine))
   const timeout = useRef<ReturnType<typeof setInterval>>()
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
-  const { t } = useTranslation()
   const location = useLocation()
 
   const navigate = useNavigate()
 
-  const searchOnline = async (term: string) => {
-    return await SearchPodcast(term)
+  const searchOnline = async (term: string, searchEngine: string) => {
+    return await SearchPodcast(term, searchEngine)
   }
 
   const setSearchMode = (mode: typeof searchMode) => {
     if (mode !== searchMode) {
       setResults([])
       setSearchMode_(mode)
+    }
+  }
+
+  const setSearchEngine = (engine: typeof searchEngine) => {
+    if (engine !== searchEngine) {
+      updateSettings({ search: { engine: engine } });
+      setSearchEngine_(engine);
     }
   }
 
@@ -44,7 +65,7 @@ function SearchBar() {
     if (searchMode === 'subscriptions') {
       newResults = await subscriptionsEpisodes.getAll({ searchTerm: term })
     } else if (searchMode === 'podcasts') {
-      newResults = await searchOnline(term)
+      newResults = await searchOnline(term, searchEngine)
     } else if (searchMode === 'current') {
       newResults = searchOnCurrentPodcast(term)
     }
@@ -68,6 +89,13 @@ function SearchBar() {
       setSearchMode(subscriptions.length > 0 ? 'subscriptions' : 'podcasts')
     }
   }, [location])
+
+  useEffect(() => {
+    // Redo current search when searchEngine is changed.
+    if (inputRef.current && inputRef.current.value.length > 3) {
+      search(inputRef.current.value)
+    }
+  }, [searchEngine])
 
   const searchOnCurrentPodcast = (term: string) => {
     const episodes = location.state.currentPodcastEpisodes as EpisodeData[]
@@ -110,6 +138,15 @@ function SearchBar() {
           {arrowRight}
         </button>
       </div>
+      <select
+        className={`${searchMode === 'podcasts' ? '' : 'hidden'} rounded-md bg-primary-8 px-2 py-[1px] text-center outline-none`}
+        defaultValue={searchEngineOrDefault(searchSettings.engine)}
+        onChange={(engine) => setSearchEngine(engine.target.value)}
+      >
+        {searchEngineOptions.map(({value, label}) => (
+          <option key={value}>{label}</option>
+        ))}
+      </select>
       <form
         className="flex w-full"
         onSubmit={(e) => {
