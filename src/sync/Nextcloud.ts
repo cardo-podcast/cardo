@@ -8,14 +8,16 @@ export async function login(url: string, onSucess: (user: string, password: stri
 
   const baseUrl = url.split('index.php')[0] // clean possible extra paths in url, cannot guess subpaths without index.php
 
+  console.log(1)
   const r = await fetch(baseUrl + '/index.php/login/v2', {
     method: 'POST',
   })
+  console.log(2)
 
   const {
     login,
     poll: { token, endpoint },
-  } = await r.json() as { login: string; poll: { token: string; endpoint: string } }
+  } = (await r.json()) as { login: string; poll: { token: string; endpoint: string } }
 
   shell.open(login) // throw explorer with nextcloud login page
 
@@ -31,7 +33,7 @@ export async function login(url: string, onSucess: (user: string, password: stri
     if (!r.ok) return // poll again
 
     // get credentials from response
-    const { loginName, appPassword } = await r.json() as { server: string; loginName: string; appPassword: string }
+    const { loginName, appPassword } = (await r.json()) as { server: string; loginName: string; appPassword: string }
 
     onSucess(loginName, appPassword)
     clearInterval(interval)
