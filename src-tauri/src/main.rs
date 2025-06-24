@@ -252,7 +252,6 @@ fn main() {
             Ok(())
         })
         .plugin(tauri_plugin_context_menu::init())
-        .plugin(tauri_plugin_single_instance::init(|_, _, _| {}))
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
