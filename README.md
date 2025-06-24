@@ -84,32 +84,32 @@ Be free of summiting a PR if you get something good!
   </thead>
   <tbody>
      <tr>
+      <td>es</td>
+      <td style="color: green;">100%</td>
+    </tr>
+     <tr>
       <td>en</td>
       <td style="color: green;">100%</td>
     </tr>
      <tr>
-      <td>es</td>
-      <td style="color: green;">95%</td>
-    </tr>
-     <tr>
       <td>fr</td>
-      <td style="color: green;">95%</td>
+      <td style="color: green;">100%</td>
     </tr>
      <tr>
       <td>tr</td>
-      <td style="color: green;">95%</td>
+      <td style="color: green;">100%</td>
     </tr>
      <tr>
       <td>de</td>
-      <td style="color: green;">91%</td>
+      <td style="color: green;">95%</td>
     </tr>
      <tr>
       <td>cn</td>
-      <td style="color: green;">91%</td>
+      <td style="color: green;">95%</td>
     </tr>
      <tr>
       <td>pt</td>
-      <td style="color: green;">90%</td>
+      <td style="color: green;">94%</td>
     </tr>
   </tbody>
 </table>
