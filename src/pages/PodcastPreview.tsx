@@ -394,6 +394,7 @@ function PodcastPreview() {
 
                 <button
                   className="hover:text-accent-6"
+                  title={t('sort_episodes')}
                   onClick={() => {
                     setTweakMenu('sort')
                   }}
@@ -402,6 +403,7 @@ function PodcastPreview() {
                 </button>
                 <button
                   className="hover:text-accent-6"
+                  title={t('filter_episodes')}
                   onClick={() => {
                     setTweakMenu('filter')
                   }}
@@ -410,6 +412,7 @@ function PodcastPreview() {
                 </button>
                 <button
                   className="h-6 w-6 hover:text-accent-6"
+                  title={t('podcast_settings')}
                   onClick={() => {
                     setTweakMenu('settings')
                   }}
@@ -418,6 +421,7 @@ function PodcastPreview() {
                 </button>
                 <button
                   className={`w-6 hover:text-accent-6 ${downloading && 'animate-[spin_2s_linear_reverse_infinite]'}`}
+                  title={t('podcast_refresh')}
                   onClick={async () => {
                     loadEpisodes(true)
                   }}
