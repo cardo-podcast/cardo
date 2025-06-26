@@ -2,6 +2,7 @@ import { MouseEventHandler, useRef } from 'react'
 import { EpisodeData } from '..'
 import * as icons from '../Icons'
 import { useNavigate } from 'react-router-dom'
+import { stripAllHTML } from '../utils/stripAllHTML'
 import { secondsToStr } from '../utils/utils'
 import ProgressBar from './ProgressBar'
 import { useTranslation } from 'react-i18next'
@@ -83,7 +84,7 @@ function EpisodeCard({
           <p className={`text-sm ${reprState.complete ? '0' : '-4'}`}>
             {getDateString()} - {episode.size} MB{' '}
           </p>
-          <h2 className="mb-2" title={episode.description}>
+          <h2 className="mb-2" title={stripAllHTML(episode.description)}>
             {episode.title}
           </h2>
           <div className="flex w-full items-center justify-end gap-2">
