@@ -18,7 +18,7 @@
   "sync": "synchronization",
   "subscriptions": "subscriptions",
   "open_podcast": "Open the podcast",
-  "not_logged_sync": "Before synchronizing you have to log in to Nextcloud",
+  "not_logged_sync": "Before syncing, you must log in to a provider",
   "episodes": "episodes",
   "remaining_time": "remaining time",
   "hours": "hours",
