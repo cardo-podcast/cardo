@@ -46,7 +46,7 @@ function SearchBar() {
     }
   }
 
-  const searchEngineOptions = ['iTunes', 'fyyd']
+  const searchEngineOptions = ['iTunes', 'fyyd', 'PodcastIndex']
 
   const search = async () =>
     startTransition(async function () {
