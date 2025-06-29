@@ -98,7 +98,7 @@ function SearchBar() {
   const handleChange = async (term: string) => {
     setNoResults(false)
     if (term.length > 3) {
-      clearTimeout(timeout.current)
+      clearTimeout(timeout.current ?? 0)
       timeout.current = setTimeout(() => search(), 300)
     }
   }
@@ -125,20 +125,11 @@ function SearchBar() {
           {arrowRight}
         </button>
       </div>
-      <select
-        className={`${searchMode === 'podcasts' ? '' : 'hidden'} rounded-md bg-primary-8 px-2 py-[1px] text-center outline-none`}
-        defaultValue={engine}
-        onChange={(newEngine) => updateSettings({ search: { engine: newEngine.target.value } })}
-      >
-        {searchEngineOptions.map((value) => (
-          <option key={value}>{value}</option>
-        ))}
-      </select>
       <form
         className="flex w-full"
         onSubmit={(e) => {
           e.preventDefault()
-          clearTimeout(timeout.current)
+          clearTimeout(timeout.current ?? 0)
           if (inputRef.current) {
             search()
           }
@@ -158,7 +149,9 @@ function SearchBar() {
             }
           }}
         />
-        <div className="mr-2 hidden items-center gap-2 whitespace-nowrap active:flex peer-focus:flex">
+        <div
+          className={`mr-2 items-center gap-2 whitespace-nowrap ${results.length > 0 ? 'flex' : 'hidden active:flex peer-focus:flex'}`}
+        >
           <div
             className={`${isSearchInProgress ? '' : 'hidden'} flex w-6 items-center outline-none hover:text-accent-4`}
           >
@@ -201,7 +194,7 @@ function SearchBar() {
         </div>
       </form>
 
-      {results.length > 0 && (
+      {(results.length > 0 || isSearchInProgress) && (
         <>
           {/* close with click outside */}
           <div className="absolute left-0 top-0 z-10 mt-10 h-screen w-screen" onClick={() => setResults([])} />
@@ -211,6 +204,21 @@ function SearchBar() {
             ref={resultsRef}
           >
             <div className="flex w-full flex-col">
+              {searchMode === 'podcasts' && (
+                <div className="flex items-center justify-center gap-3 px-4 py-2">
+                  {searchEngineOptions.map((newEngine) => (
+                    <span
+                      className={`cursor-pointer font-thin ${newEngine === engine ? 'text-accent-5' : ''}`}
+                      onClick={() => {
+                        updateSettings({ search: { engine: newEngine } })
+                      }}
+                    >
+                      {newEngine}
+                    </span>
+                  ))}
+                </div>
+              )}
+
               {results.map((result, i) => {
                 if (searchMode === 'podcasts') {
                   return <PodcastCard key={i} podcast={result as PodcastData} />
