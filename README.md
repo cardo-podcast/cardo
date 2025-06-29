@@ -67,37 +67,7 @@ It's also nice if you want to improve the app. The stack is Tauri v1 + React + T
 To install dependencies `pnpm i` command should be enough. To setup a Tauri development environment check their [docs](https://tauri.app/v1/guides/getting-started/prerequisites), which are pretty good.
 In [tauri-conf.json](/src-tauri/tauri.conf.json) you should remove the updater configuration and windows certificate settings, or you will experiment errors of missing private key / certificate.
 
-To run/debug with Visual Studio Code create a `launch.json` file with the following configurations:
-````
-"version": "0.2.0",
-  "configurations": [
-    {
-      "type": "lldb",
-      "request": "launch",
-      "name": "Tauri Development Debug",
-      "cargo": {
-        "args": [
-          "build",
-          "--manifest-path=./src-tauri/Cargo.toml",
-          "--no-default-features"
-        ]
-      },
-      // task for the `beforeDevCommand` if used, must be configured in `.vscode/tasks.json`
-      "preLaunchTask": "ui:dev"
-    },
-    {
-      "type": "lldb",
-      "request": "launch",
-      "name": "Tauri Production Debug",
-      "cargo": {
-        "args": ["build", "--release", "--manifest-path=./src-tauri/Cargo.toml"]
-      },
-      // task for the `beforeBuildCommand` if used, must be configured in `.vscode/tasks.json`
-      "preLaunchTask": "ui:build"
-    }
-  ]
-}
-````
+To run/debug with Visual Studio Code, follow [the instructions in the Tauri docs](https://v1.tauri.app/v1/guides/debugging/vs-code/) but replace `yarn` in the config to `pnpm`.
 
 Feel free to summit a PR if you create something good!
 
