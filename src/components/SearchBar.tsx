@@ -3,7 +3,7 @@ import { searchPodcast } from '../engines/search/base'
 import { EpisodeData, PodcastData } from '..'
 import PodcastCard from './PodcastCard'
 import { useTranslation } from 'react-i18next'
-import { arrowLeft, arrowRight, sync } from '../Icons'
+import { arrowLeft, arrowRight, sync, search as searchIcon } from '../Icons'
 import { useLocation, useNavigate } from 'react-router-dom'
 import EpisodeCard from './EpisodeCard'
 import { useDB } from '../ContextProviders'
@@ -52,6 +52,7 @@ function SearchBar() {
     startTransition(async function () {
       const term = inputRef.current?.value ?? ''
       if (term.length === 0) return
+
       let newResults: typeof results = []
 
       if (searchMode === 'subscriptions') {
@@ -152,11 +153,10 @@ function SearchBar() {
         <div
           className={`mr-2 items-center gap-2 whitespace-nowrap ${results.length > 0 ? 'flex' : 'hidden active:flex peer-focus:flex'}`}
         >
-          <div
-            className={`${isSearchInProgress ? '' : 'hidden'} flex w-6 items-center outline-none hover:text-accent-4`}
-          >
+          <div className={`${isSearchInProgress ? '' : 'hidden'} flex w-6 items-center outline-none`}>
             <span className="w-6 animate-[spin_1.5s_linear_reverse_infinite]">{sync}</span>
           </div>
+          {!isSearchInProgress && <button className="outline-button w-5">{searchIcon}</button>}
           <button
             className={`${searchMode === 'subscriptions' ? 'bg-accent-7' : ''} flex items-center rounded-md border-2 border-accent-7 px-1 py-[1px] text-xs uppercase`}
             type="button"
