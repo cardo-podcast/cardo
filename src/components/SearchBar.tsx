@@ -208,6 +208,7 @@ function SearchBar() {
                 <div className="flex items-center justify-center gap-3 px-4 py-2">
                   {searchEngineOptions.map((newEngine) => (
                     <span
+                      key={newEngine}
                       className={`cursor-pointer font-thin ${newEngine === engine ? 'text-accent-5' : ''}`}
                       onClick={() => {
                         updateSettings({ search: { engine: newEngine } })
