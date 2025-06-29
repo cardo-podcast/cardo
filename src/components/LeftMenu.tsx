@@ -142,6 +142,7 @@ function LeftMenu() {
       <div
         id="folder"
         className="absolute right-0 my-auto h-full w-2 translate-x-1/2 cursor-w-resize bg-clip-content px-[3px] transition-colors hover:bg-accent-8"
+        title={collapsedLeftMenu ? t('double_click_expand') : t('double_click_collapse')}
         onDoubleClick={() => {
           updateSettings({ ui: { collapsedLeftMenu: !collapsedLeftMenu } })
         }}

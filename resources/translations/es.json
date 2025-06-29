@@ -93,5 +93,7 @@
   "import_opml": "Importar subscripciones de archivo OPML",
   "export_opml": "Exportar subscripciones a archivo OPML",
   "change_podcast_cover": "Cambiar la cover del podcast",
-  "podcast_cover_url": "Url a la cover del podcast"
+  "podcast_cover_url": "Url a la cover del podcast",
+  "double_click_expand": "Doble click para expandir",
+  "double_click_collapse": "Doble click para colapsar"
 }
