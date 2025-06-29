@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useTransition } from 'react'
-import { SearchPodcast } from '../engines/search/base'
+import { searchPodcast } from '../engines/search/base'
 import { EpisodeData, PodcastData } from '..'
 import PodcastCard from './PodcastCard'
 import { useTranslation } from 'react-i18next'
@@ -7,6 +7,7 @@ import { arrowLeft, arrowRight, sync } from '../Icons'
 import { useLocation, useNavigate } from 'react-router-dom'
 import EpisodeCard from './EpisodeCard'
 import { useDB } from '../ContextProviders'
+import { useSettings } from '../engines/Settings'
 
 function SearchBar() {
   const [results, setResults] = useState<PodcastData[] | EpisodeData[]>([])
@@ -19,16 +20,23 @@ function SearchBar() {
   )
   const [noResults, setNoResults] = useState(false)
   const [isSearchInProgress, startTransition] = useTransition()
+  const { t } = useTranslation()
+
+  const [
+    {
+      search: { engine },
+    },
+    updateSettings,
+  ] = useSettings()
   const timeout = useRef<ReturnType<typeof setInterval>>()
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
-  const { t } = useTranslation()
   const location = useLocation()
 
   const navigate = useNavigate()
 
   const searchOnline = async (term: string) => {
-    return await SearchPodcast(term)
+    return await searchPodcast(term, engine)
   }
 
   const setSearchMode = (mode: typeof searchMode) => {
@@ -38,7 +46,9 @@ function SearchBar() {
     }
   }
 
-  const search = () =>
+  const searchEngineOptions = ['iTunes', 'fyyd']
+
+  const search = async () =>
     startTransition(async function () {
       const term = inputRef.current?.value ?? ''
       if (term.length === 0) return
@@ -52,15 +62,17 @@ function SearchBar() {
         newResults = searchOnCurrentPodcast(term)
       }
 
-      setResults(newResults)
-      setNoResults(newResults.length === 0)
+      startTransition(() => {
+        setResults(newResults)
+        setNoResults(newResults.length === 0)
+      })
     })
 
   useEffect(() => {
     if (inputRef.current && inputRef.current.value.length > 3) {
       search()
     }
-  }, [searchMode])
+  }, [searchMode, engine])
 
   useEffect(() => {
     setResults([])
@@ -113,6 +125,15 @@ function SearchBar() {
           {arrowRight}
         </button>
       </div>
+      <select
+        className={`${searchMode === 'podcasts' ? '' : 'hidden'} rounded-md bg-primary-8 px-2 py-[1px] text-center outline-none`}
+        defaultValue={engine}
+        onChange={(newEngine) => updateSettings({ search: { engine: newEngine.target.value } })}
+      >
+        {searchEngineOptions.map((value) => (
+          <option key={value}>{value}</option>
+        ))}
+      </select>
       <form
         className="flex w-full"
         onSubmit={(e) => {

@@ -142,6 +142,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       removeFromQueueAtEnd: false,
       removeFromDownloadsAtEnd: false,
     },
+    search: {
+      engine: 'iTunes',
+    },
     ui: {
       showPinWindowButton: false,
       collapsedLeftMenu: true,
