@@ -38,7 +38,7 @@ export async function searchPodcastIndex(term: string): Promise<Array<PodcastDat
   })
 
   const apiResults = await (response.data as any).feeds
-  const results = []
+  const results: PodcastData[] = []
   for (const result of apiResults) {
     if (result.url) {
       results.push({
@@ -47,6 +47,7 @@ export async function searchPodcastIndex(term: string): Promise<Array<PodcastDat
         coverUrl: result.image,
         coverUrlLarge: result.image,
         feedUrl: result.url,
+        description: result.description,
       })
     }
   }
