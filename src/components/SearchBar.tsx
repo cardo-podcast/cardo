@@ -194,7 +194,7 @@ function SearchBar() {
         </div>
       </form>
 
-      {(results.length > 0 || isSearchInProgress) && (
+      {(results.length > 0 || isSearchInProgress || noResults) && (
         <>
           {/* close with click outside */}
           <div className="absolute left-0 top-0 z-10 mt-10 h-screen w-screen" onClick={() => setResults([])} />
