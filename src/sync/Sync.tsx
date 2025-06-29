@@ -18,7 +18,7 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
   } = useDB()
   const [loggedIn, setLoggedIn] = useState<SyncProtocol>(null)
   const [{ sync: syncSettings }] = useSettings()
-  const provider = useRef<ReturnType<ProtocolFn>>()
+  const provider = useRef<ReturnType<ProtocolFn>>(null)
   const { playing, reload } = usePlayer()
 
   async function logIn() {

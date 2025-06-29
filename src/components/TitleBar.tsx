@@ -20,7 +20,7 @@ function TitleBar() {
       ui,
     },
   ] = useSettings()
-  const unlistenClose = useRef<UnlistenFn>()
+  const unlistenClose = useRef<UnlistenFn>(null)
 
   const executeBeforeExit = async () => {
     await savePlayerStatus()
@@ -43,7 +43,9 @@ function TitleBar() {
       .then((unlisten) => (unlistenClose.current = unlisten))
 
     // when reloading delete the previous event
-    return () => unlistenClose.current && unlistenClose.current()
+    return () => {
+      unlistenClose.current && unlistenClose.current()
+    }
   }, [savePlayerStatus]) // reload when dependencies change
 
   return (

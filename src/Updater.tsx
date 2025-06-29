@@ -9,7 +9,7 @@ import { useModalBanner } from './components/ModalBanner'
 import { useDB } from './ContextProviders'
 
 export default function Updater() {
-  const unlistenCeckUpdates = useRef<UnlistenFn>()
+  const unlistenCeckUpdates = useRef<UnlistenFn>(null)
   const [dialog, setDialog] = useState<{ version: string; releaseNotes: string }>()
   const [showBanner, Banner] = useModalBanner()
   const {
@@ -21,7 +21,9 @@ export default function Updater() {
   useEffect(() => {
     dbLoaded && checkUpdates()
 
-    return () => unlistenCeckUpdates.current && unlistenCeckUpdates.current()
+    return () => {
+      unlistenCeckUpdates.current && unlistenCeckUpdates.current()
+    }
   }, [dbLoaded])
 
   const checkUpdates = async () => {

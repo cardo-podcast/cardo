@@ -6,7 +6,7 @@ import { useDB, useSync } from '../../ContextProviders'
 import { invoke } from '@tauri-apps/api'
 
 export function NextcloudSettings() {
-  const interval = useRef<ReturnType<typeof setInterval>>()
+  const interval = useRef<ReturnType<typeof setInterval>>(null)
   const { t } = useTranslation()
   const { setLoggedIn } = useSync()
   const {
@@ -14,7 +14,7 @@ export function NextcloudSettings() {
   } = useDB()
 
   useEffect(() => {
-    return () => clearInterval(interval.current)
+    return () => clearInterval(interval.current ?? 0)
   }, [])
 
   async function handleLogin(user: string, password: string, baseUrl: string) {
