@@ -28,7 +28,7 @@ function SearchBar() {
     },
     updateSettings,
   ] = useSettings()
-  const timeout = useRef<ReturnType<typeof setInterval>>()
+  const timeout = useRef<ReturnType<typeof setInterval>>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
   const location = useLocation()
