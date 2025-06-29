@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState } from 'react'
-import { SearchPodcast } from '../engines/search/base'
+import { useEffect, useRef, useState, useTransition } from 'react'
+import { searchPodcast } from '../engines/search/base'
 import { EpisodeData, PodcastData } from '..'
 import PodcastCard from './PodcastCard'
 import { useTranslation } from 'react-i18next'
-import { arrowLeft, arrowRight } from '../Icons'
+import { arrowLeft, arrowRight, sync } from '../Icons'
 import { useLocation, useNavigate } from 'react-router-dom'
 import EpisodeCard from './EpisodeCard'
 import { useDB } from '../ContextProviders'
+import { useSettings } from '../engines/Settings'
 
 function SearchBar() {
   const [results, setResults] = useState<PodcastData[] | EpisodeData[]>([])
@@ -18,16 +19,24 @@ function SearchBar() {
     subscriptions.length > 0 ? 'subscriptions' : 'podcasts',
   )
   const [noResults, setNoResults] = useState(false)
-  const timeout = useRef<ReturnType<typeof setInterval>>()
+  const [isSearchInProgress, startTransition] = useTransition()
+  const { t } = useTranslation()
+
+  const [
+    {
+      search: { engine },
+    },
+    updateSettings,
+  ] = useSettings()
+  const timeout = useRef<ReturnType<typeof setInterval>>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
-  const { t } = useTranslation()
   const location = useLocation()
 
   const navigate = useNavigate()
 
   const searchOnline = async (term: string) => {
-    return await SearchPodcast(term)
+    return await searchPodcast(term, engine)
   }
 
   const setSearchMode = (mode: typeof searchMode) => {
@@ -37,27 +46,33 @@ function SearchBar() {
     }
   }
 
-  const search = async (term: string) => {
-    if (term.length === 0) return
-    let newResults: typeof results = []
+  const searchEngineOptions = ['iTunes', 'fyyd']
 
-    if (searchMode === 'subscriptions') {
-      newResults = await subscriptionsEpisodes.getAll({ searchTerm: term })
-    } else if (searchMode === 'podcasts') {
-      newResults = await searchOnline(term)
-    } else if (searchMode === 'current') {
-      newResults = searchOnCurrentPodcast(term)
-    }
+  const search = async () =>
+    startTransition(async function () {
+      const term = inputRef.current?.value ?? ''
+      if (term.length === 0) return
+      let newResults: typeof results = []
 
-    setResults(newResults)
-    setNoResults(newResults.length === 0)
-  }
+      if (searchMode === 'subscriptions') {
+        newResults = await subscriptionsEpisodes.getAll({ searchTerm: term })
+      } else if (searchMode === 'podcasts') {
+        newResults = await searchOnline(term)
+      } else if (searchMode === 'current') {
+        newResults = searchOnCurrentPodcast(term)
+      }
+
+      startTransition(() => {
+        setResults(newResults)
+        setNoResults(newResults.length === 0)
+      })
+    })
 
   useEffect(() => {
     if (inputRef.current && inputRef.current.value.length > 3) {
-      search(inputRef.current.value)
+      search()
     }
-  }, [searchMode])
+  }, [searchMode, engine])
 
   useEffect(() => {
     setResults([])
@@ -83,8 +98,8 @@ function SearchBar() {
   const handleChange = async (term: string) => {
     setNoResults(false)
     if (term.length > 3) {
-      clearTimeout(timeout.current)
-      timeout.current = setTimeout(() => search(term), 300)
+      clearTimeout(timeout.current ?? 0)
+      timeout.current = setTimeout(() => search(), 300)
     }
   }
 
@@ -114,9 +129,9 @@ function SearchBar() {
         className="flex w-full"
         onSubmit={(e) => {
           e.preventDefault()
-          clearTimeout(timeout.current)
+          clearTimeout(timeout.current ?? 0)
           if (inputRef.current) {
-            search(inputRef.current.value)
+            search()
           }
         }}
       >
@@ -134,7 +149,14 @@ function SearchBar() {
             }
           }}
         />
-        <div className="mr-2 hidden items-center gap-2 whitespace-nowrap active:flex peer-focus:flex">
+        <div
+          className={`mr-2 items-center gap-2 whitespace-nowrap ${results.length > 0 ? 'flex' : 'hidden active:flex peer-focus:flex'}`}
+        >
+          <div
+            className={`${isSearchInProgress ? '' : 'hidden'} flex w-6 items-center outline-none hover:text-accent-4`}
+          >
+            <span className="w-6 animate-[spin_1.5s_linear_reverse_infinite]">{sync}</span>
+          </div>
           <button
             className={`${searchMode === 'subscriptions' ? 'bg-accent-7' : ''} flex items-center rounded-md border-2 border-accent-7 px-1 py-[1px] text-xs uppercase`}
             type="button"
@@ -172,7 +194,7 @@ function SearchBar() {
         </div>
       </form>
 
-      {results.length > 0 && (
+      {(results.length > 0 || isSearchInProgress) && (
         <>
           {/* close with click outside */}
           <div className="absolute left-0 top-0 z-10 mt-10 h-screen w-screen" onClick={() => setResults([])} />
@@ -182,6 +204,21 @@ function SearchBar() {
             ref={resultsRef}
           >
             <div className="flex w-full flex-col">
+              {searchMode === 'podcasts' && (
+                <div className="flex items-center justify-center gap-3 px-4 py-2">
+                  {searchEngineOptions.map((newEngine) => (
+                    <span
+                      className={`cursor-pointer font-thin ${newEngine === engine ? 'text-accent-5' : ''}`}
+                      onClick={() => {
+                        updateSettings({ search: { engine: newEngine } })
+                      }}
+                    >
+                      {newEngine}
+                    </span>
+                  ))}
+                </div>
+              )}
+
               {results.map((result, i) => {
                 if (searchMode === 'podcasts') {
                   return <PodcastCard key={i} podcast={result as PodcastData} />

@@ -1,8 +1,8 @@
 import { PodcastData } from '../..'
 import { fetch as tauriFetch } from '@tauri-apps/api/http'
 
-export async function SearchApple(term: string): Promise<Array<PodcastData>> {
-  const searchParams = new URLSearchParams({
+export async function searchITunes(term: string): Promise<Array<PodcastData>> {
+    const searchParams = new URLSearchParams({
     'limit': '40',
     'entity': 'podcast',
     'term': term.trim()

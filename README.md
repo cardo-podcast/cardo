@@ -96,6 +96,10 @@ Be free of summiting a PR if you get something good!
       <td style="color: green;">100%</td>
     </tr>
      <tr>
+      <td>ar</td>
+      <td style="color: green;">100%</td>
+    </tr>
+     <tr>
       <td>en</td>
       <td style="color: green;">100%</td>
     </tr>
