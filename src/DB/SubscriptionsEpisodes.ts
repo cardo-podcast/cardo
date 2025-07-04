@@ -75,8 +75,7 @@ export function useSubscriptionsEpisodes(db: Database) {
       searchTerm?: string
     }): Promise<EpisodeData[]> {
       let query = `SELECT
-        se.*,
-        subscriptions.coverUrl
+        se.*
       FROM
         subscriptions_episodes se
       LEFT JOIN
