@@ -8,8 +8,6 @@ export async function searchFyyd(term: string): Promise<Array<PodcastData>> {
   })
   const url = `https://api.fyyd.de/0.2/search/podcast?${searchParams.toString()}`
 
-  console.log(url)
-
   const response = await tauriFetch(url) // fetching from backend to avoid cors errors
   const apiResults = ((await response.data) as any).data
 
