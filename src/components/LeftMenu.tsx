@@ -14,6 +14,15 @@ function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
 
+  function checkURLScheme() {
+    // If no scheme is specified, attempt to append https:// to the URL.
+    if (inputRef.current &&
+      inputRef.current.value.length >= 3 &&
+      !inputRef.current.value.includes('://')) {
+        inputRef.current.value = 'https://' + inputRef.current.value;
+    }
+  }
+
   return (
     <>
       <Banner
@@ -44,6 +53,12 @@ function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
             autoFocus
             className="w-96 rounded-md bg-primary-8 px-2 py-1 focus:outline-none"
             onContextMenu={(e) => e.stopPropagation()}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                checkURLScheme();
+              }
+            }}
+            onBlur={checkURLScheme}
           />
         </div>
       </Banner>
