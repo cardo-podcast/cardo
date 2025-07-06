@@ -81,20 +81,25 @@ export function useSubscriptionsEpisodes(db: Database) {
       LEFT JOIN
         subscriptions ON subscriptions.feedUrl = se.podcastUrl
       WHERE
-        se.pubDate > $1`
+        se.pubDate > ?`
+      let optionalParams: string[] = [];
 
       if (options.podcastUrl) {
-        query += ' AND podcastUrl = $2'
+        query += ' AND podcastUrl = ?'
+        optionalParams.push(options.podcastUrl);
       }
 
       if (options.searchTerm) {
-        query += ` AND (lower(se.title) LIKE "%${options.searchTerm.toLowerCase()}%"
-                      OR lower(se.description) LIKE "%${options.searchTerm.toLocaleLowerCase()}%")`
+        // Escape any % characters provided by the user with a backslash.
+        query += ` AND (lower(se.title) LIKE ? ESCAPE "\\"
+                      OR lower(se.description) LIKE ? ESCAPE "\\")`
+        optionalParams.push('%' + options.searchTerm.toLowerCase().replace('%', '\\%') + '%');
+        optionalParams.push('%' + options.searchTerm.toLowerCase().replace('%', '\\%') + '%');
       }
 
       const r: (EpisodeData & { coverUrl: string })[] = await db.select(query, [
         options.pubdate_gt ?? 0,
-        options.podcastUrl,
+        ...optionalParams,
       ])
 
       console.log(r)
