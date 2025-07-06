@@ -74,7 +74,7 @@ function EpisodePreview() {
     <div className="flex w-full flex-col p-2">
       <div className="justify-left mb-2 flex w-full gap-3 border-b-2 border-primary-8 p-2 pb-3">
         <div
-          className={`flex aspect-square h-28 items-center justify-center rounded-md bg-primary-8 transition-all ${podcastFetched ? 'cursor-pointer hover:scale-95' : ''}`}
+          className={`flex aspect-square h-28 items-center justify-center rounded-md bg-primary-8 transition-all ${podcastFetched ? 'cursor-pointer' : ''}`}
         >
           <EpisodeCover
             className="rounded-md"

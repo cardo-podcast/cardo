@@ -1,0 +1,32 @@
+/* flip card effect */
+.flip {
+  @apply relative select-none;
+
+  > .front,
+  > .back {
+    transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition-duration: 0.8s;
+    transition-property: transform, opacity;
+  }
+  > .front {
+    transform: rotateY(0deg);
+  }
+  > .back {
+    @apply absolute top-0 left-0 h-full w-full opacity-0;
+    transform: rotateY(-180deg);
+  }
+  &:hover {
+    > .front {
+      transform: rotateY(180deg);
+    }
+    > .back {
+      opacity: 1;
+      transform: rotateY(0deg);
+    }
+  }
+}
+
+/* Protect back side links to be unintentionaly clicked */
+.back {
+  pointer-events: none;
+}

@@ -28,7 +28,7 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
 
   return (
     <div
-      className="amber-600 flex w-24 flex-shrink-0 cursor-pointer flex-col rounded-md transition-all duration-100 hover:p-[3px]"
+      className="amber-600 flex w-24 flex-shrink-0 cursor-pointer flex-col rounded-md transition-all duration-100"
       onContextMenu={() => {
         showMenu({
           items: [
