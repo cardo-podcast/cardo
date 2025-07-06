@@ -225,3 +225,12 @@ export function toastError(message: string) {
     theme: 'dark',
   })
 }
+
+export function checkURLScheme(e: React.InputEvent<HTMLInputElement>) {
+  // If no scheme is specified, attempt to append https:// to the URL.
+  const input = e.currentTarget
+
+  if (input.value.length > 6 && !input.value.startsWith('http')) {
+    input.value = 'https://' + input.value
+  }
+}

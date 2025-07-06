@@ -2,7 +2,7 @@ import { useLocation } from 'react-router-dom'
 import { EpisodeData, PodcastData, SortCriterion } from '..'
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import * as icons from '../Icons'
-import { parseXML, toastError } from '../utils/utils'
+import { checkURLScheme, parseXML, toastError } from '../utils/utils'
 import EpisodeCard from '../components/EpisodeCard'
 import { Checkbox, Switch, SwitchState, TimeInput } from '../components/Inputs'
 import { usePodcastSettings } from '../engines/Settings'
@@ -239,6 +239,7 @@ function PodcastPreview() {
         <h1>{t('change_podcast_cover')}</h1>
         <input
           type="url"
+          onInput={checkURLScheme}
           name="url"
           placeholder={t('podcast_cover_url')}
           autoFocus
@@ -455,7 +456,7 @@ function PodcastPreview() {
                     // not including all vars to save some memory
                     coverUrl: podcast.coverUrl,
                     podcastName: podcast.podcastName,
-                    feedUrl: podcast.feedUrl
+                    feedUrl: podcast.feedUrl,
                   },
                 }}
                 className="border-b-[1px] border-primary-8 transition-colors hover:bg-primary-8"

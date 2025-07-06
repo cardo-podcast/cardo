@@ -4,7 +4,7 @@ import { sync, home, settings, queue, download } from '../Icons'
 import SubscriptionCard from './SubscriptionCard'
 import { useSettings } from '../engines/Settings'
 import { useModalBanner } from './ModalBanner'
-import { parsePodcastDetails, toastError } from '../utils/utils'
+import { checkURLScheme, parsePodcastDetails, toastError } from '../utils/utils'
 import { useRef } from 'react'
 import { useDB } from '../ContextProviders'
 
@@ -39,6 +39,7 @@ function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
           <input
             ref={inputRef}
             type="url"
+            onInput={checkURLScheme}
             placeholder={t('feed_url')}
             autoFocus
             className="w-96 rounded-md bg-primary-8 px-2 py-1 focus:outline-none"

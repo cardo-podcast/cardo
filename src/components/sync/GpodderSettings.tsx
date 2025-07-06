@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { saveCreds, toastError } from '../../utils/utils'
+import { checkURLScheme, saveCreds, toastError } from '../../utils/utils'
 import { useDB, useSync } from '../../ContextProviders'
 import { invoke } from '@tauri-apps/api'
 import { login } from '../../sync/Gpodder'
@@ -50,6 +50,7 @@ export function GpodderSettings() {
             id="server"
             required
             type="url"
+            onInput={checkURLScheme}
             className="w-full rounded-md bg-primary-8 px-2 py-1 focus:outline-none"
             placeholder={t('gpodder_server_url')}
           />
