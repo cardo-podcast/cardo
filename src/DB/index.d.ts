@@ -1,5 +1,5 @@
 import { useDownloads } from './Downloads'
-import { useEpisodeState } from './EpisodeState'
+import { useEpisodeState } from './History'
 import { useMisc } from './Misc'
 import { useQueue } from './Queue'
 import { useSubscriptions } from './Subscriptions'

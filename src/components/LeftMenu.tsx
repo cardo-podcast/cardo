@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { sync, home, settings, queue, download } from '../Icons'
+import { sync, home, settings, queue, download, history } from '../Icons'
 import SubscriptionCard from './SubscriptionCard'
 import { useSettings } from '../engines/Settings'
 import { useModalBanner } from './ModalBanner'
@@ -117,6 +117,15 @@ function LeftMenu() {
             title={t('downloads')}
           >
             {collapsedLeftMenu ? <span className="w-6">{download}</span> : t('downloads')}
+          </NavLink>
+          <NavLink
+            to="/history"
+            className={({ isActive }) =>
+              `flex transition-all ${isActive ? 'cursor-default text-primary-4' : 'hover:pl-1 hover:text-accent-5'}`
+            }
+            title={t('history')}
+          >
+            {collapsedLeftMenu ? <span className="w-6">{history}</span> : t('history')}
           </NavLink>
         </div>
 

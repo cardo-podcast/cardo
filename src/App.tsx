@@ -17,6 +17,7 @@ const EpisodePreview = lazy(() => import('./pages/EpisodePreview'))
 const Settings = lazy(() => import('./pages/Settings'))
 const QueuePage = lazy(() => import('./pages/QueuePage'))
 const DownloadsPage = lazy(() => import('./pages/DownloadsPage'))
+const HistoryPage = lazy(() => import('./pages/HistoryPage'))
 
 const App = () => {
   const [roundedCorners, setRoundedCorners] = useState(false)
@@ -69,6 +70,7 @@ const App = () => {
                           <Route path="/settings" element={<Settings />} />
                           <Route path="/queue" element={<QueuePage />} />
                           <Route path="/downloads" element={<DownloadsPage />} />
+                          <Route path="/history" element={<HistoryPage />} />
                         </Routes>
                       </Suspense>
                     </div>

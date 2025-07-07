@@ -99,5 +99,6 @@
   "change_podcast_cover": "Change the podcast cover",
   "podcast_cover_url": "URL to the podcast cover",
   "double_click_expand": "Double click to expand",
-  "double_click_collapse": "Double click to collapse"
+  "double_click_collapse": "Double click to collapse",
+  "history": "Record"
 }

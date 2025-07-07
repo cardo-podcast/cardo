@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import Database from 'tauri-plugin-sql-api'
-import { EpisodeState } from '..'
+import { EpisodeData, EpisodeState } from '..'
 
 export function useEpisodeState(db: Database) {
   const get = useCallback(
@@ -36,6 +36,22 @@ export function useEpisodeState(db: Database) {
     [db],
   )
 
+  const getAllEpisodes = useCallback(
+    async function (): Promise<EpisodeData[]> {
+      const r: EpisodeData[] = await db.select(
+        `
+        SELECT se.*
+        FROM episodes_history eh
+        LEFT JOIN
+            subscriptions_episodes se ON eh.episode = se.src
+        `,
+        [],
+      )
+      return r.map((episode) => ({ ...episode, pubDate: new Date(episode.pubDate) }))
+    },
+    [db],
+  )
+
   const update = useCallback(
     async function (episodeUrl: string, podcastUrl: string, position: number, total: number, timestamp?: number) {
       position = Math.floor(position)
@@ -53,5 +69,5 @@ export function useEpisodeState(db: Database) {
     [db],
   )
 
-  return { get, getCompleted, getAll, update }
+  return { get, getCompleted, getAll, update, getAllEpisodes }
 }
