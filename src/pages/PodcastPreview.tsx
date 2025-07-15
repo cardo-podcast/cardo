@@ -13,9 +13,7 @@ import { showMenu } from 'tauri-plugin-context-menu'
 import { useSync, useDB } from '../ContextProviders'
 import { PodcastCover } from '../components/Cover'
 import { useModalBanner } from '../components/ModalBanner'
-
-const EPISODE_CARD_HEIGHT = 80 // min height
-const PRELOADED_EPISODES = 10 //
+import { EPISODE_CARD_HEIGHT, PRELOADED_EPISODES } from '../Global'
 
 function SortButton({
   children,
