@@ -59,6 +59,8 @@ export function useEpisode(episode: EpisodeData) {
   }
 
   const getDateString = useCallback(() => {
+    if (!episode.pubDate) return ''
+
     // set print date
     const episodeYear = episode.pubDate.getFullYear()
     const actualYear = new Date().getFullYear()
@@ -123,7 +125,7 @@ export function useEpisode(episode: EpisodeData) {
   }
 
   const removeDownload = async () => {
-    if (downloadState == 'downloaded') {
+    if (downloadState === 'downloaded') {
       await removeDownloadedEpisode(downloadedFile.current)
       await downloads.removeFromDownloadList(episode.src)
       setDownloadState(undefined)

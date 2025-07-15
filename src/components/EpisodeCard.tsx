@@ -63,7 +63,7 @@ function EpisodeCard({
               event: toggleQueue,
             },
             {
-              label: t(downloadState == 'downloaded' ? 'remove_download' : 'download'),
+              label: t(downloadState === 'downloaded' ? 'remove_download' : 'download'),
               event: toggleDownload,
             },
           ],
