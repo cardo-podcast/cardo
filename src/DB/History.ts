@@ -40,14 +40,19 @@ export function useEpisodeState(db: Database) {
     async function (): Promise<EpisodeData[]> {
       const r: EpisodeData[] = await db.select(
         `
-        SELECT se.*
+        SELECT se.*, eh.timestamp
         FROM episodes_history eh
-        LEFT JOIN
-            subscriptions_episodes se ON eh.episode = se.src
+        JOIN
+          subscriptions_episodes se ON eh.episode = se.src
+        ORDER BY eh.timestamp DESC
         `,
         [],
       )
-      return r.map((episode) => ({ ...episode, pubDate: new Date(episode.pubDate) }))
+      return r.map((episode) => ({
+        ...episode,
+        pubDate: new Date(episode.pubDate),
+        podcast: { feedUrl: episode.podcastUrl },
+      }))
     },
     [db],
   )
