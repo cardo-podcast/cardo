@@ -104,15 +104,15 @@ Be free of summiting a PR if you get something good!
       <td style="color: green;">93%</td>
     </tr>
      <tr>
-      <td>cn</td>
-      <td style="color: yellow;">88%</td>
-    </tr>
-     <tr>
       <td>pt</td>
       <td style="color: yellow;">88%</td>
     </tr>
      <tr>
       <td>de</td>
+      <td style="color: yellow;">88%</td>
+    </tr>
+     <tr>
+      <td>cn</td>
       <td style="color: yellow;">88%</td>
     </tr>
   </tbody>
