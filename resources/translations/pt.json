@@ -67,6 +67,10 @@
   "downloads_default_message": "Você pode baixar episódios clicando com o botão direito na lista ou na visualização do episódio",
   "remove_from_subscriptions": "Remover inscrição",
   "add_to_subscriptions": "Increver-se",
+  "sort_episodes": "Ordernar",
+  "filter_episodes": "Filtrar", 
+  "podcast_settings": "Configurações",
+  "podcast_refresh": "Atualizar",
   "add": "Adicionar",
   "right_click_remove_preset": "Clique com o botão direito para excluir a predefinição",
   "open_settings_file": "Abrir arquivo de configuração",
@@ -88,5 +92,13 @@
   "remove_from_queue_end": "Excluir episódio da fila quando concluído",
   "remove_from_downloads_end": "Excluir download após concluído",
   "download_new": "Baixar automaticamente novos episódios",
-  "queue_new": "Adicionar automaticamente novos episódios à fila"
+  "queue_new": "Adicionar automaticamente novos episódios à fila",
+  "import/export": "Importar / Exportar",
+  "import_opml": "Importar assinaturas do arquivo OPML",
+  "export_opml": "Exportar assinaturas do arquivo OPML",
+  "change_podcast_cover": "Mudar capa do podcast",
+  "podcast_cover_url": "URL da capa do podcast",
+  "double_click_expand": "Click duplo para expandir",
+  "double_click_collapse": "Click duplo para recolher",
+  "history": "Record"
 }
