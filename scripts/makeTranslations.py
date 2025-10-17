@@ -33,6 +33,7 @@ for dest_lang in DEST:
 
 # delete removed keys other languages
 delete_keys = set()
+something_new = False
 for lang in os.listdir(LOCALE_FOLDER):
     lang_file = os.path.join(LOCALE_FOLDER, lang)
 
@@ -50,5 +51,9 @@ for lang in os.listdir(LOCALE_FOLDER):
                 new_translations.pop(key)
 
     if new_translations.keys() != translations.keys():
+        something_new = True
         with open(lang_file, "w", encoding="utf-8") as f:
             json.dump(new_translations, f, indent=2, ensure_ascii=False)
+
+if not something_new:
+    exit(1)
