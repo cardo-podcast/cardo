@@ -88,7 +88,7 @@
         "../resources/**"
       ],
       "windows": {
-        "certificateThumbprint": "adc7a1a8a7219a69236cc8b14d061771154d68b3",
+        "certificateThumbprint": "ac371837547551654794263b4d2ba7da7f1118f5",
         "digestAlgorithm": "sha256",
         "timestampUrl": "http://timestamp.comodoca.com"
       },
