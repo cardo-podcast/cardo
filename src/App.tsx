@@ -48,7 +48,7 @@ const App = () => {
 
   return (
     <div
-      className={`flex h-screen w-full flex-col overflow-hidden border-[1px] border-primary-7 bg-primary-9 ${roundedCorners && 'rounded-lg'}`}
+      className={`flex h-screen w-full flex-col overflow-hidden border border-primary-7 bg-primary-9 ${roundedCorners && 'rounded-lg'}`}
     >
       <BrowserRouter>
         <SettingsProvider>
@@ -75,7 +75,7 @@ const App = () => {
                     </div>
                   </div>
                 </div>
-                <AudioPlayer className="h-28 w-full flex-shrink-0" />
+                <AudioPlayer className="h-28 w-full shrink-0" />
               </SyncProvider>
             </AudioPlayerProvider>
           </DBProvider>

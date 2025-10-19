@@ -277,7 +277,7 @@ function PodcastPreview() {
             <>
               <div className="absolute left-0 top-0 z-20 h-screen w-screen" onClick={() => setTweakMenu(undefined)} />
 
-              <div className="absolute left-1/2 top-0 z-20 flex w-4/5 -translate-x-1/2 flex-col items-center justify-between overflow-hidden rounded-b-3xl border-[1px] border-t-0 border-primary-6 bg-primary-9 transition-all duration-200">
+              <div className="absolute left-1/2 top-0 z-20 flex w-4/5 -translate-x-1/2 flex-col items-center justify-between overflow-hidden rounded-b-3xl border border-t-0 border-primary-6 bg-primary-9 transition-all duration-200">
                 <div className="flex w-full flex-col items-center gap-1 p-2">
                   {tweakMenu === 'sort' && (
                     <div className="flex w-4/5 flex-col items-center justify-center gap-1">
@@ -459,7 +459,7 @@ function PodcastPreview() {
                     feedUrl: podcast.feedUrl,
                   },
                 }}
-                className="border-b-[1px] border-primary-8 transition-colors hover:bg-primary-8"
+                className="border-b border-primary-8 transition-colors hover:bg-primary-8"
                 onClick={() => {
                   sessionStorage.setItem(
                     `scroll-${location.key}`,

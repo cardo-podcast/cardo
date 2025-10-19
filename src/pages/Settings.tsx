@@ -75,7 +75,7 @@ function Settings() {
 
   return (
     <div className="flex w-full flex-col gap-2 p-2">
-      <div className="flex justify-between rounded-md border-[2px] border-primary-8 p-2">
+      <div className="flex justify-between rounded-md border-2 border-primary-8 p-2">
         <h2>{t('open_settings_file')}:</h2>
         <button className="filled-button text-sm" onClick={() => showBanner()}>
           config.json
@@ -92,19 +92,19 @@ function Settings() {
         </Banner>
       </div>
 
-      <div className="flex flex-col gap-1 rounded-md border-[2px] border-primary-8 p-2">
+      <div className="flex flex-col gap-1 rounded-md border-2 border-primary-8 p-2">
         <h1 className="mb-2 border-b-2 border-primary-8 uppercase">{t('sync')}</h1>
         <SyncSettings />
       </div>
 
-      <div className="flex flex-col gap-1 rounded-md border-[2px] border-primary-8 p-2">
+      <div className="flex flex-col gap-1 rounded-md border-2 border-primary-8 p-2">
         <h1 className="mb-2 border-b-2 border-primary-8 uppercase">{t('general')}</h1>
 
         <div className="flex flex-col gap-1">
           <label className="mb-1 flex items-center gap-2 uppercase">
             {t('language')}:
             <select
-              className="rounded-md bg-primary-8 px-2 py-[1px] text-center outline-none"
+              className="rounded-md bg-primary-8 px-2 py-px text-center outline-none"
               onChange={({ target: { value } }) => {
                 changeLanguage(value)
                 updateSettings({
@@ -138,7 +138,7 @@ function Settings() {
               <label className="flex items-center gap-2 uppercase">
                 {t('base')}:
                 <select
-                  className="rounded-md bg-primary-8 px-2 py-[1px] text-center outline-none"
+                  className="rounded-md bg-primary-8 px-2 py-px text-center outline-none"
                   onChange={({ target: { value } }) =>
                     updateSettings({
                       colors: {
@@ -167,7 +167,7 @@ function Settings() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-1 rounded-md border-[2px] border-primary-8 p-2">
+      <div className="flex flex-col gap-1 rounded-md border-2 border-primary-8 p-2">
         <h1 className="mb-2 border-b-2 border-primary-8 uppercase">{t('import/export')}</h1>
         <div className="flex gap-3">
           <label>
@@ -190,7 +190,7 @@ function Settings() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-1 rounded-md border-[2px] border-primary-8 p-2">
+      <div className="flex flex-col gap-1 rounded-md border-2 border-primary-8 p-2">
         <h1 className="mb-2 border-b-2 border-primary-8 uppercase">{t('news')}</h1>
 
         <label className="flex w-fit gap-1">
@@ -217,7 +217,7 @@ function Settings() {
         </label>
       </div>
 
-      <div className="flex flex-col gap-1 rounded-md border-[2px] border-primary-8 p-2">
+      <div className="flex flex-col gap-1 rounded-md border-2 border-primary-8 p-2">
         <h1 className="mb-2 border-b-2 border-primary-8 uppercase">{t('playback')}</h1>
         <div className="flex items-center gap-8">
           <div className="flex flex-col items-end gap-2">
@@ -272,7 +272,7 @@ function Settings() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-1 rounded-md border-[2px] border-primary-8 p-2">
+      <div className="flex flex-col gap-1 rounded-md border-2 border-primary-8 p-2">
         <h1 className="mb-2 border-b-2 border-primary-8 uppercase">UI</h1>
         <div>
           <label className="flex w-fit gap-1">
@@ -285,7 +285,7 @@ function Settings() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-1 rounded-md border-[2px] border-primary-8 p-2">
+      <div className="flex flex-col gap-1 rounded-md border-2 border-primary-8 p-2">
         <h1 className="mb-2 border-b-2 border-primary-8 uppercase">{t('about')}</h1>
         <div className="flex gap-3">
           <img
@@ -310,7 +310,7 @@ function Settings() {
                 <div className="flex h-fit items-center gap-1">
                   <p>{t('source_code')}: </p>
                   <img
-                    className="w-5 cursor-pointer rounded-full bg-white p-[1px] transition-transform hover:scale-110"
+                    className="w-5 cursor-pointer rounded-full bg-white p-px transition-transform hover:scale-110"
                     src="https://github.githubassets.com/favicons/favicon.png"
                     alt="Github"
                     title="https://github.com/cardo-podcast/cardo"

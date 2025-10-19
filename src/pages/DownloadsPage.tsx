@@ -61,7 +61,7 @@ export default function DownloadsPage() {
   return (
     <div className="flex w-full flex-col p-2">
       <div>
-        <div className="flex w-full items-center justify-between gap-5 border-b-[1px] border-primary-8 p-2">
+        <div className="flex w-full items-center justify-between gap-5 border-b border-primary-8 p-2">
           <div className="flex flex-col">
             <h1 className="uppercase">{t('downloads')}</h1>
             <h2 className="0 text-sm">{downloadsInfo}</h2>
@@ -91,7 +91,7 @@ export default function DownloadsPage() {
               <Suspense key={episode.id} fallback={<div className="h-20 w-full bg-primary-8" />}>
                 <EpisodeCard
                   episode={episode}
-                  className="border-b-[1px] border-primary-8 hover:bg-primary-8"
+                  className="border-b border-primary-8 hover:bg-primary-8"
                   onImageClick={(e) => {
                     e.stopPropagation()
                     navigate('/preview', {

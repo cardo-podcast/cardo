@@ -28,7 +28,7 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
 
   return (
     <div
-      className="amber-600 flex w-24 flex-shrink-0 cursor-pointer flex-col rounded-md transition-all duration-100"
+      className="amber-600 flex w-24 shrink-0 cursor-pointer flex-col rounded-md transition-all duration-100"
       // onContextMenu={() => {
       //   showMenu({
       //     items: [
@@ -69,7 +69,7 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
         />
 
         <button
-          className="absolute bottom-2 right-2 flex aspect-square w-7 items-center justify-center rounded-full border-2 border-accent-8 bg-accent-7 p-[3px] pl-[4px] transition-all hover:p-[1px]"
+          className="absolute bottom-2 right-2 flex aspect-square w-7 items-center justify-center rounded-full border-2 border-accent-8 bg-accent-7 p-[3px] pl-[4px] transition-all hover:p-px"
           onClick={(e) => {
             e.stopPropagation()
             inProgress(true) ? pause() : play()

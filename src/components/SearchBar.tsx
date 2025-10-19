@@ -158,7 +158,7 @@ function SearchBar() {
           </div>
           {!isSearchInProgress && <button className="outline-button w-5">{searchIcon}</button>}
           <button
-            className={`${searchMode === 'subscriptions' ? 'bg-accent-7' : ''} flex items-center rounded-md border-2 border-accent-7 px-1 py-[1px] text-xs uppercase`}
+            className={`${searchMode === 'subscriptions' ? 'bg-accent-7' : ''} flex items-center rounded-md border-2 border-accent-7 px-1 py-px text-xs uppercase`}
             type="button"
             onClick={() => {
               setSearchMode('subscriptions')
@@ -169,7 +169,7 @@ function SearchBar() {
           </button>
 
           <button
-            className={`${searchMode === 'podcasts' ? 'bg-accent-7' : ''} flex items-center rounded-md border-2 border-accent-7 px-1 py-[1px] text-xs uppercase`}
+            className={`${searchMode === 'podcasts' ? 'bg-accent-7' : ''} flex items-center rounded-md border-2 border-accent-7 px-1 py-px text-xs uppercase`}
             type="button"
             onClick={() => {
               setSearchMode('podcasts')
@@ -181,7 +181,7 @@ function SearchBar() {
 
           {location.pathname === '/preview' && (
             <button
-              className={`${searchMode === 'current' ? 'bg-accent-7' : ''} flex items-center rounded-md border-2 border-accent-7 px-1 py-[1px] text-xs uppercase`}
+              className={`${searchMode === 'current' ? 'bg-accent-7' : ''} flex items-center rounded-md border-2 border-accent-7 px-1 py-px text-xs uppercase`}
               type="button"
               onClick={() => {
                 setSearchMode('current')
@@ -228,7 +228,7 @@ function SearchBar() {
                     <EpisodeCard
                       key={result.id}
                       episode={result as EpisodeData}
-                      className="border-b-[1px] border-primary-8 transition-colors hover:bg-primary-8"
+                      className="border-b border-primary-8 transition-colors hover:bg-primary-8"
                     />
                   )
                 }

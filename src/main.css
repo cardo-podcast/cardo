@@ -1,6 +1,4 @@
-@import url('text-auto.css'); /* auto text colors could be overwriten by tailwind more specific classes*/
-@import url('custom-styles.css');
-@import url('flip-cards.css');
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('text-auto.css') layer(base); /* auto text colors could be overwriten by tailwind more specific classes*/
+@import url('custom-styles.css') layer(base);
+@import url('flip-cards.css') layer(base);
+@import 'tailwindcss';
