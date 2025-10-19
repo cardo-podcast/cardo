@@ -1,45 +1,43 @@
 .bg-primary {
-    @apply text-primary-10
+  color: var(--color-primary-10);
 }
 
 .bg-primary-1 {
-    @apply text-primary-9
+  color: var(--color-primary-9);
 }
 
 .bg-primary-2 {
-    @apply text-primary-8
+  color: var(--color-primary-8);
 }
 
 .bg-primary-3 {
-    @apply text-primary-7
+  color: var(--color-primary-7);
 }
 
 .bg-primary-4 {
-    @apply text-primary-7
+  color: var(--color-primary-7);
 }
 
 .bg-primary-5 {
-    @apply text-primary-7
+  color: var(--color-primary-7);
 }
 
 .bg-primary-6 {
-    @apply text-primary-3
+  color: var(--color-primary-3);
 }
 
-
 .bg-primary-7 {
-    @apply text-primary-3
+  color: var(--color-primary-3);
 }
 
 .bg-primary-8 {
-    @apply text-primary-2
+  color: var(--color-primary-2);
 }
 
-
 .bg-primary-9 {
-    @apply text-primary-1
+  color: var(--color-primary-1);
 }
 
 .bg-primary-10 {
-    @apply text-primary
+  color: var(--color-primary);
 }

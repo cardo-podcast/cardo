@@ -2,3 +2,31 @@
 @import url('custom-styles.css') layer(base);
 @import url('flip-cards.css') layer(base);
 @import 'tailwindcss';
+
+@theme {
+  /* Primary colors - tus valores dinámicos desde config */
+  --color-primary: #000;
+  --color-primary-1: #000;
+  --color-primary-2: #000;
+  --color-primary-3: #000;
+  --color-primary-4: #000;
+  --color-primary-5: #000;
+  --color-primary-6: #000;
+  --color-primary-7: #000;
+  --color-primary-8: #000;
+  --color-primary-9: #000;
+  --color-primary-10: #000;
+
+  /* Accent colors */
+  --color-accent: #000;
+  --color-accent-1: #000;
+  --color-accent-2: #000;
+  --color-accent-3: #000;
+  --color-accent-4: #000;
+  --color-accent-5: #000;
+  --color-accent-6: #000;
+  --color-accent-7: #000;
+  --color-accent-8: oklck(0.5 0.18 50);
+  --color-accent-9: #000;
+  --color-accent-10: #000;
+}
