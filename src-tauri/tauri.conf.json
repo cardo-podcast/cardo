@@ -19,7 +19,7 @@
       "icons/icon.ico"
     ],
     "resources": [
-      "../resources/**"
+      "../resources/translations/*"
     ],
     "windows": {
       "certificateThumbprint": "ac371837547551654794263b4d2ba7da7f1118f5",
