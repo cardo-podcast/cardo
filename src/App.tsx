@@ -24,19 +24,17 @@ const App = () => {
 
   // handle rounded corners when window is minimized, disabled on mac
   useEffect(() => {
-    platform().then((p) => {
-      if (p === 'darwin') {
-        return // no rounded corners on mac (https://github.com/agmmnn/tauri-controls/issues/10)
-      } else {
-        async function handleResize() {
-          const isMaximized = await appWindow.isMaximized()
-          setRoundedCorners(!isMaximized)
-        }
-
-        appWindow.onResized(handleResize)
-        handleResize()
+    if (platform() === 'macos') {
+      return // no rounded corners on mac (https://github.com/agmmnn/tauri-controls/issues/10)
+    } else {
+      async function handleResize() {
+        const isMaximized = await appWindow.isMaximized()
+        setRoundedCorners(!isMaximized)
       }
-    })
+
+      appWindow.onResized(handleResize)
+      handleResize()
+    }
   }, [appWindow])
 
   // prevent webview context menu
@@ -48,7 +46,7 @@ const App = () => {
 
   return (
     <div
-      className={`flex h-screen w-full flex-col overflow-hidden border border-primary-7 bg-primary-9 ${roundedCorners && 'rounded-lg'}`}
+      className={`border-primary-7 bg-primary-9 flex h-screen w-full flex-col overflow-hidden border ${roundedCorners && 'rounded-lg'}`}
     >
       <BrowserRouter>
         <SettingsProvider>
@@ -61,7 +59,7 @@ const App = () => {
                   <LeftMenu />
                   <div className="flex h-full w-full flex-col overflow-y-hidden">
                     <SearchBar />
-                    <div className="flex h-full overflow-y-auto scroll-smooth border-t border-primary-8">
+                    <div className="border-primary-8 flex h-full overflow-y-auto scroll-smooth border-t">
                       <Suspense>
                         <Routes>
                           <Route path="/" element={<HomePage />} />

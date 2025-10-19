@@ -1,9 +1,9 @@
-import { ResponseType, fetch as tauriFetch } from '@tauri-apps/plugin-http'
+import * as http from '@tauri-apps/plugin-http'
 import { EpisodeData, PodcastData } from '..'
-import { createDir, exists, readTextFile, writeTextFile, removeFile, removeDir, readDir } from '@tauri-apps/plugin-fs'
+import { create, exists, readTextFile, writeTextFile, remove, readDir } from '@tauri-apps/plugin-fs'
 import { appCacheDir, dirname, join } from '@tauri-apps/api/path'
-import { invoke } from '@tauri-apps/api'
 import { toast } from 'react-toastify'
+import { invoke } from '@tauri-apps/api/core'
 
 export function secondsToStr(seconds: number, alwaysShowHours = false) {
   const negative = seconds < 0
@@ -39,11 +39,10 @@ export function strToSeconds(time: string) {
 }
 
 async function downloadXml(url: string): Promise<string> {
-  const response = await tauriFetch(url, {
+  const response = await http.fetch(url, {
     method: 'GET',
-    responseType: ResponseType.Text,
   })
-  return response.data as string
+  return (await response.text()) as string
 }
 
 function getItunesTag(item: Element, tag: string): Element | null {
@@ -194,7 +193,7 @@ export async function downloadEpisode(episode: EpisodeData) {
   const destination = await join(destFolder, filename)
 
   if (!(await exists(destFolder))) {
-    await createDir(destFolder, { recursive: true })
+    await create(destFolder)
   }
 
   await invoke('download_file', { url: episode.src, destination, name: episode.title })
@@ -203,13 +202,13 @@ export async function downloadEpisode(episode: EpisodeData) {
 }
 
 export async function removeDownloadedEpisode(localFile: string) {
-  await removeFile(localFile)
+  await remove(localFile)
 
   const podcastDir = await dirname(localFile)
   const downloadedPodcasts = await readDir(podcastDir)
 
   if (downloadedPodcasts.length == 0) {
-    removeDir(podcastDir)
+    remove(podcastDir, {recursive: true})
   }
 }
 

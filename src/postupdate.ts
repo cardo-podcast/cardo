@@ -11,7 +11,7 @@ const migrations: { [version: string]: () => Promise<void> } = {
 
 export async function postupdate() {
   const updatesFile = await join(await appConfigDir(), 'updates.json')
-  const version = config.package.version
+  const version = config.version
 
   const appliedUpdates: string[] = (await exists(updatesFile)) ? JSON.parse(await readTextFile(updatesFile)) : []
 

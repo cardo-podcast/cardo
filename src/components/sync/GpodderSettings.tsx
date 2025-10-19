@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { checkURLScheme, saveCreds, toastError } from '../../utils/utils'
 import { useDB, useSync } from '../../ContextProviders'
-import { invoke } from '@tauri-apps/api'
+import { invoke } from '@tauri-apps/api/core'
 import { login } from '../../sync/Gpodder'
 
 export function GpodderSettings() {
@@ -51,20 +51,20 @@ export function GpodderSettings() {
             required
             type="url"
             onInput={checkURLScheme}
-            className="w-full rounded-md bg-primary-8 px-2 py-1 focus:outline-none"
+            className="bg-primary-8 w-full rounded-md px-2 py-1 focus:outline-none"
             placeholder={t('gpodder_server_url')}
           />
           <div className="flex w-3/4 gap-1.5">
             <input
               type="text"
               required
-              className="w-full rounded-md bg-primary-8 px-2 py-1 focus:outline-none"
+              className="bg-primary-8 w-full rounded-md px-2 py-1 focus:outline-none"
               placeholder={t('username')}
             />
             <input
               type="password"
               required
-              className="w-full rounded-md bg-primary-8 px-2 py-1 focus:outline-none"
+              className="bg-primary-8 w-full rounded-md px-2 py-1 focus:outline-none"
               placeholder={t('password')}
             />
           </div>

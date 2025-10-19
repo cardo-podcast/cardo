@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { login } from '../../sync/Nextcloud'
 import { checkURLScheme, saveCreds, toastError } from '../../utils/utils'
 import { useDB, useSync } from '../../ContextProviders'
-import { invoke } from '@tauri-apps/api'
+import { invoke } from '@tauri-apps/api/core'
 
 export function NextcloudSettings() {
   const interval = useRef<ReturnType<typeof setInterval>>(null)
@@ -67,7 +67,7 @@ export function NextcloudSettings() {
             type="url"
             onInput={checkURLScheme}
             required
-            className="w-11/12 rounded-md bg-primary-8 px-2 py-1 focus:outline-none"
+            className="bg-primary-8 w-11/12 rounded-md px-2 py-1 focus:outline-none"
             placeholder={t('nextcloud_server_url')}
           />
           <button className="filled-button p-1 px-4 uppercase">{t('connect')}</button>

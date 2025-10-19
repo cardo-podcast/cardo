@@ -297,7 +297,7 @@ function Settings() {
           />
           <div className="flex flex-col gap-2">
             <h1>
-              Cardo - {t('podcast_player')} ( v{tauriConfig.package.version} )
+              Cardo - {t('podcast_player')} ( v{tauriConfig.version} )
             </h1>
             <div className="flex gap-10">
               <div>

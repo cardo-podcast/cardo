@@ -2,15 +2,15 @@ import { PodcastData } from '../..'
 import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 
 export async function searchITunes(term: string): Promise<Array<PodcastData>> {
-    const searchParams = new URLSearchParams({
-    'limit': '40',
-    'entity': 'podcast',
-    'term': term.trim()
-  });
+  const searchParams = new URLSearchParams({
+    limit: '40',
+    entity: 'podcast',
+    term: term.trim(),
+  })
   const url = `https://itunes.apple.com/search?${searchParams.toString()}`
 
   const response = await tauriFetch(url) // fetching from backend to avoid cors errors
-  const apiResults = await (response.data as any).results
+  const apiResults = (await response.json()).results
 
   const results = []
   for (const result of apiResults) {

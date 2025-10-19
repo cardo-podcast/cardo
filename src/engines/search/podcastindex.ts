@@ -1,9 +1,9 @@
-import {  } from '@tauri-apps/api'
+import {} from '@tauri-apps/api'
 import { PodcastData } from '../..'
 import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 import { sha1 } from 'js-sha1'
 import tauriConfig from '../../../src-tauri/tauri.conf.json'
-import * as http from "@tauri-apps/plugin-http"
+import * as http from '@tauri-apps/plugin-http'
 
 // The API key and secret for PodcastIndex must be specified in a .env File. This file is not
 // checked in to git. To build/run/debug you will need to register for the PodcastIndex API
@@ -28,17 +28,16 @@ export async function searchPodcastIndex(term: string): Promise<Array<PodcastDat
 
   const response = await tauriFetch(url, {
     method: 'GET',
-    responseType: http.ResponseType.JSON,
     headers: {
       'Content-Type': 'application/json',
       'X-Auth-Date': apiHeaderTime,
       'X-Auth-Key': apiKey,
       Authorization: sha1(apiKey + apiSecret + apiHeaderTime),
-      'User-Agent': tauriConfig.package.productName + '/' + tauriConfig.package.version,
+      'User-Agent': tauriConfig.productName + '/' + tauriConfig.version,
     },
   })
 
-  const apiResults = await (response.data as any).feeds
+  const apiResults = (await response.json()).feeds
   const results: PodcastData[] = []
   for (const result of apiResults) {
     if (result.url) {

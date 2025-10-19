@@ -9,7 +9,7 @@ export async function searchFyyd(term: string): Promise<Array<PodcastData>> {
   const url = `https://api.fyyd.de/0.2/search/podcast?${searchParams.toString()}`
 
   const response = await tauriFetch(url) // fetching from backend to avoid cors errors
-  const apiResults = ((await response.data) as any).data
+  const apiResults = (await response.json()).data
 
   // Put results into a map using the returned search rank as keys.
   const resultsMap = new Map()

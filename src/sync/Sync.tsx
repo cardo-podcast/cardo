@@ -3,7 +3,7 @@ import { getCreds, parsePodcastDetails } from '../utils/utils'
 import { useEffect, useRef, useState } from 'react'
 import { Credentials, GpodderUpdate, ProtocolFn, SubscriptionsUpdate, SyncProtocol, SyncStatus } from '.'
 import { SyncContext, useDB, usePlayer } from '../ContextProviders'
-import { invoke } from '@tauri-apps/api'
+import { invoke } from '@tauri-apps/api/core'
 import { nextcloudProtocol } from './Nextcloud'
 import { gpodderProtocol } from './Gpodder'
 

@@ -1,4 +1,4 @@
-import { checkUpdate, installUpdate } from '@tauri-apps/plugin-updater'
+import { check, Update } from '@tauri-apps/plugin-updater'
 import { relaunch } from '@tauri-apps/plugin-process'
 import { useEffect, useRef, useState } from 'react'
 import { UnlistenFn } from '@tauri-apps/api/event'
@@ -11,6 +11,7 @@ import { useDB } from './ContextProviders'
 export default function Updater() {
   const unlistenCeckUpdates = useRef<UnlistenFn>(null)
   const [dialog, setDialog] = useState<{ version: string; releaseNotes: string }>()
+  const installUpdate = useRef<Update['install']>(null)
   const [showBanner, Banner] = useModalBanner()
   const {
     misc: { getLastUpdate, setLastUpdate },
@@ -28,19 +29,21 @@ export default function Updater() {
 
   const checkUpdates = async () => {
     try {
-      const { shouldUpdate, manifest } = await checkUpdate()
+      const update = await check()
 
-      if (!manifest || !shouldUpdate) return
+      if (!update?.body || !update.date) return
 
-      const release_notes = manifest.body.replace(/^v\d.\d.\d\s*\n*/, '') // messages could start with vX.X.X (in github  appears as title)
+      const release_notes = update.body.replace(/^v\d.\d.\d\s*\n*/, '') // messages could start with vX.X.X (in github  appears as title)
 
       setDialog({
-        version: manifest.version,
+        version: update.version,
         releaseNotes: release_notes,
       })
 
+      installUpdate.current = update.install
+
       const formatString = 'yyyy-MM-dd HH:mm:ss.SSS xxxxx'
-      const releaseDate = parse(manifest.date, formatString, new Date())
+      const releaseDate = parse(update.date, formatString, new Date())
       const lastUpdate = await getLastUpdate()
 
       showBanner(releaseDate.getTime() > lastUpdate) // annoying dialog is shown only once, after that only the title bar icon appears
@@ -66,7 +69,7 @@ export default function Updater() {
         onSubmit={async () => {
           try {
             // Install the update. This will also restart the app on Windows!
-            await installUpdate()
+            installUpdate.current && (await installUpdate.current())
 
             // On macOS and Linux you will need to restart the app manually.
             // You could use this step to display another confirmation dialog.
@@ -76,12 +79,12 @@ export default function Updater() {
           }
         }}
       >
-        <h1 className="border-b-2 border-primary-8 pb-1 text-lg">{t('new_update_available')}</h1>
+        <h1 className="border-primary-8 border-b-2 pb-1 text-lg">{t('new_update_available')}</h1>
         <div className="flex flex-col gap-1">
           <p>
             {t('release_notes')}: v{dialog?.version}
           </p>
-          <p className="whitespace-pre-line rounded-md bg-primary-8 p-2 pl-1 text-sm">{dialog?.releaseNotes}</p>
+          <p className="bg-primary-8 rounded-md p-2 pl-1 text-sm whitespace-pre-line">{dialog?.releaseNotes}</p>
         </div>
       </Banner>
     </>
