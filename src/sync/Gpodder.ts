@@ -38,7 +38,7 @@ export const gpodderProtocol: ProtocolFn = function (creds) {
       },
     })
 
-    const data: { actions: ServerGpodderUpdate[] } = (await r.json()).data
+    const data: { actions: ServerGpodderUpdate[] } = await r.json()
 
     return data.actions.map((update: ServerGpodderUpdate) => ({
       ...update,
@@ -64,7 +64,7 @@ export const gpodderProtocol: ProtocolFn = function (creds) {
       },
     })
 
-    return (await r.json()).data
+    return r.json()
   }
 
   async function pushEpisodes(updates: GpodderUpdate[]) {
