@@ -1,8 +1,9 @@
-import { http } from '@tauri-apps/api'
+import {  } from '@tauri-apps/api'
 import { PodcastData } from '../..'
-import { fetch as tauriFetch } from '@tauri-apps/api/http'
+import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 import { sha1 } from 'js-sha1'
 import tauriConfig from '../../../src-tauri/tauri.conf.json'
+import * as http from "@tauri-apps/plugin-http"
 
 // The API key and secret for PodcastIndex must be specified in a .env File. This file is not
 // checked in to git. To build/run/debug you will need to register for the PodcastIndex API

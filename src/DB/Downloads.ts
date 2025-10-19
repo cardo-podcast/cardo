@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { EpisodeData } from '..'
-import Database from 'tauri-plugin-sql-api'
+import Database from '@tauri-apps/plugin-sql'
 
 // #region DOWNLOADS
 type DownloadedEpisode = EpisodeData & { localFile: string }

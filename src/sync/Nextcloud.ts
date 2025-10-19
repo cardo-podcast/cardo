@@ -1,5 +1,7 @@
-import { http, shell } from '@tauri-apps/api'
+import {   } from '@tauri-apps/api'
 import { GpodderUpdate, ProtocolFn, ServerGpodderUpdate, SubscriptionsUpdate } from '.'
+import * as http from "@tauri-apps/plugin-http"
+import * as shell from "@tauri-apps/plugin-shell"
 
 export async function login(url: string, onSucess: (user: string, password: string) => void) {
   // nextcloud flow v2 o-auth login

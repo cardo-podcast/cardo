@@ -7,11 +7,12 @@ import HomePage from './pages/HomePage'
 import SearchBar from './components/SearchBar'
 import { DBProvider } from './DB/DB'
 import { SettingsProvider } from './engines/Settings'
-import { appWindow } from '@tauri-apps/api/window'
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { SyncProvider } from './sync/Sync'
-import { platform } from '@tauri-apps/api/os'
+import { platform } from '@tauri-apps/plugin-os'
+const appWindow = getCurrentWebviewWindow()
 const PodcastPreview = lazy(() => import('./pages/PodcastPreview'))
 const EpisodePreview = lazy(() => import('./pages/EpisodePreview'))
 const Settings = lazy(() => import('./pages/Settings'))

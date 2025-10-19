@@ -1,6 +1,6 @@
-import { ResponseType, fetch as tauriFetch } from '@tauri-apps/api/http'
+import { ResponseType, fetch as tauriFetch } from '@tauri-apps/plugin-http'
 import { EpisodeData, PodcastData } from '..'
-import { createDir, exists, readTextFile, writeTextFile, removeFile, removeDir, readDir } from '@tauri-apps/api/fs'
+import { createDir, exists, readTextFile, writeTextFile, removeFile, removeDir, readDir } from '@tauri-apps/plugin-fs'
 import { appCacheDir, dirname, join } from '@tauri-apps/api/path'
 import { invoke } from '@tauri-apps/api'
 import { toast } from 'react-toastify'

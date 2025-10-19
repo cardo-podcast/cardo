@@ -2,61 +2,54 @@
   "build": {
     "beforeDevCommand": "pnpm dev",
     "beforeBuildCommand": "pnpm build",
-    "devPath": "http://localhost:1420",
-    "distDir": "../dist"
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420"
   },
-  "package": {
-    "productName": "Cardo",
-    "version": "1.12.0"
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "macOS": {
+      "signingIdentity": "-"
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "resources": [
+      "../resources/**"
+    ],
+    "windows": {
+      "certificateThumbprint": "ac371837547551654794263b4d2ba7da7f1118f5",
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "http://timestamp.comodoca.com"
+    },
+    "licenseFile": "LICENSE",
+    "createUpdaterArtifacts": "v1Compatible"
   },
-  "tauri": {
+  "productName": "Cardo",
+  "mainBinaryName": "Cardo",
+  "version": "1.12.0",
+  "identifier": "cardo",
+  "plugins": {
     "updater": {
-      "active": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdDODExNjU4QTczOUZDMUIKUldRYi9EbW5XQmFCZkdydnVrZ1dWQ0NBR2NMckRpLzBOam5HNzBOcUk0U3VLNTc3b21FKytDeksK",
       "endpoints": [
         "https://github.com/cardo-podcast/cardo/releases/latest/download/latest.json"
-      ],
-      "dialog": false,
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdDODExNjU4QTczOUZDMUIKUldRYi9EbW5XQmFCZkdydnVrZ1dWQ0NBR2NMckRpLzBOam5HNzBOcUk0U3VLNTc3b21FKytDeksK"
-    },
-    "allowlist": {
-      "all": false,
-      "shell": {
-        "all": false,
-        "open": "^((.*config.json)|(https?://\\w+))"
-      },
-      "window": {
-        "all": true
-      },
-      "http": {
-        "all": true,
+      ]
+    }
+  },
+  "app": {
+    "security": {
+      "assetProtocol": {
         "scope": [
-          "https://*",
-          "http://*"
-        ]
-      },
-      "path": {
-        "all": true
-      },
-      "fs": {
-        "all": true,
-        "scope": [
-          "$APPCACHE/**",
-          "$APPCONFIG/**",
-          "$RESOURCE/**"
-        ]
-      },
-      "os": {
-        "all": true
-      },
-      "globalShortcut": {
-        "all": true
-      },
-      "protocol": {
-        "asset": true,
-        "assetScope": [
           "$APPCACHE/Downloads/**"
-        ]
-      }
+        ],
+        "enable": true
+      },
+      "csp": null
     },
     "windows": [
       {
@@ -67,35 +60,9 @@
         "decorations": false,
         "transparent": true,
         "minWidth": 700,
-        "minHeight": 500
+        "minHeight": 500,
+        "useHttpsScheme": true
       }
-    ],
-    "security": {
-      "csp": null
-    },
-    "bundle": {
-      "active": true,
-      "targets": "all",
-      "identifier": "cardo",
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
-      "resources": [
-        "../resources/**"
-      ],
-      "windows": {
-        "certificateThumbprint": "ac371837547551654794263b4d2ba7da7f1118f5",
-        "digestAlgorithm": "sha256",
-        "timestampUrl": "http://timestamp.comodoca.com"
-      },
-      "macOS": {
-        "license": "LICENSE",
-        "signingIdentity": "-"
-      }
-    }
+    ]
   }
 }

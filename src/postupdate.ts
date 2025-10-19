@@ -1,6 +1,6 @@
 import { appConfigDir, join } from '@tauri-apps/api/path'
 import config from '../src-tauri/tauri.conf.json'
-import { exists, readTextFile, writeTextFile } from '@tauri-apps/api/fs'
+import { exists, readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
 
 // migrations in ascending order
 const migrations: { [version: string]: () => Promise<void> } = {

@@ -1,4 +1,4 @@
-import Database from 'tauri-plugin-sql-api'
+import Database from '@tauri-apps/plugin-sql'
 import { join, appDataDir } from '@tauri-apps/api/path'
 import { ReactNode, useEffect, useState } from 'react'
 import { useSubscriptions } from './Subscriptions'

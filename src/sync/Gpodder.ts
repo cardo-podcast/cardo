@@ -1,5 +1,6 @@
-import { http } from '@tauri-apps/api'
+import {  } from '@tauri-apps/api'
 import { GpodderUpdate, ProtocolFn, ServerGpodderUpdate, SubscriptionsUpdate } from '.'
+import * as http from "@tauri-apps/plugin-http"
 
 export async function login(url: string, user: string, password: string): Promise<boolean> {
   // just eturns true if login was successful

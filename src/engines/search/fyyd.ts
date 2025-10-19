@@ -1,5 +1,5 @@
 import { PodcastData } from '../..'
-import { fetch as tauriFetch } from '@tauri-apps/api/http'
+import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 
 export async function searchFyyd(term: string): Promise<Array<PodcastData>> {
   const searchParams = new URLSearchParams({
