@@ -23,8 +23,10 @@ export async function login(url: string, onSucess: (user: string, password: stri
   // start polling for a sucessful response of nextcloud
   const interval = setInterval(async () => {
     const r = await http.fetch(endpoint, {
-      method: 'POST',
-
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ token }),
     })
 
