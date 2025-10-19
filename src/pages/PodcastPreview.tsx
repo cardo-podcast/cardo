@@ -9,7 +9,7 @@ import { usePodcastSettings } from '../engines/Settings'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 import { sanitizeHTML } from '../utils/sanitize'
-import { showMenu } from 'tauri-plugin-context-menu'
+// import { showMenu } from 'tauri-plugin-context-menu'
 import { useSync, useDB } from '../ContextProviders'
 import { PodcastCover } from '../components/Cover'
 import { useModalBanner } from '../components/ModalBanner'
@@ -356,20 +356,20 @@ function PodcastPreview() {
             <div className="flex shrink-0 flex-col items-center gap-2">
               <div
                 className="aspect-square h-40 cursor-pointer"
-                onContextMenu={() => {
-                  showMenu({
-                    items: [
-                      {
-                        label: t('copy_feed_url'),
-                        event: copyFeedUrl,
-                      },
-                      {
-                        label: t('change_podcast_cover'),
-                        event: () => showChangeCoverBanner(),
-                      },
-                    ],
-                  })
-                }}
+                // onContextMenu={() => {
+                //   showMenu({
+                //     items: [
+                //       {
+                //         label: t('copy_feed_url'),
+                //         event: copyFeedUrl,
+                //       },
+                //       {
+                //         label: t('change_podcast_cover'),
+                //         event: () => showChangeCoverBanner(),
+                //       },
+                //     ],
+                //   })
+                // }}
               >
                 <PodcastCover className="aspect-square h-40 rounded-md bg-primary-7" podcast={podcast} />
               </div>

@@ -5,7 +5,7 @@ import * as icons from '../Icons'
 import { useNavigate } from 'react-router-dom'
 import ProgressBar from './ProgressBar'
 import { useTranslation } from 'react-i18next'
-import { showMenu } from 'tauri-plugin-context-menu'
+// import { showMenu } from 'tauri-plugin-context-menu'
 import { useEpisode } from '../engines/Episode'
 import { EpisodeCover } from './Cover'
 
@@ -29,24 +29,24 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
   return (
     <div
       className="amber-600 flex w-24 flex-shrink-0 cursor-pointer flex-col rounded-md transition-all duration-100"
-      onContextMenu={() => {
-        showMenu({
-          items: [
-            {
-              label: t(reprState.complete ? 'mark_not_played' : 'mark_played'),
-              event: togglePlayed,
-            },
-            {
-              label: t(inQueue ? 'remove_queue' : 'add_queue'),
-              event: toggleQueue,
-            },
-            {
-              label: t(downloadState === 'downloaded' ? 'remove_download' : 'download'),
-              event: toggleDownload,
-            },
-          ],
-        })
-      }}
+      // onContextMenu={() => {
+      //   showMenu({
+      //     items: [
+      //       {
+      //         label: t(reprState.complete ? 'mark_not_played' : 'mark_played'),
+      //         event: togglePlayed,
+      //       },
+      //       {
+      //         label: t(inQueue ? 'remove_queue' : 'add_queue'),
+      //         event: toggleQueue,
+      //       },
+      //       {
+      //         label: t(downloadState === 'downloaded' ? 'remove_download' : 'download'),
+      //         event: toggleDownload,
+      //       },
+      //     ],
+      //   })
+      // }}
     >
       <div className="relative flex aspect-square w-full flex-col items-center justify-center overflow-hidden rounded-md bg-primary-8">
         <EpisodeCover

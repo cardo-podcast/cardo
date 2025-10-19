@@ -27,7 +27,6 @@
     "react-i18next": "^15.5.3",
     "react-router-dom": "^7.6.2",
     "react-toastify": "^11.0.5",
-    "tauri-plugin-context-menu": "^0.8.0",
     "tauri-plugin-sql-api": "github:tauri-apps/tauri-plugin-sql#v1",
     "vite-bundle-visualizer": "^1.2.1"
   },
