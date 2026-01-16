@@ -5,7 +5,7 @@ import * as icons from '../Icons'
 import { useNavigate } from 'react-router-dom'
 import ProgressBar from './ProgressBar'
 import { useTranslation } from 'react-i18next'
-// import { showMenu } from 'tauri-plugin-context-menu'
+import { Menu } from '@tauri-apps/api/menu'
 import { useEpisode } from '../engines/Episode'
 import { EpisodeCover } from './Cover'
 
@@ -29,26 +29,28 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
   return (
     <div
       className="amber-600 flex w-24 shrink-0 cursor-pointer flex-col rounded-md transition-all duration-100"
-      // onContextMenu={() => {
-      //   showMenu({
-      //     items: [
-      //       {
-      //         label: t(reprState.complete ? 'mark_not_played' : 'mark_played'),
-      //         event: togglePlayed,
-      //       },
-      //       {
-      //         label: t(inQueue ? 'remove_queue' : 'add_queue'),
-      //         event: toggleQueue,
-      //       },
-      //       {
-      //         label: t(downloadState === 'downloaded' ? 'remove_download' : 'download'),
-      //         event: toggleDownload,
-      //       },
-      //     ],
-      //   })
-      // }}
+      onContextMenu={async() => {
+        const menu = await Menu.new({
+          items: [
+            {
+              text: t(reprState.complete ? 'mark_not_played' : 'mark_played'),
+              action: togglePlayed,
+            },
+            {
+              text: t(inQueue ? 'remove_queue' : 'add_queue'),
+              action: toggleQueue,
+            },
+            {
+              text: t(downloadState === 'downloaded' ? 'remove_download' : 'download'),
+              action: toggleDownload,
+            },
+          ],
+        })
+        
+        menu.popup()
+      }}
     >
-      <div className="relative flex aspect-square w-full flex-col items-center justify-center overflow-hidden rounded-md bg-primary-8">
+      <div className="bg-primary-8 relative flex aspect-square w-full flex-col items-center justify-center overflow-hidden rounded-md">
         <EpisodeCover
           episode={episode}
           title={episode.podcast?.podcastName}
@@ -69,7 +71,7 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
         />
 
         <button
-          className="absolute bottom-2 right-2 flex aspect-square w-7 items-center justify-center rounded-full border-2 border-accent-8 bg-accent-7 p-[3px] pl-[4px] transition-all hover:p-px"
+          className="border-accent-8 bg-accent-7 absolute right-2 bottom-2 flex aspect-square w-7 items-center justify-center rounded-full border-2 p-[3px] pl-[4px] transition-all hover:p-px"
           onClick={(e) => {
             e.stopPropagation()
             inProgress(true) ? pause() : play()
@@ -83,7 +85,7 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
           {episode.title}
         </h1>
         <div className="flex items-center gap-2">
-          {(episode as NewEpisodeData).new && <span className="h-2 w-2 rounded-full bg-accent-5" title={t('new')} />}
+          {(episode as NewEpisodeData).new && <span className="bg-accent-5 h-2 w-2 rounded-full" title={t('new')} />}
           <h2 className="0 text-sm">{getDateString()}</h2>
         </div>
       </div>

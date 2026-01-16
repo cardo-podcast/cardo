@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 import ProgressBar from '../components/ProgressBar'
 import { useEpisode } from '../engines/Episode'
 import { sanitizeHTML } from '../utils/sanitize'
-// import { showMenu } from 'tauri-plugin-context-menu'
+import { Menu } from '@tauri-apps/api/menu';
 import { toast } from 'react-toastify'
 import { useDB } from '../ContextProviders'
 import { EpisodeCover } from '../components/Cover'
@@ -88,18 +88,19 @@ function EpisodePreview() {
                   },
                 })
             }}
-            // onContextMenu={() => {
-            //   if (!podcastFetched) return
+            onContextMenu={async() => {
+              if (!podcastFetched) return
 
-            //   showMenu({
-            //     items: [
-            //       {
-            //         label: t('copy_episode_url'),
-            //         event: copyEpisodeSrc,
-            //       },
-            //     ],
-            //   })
-            // }}
+              const menu = await Menu.new({
+                items: [
+                  {
+                    text: t('copy_episode_url'),
+                    action: copyEpisodeSrc,
+                  },
+                ],
+              })
+              menu.popup()
+            }}
           />
         </div>
 

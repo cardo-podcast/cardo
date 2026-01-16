@@ -6,7 +6,7 @@ import { stripAllHTML } from '../utils/stripAllHTML'
 import { secondsToStr } from '../utils/utils'
 import ProgressBar from './ProgressBar'
 import { useTranslation } from 'react-i18next'
-// import { showMenu } from 'tauri-plugin-context-menu'
+import { Menu } from '@tauri-apps/api/menu'
 import { useEpisode } from '../engines/Episode'
 import { EpisodeCover } from './Cover'
 
@@ -51,27 +51,29 @@ function EpisodeCard({
           },
         })
       }}
-      // onContextMenu={() => {
-      //   showMenu({
-      //     items: [
-      //       {
-      //         label: t(reprState.complete ? 'mark_not_played' : 'mark_played'),
-      //         event: togglePlayed,
-      //       },
-      //       {
-      //         label: t(inQueue ? 'remove_queue' : 'add_queue'),
-      //         event: toggleQueue,
-      //       },
-      //       {
-      //         label: t(downloadState == 'downloaded' ? 'remove_download' : 'download'),
-      //         event: toggleDownload,
-      //       },
-      //     ],
-      //   })
-      // }}
+      onContextMenu={async () => {
+        const menu = await Menu.new({
+          items: [
+            {
+              text: t(reprState.complete ? 'mark_not_played' : 'mark_played'),
+              action: togglePlayed,
+            },
+            {
+              text: t(inQueue ? 'remove_queue' : 'add_queue'),
+              action: toggleQueue,
+            },
+            {
+              text: t(downloadState == 'downloaded' ? 'remove_download' : 'download'),
+              action: toggleDownload,
+            },
+          ],
+        })
+
+        menu.popup()
+      }}
     >
       <>
-        <div className="flex aspect-square h-16 items-center justify-center rounded-md bg-primary-8">
+        <div className="bg-primary-8 flex aspect-square h-16 items-center justify-center rounded-md">
           <EpisodeCover
             className={`rounded-md ${onImageClick !== undefined ? 'cursor-pointer hover:p-0.5' : ''}`}
             onClick={onImageClick}
@@ -98,7 +100,7 @@ function EpisodeCard({
               secondsToStr(reprState.total)
             )}
             <button
-              className="flex aspect-square w-7 shrink-0 items-center justify-center rounded-full border-2 border-primary-6 p-1 hover:p-[2px] hover:text-accent-6"
+              className="border-primary-6 hover:text-accent-6 flex aspect-square w-7 shrink-0 items-center justify-center rounded-full border-2 p-1 hover:p-[2px]"
               onClick={(e) => {
                 e.stopPropagation()
                 inProgress(true) ? pause() : play()
