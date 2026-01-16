@@ -1,43 +1,40 @@
 {
-    "identifier": "migrated",
-    "description": "permissions that were migrated from v1",
-    "local": true,
-    "windows": [
-        "main"
-    ],
-    "permissions": [
-        "core:default",
-        "fs:default",
-        "fs:read-all",
-        "fs:write-all",
+  "identifier": "migrated",
+  "description": "permissions that were migrated from v1",
+  "local": true,
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "fs:default",
+    "fs:read-all",
+    "fs:write-all",
+    {
+      "identifier": "fs:scope",
+      "allow": ["$APPCACHE/**", "$APPCONFIG/**", "$RESOURCE/**"]
+    },
+    "core:window:default",
+    "core:window:allow-close",
+    "core:window:allow-destroy",
+    "core:window:allow-start-dragging",
+    "core:window:allow-set-always-on-top",
+    "core:webview:default",
+    "shell:default",
+    {
+      "identifier": "http:default",
+      "allow": [
         {
-            "identifier": "fs:scope",
-            "allow": [
-                "$APPCACHE/**",
-                "$APPCONFIG/**",
-                "$RESOURCE/**"
-            ]
+          "url": "https://*/"
         },
-        "core:window:default",
-        "core:window:allow-start-dragging",
-        "core:webview:default",
-        "shell:default",
         {
-            "identifier": "http:default",
-            "allow": [
-                {
-                    "url": "https://*/"
-                },
-                {
-                    "url": "http://*/"
-                }
-            ]
-        },
-        "global-shortcut:default",
-        "global-shortcut:allow-is-registered",
-        "os:default",
-        "updater:default",
-        "sql:default",
-        "sql:allow-execute"
-    ]
+          "url": "http://*/"
+        }
+      ]
+    },
+    "global-shortcut:default",
+    "global-shortcut:allow-is-registered",
+    "os:default",
+    "updater:default",
+    "sql:default",
+    "sql:allow-execute"
+  ]
 }
