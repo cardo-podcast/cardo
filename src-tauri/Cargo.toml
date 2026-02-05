@@ -11,29 +11,29 @@ edition = "2021"
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [ "protocol-asset"] }
+tauri = { version = "2.10.1", features = ["protocol-asset"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-mio = {version = "1"}
+mio = { version = "1" }
 aes-gcm = "0.10"
 base64 = "0.22"
 rand = "0.8.5"
 reqwest = { version = "0.12", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
-tauri-plugin-process = "2"
-tauri-plugin-os = "2"
-tauri-plugin-http = "2"
-tauri-plugin-shell = "2"
-tauri-plugin-fs = "2"
+tauri-plugin-process = "2.3.1"
+tauri-plugin-os = "2.3.2"
+tauri-plugin-http = "2.5.7"
+tauri-plugin-shell = "2.3.5"
+tauri-plugin-fs = "2.4.5"
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!
 custom-protocol = ["tauri/custom-protocol"]
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
-tauri-plugin-global-shortcut = "2"
-tauri-plugin-updater = "2"
+tauri-plugin-global-shortcut = "2.3.1"
+tauri-plugin-updater = "2.10.0"
 
 [dependencies.tauri-plugin-sql]
 features = ["sqlite"] # or "postgres", or "mysql"
-version = "2"
+version = "2.3.2"
