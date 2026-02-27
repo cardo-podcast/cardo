@@ -4,7 +4,7 @@ import { sync, home, settings, queue, download } from '../Icons'
 import SubscriptionCard from './SubscriptionCard'
 import { useSettings } from '../engines/Settings'
 import { useModalBanner } from './ModalBanner'
-import { parsePodcastDetails, toastError } from '../utils/utils'
+import { checkURLScheme, parsePodcastDetails, toastError } from '../utils/utils'
 import { useRef } from 'react'
 import { useDB } from '../ContextProviders'
 
@@ -39,6 +39,7 @@ function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
           <input
             ref={inputRef}
             type="url"
+            onInput={checkURLScheme}
             placeholder={t('feed_url')}
             autoFocus
             className="w-96 rounded-md bg-primary-8 px-2 py-1 focus:outline-none"
@@ -124,7 +125,7 @@ function LeftMenu() {
           <button
             className={`flex justify-center hover:text-accent-5 ${subscriptionsEpisodes.fetchingFeeds.length && 'animate-[spin_1.5s_linear_reverse_infinite]'}`}
             onClick={() => subscriptions.updateFeeds()}
-            title={t('update_subs_ feeds')}
+            title={t('update_subs_feeds')}
           >
             <span className={`${collapsedLeftMenu ? 'w-6' : 'w-5'}`}>{sync}</span>
           </button>
@@ -142,6 +143,7 @@ function LeftMenu() {
       <div
         id="folder"
         className="absolute right-0 my-auto h-full w-2 translate-x-1/2 cursor-w-resize bg-clip-content px-[3px] transition-colors hover:bg-accent-8"
+        title={collapsedLeftMenu ? t('double_click_expand') : t('double_click_collapse')}
         onDoubleClick={() => {
           updateSettings({ ui: { collapsedLeftMenu: !collapsedLeftMenu } })
         }}

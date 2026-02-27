@@ -1,7 +1,7 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import { resolveResource } from '@tauri-apps/api/path'
-import { readTextFile } from '@tauri-apps/api/fs'
+import { readTextFile } from '@tauri-apps/plugin-fs'
 
 i18n.use(initReactI18next).init({
   fallbackLng: 'en',

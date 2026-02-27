@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 import ProgressBar from '../components/ProgressBar'
 import { useEpisode } from '../engines/Episode'
 import { sanitizeHTML } from '../utils/sanitize'
-import { showMenu } from 'tauri-plugin-context-menu'
+import { Menu } from '@tauri-apps/api/menu';
 import { toast } from 'react-toastify'
 import { useDB } from '../ContextProviders'
 import { EpisodeCover } from '../components/Cover'
@@ -74,7 +74,7 @@ function EpisodePreview() {
     <div className="flex w-full flex-col p-2">
       <div className="justify-left mb-2 flex w-full gap-3 border-b-2 border-primary-8 p-2 pb-3">
         <div
-          className={`flex aspect-square h-28 items-center justify-center rounded-md bg-primary-8 transition-all ${podcastFetched ? 'cursor-pointer hover:scale-95' : ''}`}
+          className={`flex aspect-square h-28 items-center justify-center rounded-md bg-primary-8 transition-all ${podcastFetched ? 'cursor-pointer' : ''}`}
         >
           <EpisodeCover
             className="rounded-md"
@@ -88,17 +88,18 @@ function EpisodePreview() {
                   },
                 })
             }}
-            onContextMenu={() => {
+            onContextMenu={async() => {
               if (!podcastFetched) return
 
-              showMenu({
+              const menu = await Menu.new({
                 items: [
                   {
-                    label: t('copy_episode_url'),
-                    event: copyEpisodeSrc,
+                    text: t('copy_episode_url'),
+                    action: copyEpisodeSrc,
                   },
                 ],
               })
+              menu.popup()
             }}
           />
         </div>

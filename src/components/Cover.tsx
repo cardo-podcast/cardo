@@ -29,7 +29,7 @@ export function PodcastCover({ podcast, ...props }: PodcastCoverProps) {
       onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
         e.currentTarget.src = appIcon
       }}
-      style={{ backgroundColor: 'white' }}
+      style={{ backgroundColor: 'var(--color-primary-10)' }}
       {...props}
     />
   )
@@ -38,7 +38,27 @@ export function PodcastCover({ podcast, ...props }: PodcastCoverProps) {
 export function EpisodeCover({ episode, ...props }: EpisodeCoverProps) {
   const [error, setError] = useState(false)
 
-  if (error) return <PodcastCover podcast={episode.podcast!} {...props}/>
+  if (error) return <PodcastCover podcast={episode.podcast!} {...props} />
 
-  return <img src={episode.coverUrl} alt="" loading="lazy" decoding="async" onError={() => setError(true)} {...props} />
+  return (
+    <div className="flip">
+      <div className="front">
+        <img src={episode.coverUrl} alt="" loading="lazy" decoding="async" onError={() => setError(true)} {...props} />
+      </div>
+      <div className="back">
+        {episode.podcast?.coverUrl ? (
+          <PodcastCover podcast={episode.podcast!} {...props} />
+        ) : (
+          <img
+            src={episode.coverUrl}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            onError={() => setError(true)}
+            {...props}
+          />
+        )}
+      </div>
+    </div>
+  )
 }

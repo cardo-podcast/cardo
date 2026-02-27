@@ -1,4 +1,4 @@
-import { appWindow } from '@tauri-apps/api/window'
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
 import * as icons from '../Icons'
 import { useEffect, useRef, useState } from 'react'
 import { UnlistenFn } from '@tauri-apps/api/event'
@@ -7,6 +7,7 @@ import Updater from '../Updater'
 import DownloadsIndicator from './DownloadsIndicator'
 import { usePlayer, useSync } from '../ContextProviders'
 import { SyncButton } from './sync/SyncButton'
+const appWindow = getCurrentWebviewWindow()
 
 function TitleBar() {
   const [windowPinned, setWindowPinned] = useState(false)
@@ -20,7 +21,7 @@ function TitleBar() {
       ui,
     },
   ] = useSettings()
-  const unlistenClose = useRef<UnlistenFn>()
+  const unlistenClose = useRef<UnlistenFn>(null)
 
   const executeBeforeExit = async () => {
     await savePlayerStatus()
@@ -43,7 +44,9 @@ function TitleBar() {
       .then((unlisten) => (unlistenClose.current = unlisten))
 
     // when reloading delete the previous event
-    return () => unlistenClose.current && unlistenClose.current()
+    return () => {
+      unlistenClose.current && unlistenClose.current()
+    }
   }, [savePlayerStatus]) // reload when dependencies change
 
   return (

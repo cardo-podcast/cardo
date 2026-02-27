@@ -7,7 +7,7 @@ type DownloadsList = {
 }
 
 export default function DownloadsIndicator() {
-  const unlisten = useRef<UnlistenFn>()
+  const unlisten = useRef<UnlistenFn>(null)
   const downloads = useRef<DownloadsList>({})
   const [progress, setProgress] = useState<number>(0)
 
@@ -44,7 +44,9 @@ export default function DownloadsIndicator() {
   useEffect(() => {
     startListening()
 
-    return () => unlisten.current && unlisten.current()
+    return () => {
+      unlisten.current && unlisten.current()
+    }
   }, [])
 
   if (progress == 0) return <></>

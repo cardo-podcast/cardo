@@ -88,6 +88,9 @@ export interface Settings {
     removeFromQueueAtEnd: boolean
     removeFromDownloadsAtEnd: boolean
   }
+  search: {
+    engine: string
+  }
   ui: {
     showPinWindowButton: boolean
     collapsedLeftMenu: boolean

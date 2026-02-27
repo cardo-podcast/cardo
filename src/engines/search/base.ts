@@ -1,7 +1,18 @@
 import { PodcastData } from '../..'
-import { SearchApple } from './apple'
+import { searchITunes } from './apple'
+import { searchFyyd } from './fyyd'
+import { searchPodcastIndex } from './podcastindex'
 
-export async function SearchPodcast(term: string): Promise<Array<PodcastData>> {
-  // no more options right now
-  return SearchApple(term)
+export async function searchPodcast(term: string, searchEngine: string): Promise<Array<PodcastData>> {
+  // Perform search with selected search engine.
+  switch (searchEngine) {
+    case 'iTunes':
+      return searchITunes(term)
+    case 'fyyd':
+      return searchFyyd(term)
+    case 'PodcastIndex':
+      return searchPodcastIndex(term)
+    default:
+      throw new Error('Unexpected searchEngine value')
+  }
 }

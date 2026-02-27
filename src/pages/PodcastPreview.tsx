@@ -2,14 +2,14 @@ import { useLocation } from 'react-router-dom'
 import { EpisodeData, PodcastData, SortCriterion } from '..'
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import * as icons from '../Icons'
-import { parseXML, toastError } from '../utils/utils'
+import { checkURLScheme, parseXML, toastError } from '../utils/utils'
 import EpisodeCard from '../components/EpisodeCard'
 import { Checkbox, Switch, SwitchState, TimeInput } from '../components/Inputs'
 import { usePodcastSettings } from '../engines/Settings'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 import { sanitizeHTML } from '../utils/sanitize'
-import { showMenu } from 'tauri-plugin-context-menu'
+import { Menu } from '@tauri-apps/api/menu'
 import { useSync, useDB } from '../ContextProviders'
 import { PodcastCover } from '../components/Cover'
 import { useModalBanner } from '../components/ModalBanner'
@@ -31,7 +31,7 @@ function SortButton({
 
   return (
     <button
-      className={`flex w-2/3 items-center justify-center rounded-md bg-primary-8 hover:bg-primary-7 ${sort.criterion === criterion ? '.text-accent-6' : ''}`}
+      className={`bg-primary-8 hover:bg-primary-7 flex w-2/3 items-center justify-center rounded-md ${sort.criterion === criterion ? '.text-accent-6' : ''}`}
       onClick={() => {
         if (sort.criterion === criterion) {
           updatePodcastSettings({
@@ -239,17 +239,18 @@ function PodcastPreview() {
         <h1>{t('change_podcast_cover')}</h1>
         <input
           type="url"
+          onInput={checkURLScheme}
           name="url"
           placeholder={t('podcast_cover_url')}
           autoFocus
-          className="w-96 rounded-md bg-primary-8 px-2 py-1 focus:outline-none"
+          className="bg-primary-8 w-96 rounded-md px-2 py-1 focus:outline-none"
         />
       </ChangeCoverBanner>
 
       <div className="relative w-full px-1">
         {/* sticky bar that appears when scrolling */}
-        <div className="group absolute top-0 z-10 flex w-full cursor-default items-center gap-2 border-b-2 border-primary-8 bg-primary-9 p-1">
-          <PodcastCover className="aspect-square h-10 rounded-md bg-primary-7" podcast={podcast} />
+        <div className="group border-primary-8 bg-primary-9 absolute top-0 z-10 flex w-full cursor-default items-center gap-2 border-b-2 p-1">
+          <PodcastCover className="bg-primary-7 aspect-square h-10 rounded-md" podcast={podcast} />
 
           <h1 className="text-xl group-hover:hidden">{podcast.podcastName}</h1>
 
@@ -274,9 +275,9 @@ function PodcastPreview() {
         >
           {tweakMenu && (
             <>
-              <div className="absolute left-0 top-0 z-20 h-screen w-screen" onClick={() => setTweakMenu(undefined)} />
+              <div className="absolute top-0 left-0 z-20 h-screen w-screen" onClick={() => setTweakMenu(undefined)} />
 
-              <div className="absolute left-1/2 top-0 z-20 flex w-4/5 -translate-x-1/2 flex-col items-center justify-between overflow-hidden rounded-b-3xl border-[1px] border-t-0 border-primary-6 bg-primary-9 transition-all duration-200">
+              <div className="border-primary-6 bg-primary-9 absolute top-0 left-1/2 z-20 flex w-4/5 -translate-x-1/2 flex-col items-center justify-between overflow-hidden rounded-b-3xl border border-t-0 transition-all duration-200">
                 <div className="flex w-full flex-col items-center gap-1 p-2">
                   {tweakMenu === 'sort' && (
                     <div className="flex w-4/5 flex-col items-center justify-center gap-1">
@@ -342,7 +343,7 @@ function PodcastPreview() {
                 </div>
 
                 <button
-                  className="mt-1 flex h-5 w-4/5 items-center justify-center border-t-2 border-primary-8 p-2"
+                  className="border-primary-8 mt-1 flex h-5 w-4/5 items-center justify-center border-t-2 p-2"
                   onClick={() => setTweakMenu(undefined)}
                 >
                   <span className="h-6 w-6">{icons.upArrow}</span>
@@ -351,32 +352,34 @@ function PodcastPreview() {
             </>
           )}
 
-          <div className="justify-left z-10 flex h-52 w-full gap-3 border-b-2 border-primary-8 bg-primary-9 p-2 pb-3">
+          <div className="justify-left border-primary-8 bg-primary-9 z-10 flex h-52 w-full gap-3 border-b-2 p-2 pb-3">
             <div className="flex shrink-0 flex-col items-center gap-2">
               <div
                 className="aspect-square h-40 cursor-pointer"
-                onContextMenu={() => {
-                  showMenu({
+                onContextMenu={async () => {
+                  const menu = await Menu.new({
                     items: [
                       {
-                        label: t('copy_feed_url'),
-                        event: copyFeedUrl,
+                        text: t('copy_feed_url'),
+                        action: copyFeedUrl,
                       },
                       {
-                        label: t('change_podcast_cover'),
-                        event: () => showChangeCoverBanner(),
+                        text: t('change_podcast_cover'),
+                        action: () => showChangeCoverBanner(),
                       },
                     ],
                   })
+
+                  menu.popup()
                 }}
               >
-                <PodcastCover className="aspect-square h-40 rounded-md bg-primary-7" podcast={podcast} />
+                <PodcastCover className="bg-primary-7 aspect-square h-40 rounded-md" podcast={podcast} />
               </div>
 
               {/* #region BUTTONS */}
               <div className="flex gap-2">
                 <button
-                  className="w-6 hover:text-accent-6"
+                  className="hover:text-accent-6 w-6"
                   title={t(isSubscribed ? 'remove_from_subscriptions' : 'add_to_subscriptions')}
                   onClick={async () => {
                     if (isSubscribed) {
@@ -394,6 +397,7 @@ function PodcastPreview() {
 
                 <button
                   className="hover:text-accent-6"
+                  title={t('sort_episodes')}
                   onClick={() => {
                     setTweakMenu('sort')
                   }}
@@ -402,6 +406,7 @@ function PodcastPreview() {
                 </button>
                 <button
                   className="hover:text-accent-6"
+                  title={t('filter_episodes')}
                   onClick={() => {
                     setTweakMenu('filter')
                   }}
@@ -409,7 +414,8 @@ function PodcastPreview() {
                   {icons.filter}
                 </button>
                 <button
-                  className="h-6 w-6 hover:text-accent-6"
+                  className="hover:text-accent-6 h-6 w-6"
+                  title={t('podcast_settings')}
                   onClick={() => {
                     setTweakMenu('settings')
                   }}
@@ -417,7 +423,8 @@ function PodcastPreview() {
                   {icons.settings}
                 </button>
                 <button
-                  className={`w-6 hover:text-accent-6 ${downloading && 'animate-[spin_2s_linear_reverse_infinite]'}`}
+                  className={`hover:text-accent-6 w-6 ${downloading && 'animate-[spin_2s_linear_reverse_infinite]'}`}
+                  title={t('podcast_refresh')}
                   onClick={async () => {
                     loadEpisodes(true)
                   }}
@@ -434,7 +441,7 @@ function PodcastPreview() {
 
               <div className="flex overflow-y-auto scroll-smooth rounded-md pr-2">
                 <div
-                  className="whitespace-pre-line text-sm text-primary-4"
+                  className="text-primary-4 text-sm whitespace-pre-line"
                   dangerouslySetInnerHTML={{ __html: sanitizeHTML(podcast.description ?? '') }}
                 />
               </div>
@@ -451,10 +458,10 @@ function PodcastPreview() {
                     // not including all vars to save some memory
                     coverUrl: podcast.coverUrl,
                     podcastName: podcast.podcastName,
-                    feedUrl: podcast.feedUrl
+                    feedUrl: podcast.feedUrl,
                   },
                 }}
-                className="border-b-[1px] border-primary-8 transition-colors hover:bg-primary-8"
+                className="border-primary-8 hover:bg-primary-8 border-b transition-colors"
                 onClick={() => {
                   sessionStorage.setItem(
                     `scroll-${location.key}`,

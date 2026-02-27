@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import Database from 'tauri-plugin-sql-api'
+import Database from '@tauri-apps/plugin-sql'
 import { EpisodeData, NewEpisodeData, PodcastData, RawEpisodeData } from '..'
 import { parseXML, toastError } from '../utils/utils'
 
@@ -75,30 +75,32 @@ export function useSubscriptionsEpisodes(db: Database) {
       searchTerm?: string
     }): Promise<EpisodeData[]> {
       let query = `SELECT
-        se.*,
-        subscriptions.coverUrl
+        se.*
       FROM
         subscriptions_episodes se
       LEFT JOIN
         subscriptions ON subscriptions.feedUrl = se.podcastUrl
       WHERE
-        se.pubDate > $1`
+        se.pubDate > ?`
+      let optionalParams: string[] = [];
 
       if (options.podcastUrl) {
-        query += ' AND podcastUrl = $2'
+        query += ' AND podcastUrl = ?'
+        optionalParams.push(options.podcastUrl);
       }
 
       if (options.searchTerm) {
-        query += ` AND (lower(se.title) LIKE "%${options.searchTerm.toLowerCase()}%"
-                      OR lower(se.description) LIKE "%${options.searchTerm.toLocaleLowerCase()}%")`
+        // Escape any % characters provided by the user with a backslash.
+        query += ` AND (lower(se.title) LIKE ? ESCAPE "\\"
+                      OR lower(se.description) LIKE ? ESCAPE "\\")`
+        optionalParams.push('%' + options.searchTerm.toLowerCase().replace('%', '\\%') + '%');
+        optionalParams.push('%' + options.searchTerm.toLowerCase().replace('%', '\\%') + '%');
       }
 
       const r: (EpisodeData & { coverUrl: string })[] = await db.select(query, [
         options.pubdate_gt ?? 0,
-        options.podcastUrl,
+        ...optionalParams,
       ])
-
-      console.log(r)
 
       return r.map((episode) => ({
         ...episode,

@@ -1,13 +1,14 @@
-import { os } from '@tauri-apps/api'
+import {  } from '@tauri-apps/api'
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import { appConfigDir, join } from '@tauri-apps/api/path'
-import { readTextFile, writeTextFile } from '@tauri-apps/api/fs'
+import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
 import { RecursivePartial, Settings, SortCriterion, TailwindBaseColor, ColorTheme } from '..'
 import { SwitchState } from '../components/Inputs'
 import { changeLanguage } from './translations'
 import merge from 'lodash/merge'
 import colors from 'tailwindcss/colors'
 import { DefaultTheme, DefaultThemes } from '../DefaultThemes'
+import * as os from "@tauri-apps/plugin-os"
 
 type DurationFilter = {
   min: number
@@ -141,6 +142,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       volume: 1,
       removeFromQueueAtEnd: false,
       removeFromDownloadsAtEnd: false,
+    },
+    search: {
+      engine: 'iTunes',
     },
     ui: {
       showPinWindowButton: false,

@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { login } from '../../sync/Nextcloud'
-import { saveCreds, toastError } from '../../utils/utils'
+import { checkURLScheme, saveCreds, toastError } from '../../utils/utils'
 import { useDB, useSync } from '../../ContextProviders'
-import { invoke } from '@tauri-apps/api'
+import { invoke } from '@tauri-apps/api/core'
 
 export function NextcloudSettings() {
-  const interval = useRef<ReturnType<typeof setInterval>>()
+  const interval = useRef<ReturnType<typeof setInterval>>(null)
   const { t } = useTranslation()
   const { setLoggedIn } = useSync()
   const {
@@ -14,7 +14,7 @@ export function NextcloudSettings() {
   } = useDB()
 
   useEffect(() => {
-    return () => clearInterval(interval.current)
+    return () => clearInterval(interval.current ?? 0)
   }, [])
 
   async function handleLogin(user: string, password: string, baseUrl: string) {
@@ -65,8 +65,9 @@ export function NextcloudSettings() {
           <input
             name="server"
             type="url"
+            onInput={checkURLScheme}
             required
-            className="w-11/12 rounded-md bg-primary-8 px-2 py-1 focus:outline-none"
+            className="bg-primary-8 w-11/12 rounded-md px-2 py-1 focus:outline-none"
             placeholder={t('nextcloud_server_url')}
           />
           <button className="filled-button p-1 px-4 uppercase">{t('connect')}</button>
