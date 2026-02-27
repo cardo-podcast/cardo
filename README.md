@@ -62,14 +62,28 @@ If you like this app you can contribute by buying me a coffee or whatever you wa
 
 ### If you are a developer
 
-It's also nice if you want to improve the app. The stack is Tauri v1 + React + Typescript + Tailwind.
-
-To install dependencies `pnpm i` command should be enough. To setup a Tauri development environment check their [docs](https://tauri.app/v1/guides/getting-started/prerequisites), which are pretty good.
-In [tauri-conf.json](/src-tauri/tauri.conf.json) you should remove the updater configuration and windows certificate settings, or you will experiment errors of missing private key / certificate.
-
-To run/debug with Visual Studio Code, follow [the instructions in the Tauri docs](https://v1.tauri.app/v1/guides/debugging/vs-code/) but replace `yarn` in the config to `pnpm`.
+It's also nice if you want to improve the app. The stack is Tauri v2 + React + Typescript + Tailwind.
 
 Feel free to summit a PR if you create something good!
+
+#### Prerequisites
+
+You will need:
+
+- [Node.js](https://nodejs.org/)
+- [pnpm](https://pnpm.io/installation)
+- [Rust](https://rustup.rs/)
+- [Tauri dependencies](https://v2.tauri.app/start/prerequisites/)
+
+Install dependencies:
+`pnpm install`
+
+#### Run and debug
+
+From the command line:
+`pnpm tauri dev`
+
+To run/debug with Visual Studio Code, follow [the instructions in the Tauri docs](https://v2.tauri.app/develop/debug/vscode/) but replace `yarn` in the config to `pnpm`.
 
 ### Translations
 
