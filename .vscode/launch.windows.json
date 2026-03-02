@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Frontend",
+      "type": "msedge",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceFolder}/src-tauri/target/debug/cardo.exe",
+      "useWebView": true,
+      "webRoot": "${workspaceFolder}",
+      "timeout": 60000,
+      "preLaunchTask": "tauri:debug-prep"
+    }
+  ]
+}
