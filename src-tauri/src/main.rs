@@ -242,6 +242,12 @@ fn main() {
             download_file
         ])
         .setup(|app| {
+            #[cfg(debug_assertions)]
+            {
+                let window = app.get_webview_window("main").unwrap();
+                window.open_devtools();
+            }
+
             let app_handle = app.handle();
 
             let app_data_dir = app.path().app_data_dir().unwrap();

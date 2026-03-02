@@ -2,13 +2,21 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug Tauri",
+      "name": "Debug Tauri (Windows)",
       "type": "msedge",
       "request": "launch",
       "runtimeExecutable": "${workspaceFolder}/src-tauri/target/debug/cardo.exe",
       "useWebView": true,
       "webRoot": "${workspaceFolder}",
       "timeout": 60000,
+      "preLaunchTask": "tauri:debug-prep"
+    },
+    {
+      "name": "Debug Frontend (Browser)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:1420",
+      "webRoot": "${workspaceFolder}",
       "preLaunchTask": "tauri:debug-prep"
     }
   ]
