@@ -35,7 +35,7 @@ PACKAGES=(
     patchelf
 )
 
-sudo apt-get update
+sudo apt-get update || warn "Some repositories failed to update (non-fatal)."
 sudo apt-get install -y "${PACKAGES[@]}"
 ok "System packages installed."
 
@@ -88,7 +88,7 @@ else
     if [[ "$node_ok" == true ]]; then
         read -rp "   pnpm not found. Install via npm? (y/N) " ans
         if [[ "$ans" == "y" ]]; then
-            npm install -g pnpm
+            sudo npm install -g pnpm
             ok "pnpm installed."
         else
             missing+=("pnpm")
@@ -101,8 +101,8 @@ fi
 
 # --- VS Code config ---
 step "Setting up VS Code config..."
-cp "$SCRIPT_DIR/../.vscode/launch.macos.json" "$SCRIPT_DIR/../.vscode/launch.json"
-ok "Copied launch.macos.json → .vscode/launch.json"
+cp "$SCRIPT_DIR/../.vscode/launch.linux.json" "$SCRIPT_DIR/../.vscode/launch.json"
+ok "Copied launch.linux.json → .vscode/launch.json"
 
 # --- Summary ---
 echo ""
