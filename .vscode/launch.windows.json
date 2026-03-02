@@ -5,9 +5,11 @@
       "name": "Debug Frontend",
       "type": "msedge",
       "request": "launch",
-      "url": "http://localhost:1420",
+      "runtimeExecutable": "${workspaceFolder}/src-tauri/target/debug/cardo.exe",
+      "useWebView": true,
       "webRoot": "${workspaceFolder}",
-      "preLaunchTask": "tauri:dev"
+      "timeout": 60000,
+      "preLaunchTask": "tauri:debug-prep"
     }
   ]
 }

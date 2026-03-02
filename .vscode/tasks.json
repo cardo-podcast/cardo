@@ -2,6 +2,31 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "ui:dev",
+      "type": "shell",
+      "command": "pnpm dev",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": { "regexp": "." },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "VITE",
+          "endsPattern": "Local:"
+        }
+      }
+    },
+    {
+      "label": "cargo:build",
+      "type": "shell",
+      "command": "cargo build --manifest-path ./src-tauri/Cargo.toml"
+    },
+    {
+      "label": "tauri:debug-prep",
+      "dependsOn": ["cargo:build", "ui:dev"],
+      "dependsOrder": "sequence"
+    },
+    {
       "label": "tauri:dev",
       "type": "shell",
       "command": "pnpm tauri dev",
