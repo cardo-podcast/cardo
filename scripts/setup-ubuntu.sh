@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Cardo
 set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 step()  { printf '\n\033[36m=> %s\033[0m\n' "$1"; }
 ok()    { printf '   \033[32m%s\033[0m\n' "$1"; }
@@ -97,6 +98,11 @@ else
         missing+=("pnpm")
     fi
 fi
+
+# --- VS Code config ---
+step "Setting up VS Code config..."
+cp "$SCRIPT_DIR/../.vscode/launch.macos.json" "$SCRIPT_DIR/../.vscode/launch.json"
+ok "Copied launch.macos.json → .vscode/launch.json"
 
 # --- Summary ---
 echo ""

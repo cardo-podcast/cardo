@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Frontend",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:1420",
+      "webRoot": "${workspaceFolder}",
+      "preLaunchTask": "tauri:dev"
+    }
+  ]
+}

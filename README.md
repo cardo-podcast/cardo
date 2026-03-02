@@ -66,24 +66,50 @@ It's also nice if you want to improve the app. The stack is Tauri v2 + React + T
 
 Feel free to summit a PR if you create something good!
 
-#### Prerequisites
+#### Setup
 
-You will need:
+This project uses:
 
 - [Node.js](https://nodejs.org/)
 - [pnpm](https://pnpm.io/installation)
 - [Rust](https://rustup.rs/)
 - [Tauri dependencies](https://v2.tauri.app/start/prerequisites/)
 
-Install dependencies:
-`pnpm install`
+Install these with the setup script for your platform:
+- Windows (PowerShell): 
+```bash
+./scripts/setup-windows.ps1
+```
+- MacOS: 
+```bash
+./scripts/setup-macos.sh
+```
+- Ubuntu/Debian Linux:
+```bash
+./scripts/setup-ubuntu.sh
+```
+
+Once you have successfully completed the above, you will need to install the `pnpm` packages:
+
+```bash
+pnpm install
+```
 
 #### Run and debug
 
-From the command line:
-`pnpm tauri dev`
+Debug from the command line:
+```bash
+pnpm tauri dev
+```
 
-To run/debug with Visual Studio Code, follow [the instructions in the Tauri docs](https://v2.tauri.app/develop/debug/vscode/) but replace `yarn` in the config to `pnpm`.
+Run without debugging:
+```bash
+pnpm tauri dev --release
+```
+
+For your convinenece the setup scripts will also create a ***Visual Studio Code*** `launch.json` project file for your platform. Open the Cardo folder in VS Code and it will be used automatically.
+
+For help modifying the setup with VS Code, follow [the instructions in the Tauri docs](https://v2.tauri.app/develop/debug/vscode/) but replace `yarn` in the sample config to `pnpm`.
 
 ### Translations
 

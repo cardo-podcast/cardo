@@ -142,6 +142,12 @@ if ($pnpm) {
     }
 }
 
+# --- VS Code config ---
+Write-Step "Setting up VS Code config..."
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+Copy-Item "$scriptDir\..\.vscode\launch.windows.json" "$scriptDir\..\.vscode\launch.json"
+Write-Ok "Copied launch.windows.json → .vscode\launch.json"
+
 # --- Summary ---
 Write-Host ""
 Write-Host "----------------------------------"
