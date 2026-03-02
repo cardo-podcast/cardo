@@ -2,24 +2,14 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Tauri Dev",
-      "type": "node",
+      "name": "Debug Tauri",
+      "type": "msedge",
       "request": "launch",
-      "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["tauri", "dev"],
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal",
-      "skipFiles": ["<node_internals>/**"]
-    },
-    {
-      "name": "Tauri Build",
-      "type": "node",
-      "request": "launch",
-      "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["tauri", "build"],
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal",
-      "skipFiles": ["<node_internals>/**"]
+      "runtimeExecutable": "${workspaceFolder}/src-tauri/target/debug/cardo.exe",
+      "useWebView": true,
+      "webRoot": "${workspaceFolder}",
+      "timeout": 60000,
+      "preLaunchTask": "tauri:debug-prep"
     }
   ]
 }
