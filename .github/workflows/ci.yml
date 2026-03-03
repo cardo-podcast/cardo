@@ -34,4 +34,4 @@ jobs:
         env:
           VITE_PODCASTINDEX_API_KEY: ${{ secrets.VITE_PODCASTINDEX_API_KEY }}
           VITE_PODCASTINDEX_API_SECRET: ${{ secrets.VITE_PODCASTINDEX_API_SECRET }}
-        run: pnpm tauri build ${{ matrix.args }}
+        run: pnpm tauri build --no-bundle ${{ matrix.args }}
