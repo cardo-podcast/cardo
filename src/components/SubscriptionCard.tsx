@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-// import { showMenu } from 'tauri-plugin-context-menu'
+import { Menu } from '@tauri-apps/api/menu'
 import { PodcastData } from '..'
 import { sync } from '../Icons'
 import { useDB } from '../ContextProviders'
@@ -24,18 +24,19 @@ export default function SubscriptionCard({ podcast, mini = false }: { podcast: P
           },
         })
       }
-      // onContextMenu={() => {
-      //   showMenu({
-      //     items: [
-      //       {
-      //         label: t('remove_from_subscriptions'),
-      //         event: async () => {
-      //           await subscriptions.remove(podcast.feedUrl)
-      //         },
-      //       },
-      //     ],
-      //   })
-      // }}
+      onContextMenu={async () => {
+        const menu = await Menu.new({
+          items: [
+            {
+              text: t('remove_from_subscriptions'),
+              action: async () => {
+                await subscriptions.remove(podcast.feedUrl)
+              },
+            },
+          ],
+        })
+        menu.popup()
+      }}
     >
       <div className="relative aspect-square h-10">
         <PodcastCover
