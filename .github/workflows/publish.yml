@@ -2,9 +2,8 @@ name: Releases
 
 on:
   push:
-    # Sequence of patterns matched against refs/tags
     tags:
-      - '*' # Push events to matching any tag format, i.e. 1.0, 20.15.10
+      - '*'  # Build for tags
 
 jobs:
   publish-tauri:
@@ -14,11 +13,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest' # for Arm based macs (M1 and above).
+          - platform: 'macos-latest' # Apple Silicon macs
             args: '--target aarch64-apple-darwin'
-          - platform: 'macos-latest' # for Intel based macs.
+          - platform: 'macos-latest' # Intel macs
             args: '--target x86_64-apple-darwin'
-          - platform: 'ubuntu-24.04' # for Tauri v1 you could replace this with ubuntu-20.04.
+          - platform: 'ubuntu-24.04'
             args: ''
           - platform: 'windows-latest'
             args: ''
@@ -27,27 +26,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: setup node
-        uses: actions/setup-node@v4
+      - name: setup build environment
+        uses: ./.github/actions/setup
         with:
-          node-version: lts/*
-
-      - name: install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
-
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-24.04' # This must match the platform value defined above.
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-        # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
-        # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
+          platform: ${{ matrix.platform }}
 
       - name: Get tag description
         id: tag_description
@@ -76,9 +58,6 @@ jobs:
           Remove-Item -path certificate -include tempCert.txt
           Import-PfxCertificate -FilePath certificate/certificate.pfx -CertStoreLocation Cert:\CurrentUser\My -Password (ConvertTo-SecureString -String $env:WINDOWS_CERTIFICATE_PASSWORD -Force -AsPlainText)
 
-      - name: install frontend dependencies
-        run: pnpm install # change this to npm, pnpm or bun depending on which one you use.
-
       - uses: tauri-apps/tauri-action@dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -87,7 +66,7 @@ jobs:
           VITE_PODCASTINDEX_API_KEY: ${{ secrets.VITE_PODCASTINDEX_API_KEY }}
           VITE_PODCASTINDEX_API_SECRET: ${{ secrets.VITE_PODCASTINDEX_API_SECRET }}
         with:
-          tagName: __VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
+          tagName: __VERSION__
           releaseName: '__VERSION__'
           releaseBody: ${{ steps.tag_description.outputs.MESSAGE }}
           releaseDraft: true

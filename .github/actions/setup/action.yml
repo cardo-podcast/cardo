@@ -1,0 +1,35 @@
+name: 'Setup Tauri build environment'
+description: 'Installs Node, Rust, pnpm, system deps, and frontend dependencies'
+
+inputs:
+  platform:
+    description: 'The runner platform (e.g. macos-latest, ubuntu-24.04, windows-latest)'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: setup node
+      uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+
+    - name: install Rust stable
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: ${{ inputs.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+    - name: Install pnpm
+      shell: bash
+      run: npm install -g pnpm
+
+    - name: install dependencies (ubuntu only)
+      if: inputs.platform == 'ubuntu-24.04'
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+    - name: install frontend dependencies
+      shell: bash
+      run: pnpm install
