@@ -28,6 +28,27 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const [playing, setPlaying] = useState<EpisodeData>()
   const { history, misc, downloads } = useDB()
   const [paused, setPaused] = useState(true)
+  const [position, setPosition] = useState(0)
+
+  // Set up event listeners to keep <audio> element in sync with Cardo.
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) {
+      return
+    }
+
+    const onTimeUpdate = () => setPosition(audio.currentTime)
+    const onPlay = () => setPaused(false)
+    const onPause = () => setPaused(true)
+    audio.addEventListener('timeupdate', onTimeUpdate)
+    audio.addEventListener('play', onPlay)
+    audio.addEventListener('pause', onPause)
+    return () => {
+      audio.removeEventListener('timeupdate', onTimeUpdate)
+      audio.removeEventListener('play', onPlay)
+      audio.removeEventListener('pause', onPause)
+    }
+  }, [])
 
   const loadLastPlayed = async () => {
     if (audioRef.current == null) return
@@ -76,13 +97,11 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     }
 
     audioRef.current.play()
-    setPaused(false)
   }
 
   const pause = () => {
     if (audioRef.current) {
       audioRef.current.pause()
-      setPaused(true)
     }
   }
 
@@ -115,6 +134,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
         pause,
         paused,
         playing,
+        position,
         onExit,
         quit,
       }}
@@ -268,10 +288,9 @@ function VolumeControl({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) 
 }
 
 function AudioPlayer({ className = '' }) {
-  const [position, setPosition] = useState(0)
   const [duration, setDuration] = useState(0)
   const { history, queue, downloads } = useDB()
-  const { audioRef, play, pause, playing, quit } = usePlayer()
+  const { audioRef, play, pause, paused, playing, quit, position } = usePlayer()
   const navigate = useNavigate()
   const [
     {
@@ -280,18 +299,29 @@ function AudioPlayer({ className = '' }) {
     updateSettings,
   ] = useSettings()
   const { t } = useTranslation()
+  const mediaHandlers = useRef<Record<string, () => void>>({})
 
   // #region MEDIA_KEYS
   useEffect(() => {
-    if (!globalShortcut.isRegistered('MediaPlayPause')) {
-      globalShortcut.register('MediaPlayPause', handlePlayPause)
+    const keys = ['MediaPlayPause', 'MediaTrackNext', 'MediaTrackPrevious']
+
+    async function registerShortcuts() {
+      for (const key of keys) {
+        if (!(await globalShortcut.isRegistered(key))) {
+          await globalShortcut.register(key, (event) => {
+            if (event.state === 'Pressed') {
+              mediaHandlers.current[event.shortcut]?.()
+            }
+          })
+        }
+      }
     }
 
-    if (!globalShortcut.isRegistered('MediaNextTrack')) {
-      globalShortcut.register('MediaNextTrack', () => playNextInQueue)
-    }
+    registerShortcuts()
 
-    // MediaPreviousTrack
+    return () => {
+      keys.forEach((key) => globalShortcut.unregister(key))
+    }
   }, [])
   // #endregion
 
@@ -313,7 +343,11 @@ function AudioPlayer({ className = '' }) {
 
   const handlePlayPause = () => {
     if (audioRef.current) {
-      audioRef.current.paused ? play() : pause()
+      if (audioRef.current.paused) {
+        play()
+      } else {
+        pause()
+      }
     }
   }
 
@@ -330,6 +364,15 @@ function AudioPlayer({ className = '' }) {
     }
   }
 
+  // Register callbacks on mediaHandlers.current
+  useEffect(() => {
+    mediaHandlers.current = {
+      MediaPlayPause: handlePlayPause,
+      MediaTrackNext: playNextInQueue,
+      MediaTrackPrevious: () => changeTime(0),
+    }
+  })
+
   const changeTime = (newTime: number, relative = false) => {
     if (audioRef.current) {
       if (relative) {
@@ -340,7 +383,6 @@ function AudioPlayer({ className = '' }) {
       newTime = Math.min(newTime, audioRef.current.duration - 0.01)
 
       audioRef.current.currentTime = newTime
-      setPosition(newTime)
     }
   }
 
@@ -356,7 +398,6 @@ function AudioPlayer({ className = '' }) {
         ref={audioRef}
         className="hidden"
         onLoadedMetadata={handleLoadedMetadata}
-        onTimeUpdate={(e: SyntheticEvent<HTMLAudioElement>) => setPosition(e.currentTarget.currentTime)}
       />
 
       {playing && (
@@ -434,7 +475,7 @@ function AudioPlayer({ className = '' }) {
                     className="hover: mb-2 flex w-9 items-center hover:text-accent-6 focus:outline-none"
                     onClick={handlePlayPause}
                   >
-                    <span className="w-9">{audioRef.current?.paused ? playIcon : pauseIcon}</span>
+                    <span className="w-9">{paused ? playIcon : pauseIcon}</span>
                   </button>
 
                   <button

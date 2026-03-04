@@ -161,6 +161,7 @@ export type AudioPlayerRef = {
   pause: () => void
   paused: boolean
   playing: EpisodeData | undefined
+  position: number
   onExit: () => Promise<void>
   quit: () => void
 }

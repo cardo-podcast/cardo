@@ -90,45 +90,57 @@ export function useQueue(db: Database) {
     return query.lastInsertId
   }
 
-  const indexOf = (episodeSrc: string) => {
+  const indexOf = useCallback((episodeSrc: string) => {
     return queue.findIndex((episode) => episode.src === episodeSrc)
-  }
-
-  // #endregion
-
-  const unshift = useCallback(
-    async function (episode: EpisodeData) {
-      if (includes(episode.src)) return
-
-      const id = await insertOnDb(episode)
-
-      if (id !== undefined) {
-        // episode appended to queue
-        setQueue((prev) => [{ ...episode, id: id }, ...prev])
-      }
-    },
-    [insertOnDb],
-  )
-
-  const push = useCallback(
-    async function (episode: EpisodeData) {
-      if (includes(episode.src)) return
-
-      const id = await insertOnDb(episode)
-
-      if (id !== undefined) {
-        // episode appended to queue
-        setQueue((prev) => [...prev, { ...episode, id: id }])
-      }
-    },
-    [db],
-  )
+  }, [queue])
 
   const includes = useCallback(
     function (episodeSrc: string) {
       return indexOf(episodeSrc) > -1
     },
     [indexOf],
+  )
+
+  // #endregion
+
+  const unshift = useCallback(
+    async function (episode: EpisodeData) {
+      if (includes(episode.src)) {
+        return
+      }
+
+      const id = await insertOnDb(episode)
+
+      if (id !== undefined) {
+        setQueue((prev) => {
+          if (prev.some((ep) => ep.src === episode.src)) {
+            return prev
+          }
+          return [{ ...episode, id: id }, ...prev]
+        })
+      }
+    },
+    [insertOnDb, includes],
+  )
+
+  const push = useCallback(
+    async function (episode: EpisodeData) {
+      if (includes(episode.src)) {
+        return
+      }
+
+      const id = await insertOnDb(episode)
+
+      if (id !== undefined) {
+        setQueue((prev) => {
+          if (prev.some((ep) => ep.src === episode.src)) {
+            return prev
+          }
+          return [...prev, { ...episode, id: id }]
+        })
+      }
+    },
+    [insertOnDb, includes],
   )
 
   const next = useCallback(
