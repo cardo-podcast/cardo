@@ -1,16 +1,19 @@
+import { usePlayerPosition } from '../ContextProviders'
 import { secondsToStr } from '../utils/utils'
+
+type ProgressBarProps = {
+  position: number
+  total: number
+  showTime?: boolean
+  className?: { div?: string; bar?: string; innerBar?: string }
+}
 
 const ProgressBar = ({
   position,
   total,
   showTime = true,
   className,
-}: {
-  position: number
-  total: number
-  showTime?: boolean
-  className?: { div?: string; bar?: string; innerBar?: string }
-}) => {
+}: ProgressBarProps) => {
   const progressStyle = {
     width: `${(position / total) * 100}%`,
   }
@@ -24,6 +27,11 @@ const ProgressBar = ({
       {showTime && <p>{secondsToStr(total)}</p>}
     </div>
   )
+}
+
+export function LiveProgressBar(props: Omit<ProgressBarProps, 'position'>) {
+  const position = usePlayerPosition()
+  return <ProgressBar {...props} position={position} />
 }
 
 export default ProgressBar

@@ -4,7 +4,7 @@ import { EpisodeData } from '..'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { parsePodcastDetails, secondsToStr } from '../utils/utils'
 import { useTranslation } from 'react-i18next'
-import ProgressBar from '../components/ProgressBar'
+import ProgressBar, { LiveProgressBar } from '../components/ProgressBar'
 import { useEpisode } from '../engines/Episode'
 import { sanitizeHTML } from '../utils/sanitize'
 import { Menu } from '@tauri-apps/api/menu';
@@ -27,6 +27,7 @@ function EpisodePreview() {
     toggleQueue,
     position,
     inProgress,
+    isPlaying,
     toggleDownload,
     downloadState,
     play,
@@ -113,11 +114,18 @@ function EpisodePreview() {
           </div>
           <div className="flex items-center justify-end gap-2">
             {inProgress() ? (
-              <ProgressBar
-                position={position}
-                total={episode.duration}
-                className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }}
-              />
+              isPlaying ? (
+                <LiveProgressBar
+                  total={episode.duration}
+                  className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }}
+                />
+              ) : (
+                <ProgressBar
+                  position={position}
+                  total={episode.duration}
+                  className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }}
+                />
+              )
             ) : (
               secondsToStr(episode.duration)
             )}
