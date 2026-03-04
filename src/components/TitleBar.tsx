@@ -32,7 +32,9 @@ function TitleBar() {
     }
   }
 
-  appWindow.isMaximized().then((m) => setMaximized(m))
+  useEffect(() => {
+    appWindow.isMaximized().then((m) => setMaximized(m))
+  }, [])
 
   useEffect(() => {
     /* listen onCloseRequest to do exit actions when close is not triggered
@@ -75,7 +77,7 @@ function TitleBar() {
       </div>
 
       <h1
-        className="absolute left-1/2 -translate-x-1/2 cursor-default"
+        className="absolute left-1/2 -translate-x-1/2 cursor-default select-none"
         data-tauri-drag-region={true}
         onDragStart={appWindow.startDragging}
       >
