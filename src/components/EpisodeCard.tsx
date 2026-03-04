@@ -4,7 +4,7 @@ import * as icons from '../Icons'
 import { useNavigate } from 'react-router-dom'
 import { stripAllHTML } from '../utils/stripAllHTML'
 import { secondsToStr } from '../utils/utils'
-import ProgressBar from './ProgressBar'
+import ProgressBar, { LiveProgressBar } from './ProgressBar'
 import { useTranslation } from 'react-i18next'
 import { Menu } from '@tauri-apps/api/menu'
 import { useEpisode } from '../engines/Episode'
@@ -33,6 +33,7 @@ function EpisodeCard({
     toggleQueue,
     position,
     inProgress,
+    isPlaying,
     play,
     pause,
     toggleDownload,
@@ -91,11 +92,18 @@ function EpisodeCard({
           </h2>
           <div className="flex w-full items-center justify-end gap-2">
             {inProgress() ? (
-              <ProgressBar
-                position={position}
-                total={reprState.total}
-                className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }}
-              />
+              isPlaying ? (
+                <LiveProgressBar
+                  total={reprState.total}
+                  className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }}
+                />
+              ) : (
+                <ProgressBar
+                  position={position}
+                  total={reprState.total}
+                  className={{ div: 'h-1', bar: 'rounded', innerBar: 'rounded' }}
+                />
+              )
             ) : (
               secondsToStr(reprState.total)
             )}

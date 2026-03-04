@@ -16,14 +16,10 @@ export function useEpisode(episode: EpisodeData) {
       globals: { locale },
     },
   ] = useSettings()
-  const { play: playEpisode, pause, paused, playing, quit: quitPlayer, position: playerPosition } = usePlayer()
+  const { play: playEpisode, pause, paused, playing, quit: quitPlayer } = usePlayer()
   const downloadedFile = useRef('')
 
-  useEffect(() => {
-    if (episode.src === playing?.src) {
-      setReprState((prev) => ({ ...prev, position: playerPosition }))
-    }
-  }, [episode.src, playing?.src, playerPosition])
+  const isCurrentlyPlaying = playing?.src === episode.src
 
   useEffect(() => {
     if (episode.src) {
@@ -88,14 +84,14 @@ export function useEpisode(episode: EpisodeData) {
 
   const inProgress = useCallback(
     (mustBePlaying = false) => {
-      const isStarted = reprState.position > 0 && !reprState.complete
+      const isStarted = (reprState.position > 0 && !reprState.complete) || isCurrentlyPlaying
       if (mustBePlaying) {
-        return isStarted && playing?.src === episode.src && !paused
+        return isStarted && isCurrentlyPlaying && !paused
       } else {
         return isStarted
       }
     },
-    [playing?.src, episode.src, reprState.position, reprState.complete, paused],
+    [isCurrentlyPlaying, reprState.position, reprState.complete, paused],
   )
 
   const download = async () => {
@@ -147,6 +143,7 @@ export function useEpisode(episode: EpisodeData) {
     toggleQueue,
     position: reprState.position,
     inProgress,
+    isPlaying: isCurrentlyPlaying,
     toggleDownload,
     downloadState,
     play,

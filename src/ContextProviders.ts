@@ -11,3 +11,6 @@ export const useDB = () => useContext(DBContext) as DB
 
 export const PlayerContext = createContext<AudioPlayerRef | undefined>(undefined)
 export const usePlayer = () => useContext(PlayerContext) as AudioPlayerRef
+
+export const PlayerPositionContext = createContext<number>(0)
+export const usePlayerPosition = () => useContext(PlayerPositionContext)

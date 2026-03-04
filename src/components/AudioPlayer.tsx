@@ -19,16 +19,33 @@ import appIcon from '../../src-tauri/icons/icon.png'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import round from 'lodash/round'
 import { RangeInput } from './Inputs'
-import { PlayerContext, useDB, usePlayer } from '../ContextProviders'
+import { PlayerContext, PlayerPositionContext, useDB, usePlayer, usePlayerPosition } from '../ContextProviders'
 import { EpisodeCover } from './Cover'
 import * as globalShortcut from "@tauri-apps/plugin-global-shortcut"
+
+function PositionProvider({ audioRef, children }: { audioRef: RefObject<HTMLAudioElement | null>; children: ReactNode }) {
+  const [position, setPosition] = useState(0)
+
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) { return }
+    const onTimeUpdate = () => setPosition(audio.currentTime)
+    audio.addEventListener('timeupdate', onTimeUpdate)
+    return () => audio.removeEventListener('timeupdate', onTimeUpdate)
+  }, [])
+
+  return (
+    <PlayerPositionContext.Provider value={position}>
+      {children}
+    </PlayerPositionContext.Provider>
+  )
+}
 
 export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playing, setPlaying] = useState<EpisodeData>()
   const { history, misc, downloads } = useDB()
   const [paused, setPaused] = useState(true)
-  const [position, setPosition] = useState(0)
 
   // Set up event listeners to keep <audio> element in sync with Cardo.
   useEffect(() => {
@@ -37,14 +54,11 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
       return
     }
 
-    const onTimeUpdate = () => setPosition(audio.currentTime)
     const onPlay = () => setPaused(false)
     const onPause = () => setPaused(true)
-    audio.addEventListener('timeupdate', onTimeUpdate)
     audio.addEventListener('play', onPlay)
     audio.addEventListener('pause', onPause)
     return () => {
-      audio.removeEventListener('timeupdate', onTimeUpdate)
       audio.removeEventListener('play', onPlay)
       audio.removeEventListener('pause', onPause)
     }
@@ -134,12 +148,13 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
         pause,
         paused,
         playing,
-        position,
         onExit,
         quit,
       }}
     >
-      {children}
+      <PositionProvider audioRef={audioRef}>
+        {children}
+      </PositionProvider>
     </PlayerContext.Provider>
   )
 }
@@ -290,7 +305,8 @@ function VolumeControl({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) 
 function AudioPlayer({ className = '' }) {
   const [duration, setDuration] = useState(0)
   const { history, queue, downloads } = useDB()
-  const { audioRef, play, pause, paused, playing, quit, position } = usePlayer()
+  const { audioRef, play, pause, paused, playing, quit } = usePlayer()
+  const position = usePlayerPosition()
   const navigate = useNavigate()
   const [
     {

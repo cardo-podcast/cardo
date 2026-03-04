@@ -3,7 +3,7 @@
 import { EpisodeData, NewEpisodeData } from '..'
 import * as icons from '../Icons'
 import { useNavigate } from 'react-router-dom'
-import ProgressBar from './ProgressBar'
+import ProgressBar, { LiveProgressBar } from './ProgressBar'
 import { useTranslation } from 'react-i18next'
 import { Menu } from '@tauri-apps/api/menu'
 import { useEpisode } from '../engines/Episode'
@@ -19,6 +19,7 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
     togglePlayed,
     toggleQueue,
     position,
+    isPlaying,
     play,
     toggleDownload,
     downloadState,
@@ -63,12 +64,20 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
             })
           }}
         />
-        <ProgressBar
-          position={position}
-          total={episode.duration}
-          showTime={false}
-          className={{ div: 'h-2 shrink-0' }}
-        />
+        {isPlaying ? (
+          <LiveProgressBar
+            total={episode.duration}
+            showTime={false}
+            className={{ div: 'h-2 shrink-0' }}
+          />
+        ) : (
+          <ProgressBar
+            position={position}
+            total={episode.duration}
+            showTime={false}
+            className={{ div: 'h-2 shrink-0' }}
+          />
+        )}
 
         <button
           className="border-accent-8 bg-accent-7 absolute right-2 bottom-2 flex aspect-square w-7 items-center justify-center rounded-full border-2 p-[3px] pl-[4px] transition-all hover:p-px"
