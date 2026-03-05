@@ -4,7 +4,7 @@ import { sync, home, settings, queue, download } from '../Icons'
 import SubscriptionCard from './SubscriptionCard'
 import { useSettings } from '../engines/Settings'
 import { useModalBanner } from './ModalBanner'
-import { checkURLScheme, parsePodcastDetails, toastError } from '../utils/utils'
+import { parsePodcastDetails, toastError } from '../utils/utils'
 import { useRef } from 'react'
 import { useDB } from '../ContextProviders'
 
@@ -14,12 +14,22 @@ function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
 
+  function checkURLScheme() {
+    // If no scheme is specified, attempt to append https:// to the URL.
+    if (inputRef.current &&
+      inputRef.current.value.length >= 3 &&
+      !inputRef.current.value.includes('://')) {
+        inputRef.current.value = 'https://' + inputRef.current.value;
+    }
+  }
+
   return (
     <>
       <Banner
         labels={[t('ok'), t('cancel')]}
         onSubmit={async () => {
           if (!inputRef.current) return
+          checkURLScheme()
 
           if (!inputRef.current.validity.valid) {
             toastError(t('please_indicate_url'))
@@ -39,11 +49,16 @@ function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
           <input
             ref={inputRef}
             type="url"
-            onInput={checkURLScheme}
             placeholder={t('feed_url')}
             autoFocus
             className="w-96 rounded-md bg-primary-8 px-2 py-1 focus:outline-none"
             onContextMenu={(e) => e.stopPropagation()}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                checkURLScheme();
+              }
+            }}
+            onBlur={checkURLScheme}
           />
         </div>
       </Banner>
