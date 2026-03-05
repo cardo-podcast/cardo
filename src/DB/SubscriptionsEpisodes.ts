@@ -3,7 +3,7 @@ import Database from '@tauri-apps/plugin-sql'
 import { EpisodeData, NewEpisodeData, PodcastData, RawEpisodeData } from '..'
 import { parseXML, toastError } from '../utils/utils'
 
-export function useSubscriptionsEpisodes(db: Database) {
+export function useSubscriptionsEpisodesStore(db: Database) {
   const [fetchingFeeds, setFetchingFeeds] = useState<number[]>([]) //id of the feed that it's been downloaded
 
   async function fetchFeed(subscription: PodcastData) {

@@ -5,7 +5,7 @@ import { getPodcastSettings, useSettings } from '../engines/Settings'
 import { DB } from '.'
 import { downloadEpisode } from '../utils/utils'
 
-export function useSubscriptions(
+export function useSubscriptionsStore(
   db: Database,
   subscriptionsEpisodes: DB['subscriptionsEpisodes'],
   downloads: DB['downloads'],

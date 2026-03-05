@@ -3,16 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { Menu } from '@tauri-apps/api/menu'
 import { PodcastData } from '..'
 import { sync } from '../Icons'
-import { useDB } from '../ContextProviders'
+import { useSubscriptions, useSubscriptionsEpisodes } from '../ContextProviders'
 import { PodcastCover } from './Cover'
 
 export default function SubscriptionCard({ podcast, mini = false }: { podcast: PodcastData; mini?: boolean }) {
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const {
-    subscriptions,
-    subscriptionsEpisodes: { fetchingFeeds },
-  } = useDB()
+  const subscriptions = useSubscriptions()
+  const { fetchingFeeds } = useSubscriptionsEpisodes()
 
   return (
     <div

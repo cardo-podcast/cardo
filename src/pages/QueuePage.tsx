@@ -7,14 +7,13 @@ import { capitalize, parsePodcastDetails } from '../utils/utils'
 import { useNavigate } from 'react-router-dom'
 import { Suspense, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDB } from '../ContextProviders'
+import { useQueue, useSubscriptions, useHistory } from '../ContextProviders'
 
 export default function QueuePage() {
-  const {
-    queue: { queue, move, batchRemove },
-  } = useDB()
+  const { queue, move, batchRemove } = useQueue()
   const navigate = useNavigate()
-  const { subscriptions, history } = useDB()
+  const subscriptions = useSubscriptions()
+  const history = useHistory()
   const { t } = useTranslation()
   const [queueInfo, setQueueInfo] = useState('')
 

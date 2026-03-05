@@ -2,16 +2,14 @@ import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { login } from '../../sync/Nextcloud'
 import { checkURLScheme, saveCreds, toastError } from '../../utils/utils'
-import { useDB, useSync } from '../../ContextProviders'
+import { useMisc, useSync } from '../../ContextProviders'
 import { invoke } from '@tauri-apps/api/core'
 
 export function NextcloudSettings() {
   const interval = useRef<ReturnType<typeof setInterval>>(null)
   const { t } = useTranslation()
   const { setLoggedIn } = useSync()
-  const {
-    misc: { getSyncKey, setSyncKey },
-  } = useDB()
+  const { getSyncKey, setSyncKey } = useMisc()
 
   useEffect(() => {
     return () => clearInterval(interval.current ?? 0)

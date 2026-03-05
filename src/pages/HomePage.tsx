@@ -2,13 +2,11 @@ import EpisodePreviewCard from '../components/EpisodePreviewCard'
 import { useTranslation } from 'react-i18next'
 import EpisodeOverview from '../components/EpisodeOverview'
 import appIcon from '../../src-tauri/icons/icon.png'
-import { useDB } from '../ContextProviders'
+import { useQueue, useSubscriptions } from '../ContextProviders'
 
 function HomePage() {
-  const {
-    queue,
-    subscriptions: { latestEpisodes },
-  } = useDB()
+  const queue = useQueue()
+  const { latestEpisodes } = useSubscriptions()
   const { t } = useTranslation()
 
   return (

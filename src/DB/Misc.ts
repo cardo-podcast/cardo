@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import Database from '@tauri-apps/plugin-sql'
 import { EpisodeData } from '..'
 
-export function useMisc(db: Database) {
+export function useMiscStore(db: Database) {
   // #region COMMON INTERNAL FUNCTIONS
   const getMiscKey = async (key: string): Promise<string | undefined> => {
     const r: { value: string }[] = await db.select(
