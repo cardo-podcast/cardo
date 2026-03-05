@@ -64,6 +64,19 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  useEffect(() => {
+    if (playing) {
+      const artworkSrc = playing.coverUrl || playing.podcast?.coverUrlLarge || playing.podcast?.coverUrl
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: playing.title,
+        artist: playing.podcast?.podcastName,
+        artwork: artworkSrc ? [{ src: artworkSrc }] : [],
+      })
+    } else {
+      navigator.mediaSession.metadata = null
+    }
+  }, [playing])
+
   const loadLastPlayed = async () => {
     if (audioRef.current == null) return
 
