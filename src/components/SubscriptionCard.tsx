@@ -8,9 +8,9 @@ import { PodcastCover } from './Cover'
 
 export default function SubscriptionCard({ podcast, mini = false }: { podcast: PodcastData; mini?: boolean }) {
   const navigate = useNavigate()
-  const { t } = useTranslation()
+  //const { t } = useTranslation()
   const {
-    subscriptions,
+    //subscriptions,
     subscriptionsEpisodes: { fetchingFeeds },
   } = useDB()
 
