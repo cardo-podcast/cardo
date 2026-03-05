@@ -43,6 +43,7 @@ function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
             placeholder={t('feed_url')}
             autoFocus
             className="w-96 rounded-md bg-primary-8 px-2 py-1 focus:outline-none"
+            onContextMenu={(e) => e.stopPropagation()}
           />
         </div>
       </Banner>
