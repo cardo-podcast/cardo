@@ -4,10 +4,12 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { EpisodeData } from '..'
 import { useSettings } from './Settings'
 import { downloadEpisode, removeDownloadedEpisode } from '../utils/utils'
-import { useDB, usePlayer } from '../ContextProviders'
+import { useQueue, useHistory, useDownloads, usePlayer } from '../ContextProviders'
 
 export function useEpisode(episode: EpisodeData) {
-  const { queue, history, downloads } = useDB()
+  const queue = useQueue()
+  const history = useHistory()
+  const downloads = useDownloads()
   const [inQueue, setInqueue] = useState(queue.includes(episode.src))
   const [downloadState, setDownloadState] = useState<'downloaded' | ['downloading', number] | undefined>()
   const [reprState, setReprState] = useState({ position: 0, total: episode.duration, complete: false })

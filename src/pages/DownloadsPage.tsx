@@ -4,14 +4,13 @@ import { capitalize, parsePodcastDetails, removeDownloadedEpisode } from '../uti
 import { useNavigate } from 'react-router-dom'
 import { Suspense, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDB } from '../ContextProviders'
+import { useDownloads, useSubscriptions, useHistory } from '../ContextProviders'
 
 export default function DownloadsPage() {
-  const {
-    downloads: { downloads, batchRemoveFromDownloadList },
-  } = useDB()
+  const { downloads, batchRemoveFromDownloadList } = useDownloads()
   const navigate = useNavigate()
-  const { subscriptions, history } = useDB()
+  const subscriptions = useSubscriptions()
+  const history = useHistory()
   const { t } = useTranslation()
   const [downloadsInfo, setDownloadsInfo] = useState('')
 

@@ -6,15 +6,13 @@ import { useTranslation } from 'react-i18next'
 import { arrowLeft, arrowRight, sync, search as searchIcon } from '../Icons'
 import { useLocation, useNavigate } from 'react-router-dom'
 import EpisodeCard from './EpisodeCard'
-import { useDB } from '../ContextProviders'
+import { useSubscriptionsEpisodes, useSubscriptions } from '../ContextProviders'
 import { useSettings } from '../engines/Settings'
 
 function SearchBar() {
   const [results, setResults] = useState<PodcastData[] | EpisodeData[]>([])
-  const {
-    subscriptionsEpisodes,
-    subscriptions: { subscriptions },
-  } = useDB()
+  const subscriptionsEpisodes = useSubscriptionsEpisodes()
+  const { subscriptions } = useSubscriptions()
   const [searchMode, setSearchMode_] = useState<'subscriptions' | 'podcasts' | 'current'>(
     subscriptions.length > 0 ? 'subscriptions' : 'podcasts',
   )

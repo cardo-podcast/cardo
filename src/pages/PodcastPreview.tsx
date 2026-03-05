@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 import { sanitizeHTML } from '../utils/sanitize'
 import { Menu } from '@tauri-apps/api/menu'
-import { useSync, useDB } from '../ContextProviders'
+import { useSync, useSubscriptions, useHistory, useSubscriptionsEpisodes } from '../ContextProviders'
 import { PodcastCover } from '../components/Cover'
 import { useModalBanner } from '../components/ModalBanner'
 
@@ -59,11 +59,9 @@ function PodcastPreview() {
 
   const [episodes, setEpisodes] = useState<EpisodeData[]>([])
   const [downloading, setDownloading] = useState(false)
-  const {
-    subscriptions,
-    history: { getCompleted },
-    subscriptionsEpisodes,
-  } = useDB()
+  const subscriptions = useSubscriptions()
+  const { getCompleted } = useHistory()
+  const subscriptionsEpisodes = useSubscriptionsEpisodes()
   const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcast.feedUrl)
   const { sync, loggedIn: loggedInSync } = useSync()
   const isSubscribed = subscriptions.includes(podcast.feedUrl)

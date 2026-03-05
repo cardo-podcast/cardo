@@ -6,26 +6,23 @@ import { parse } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import { upArrow } from './Icons'
 import { useModalBanner } from './components/ModalBanner'
-import { useDB } from './ContextProviders'
+import { useMisc } from './ContextProviders'
 
 export default function Updater() {
   const unlistenCeckUpdates = useRef<UnlistenFn>(null)
   const [dialog, setDialog] = useState<{ version: string; releaseNotes: string }>()
   const installUpdate = useRef<Update['install']>(null)
   const [showBanner, Banner] = useModalBanner()
-  const {
-    misc: { getLastUpdate, setLastUpdate },
-    dbLoaded,
-  } = useDB()
+  const { getLastUpdate, setLastUpdate } = useMisc()
   const { t } = useTranslation()
 
   useEffect(() => {
-    dbLoaded && checkUpdates()
+    checkUpdates()
 
     return () => {
       unlistenCeckUpdates.current && unlistenCeckUpdates.current()
     }
-  }, [dbLoaded])
+  }, [])
 
   const checkUpdates = async () => {
     try {

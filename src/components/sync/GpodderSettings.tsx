@@ -1,15 +1,13 @@
 import { useTranslation } from 'react-i18next'
 import { checkURLScheme, saveCreds, toastError } from '../../utils/utils'
-import { useDB, useSync } from '../../ContextProviders'
+import { useMisc, useSync } from '../../ContextProviders'
 import { invoke } from '@tauri-apps/api/core'
 import { login } from '../../sync/Gpodder'
 
 export function GpodderSettings() {
   const { t } = useTranslation()
   const { setLoggedIn } = useSync()
-  const {
-    misc: { getSyncKey, setSyncKey },
-  } = useDB()
+  const { getSyncKey, setSyncKey } = useMisc()
 
   return (
     <div className="flex h-full w-full gap-2 p-1">

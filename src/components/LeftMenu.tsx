@@ -6,7 +6,7 @@ import { useSettings } from '../engines/Settings'
 import { useModalBanner } from './ModalBanner'
 import { parsePodcastDetails, toastError } from '../utils/utils'
 import { useRef } from 'react'
-import { useDB } from '../ContextProviders'
+import { useSubscriptions, useSubscriptionsEpisodes } from '../ContextProviders'
 
 function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
   const { t } = useTranslation()
@@ -81,7 +81,8 @@ function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
 }
 
 function LeftMenu() {
-  const { subscriptions, subscriptionsEpisodes } = useDB()
+  const subscriptions = useSubscriptions()
+  const subscriptionsEpisodes = useSubscriptionsEpisodes()
   const { t } = useTranslation()
   const [
     {

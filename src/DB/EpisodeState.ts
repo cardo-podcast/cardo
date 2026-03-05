@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import Database from '@tauri-apps/plugin-sql'
 import { EpisodeState } from '..'
 
-export function useEpisodeState(db: Database) {
+export function useEpisodeStateStore(db: Database) {
   const get = useCallback(
     async function (episodeUrl: string): Promise<EpisodeState | undefined> {
       const r: EpisodeState[] = await db.select('SELECT * from episodes_history WHERE episode = $1', [episodeUrl])

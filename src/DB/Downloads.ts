@@ -5,7 +5,7 @@ import Database from '@tauri-apps/plugin-sql'
 // #region DOWNLOADS
 type DownloadedEpisode = EpisodeData & { localFile: string }
 
-export function useDownloads(db: Database) {
+export function useDownloadsStore(db: Database) {
   const [downloads, setDownloads] = useState<DownloadedEpisode[]>([])
   const [loaded, setLoaded] = useState(false)
 

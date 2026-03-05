@@ -1,8 +1,8 @@
-import { useDB } from '../ContextProviders'
+import { useSubscriptions } from '../ContextProviders'
 import { parsePodcastDetails } from './utils'
 
 export function useOPML(): [typeof importOPML, typeof exportOPML] {
-  const { subscriptions } = useDB()
+  const subscriptions = useSubscriptions()
 
   function importOPML(file: File) {
     const reader = new FileReader()
