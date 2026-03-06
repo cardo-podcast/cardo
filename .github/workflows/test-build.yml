@@ -10,10 +10,10 @@ jobs:
       matrix:
         include:
           - platform: 'macos-latest'
-            args: '--target aarch64-apple-darwin'
+            args: '--target aarch64-apple-darwin --bundles app'
             artifact: 'cardo-macos-arm64'
           - platform: 'macos-latest'
-            args: '--target x86_64-apple-darwin'
+            args: '--target x86_64-apple-darwin --bundles app'
             artifact: 'cardo-macos-x64'
           - platform: 'ubuntu-24.04'
             args: ''
@@ -35,7 +35,7 @@ jobs:
         env:
           VITE_PODCASTINDEX_API_KEY: ${{ secrets.VITE_PODCASTINDEX_API_KEY }}
           VITE_PODCASTINDEX_API_SECRET: ${{ secrets.VITE_PODCASTINDEX_API_SECRET }}
-        run: pnpm tauri build ${{ matrix.args }}
+        run: pnpm tauri build ${{ matrix.args }} --config '{"bundle":{"createUpdaterArtifacts":false}}'
 
       - name: upload artifacts
         uses: actions/upload-artifact@v4
