@@ -139,6 +139,7 @@ function SearchBar() {
           type="text"
           placeholder={t('search_placeholder')}
           className={`peer w-full bg-primary-9 px-2 py-1 focus:outline-none ${noResults && inputRef.current?.value && 'font-semibold text-red-600'}`}
+          onContextMenu={(e) => e.stopPropagation()}
           onChange={(event) => {
             handleChange(event.target.value)
           }}
