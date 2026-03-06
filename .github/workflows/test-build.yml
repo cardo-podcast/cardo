@@ -16,10 +16,10 @@ jobs:
             args: '--target x86_64-apple-darwin --bundles app'
             artifact: 'cardo-macos-x64'
           - platform: 'ubuntu-24.04'
-            args: ''
+            args: '--bundles deb appimage'
             artifact: 'cardo-linux'
           - platform: 'windows-latest'
-            args: ''
+            args: '--bundles nsis'
             artifact: 'cardo-windows'
 
     runs-on: ${{ matrix.platform }}
@@ -32,6 +32,7 @@ jobs:
           platform: ${{ matrix.platform }}
 
       - name: build
+        shell: bash
         env:
           VITE_PODCASTINDEX_API_KEY: ${{ secrets.VITE_PODCASTINDEX_API_KEY }}
           VITE_PODCASTINDEX_API_SECRET: ${{ secrets.VITE_PODCASTINDEX_API_SECRET }}
