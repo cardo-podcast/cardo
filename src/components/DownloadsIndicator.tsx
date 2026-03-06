@@ -64,7 +64,7 @@ export default function DownloadsIndicator() {
           fill="none"
           strokeWidth="15"
           transform="rotate(-90)"
-          transform-origin="50 50"
+          style={{ transformOrigin: '50px 50px' }}
           strokeDasharray={2 * Math.PI * 35}
           strokeDashoffset={2 * Math.PI * 35 * (1 - progress)}
         />

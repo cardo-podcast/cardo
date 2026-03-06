@@ -1,4 +1,4 @@
-import { MouseEventHandler, useRef } from 'react'
+import React, { MouseEventHandler, useRef } from 'react'
 import { EpisodeData } from '..'
 import * as icons from '../Icons'
 import { useNavigate } from 'react-router-dom'
@@ -123,4 +123,4 @@ function EpisodeCard({
   )
 }
 
-export default EpisodeCard
+export default React.memo(EpisodeCard)
