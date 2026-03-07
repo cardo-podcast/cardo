@@ -26,22 +26,27 @@ const App = () => {
   useEffect(() => {
     if (platform() === 'macos') {
       return // no rounded corners on mac (https://github.com/agmmnn/tauri-controls/issues/10)
-    } else {
-      async function handleResize() {
-        const isMaximized = await appWindow.isMaximized()
-        setRoundedCorners(!isMaximized)
-      }
-
-      appWindow.onResized(handleResize)
-      handleResize()
     }
-  }, [appWindow])
+
+    async function handleResize() {
+      const isMaximized = await appWindow.isMaximized()
+      setRoundedCorners(!isMaximized)
+    }
+
+    const unlistenResized = appWindow.onResized(handleResize)
+    handleResize()
+
+    return () => {
+      unlistenResized.then((unlisten) => unlisten())
+    }
+  }, [])
 
   // prevent webview context menu
   useEffect(() => {
-    document.addEventListener('contextmenu', (event) => event.preventDefault())
+    const preventContextMenu = (event: MouseEvent) => event.preventDefault()
+    document.addEventListener('contextmenu', preventContextMenu)
 
-    return () => document.removeEventListener('contextmenu', (event) => event.preventDefault())
+    return () => document.removeEventListener('contextmenu', preventContextMenu)
   }, [])
 
   return (
