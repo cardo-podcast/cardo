@@ -170,3 +170,10 @@ It's only necessary to replicate json files in [the translations folder](resourc
 ## Troubleshooting
 
 On Windows you may experience a Windows shield alert, that's because the app is signed with a self-signed certificate, not a paid one. Maybe alerts will stop appearing if the app earns some reputation. Of course you don't have to believe me, inspecting the code and building it by yourself is always the safer option.
+
+## Logs
+
+Recent logs are saved to one of the following directories. It may be helpful to include the logs when filing a bug report. 
+- Windows: `%LOCALAPPDATA%\cardo\logs\`
+- MacOS: `~/Library/Logs/cardo/`
+- Linux: `~/.config/cardo/logs/`
