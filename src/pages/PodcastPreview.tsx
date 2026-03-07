@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router-dom'
 import { EpisodeData, PodcastData, SortCriterion } from '..'
-import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import { ReactNode, useEffect, useRef, useState } from 'react'
 import * as icons from '../Icons'
 import { checkURLScheme, parseXML, toastError } from '../utils/utils'
 import EpisodeCard from '../components/EpisodeCard'
@@ -65,7 +65,7 @@ function PodcastPreview() {
   const [podcastSettings, updatePodcastSettings] = usePodcastSettings(podcast.feedUrl)
   const { sync, loggedIn: loggedInSync } = useSync()
   const isSubscribed = subscriptions.includes(podcast.feedUrl)
-  const allEpisodes = useMemo(async () => await getAllEpisodes(), [podcast.feedUrl])
+  const cachedEpisodesRef = useRef<{ feedUrl: string; episodes: EpisodeData[] }>({ feedUrl: '', episodes: [] })
 
   const [tweakMenu, setTweakMenu] = useState<'sort' | 'filter' | 'settings' | undefined>(undefined)
   const { t } = useTranslation()
@@ -142,8 +142,14 @@ function PodcastPreview() {
   }
 
   async function loadEpisodes(forceDownload = false) {
-    const episodes = await (forceDownload ? getAllEpisodes(true) : allEpisodes)
-    setEpisodes(sortEpisodes(await filterEpisodes(episodes)))
+    let eps: EpisodeData[]
+    if (forceDownload || cachedEpisodesRef.current.feedUrl !== podcast.feedUrl) {
+      eps = await getAllEpisodes(forceDownload)
+      cachedEpisodesRef.current = { feedUrl: podcast.feedUrl, episodes: eps }
+    } else {
+      eps = cachedEpisodesRef.current.episodes
+    }
+    setEpisodes(sortEpisodes(await filterEpisodes(eps)))
 
     forceDownload && subscriptions.loadLatestEpisodes() // when updating feed from button on podcast page latest episodes are refreshed
   }
@@ -189,9 +195,14 @@ function PodcastPreview() {
 
   useEffect(() => {
     if (!scrollRef.current) return
-    const elementsOnWindow = Math.floor(scrollRef.current.clientHeight / EPISODE_CARD_HEIGHT) + 1
-    setVisibleItems(Math.max(visibleItems, elementsOnWindow))
-  }, [scrollRef.current?.clientHeight])
+    const el = scrollRef.current
+    const observer = new ResizeObserver(() => {
+      const elementsOnWindow = Math.floor(el.clientHeight / EPISODE_CARD_HEIGHT) + 1
+      setVisibleItems((prev) => Math.max(prev, elementsOnWindow))
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     // triggered when episodes are loaded, saved scroll is deleted to avoid triggering after filter / sort
