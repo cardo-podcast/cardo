@@ -128,7 +128,7 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
       setStatus('ok')
     } catch (e) {
       console.error(e)
-      setError(e as string)
+      setError(e instanceof Error ? e.message : String(e))
       setStatus('error')
     }
   }

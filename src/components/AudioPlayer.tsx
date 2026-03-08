@@ -69,10 +69,19 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (playing) {
       const artworkSrc = playing.coverUrl || playing.podcast?.coverUrlLarge || playing.podcast?.coverUrl
+      let artwork: MediaImage[] = []
+      if (artworkSrc) {
+        try {
+          new URL(artworkSrc)
+          artwork = [{ src: artworkSrc }]
+        } catch {
+          console.warn('Invalid cover art URL:', artworkSrc)
+        }
+      }
       navigator.mediaSession.metadata = new MediaMetadata({
         title: playing.title,
         artist: playing.podcast?.podcastName,
-        artwork: artworkSrc ? [{ src: artworkSrc }] : [],
+        artwork,
       })
     } else {
       navigator.mediaSession.metadata = null
