@@ -221,7 +221,7 @@ function SearchBar() {
 
               {results.map((result, i) => {
                 if (searchMode === 'podcasts') {
-                  return <PodcastCard key={i} podcast={result as PodcastData} />
+                  return <PodcastCard key={(result as PodcastData).feedUrl} podcast={result as PodcastData} />
                 } else {
                   return (
                     <EpisodeCard
