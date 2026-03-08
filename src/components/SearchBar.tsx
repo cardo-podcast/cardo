@@ -219,7 +219,7 @@ function SearchBar() {
                 </div>
               )}
 
-              {results.map((result, i) => {
+              {results.map((result) => {
                 if (searchMode === 'podcasts') {
                   return <PodcastCard key={(result as PodcastData).feedUrl} podcast={result as PodcastData} />
                 } else {
