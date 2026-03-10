@@ -1,5 +1,6 @@
 /*Compact variation of EpisodeCard */
 
+import React from 'react'
 import { EpisodeData, NewEpisodeData } from '..'
 import * as icons from '../Icons'
 import { useNavigate } from 'react-router-dom'
@@ -9,7 +10,7 @@ import { Menu } from '@tauri-apps/api/menu'
 import { useEpisode } from '../engines/Episode'
 import { EpisodeCover } from './Cover'
 
-export default function EpisodePreviewCard({ episode }: { episode: EpisodeData | NewEpisodeData }) {
+function EpisodePreviewCard({ episode }: { episode: EpisodeData | NewEpisodeData }) {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const {
@@ -101,3 +102,5 @@ export default function EpisodePreviewCard({ episode }: { episode: EpisodeData |
     </div>
   )
 }
+
+export default React.memo(EpisodePreviewCard)

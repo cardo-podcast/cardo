@@ -6,15 +6,13 @@ import { useTranslation } from 'react-i18next'
 import { arrowLeft, arrowRight, sync, search as searchIcon } from '../Icons'
 import { useLocation, useNavigate } from 'react-router-dom'
 import EpisodeCard from './EpisodeCard'
-import { useDB } from '../ContextProviders'
+import { useSubscriptionsEpisodes, useSubscriptions } from '../ContextProviders'
 import { useSettings } from '../engines/Settings'
 
 function SearchBar() {
   const [results, setResults] = useState<PodcastData[] | EpisodeData[]>([])
-  const {
-    subscriptionsEpisodes,
-    subscriptions: { subscriptions },
-  } = useDB()
+  const subscriptionsEpisodes = useSubscriptionsEpisodes()
+  const { subscriptions } = useSubscriptions()
   const [searchMode, setSearchMode_] = useState<'subscriptions' | 'podcasts' | 'current'>(
     subscriptions.length > 0 ? 'subscriptions' : 'podcasts',
   )
@@ -141,6 +139,7 @@ function SearchBar() {
           type="text"
           placeholder={t('search_placeholder')}
           className={`peer w-full bg-primary-9 px-2 py-1 focus:outline-none ${noResults && inputRef.current?.value && 'font-semibold text-red-600'}`}
+          onContextMenu={(e) => e.stopPropagation()}
           onChange={(event) => {
             handleChange(event.target.value)
           }}
@@ -220,9 +219,9 @@ function SearchBar() {
                 </div>
               )}
 
-              {results.map((result, i) => {
+              {results.map((result) => {
                 if (searchMode === 'podcasts') {
-                  return <PodcastCard key={i} podcast={result as PodcastData} />
+                  return <PodcastCard key={(result as PodcastData).feedUrl} podcast={result as PodcastData} />
                 } else {
                   return (
                     <EpisodeCard

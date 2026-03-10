@@ -1,54 +1,36 @@
 // useful functions for episode management
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback } from 'react'
 import { EpisodeData } from '..'
 import { useSettings } from './Settings'
 import { downloadEpisode, removeDownloadedEpisode } from '../utils/utils'
-import { useDB, usePlayer } from '../ContextProviders'
+import { useQueue, useHistory, useDownloads, usePlayer } from '../ContextProviders'
 
 export function useEpisode(episode: EpisodeData) {
-  const { queue, history, downloads } = useDB()
-  const [inQueue, setInqueue] = useState(queue.includes(episode.src))
-  const [downloadState, setDownloadState] = useState<'downloaded' | ['downloading', number] | undefined>()
-  const [reprState, setReprState] = useState({ position: 0, total: episode.duration, complete: false })
+  const queue = useQueue()
+  const history = useHistory()
+  const downloads = useDownloads()
   const [
     {
       globals: { locale },
     },
   ] = useSettings()
   const { play: playEpisode, pause, paused, playing, quit: quitPlayer } = usePlayer()
-  const downloadedFile = useRef('')
 
-  const isCurrentlyPlaying = playing?.src === episode.src
+  const isPlaying = playing?.src === episode.src
 
-  useEffect(() => {
-    if (episode.src) {
-      // avoid extra computing on db on large lists
-      load()
-    }
-  }, [episode.src, playing?.src])
+  const state = history.getSync(episode.src)
+  const reprState =
+    state !== undefined
+      ? { position: state.position, total: state.total, complete: state.position >= state.total }
+      : { position: 0, total: episode.duration, complete: false }
 
-  const load = async () => {
-    // update reproduction state
-    const state = await history.get(episode.src)
+  const inQueue = queue.includes(episode.src)
 
-    if (state !== undefined) {
-      setReprState({ position: state.position, total: state.total, complete: state.position >= state.total })
-    } else {
-      // render a not played episode
-      setReprState({ position: 0, total: episode.duration, complete: false })
-    }
-
-    // check if file is downloaded
-    const downloadIndex = downloads.indexOf(episode.src)
-    if (downloadIndex > -1) {
-      setDownloadState('downloaded')
-      downloadedFile.current = downloads.downloads[downloadIndex].localFile
-    }
-  }
+  const downloadedEntry = downloads.includes(episode.src)
+  const downloadState: 'downloaded' | undefined = downloadedEntry ? 'downloaded' : undefined
 
   const getDateString = useCallback(() => {
-    // set print date
     const episodeYear = episode.pubDate.getFullYear()
     const actualYear = new Date().getFullYear()
 
@@ -57,83 +39,58 @@ export function useEpisode(episode: EpisodeData) {
       month: 'short',
       year: episodeYear < actualYear ? 'numeric' : undefined,
     })
-  }, [episode.pubDate])
+  }, [episode.pubDate, locale])
 
-  const togglePlayed = () => {
+  const togglePlayed = useCallback(() => {
     if (reprState.complete) {
       history.update(episode.src, episode.podcastUrl, 0, episode.duration)
-      setReprState({ complete: false, position: 0, total: reprState.total })
     } else {
       history.update(episode.src, episode.podcastUrl, reprState.total, reprState.total)
-      setReprState({ complete: true, position: reprState.total, total: reprState.total })
       if (playing?.src === episode.src) {
         quitPlayer()
       }
     }
-  }
+  }, [reprState.complete, reprState.total, episode.src, episode.podcastUrl, episode.duration, playing?.src, history, quitPlayer])
 
-  const toggleQueue = async () => {
+  const toggleQueue = useCallback(async () => {
     if (inQueue) {
       await queue.remove(episode.src)
-      setInqueue(false)
     } else {
       await queue.push(episode)
-      setInqueue(true)
     }
-  }
+  }, [inQueue, queue, episode])
 
   const inProgress = useCallback(
     (mustBePlaying = false) => {
-      const isStarted = (reprState.position > 0 && !reprState.complete) || isCurrentlyPlaying
+      const isStarted = (reprState.position > 0 && !reprState.complete) || isPlaying
       if (mustBePlaying) {
-        return isStarted && isCurrentlyPlaying && !paused
+        return isStarted && isPlaying && !paused
       } else {
         return isStarted
       }
     },
-    [isCurrentlyPlaying, reprState.position, reprState.complete, paused],
+    [isPlaying, reprState.position, reprState.complete, paused],
   )
 
-  const download = async () => {
-    setDownloadState(['downloading', 0])
-    downloadEpisode(episode).then((localFile) => {
-      // unlisten()
-      setDownloadState('downloaded')
-      downloadedFile.current = localFile
-      downloads.addToDownloadList(episode, localFile)
-    })
-
-    // status could be readed
-    // const unlisten = await listen<DownloadPayload>('downloading', ({payload: {src, downloaded, total}}) => {
-    //   if (src == episode.src){
-    //     setDownloadState(['downloading', downloaded / total * 100])
-    //   }
-    // })
-  }
-
-  const removeDownload = async () => {
-    if (downloadState == 'downloaded') {
-      await removeDownloadedEpisode(downloadedFile.current)
-      await downloads.removeFromDownloadList(episode.src)
-      setDownloadState(undefined)
-    }
-  }
-
-  const toggleDownload = () => {
+  const toggleDownload = useCallback(() => {
     if (!downloadState) {
-      download()
-    } else {
-      removeDownload()
+      downloadEpisode(episode).then((localFile) => {
+        downloads.addToDownloadList(episode, localFile)
+      })
+    } else if (downloadedEntry) {
+      removeDownloadedEpisode(downloadedEntry.localFile).then(() => {
+        downloads.removeFromDownloadList(episode.src)
+      })
     }
-  }
+  }, [downloadState, downloadedEntry, episode, downloads])
 
-  const play = () => {
-    if (downloadState === 'downloaded') {
-      playEpisode(episode, downloadedFile.current)
+  const play = useCallback(() => {
+    if (downloadedEntry) {
+      playEpisode(episode, downloadedEntry.localFile)
     } else {
       playEpisode(episode)
     }
-  }
+  }, [downloadedEntry, episode, playEpisode])
 
   return {
     reprState,
@@ -143,7 +100,7 @@ export function useEpisode(episode: EpisodeData) {
     toggleQueue,
     position: reprState.position,
     inProgress,
-    isPlaying: isCurrentlyPlaying,
+    isPlaying,
     toggleDownload,
     downloadState,
     play,

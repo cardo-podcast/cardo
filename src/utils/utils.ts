@@ -1,6 +1,6 @@
 import * as http from '@tauri-apps/plugin-http'
 import { EpisodeData, PodcastData } from '..'
-import { create, exists, readTextFile, writeTextFile, remove, readDir } from '@tauri-apps/plugin-fs'
+import { exists, mkdir, readTextFile, writeTextFile, remove, readDir } from '@tauri-apps/plugin-fs'
 import { appCacheDir, dirname, join } from '@tauri-apps/api/path'
 import { toast } from 'react-toastify'
 import { invoke } from '@tauri-apps/api/core'
@@ -193,7 +193,7 @@ export async function downloadEpisode(episode: EpisodeData) {
   const destination = await join(destFolder, filename)
 
   if (!(await exists(destFolder))) {
-    await create(destFolder)
+    await mkdir(destFolder, { recursive: true })
   }
 
   await invoke('download_file', { url: episode.src, destination, name: episode.title })

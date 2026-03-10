@@ -2,7 +2,7 @@ import { useSettings } from '../engines/Settings'
 import { getCreds, parsePodcastDetails } from '../utils/utils'
 import { useEffect, useRef, useState } from 'react'
 import { Credentials, GpodderUpdate, ProtocolFn, SubscriptionsUpdate, SyncProtocol, SyncStatus } from '.'
-import { SyncContext, useDB, usePlayer } from '../ContextProviders'
+import { SyncContext, useMisc, useHistory, useSubscriptions, usePlayer } from '../ContextProviders'
 import { invoke } from '@tauri-apps/api/core'
 import { nextcloudProtocol } from './Nextcloud'
 import { gpodderProtocol } from './Gpodder'
@@ -10,12 +10,9 @@ import { gpodderProtocol } from './Gpodder'
 export function SyncProvider({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<SyncStatus>('standby')
   const [error, setError] = useState('')
-  const {
-    dbLoaded,
-    misc: { setLastSync, getLastSync, getSyncKey },
-    history,
-    subscriptions,
-  } = useDB()
+  const { setLastSync, getLastSync, getSyncKey } = useMisc()
+  const history = useHistory()
+  const subscriptions = useSubscriptions()
   const [loggedIn, setLoggedIn] = useState<SyncProtocol>(null)
   const [{ sync: syncSettings }] = useSettings()
   const provider = useRef<ReturnType<ProtocolFn>>(null)
@@ -56,8 +53,8 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    dbLoaded && load()
-  }, [dbLoaded])
+    load()
+  }, [])
 
   const sync = async (updateSubscriptions?: Partial<SubscriptionsUpdate>) => {
     try {
@@ -131,7 +128,7 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
       setStatus('ok')
     } catch (e) {
       console.error(e)
-      setError(e as string)
+      setError(e instanceof Error ? e.message : String(e))
       setStatus('error')
     }
   }

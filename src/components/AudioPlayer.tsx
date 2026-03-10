@@ -19,7 +19,7 @@ import appIcon from '../../src-tauri/icons/icon.png'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import round from 'lodash/round'
 import { RangeInput } from './Inputs'
-import { PlayerContext, PlayerPositionContext, useDB, usePlayer, usePlayerPosition } from '../ContextProviders'
+import { PlayerContext, PlayerPositionContext, useHistory, useQueue, useDownloads, useMisc, usePlayer, usePlayerPosition } from '../ContextProviders'
 import { EpisodeCover } from './Cover'
 import * as globalShortcut from "@tauri-apps/plugin-global-shortcut"
 
@@ -44,7 +44,9 @@ function PositionProvider({ audioRef, children }: { audioRef: RefObject<HTMLAudi
 export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playing, setPlaying] = useState<EpisodeData>()
-  const { history, misc, downloads } = useDB()
+  const history = useHistory()
+  const misc = useMisc()
+  const downloads = useDownloads()
   const [paused, setPaused] = useState(true)
 
   // Set up event listeners to keep <audio> element in sync with Cardo.
@@ -67,10 +69,19 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (playing) {
       const artworkSrc = playing.coverUrl || playing.podcast?.coverUrlLarge || playing.podcast?.coverUrl
+      let artwork: MediaImage[] = []
+      if (artworkSrc) {
+        try {
+          new URL(artworkSrc)
+          artwork = [{ src: artworkSrc }]
+        } catch {
+          console.warn('Invalid cover art URL:', artworkSrc)
+        }
+      }
       navigator.mediaSession.metadata = new MediaMetadata({
         title: playing.title,
         artist: playing.podcast?.podcastName,
-        artwork: artworkSrc ? [{ src: artworkSrc }] : [],
+        artwork,
       })
     } else {
       navigator.mediaSession.metadata = null
@@ -317,7 +328,9 @@ function VolumeControl({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) 
 
 function AudioPlayer({ className = '' }) {
   const [duration, setDuration] = useState(0)
-  const { history, queue, downloads } = useDB()
+  const history = useHistory()
+  const queue = useQueue()
+  const downloads = useDownloads()
   const { audioRef, play, pause, paused, playing, quit } = usePlayer()
   const position = usePlayerPosition()
   const navigate = useNavigate()

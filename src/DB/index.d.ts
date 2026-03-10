@@ -1,16 +1,15 @@
-import { useDownloads } from './Downloads'
-import { useEpisodeState } from './EpisodeState'
-import { useMisc } from './Misc'
-import { useQueue } from './Queue'
-import { useSubscriptions } from './Subscriptions'
-import { useSubscriptionsEpisodes } from './SubscriptionsEpisodes'
+import { useDownloadsStore } from './Downloads'
+import { useEpisodeStateStore } from './EpisodeState'
+import { useMiscStore } from './Misc'
+import { useQueueStore } from './Queue'
+import { useSubscriptionsStore } from './Subscriptions'
+import { useSubscriptionsEpisodesStore } from './SubscriptionsEpisodes'
 
 export interface DB {
-  dbLoaded: boolean
-  subscriptions: ReturnType<typeof useSubscriptions>
-  subscriptionsEpisodes: ReturnType<typeof useSubscriptionsEpisodes>
-  history: ReturnType<typeof useEpisodeState>
-  misc: ReturnType<typeof useMisc>
-  queue: ReturnType<typeof useQueue>
-  downloads: ReturnType<typeof useDownloads>
+  subscriptions: ReturnType<typeof useSubscriptionsStore>
+  subscriptionsEpisodes: ReturnType<typeof useSubscriptionsEpisodesStore>
+  history: ReturnType<typeof useEpisodeStateStore>
+  misc: ReturnType<typeof useMiscStore>
+  queue: ReturnType<typeof useQueueStore>
+  downloads: ReturnType<typeof useDownloadsStore>
 }

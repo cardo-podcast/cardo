@@ -9,14 +9,14 @@ import { useEpisode } from '../engines/Episode'
 import { sanitizeHTML } from '../utils/sanitize'
 import { Menu } from '@tauri-apps/api/menu';
 import { toast } from 'react-toastify'
-import { useDB } from '../ContextProviders'
+import { useSubscriptions } from '../ContextProviders'
 import { EpisodeCover } from '../components/Cover'
 
 function EpisodePreview() {
   const location = useLocation()
   const episode = location.state.episode as EpisodeData
   const navigate = useNavigate()
-  const { subscriptions } = useDB()
+  const subscriptions = useSubscriptions()
   const { t } = useTranslation()
   const [podcastFetched, setPodcastFetched] = useState(false)
   const {

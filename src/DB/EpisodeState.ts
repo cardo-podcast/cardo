@@ -1,8 +1,10 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Database from '@tauri-apps/plugin-sql'
 import { EpisodeState } from '..'
 
-export function useEpisodeState(db: Database) {
+export function useEpisodeStateStore(db: Database) {
+  const [cache, setCache] = useState<Map<string, EpisodeState>>(new Map())
+
   const get = useCallback(
     async function (episodeUrl: string): Promise<EpisodeState | undefined> {
       const r: EpisodeState[] = await db.select('SELECT * from episodes_history WHERE episode = $1', [episodeUrl])
@@ -27,6 +29,11 @@ export function useEpisodeState(db: Database) {
     [db],
   )
 
+  const getSync = useCallback(
+    (episodeUrl: string) => cache.get(episodeUrl),
+    [cache],
+  )
+
   const getAll = useCallback(
     async function (timestamp = 0): Promise<EpisodeState[]> {
       const r: EpisodeState[] = await db.select(`SELECT * from episodes_history WHERE timestamp > $1`, [timestamp])
@@ -41,17 +48,41 @@ export function useEpisodeState(db: Database) {
       position = Math.floor(position)
       total = Math.floor(total)
 
+      const ts = timestamp ?? Date.now()
+      const pos = Math.min(position, total)
+      const tot = Math.max(position, total)
+
+      setCache(prev => {
+        const next = new Map(prev)
+        next.set(episodeUrl, {
+          episode: episodeUrl,
+          podcast: podcastUrl,
+          position: pos,
+          total: tot,
+          timestamp: ts,
+        })
+        return next
+      })
+
       await db.execute(
         `INSERT into episodes_history (episode, podcast, position, total, timestamp)
         VALUES ($1, $2, $3, $4, $5)
         ON CONFLICT (episode) DO UPDATE
         SET position = $3, total = $4, timestamp = $5
         WHERE episode = $1 AND timestamp < $5 AND position <> $3`,
-        [episodeUrl, podcastUrl, Math.min(position, total), Math.max(position, total), timestamp ?? Date.now()],
+        [episodeUrl, podcastUrl, pos, tot, ts],
       )
     },
     [db],
   )
 
-  return { get, getCompleted, getAll, update }
+  useEffect(() => {
+    getAll().then(states => {
+      const map = new Map<string, EpisodeState>()
+      for (const s of states) map.set(s.episode, s)
+      setCache(map)
+    })
+  }, [getAll])
+
+  return { get, getSync, getCompleted, getAll, update }
 }

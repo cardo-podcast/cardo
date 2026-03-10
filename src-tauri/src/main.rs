@@ -7,6 +7,7 @@ use rand::RngCore;
 use std::fs::File;
 use std::io::Write;
 use tauri::{command, Emitter, Manager, Window};
+use tauri_plugin_log::{Target, TargetKind, RotationStrategy};
 use tauri_plugin_sql::{Migration, MigrationKind};
 
 const NONCE_SIZE: usize = 12; // 96-bit nonce
@@ -235,6 +236,17 @@ fn main() {
         .plugin(tauri_plugin_sql::Builder::new().build())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(
+            tauri_plugin_log::Builder::new()
+                .targets([
+                    Target::new(TargetKind::Stdout),
+                    Target::new(TargetKind::LogDir { file_name: None }),
+                ])
+                .rotation_strategy(RotationStrategy::KeepOne)
+                .max_file_size(5_000_000)
+                .level(log::LevelFilter::Info)
+                .build(),
+        )
         .invoke_handler(tauri::generate_handler![
             encrypt,
             decrypt,
@@ -254,6 +266,21 @@ fn main() {
 
             let db_path = app_data_dir.join("db.sqlite");
             let db_path_str = String::from("sqlite:") + db_path.to_str().unwrap();
+
+            // Generate version at git hash strings.
+            let cardo_version = if cfg!(debug_assertions) {
+                format!("{}-dev", env!("CARGO_PKG_VERSION"))
+            } else {
+                env!("CARGO_PKG_VERSION").to_string()
+            };
+            let cardo_git_version = env!("GIT_COMMIT_HASH");
+
+            // Write our log header.
+            log::info!("\n\n\
+            ----------------------------------------\n\
+            Cardo v{cardo_version} {cardo_git_version}\n\
+            https://cardo-podcast.github.io/\n\
+            ----------------------------------------");
 
             app_handle
                 .plugin(

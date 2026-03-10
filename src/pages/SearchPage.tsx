@@ -22,7 +22,7 @@ function SearchPage({ results }: { results: Array<PodcastData> }) {
     <div className="flex h-full w-full justify-center overflow-y-auto p-2">
       <div className="grid w-[80%] gap-1 px-2">
         {results.map((result) => {
-          return <PodcastPreview result={result} />
+          return <PodcastPreview key={result.feedUrl} result={result} />
         })}
       </div>
     </div>
