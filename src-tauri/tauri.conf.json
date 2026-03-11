@@ -26,7 +26,7 @@
       "digestAlgorithm": "sha256",
       "timestampUrl": "http://timestamp.comodoca.com"
     },
-    "licenseFile": "LICENSE",
+    "licenseFile": "../LICENSE",
     "createUpdaterArtifacts": "v1Compatible"
   },
   "productName": "Cardo",
