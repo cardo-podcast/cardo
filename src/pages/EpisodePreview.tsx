@@ -11,6 +11,7 @@ import { Menu } from '@tauri-apps/api/menu';
 import { toast } from 'react-toastify'
 import { useSubscriptions } from '../ContextProviders'
 import { EpisodeCover } from '../components/Cover'
+import { LogicalPosition } from '@tauri-apps/api/dpi'
 
 function EpisodePreview() {
   const location = useLocation()
@@ -100,7 +101,7 @@ function EpisodePreview() {
                   },
                 ],
               })
-              menu.popup()
+              menu.popup(new LogicalPosition(e.screenX, e.screenY))
             }}
           />
         </div>

@@ -5,6 +5,7 @@ import { PodcastData } from '..'
 import { sync } from '../Icons'
 import { useSubscriptions, useSubscriptionsEpisodes } from '../ContextProviders'
 import { PodcastCover } from './Cover'
+import { LogicalPosition } from '@tauri-apps/api/dpi'
 
 export default function SubscriptionCard({ podcast, mini = false }: { podcast: PodcastData; mini?: boolean }) {
   const navigate = useNavigate()
@@ -22,7 +23,7 @@ export default function SubscriptionCard({ podcast, mini = false }: { podcast: P
           },
         })
       }
-      onContextMenu={async () => {
+      onContextMenu={async (e) => {
         const menu = await Menu.new({
           items: [
             {
@@ -33,7 +34,7 @@ export default function SubscriptionCard({ podcast, mini = false }: { podcast: P
             },
           ],
         })
-        menu.popup()
+        menu.popup(new LogicalPosition(e.screenX, e.screenY))
       }}
     >
       <div className="relative aspect-square h-10">

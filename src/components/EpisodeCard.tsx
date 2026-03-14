@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { Menu } from '@tauri-apps/api/menu'
 import { useEpisode } from '../engines/Episode'
 import { EpisodeCover } from './Cover'
+import { LogicalPosition } from '@tauri-apps/api/dpi'
 
 function EpisodeCard({
   episode,
@@ -52,7 +53,7 @@ function EpisodeCard({
           },
         })
       }}
-      onContextMenu={async () => {
+      onContextMenu={async (e) => {
         const menu = await Menu.new({
           items: [
             {
@@ -70,7 +71,7 @@ function EpisodeCard({
           ],
         })
 
-        menu.popup()
+        menu.popup(new LogicalPosition(e.screenX, e.screenY))
       }}
     >
       <>

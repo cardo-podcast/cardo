@@ -13,6 +13,7 @@ import { Menu } from '@tauri-apps/api/menu'
 import { useSync, useSubscriptions, useHistory, useSubscriptionsEpisodes } from '../ContextProviders'
 import { PodcastCover } from '../components/Cover'
 import { useModalBanner } from '../components/ModalBanner'
+import { LogicalPosition } from '@tauri-apps/api/dpi'
 
 const EPISODE_CARD_HEIGHT = 80 // min height
 const PRELOADED_EPISODES = 10 //
@@ -365,7 +366,7 @@ function PodcastPreview() {
             <div className="flex shrink-0 flex-col items-center gap-2">
               <div
                 className="aspect-square h-40 cursor-pointer"
-                onContextMenu={async () => {
+                onContextMenu={async (e) => {
                   const menu = await Menu.new({
                     items: [
                       {
@@ -379,7 +380,7 @@ function PodcastPreview() {
                     ],
                   })
 
-                  menu.popup()
+                  menu.popup(new LogicalPosition(e.screenX, e.screenY))
                 }}
               >
                 <PodcastCover className="bg-primary-7 aspect-square h-40 rounded-md" podcast={podcast} />

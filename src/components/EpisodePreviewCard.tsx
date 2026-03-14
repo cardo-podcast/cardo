@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { Menu } from '@tauri-apps/api/menu'
 import { useEpisode } from '../engines/Episode'
 import { EpisodeCover } from './Cover'
+import { LogicalPosition, PhysicalPosition } from '@tauri-apps/api/dpi'
 
 function EpisodePreviewCard({ episode }: { episode: EpisodeData | NewEpisodeData }) {
   const navigate = useNavigate()
@@ -31,7 +32,7 @@ function EpisodePreviewCard({ episode }: { episode: EpisodeData | NewEpisodeData
   return (
     <div
       className="amber-600 flex w-24 shrink-0 cursor-pointer flex-col rounded-md transition-all duration-100"
-      onContextMenu={async() => {
+      onContextMenu={async (e) => {
         const menu = await Menu.new({
           items: [
             {
@@ -48,8 +49,8 @@ function EpisodePreviewCard({ episode }: { episode: EpisodeData | NewEpisodeData
             },
           ],
         })
-        
-        menu.popup()
+
+        menu.popup(new LogicalPosition(e.screenX, e.screenY))
       }}
     >
       <div className="bg-primary-8 relative flex aspect-square w-full flex-col items-center justify-center overflow-hidden rounded-md">
@@ -66,11 +67,7 @@ function EpisodePreviewCard({ episode }: { episode: EpisodeData | NewEpisodeData
           }}
         />
         {isPlaying ? (
-          <LiveProgressBar
-            total={episode.duration}
-            showTime={false}
-            className={{ div: 'h-2 shrink-0' }}
-          />
+          <LiveProgressBar total={episode.duration} showTime={false} className={{ div: 'h-2 shrink-0' }} />
         ) : (
           <ProgressBar
             position={position}
