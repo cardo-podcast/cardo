@@ -21,14 +21,7 @@
     "shell:default",
     {
       "identifier": "http:default",
-      "allow": [
-        {
-          "url": "https://*/"
-        },
-        {
-          "url": "http://*/"
-        }
-      ]
+      "allow": [{ "url": "http://*:*" }, { "url": "https://*:*" }]
     },
     "global-shortcut:default",
     "global-shortcut:allow-is-registered",
