@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { Menu } from '@tauri-apps/api/menu'
 import { useEpisode } from '../engines/Episode'
 import { EpisodeCover } from './Cover'
-import { LogicalPosition, PhysicalPosition } from '@tauri-apps/api/dpi'
+import { LogicalPosition } from '@tauri-apps/api/dpi'
 
 function EpisodePreviewCard({ episode }: { episode: EpisodeData | NewEpisodeData }) {
   const navigate = useNavigate()

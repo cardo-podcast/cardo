@@ -90,7 +90,7 @@ function EpisodePreview() {
                   },
                 })
             }}
-            onContextMenu={async() => {
+            onContextMenu={async(e) => {
               if (!podcastFetched) return
 
               const menu = await Menu.new({
