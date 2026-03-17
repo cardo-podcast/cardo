@@ -2,7 +2,7 @@ name: CI
 
 on:
   workflow_dispatch:  # Manual build option
-  pull_request:       # Build for every PR
+  pull_request_target:  # Build for every PR
     branches:
       - master
 
@@ -13,6 +13,8 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
 
       - uses: pnpm/action-setup@v4
 
@@ -38,7 +40,7 @@ jobs:
           fi
 
       - name: comment lint results on PR
-        if: steps.lint.outputs.output && github.event_name == 'pull_request'
+        if: steps.lint.outputs.output && github.event_name == 'pull_request_target'
         uses: actions/github-script@v7
         with:
           script: |
@@ -91,6 +93,8 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
 
       - name: setup build environment
         uses: ./.github/actions/setup
