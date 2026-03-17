@@ -2,19 +2,15 @@ name: CI
 
 on:
   workflow_dispatch:  # Manual build option
-  pull_request_target:  # Build for every PR
+  pull_request:       # Build for every PR
     branches:
       - master
 
 jobs:
   lint:
     runs-on: ubuntu-24.04
-    permissions:
-      pull-requests: write
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.ref }}
 
       - uses: pnpm/action-setup@v4
 
@@ -39,36 +35,14 @@ jobs:
             echo "$DELIMITER" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: comment lint results on PR
-        if: steps.lint.outputs.output && github.event_name == 'pull_request_target'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const marker = '<!-- lint-results -->';
-            const body = `${marker}\n### Lint Results\n\n\`\`\`\n${process.env.LINT_OUTPUT}\n\`\`\``;
-
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-            const existing = comments.find(c => c.body.startsWith(marker));
-
-            if (existing) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existing.id,
-                body,
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body,
-              });
-            }
+      - name: post lint results to job summary
+        if: steps.lint.outputs.output
+        run: |
+          echo "### Lint Results" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "$LINT_OUTPUT" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
         env:
           LINT_OUTPUT: ${{ steps.lint.outputs.output }}
 
@@ -93,8 +67,6 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.ref }}
 
       - name: setup build environment
         uses: ./.github/actions/setup
