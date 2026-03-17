@@ -9,6 +9,8 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
