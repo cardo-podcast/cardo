@@ -107,6 +107,11 @@ Run without debugging:
 pnpm tauri dev --release
 ```
 
+View linter output:
+```bash
+pnpm lint
+```
+
 For your convinenece the setup scripts will also create a ***Visual Studio Code*** `launch.json` project file for your platform. Open the Cardo folder in VS Code and it will be used automatically.
 
 For help modifying the setup with VS Code, follow [the instructions in the Tauri docs](https://v2.tauri.app/develop/debug/vscode/) but replace `yarn` in the sample config to `pnpm`.
