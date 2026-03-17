@@ -1,12 +1,18 @@
 {
   "extends": "react-app",
   "plugins": [
-    "react-hooks",
     "react-refresh"
   ],
   // ...
   "rules": {
     "react-hooks/exhaustive-deps": 0,
-    "react-refresh/only-export-components": "warn"
+    "react-refresh/only-export-components": "warn",
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "ImportDeclaration[specifiers.length=0]",
+        "message": "Empty import"
+      }
+    ]
   }
 }

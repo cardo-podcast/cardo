@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "tauri": "dotenv -- tauri",
     "analyze": "vite-bundle-visualizer",
+    "lint": "eslint src/",
     "prettier": "prettier --write './src/**/*.{js,jsx,mjs,cjs,ts,tsx,json}'"
   },
   "dependencies": {
