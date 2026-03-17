@@ -21,34 +21,8 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: run linter
-        id: lint
-        run: |
-          set +e
-          OUTPUT=$(pnpm lint 2>&1 | tee /dev/stderr)
-          EXIT_CODE=${PIPESTATUS[0]}
-          echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
-          if [ -n "$OUTPUT" ]; then
-            DELIMITER=$(openssl rand -hex 16)
-            echo "output<<$DELIMITER" >> "$GITHUB_OUTPUT"
-            echo "$OUTPUT" >> "$GITHUB_OUTPUT"
-            echo "$DELIMITER" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: post lint results to job summary
-        if: steps.lint.outputs.output
-        run: |
-          echo "### Lint Results" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
-          echo "$LINT_OUTPUT" >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
-        env:
-          LINT_OUTPUT: ${{ steps.lint.outputs.output }}
-
-      - name: fail on lint errors
-        if: steps.lint.outputs.exit_code != '0'
-        run: exit 1
+      - name: lint
+        run: pnpm lint
 
   build:
     strategy:
