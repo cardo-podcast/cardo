@@ -24,7 +24,7 @@ jobs:
 
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: setup build environment
         uses: ./.github/actions/setup
@@ -39,7 +39,7 @@ jobs:
         run: pnpm tauri build ${{ matrix.args }} --config '{"bundle":{"createUpdaterArtifacts":false,"windows":{"certificateThumbprint":null}}}'
 
       - name: upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact }}
           retention-days: 7
