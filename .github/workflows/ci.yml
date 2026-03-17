@@ -25,8 +25,8 @@ jobs:
         id: lint
         run: |
           set +e
-          OUTPUT=$(pnpm lint 2>&1)
-          EXIT_CODE=$?
+          OUTPUT=$(pnpm lint 2>&1 | tee /dev/stderr)
+          EXIT_CODE=${PIPESTATUS[0]}
           echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
           if [ -n "$OUTPUT" ]; then
             DELIMITER=$(openssl rand -hex 16)
