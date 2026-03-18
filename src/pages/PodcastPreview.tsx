@@ -280,7 +280,7 @@ function PodcastPreview() {
             const scrolledWindows = scrollRef.current.scrollTop / scrollRef.current.clientHeight + 1
             const elementsOnWindow = Math.floor(scrollRef.current.clientHeight / EPISODE_CARD_HEIGHT) + 1
 
-            setVisibleItems(Math.max(visibleItems, Math.round(scrolledWindows * elementsOnWindow) + PRELOADED_EPISODES))
+            setVisibleItems((prev) => Math.max(prev, Math.round(scrolledWindows * elementsOnWindow) + PRELOADED_EPISODES))
           }}
         >
           {tweakMenu && (
