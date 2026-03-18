@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Database from '@tauri-apps/plugin-sql'
 import { EpisodeData, RawEpisodeData } from '..'
 
@@ -11,7 +11,12 @@ export function useQueueStore(db: Database) {
     load()
   }, [db])
 
+  const initialized = useRef(false)
   useEffect(() => {
+    if (!initialized.current) {
+      initialized.current = true
+      return
+    }
     if (queue.length > 0) {
       updateOrder(queue.map((episode) => episode.id))
     }
