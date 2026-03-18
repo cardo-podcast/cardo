@@ -32,6 +32,10 @@
 
 /* custom-styles */
 
+html {
+  overscroll-behavior: none;
+}
+
 ::-webkit-scrollbar {
   display: none;
 }
