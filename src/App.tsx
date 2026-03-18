@@ -43,7 +43,11 @@ const App = () => {
 
   // prevent webview context menu
   useEffect(() => {
-    const preventContextMenu = (event: MouseEvent) => event.preventDefault()
+    const preventContextMenu = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) return
+      event.preventDefault()
+    }
     document.addEventListener('contextmenu', preventContextMenu)
 
     return () => document.removeEventListener('contextmenu', preventContextMenu)

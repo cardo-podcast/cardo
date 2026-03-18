@@ -9,7 +9,6 @@ import { useTranslation } from 'react-i18next'
 import { Menu } from '@tauri-apps/api/menu'
 import { useEpisode } from '../engines/Episode'
 import { EpisodeCover } from './Cover'
-import { LogicalPosition } from '@tauri-apps/api/dpi'
 
 function EpisodePreviewCard({ episode }: { episode: EpisodeData | NewEpisodeData }) {
   const navigate = useNavigate()
@@ -32,7 +31,7 @@ function EpisodePreviewCard({ episode }: { episode: EpisodeData | NewEpisodeData
   return (
     <div
       className="amber-600 flex w-24 shrink-0 cursor-pointer flex-col rounded-md transition-all duration-100"
-      onContextMenu={async (e) => {
+      onContextMenu={async () => {
         const menu = await Menu.new({
           items: [
             {
@@ -50,7 +49,7 @@ function EpisodePreviewCard({ episode }: { episode: EpisodeData | NewEpisodeData
           ],
         })
 
-        menu.popup(new LogicalPosition(e.screenX, e.screenY))
+        menu.popup()
       }}
     >
       <div className="bg-primary-8 relative flex aspect-square w-full flex-col items-center justify-center overflow-hidden rounded-md">

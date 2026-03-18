@@ -11,7 +11,6 @@ import { Menu } from '@tauri-apps/api/menu';
 import { toast } from 'react-toastify'
 import { useSubscriptions } from '../ContextProviders'
 import { EpisodeCover } from '../components/Cover'
-import { LogicalPosition } from '@tauri-apps/api/dpi'
 
 function EpisodePreview() {
   const location = useLocation()
@@ -90,7 +89,7 @@ function EpisodePreview() {
                   },
                 })
             }}
-            onContextMenu={async(e) => {
+            onContextMenu={async () => {
               if (!podcastFetched) return
 
               const menu = await Menu.new({
@@ -101,7 +100,7 @@ function EpisodePreview() {
                   },
                 ],
               })
-              menu.popup(new LogicalPosition(e.screenX, e.screenY))
+              menu.popup()
             }}
           />
         </div>
