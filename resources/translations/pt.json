@@ -88,5 +88,12 @@
   "remove_from_queue_end": "Excluir episódio da fila quando concluído",
   "remove_from_downloads_end": "Excluir download após concluído",
   "download_new": "Baixar automaticamente novos episódios",
-  "queue_new": "Adicionar automaticamente novos episódios à fila"
+  "queue_new": "Adicionar automaticamente novos episódios à fila",
+  "import/export": "Import / Export",
+  "import_opml": "Import subscriptions from OPML file",
+  "export_opml": "Export subscriptions to OPML file",
+  "opml_invalid": "Invalid OPML file",
+  "opml_error": "OPML operation failed",
+  "opml_import_result": "{{imported}} imported, {{failed}} failed",
+  "opml_no_new": "All feeds already subscribed"
 }

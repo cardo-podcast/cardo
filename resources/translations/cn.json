@@ -88,5 +88,12 @@
   "remove_from_queue_end": "播放完毕后自动从播放队列中删除该集",
   "remove_from_downloads_end": "播放完毕后自动从已下载内容中删除该集",
   "download_new": "自动下载新发布的剧集",
-  "queue_new": "自动添加新发布的剧集到播放队列中"
+  "queue_new": "自动添加新发布的剧集到播放队列中",
+  "import/export": "Import / Export",
+  "import_opml": "Import subscriptions from OPML file",
+  "export_opml": "Export subscriptions to OPML file",
+  "opml_invalid": "Invalid OPML file",
+  "opml_error": "OPML operation failed",
+  "opml_import_result": "{{imported}} imported, {{failed}} failed",
+  "opml_no_new": "All feeds already subscribed"
 }

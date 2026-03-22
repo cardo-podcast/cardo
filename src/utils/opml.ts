@@ -1,52 +1,102 @@
 import { useSubscriptions } from '../ContextProviders'
-import { parsePodcastDetails } from './utils'
+import { parsePodcastDetails, toastError } from './utils'
+import { open, save } from '@tauri-apps/plugin-dialog'
+import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
+import { documentDir, join } from '@tauri-apps/api/path'
+import { toast } from 'react-toastify'
+import { useTranslation } from 'react-i18next'
 
 export function useOPML(): [typeof importOPML, typeof exportOPML] {
   const subscriptions = useSubscriptions()
+  const { t } = useTranslation()
 
-  function importOPML(file: File) {
-    const reader = new FileReader()
+  async function importOPML() {
+    try {
+      const path = await open({
+        defaultPath: await documentDir(),
+        filters: [{ name: 'OPML', extensions: ['opml'] }],
+      })
 
-    reader.readAsText(file)
+      if (!path) return
 
-    reader.onload = async () => {
+      const fileContent = await readTextFile(path)
       const parser = new DOMParser()
-      const fileContent = reader.result as string
-
       const xml = parser.parseFromString(fileContent, 'application/xml')
 
-      for (const outline of xml.getElementsByTagName('outline')) {
+      if (xml.querySelector('parsererror')) {
+        toastError(t('opml_invalid'))
+        return
+      }
+
+      const outlines = xml.getElementsByTagName('outline')
+      let imported = 0
+      let failed = 0
+
+      for (const outline of outlines) {
         const feedUrl = outline.getAttribute('xmlUrl')
-        if (feedUrl && !subscriptions.includes(feedUrl)) {
+        if (!feedUrl || subscriptions.includes(feedUrl)) continue
+
+        try {
           const podcast = await parsePodcastDetails(feedUrl)
-          subscriptions.add(podcast)
+          await subscriptions.add(podcast)
+          imported++
+        } catch (e) {
+          console.error(`Failed to import feed: ${feedUrl}`, e)
+          failed++
         }
       }
+
+      if (imported > 0 || failed > 0) {
+        toast.info(t('opml_import_result', { imported, failed }), { autoClose: 5000, theme: 'dark' })
+      } else {
+        toast.info(t('opml_no_new'), { autoClose: 3000, theme: 'dark' })
+      }
+    } catch (e) {
+      console.error('OPML import failed:', e)
+      toastError(t('opml_error'))
     }
   }
 
-  function downloadOPML(content: string, filename = 'subscriptions.opml') {
-    const blob = new Blob([content], { type: 'application/xml' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = filename
-    a.click()
-    URL.revokeObjectURL(url)
-  }
+  async function exportOPML() {
+    try {
+      const path = await save({
+        defaultPath: await join(await documentDir(), 'subscriptions.opml'),
+        filters: [{ name: 'OPML', extensions: ['opml'] }],
+      })
 
-  function exportOPML() {
-    const opml = `<?xml version="1.0" encoding="UTF-8"?>
-<opml version="2.0">
-  <head>
-    <title>Cardo Subscriptions</title>
-    <dateCreated>${new Date().toUTCString()}</dateCreated>
-  </head>
-  <body>
-    ${subscriptions.subscriptions.map((s) => `<outline text="${s.podcastName}" title="${s.podcastName}" type="rss" xmlUrl="${s.feedUrl}" />`).join('\n\t')}
-  </body>
-</opml>`
-    downloadOPML(opml)
+      if (!path) return
+
+      const doc = document.implementation.createDocument(null, 'opml')
+      doc.documentElement.setAttribute('version', '2.0')
+
+      const head = doc.createElement('head')
+      const title = doc.createElement('title')
+      title.textContent = 'Cardo Subscriptions'
+      head.appendChild(title)
+      const dateCreated = doc.createElement('dateCreated')
+      dateCreated.textContent = new Date().toUTCString()
+      head.appendChild(dateCreated)
+      doc.documentElement.appendChild(head)
+
+      const body = doc.createElement('body')
+      for (const s of subscriptions.subscriptions) {
+        const outline = doc.createElement('outline')
+        outline.setAttribute('text', s.podcastName)
+        outline.setAttribute('title', s.podcastName)
+        outline.setAttribute('type', 'rss')
+        outline.setAttribute('xmlUrl', s.feedUrl)
+        body.appendChild(outline)
+      }
+      doc.documentElement.appendChild(body)
+
+      const serializer = new XMLSerializer()
+      const opml = '<?xml version="1.0" encoding="UTF-8"?>\n' + serializer.serializeToString(doc)
+
+      await writeTextFile(path, opml)
+    } catch (e) {
+      console.error('OPML export failed:', e)
+      toastError(t('opml_error'))
+    }
   }
 
   return [importOPML, exportOPML]

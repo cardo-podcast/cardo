@@ -92,6 +92,10 @@
   "import/export": "İçe/dışa aktar",
   "import_opml": "OPML dosyasından abonelikleri içe aktar",
   "export_opml": "Abonelikleri OPML dosyası olarak dışa aktar",
+  "opml_invalid": "Invalid OPML file",
+  "opml_error": "OPML operation failed",
+  "opml_import_result": "{{imported}} imported, {{failed}} failed",
+  "opml_no_new": "All feeds already subscribed",
   "change_podcast_cover": "Podcast kapağını değiştir",
   "podcast_cover_url": "Podcast kapak URL’i"
 }

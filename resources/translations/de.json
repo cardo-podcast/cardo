@@ -88,5 +88,12 @@
   "remove_from_queue_end": "Episode nach Abschluss aus der Warteschlange entfernen",
   "remove_from_downloads_end": "Heruntergeladene Episode nach Abschluss löschen",
   "download_new": "Neue Episoden automatisch herunterladen",
-  "queue_new": "Neue Episoden automatisch zur Warteschlange hinzufügen"
+  "queue_new": "Neue Episoden automatisch zur Warteschlange hinzufügen",
+  "import/export": "Import / Export",
+  "import_opml": "Import subscriptions from OPML file",
+  "export_opml": "Export subscriptions to OPML file",
+  "opml_invalid": "Invalid OPML file",
+  "opml_error": "OPML operation failed",
+  "opml_import_result": "{{imported}} imported, {{failed}} failed",
+  "opml_no_new": "All feeds already subscribed"
 }
