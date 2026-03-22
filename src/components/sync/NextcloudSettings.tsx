@@ -4,6 +4,7 @@ import { login } from '../../sync/Nextcloud'
 import { checkURLScheme, saveCreds, toastError } from '../../utils/utils'
 import { useMisc, useSync } from '../../ContextProviders'
 import { invoke } from '@tauri-apps/api/core'
+import nextcloudLogo from '../../assets/nextcloud.png'
 
 export function NextcloudSettings() {
   const interval = useRef<ReturnType<typeof setInterval>>(null)
@@ -40,7 +41,7 @@ export function NextcloudSettings() {
     <div className="flex h-full w-full gap-2 p-1">
       <img
         className="w-32 shrink-0"
-        src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/141px-Nextcloud_Logo.svg.png"
+        src={nextcloudLogo}
         alt="Nextcloud logo"
       />
       <form

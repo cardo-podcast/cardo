@@ -5,6 +5,8 @@ import { NextcloudSettings } from './NextcloudSettings'
 import { Checkbox } from '../Inputs'
 import { useSync } from '../../ContextProviders'
 import { GpodderSettings } from './GpodderSettings'
+import gpodderLogo from '../../assets/gpodder.png'
+import nextcloudLogo from '../../assets/nextcloud.png'
 
 export function SyncSettings() {
   const [{ sync: syncSettings }, updateSettings] = useSettings()
@@ -19,12 +21,12 @@ export function SyncSettings() {
           {loggedIn === 'nextcloud' && (
             <img
               className="w-32 shrink-0"
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Nextcloud_Logo.svg/141px-Nextcloud_Logo.svg.png"
+              src={nextcloudLogo}
               alt="Nextcloud logo"
             />
           )}
           {loggedIn === 'gpodder' && (
-            <img className="w-32 shrink-0" src="https://gpodder.net/static/gpoddernet_228.png" alt="Gpodder logo" />
+            <img className="w-32 shrink-0" src={gpodderLogo} alt="Gpodder logo" />
           )}
 
           <div className="flex flex-col gap-2">

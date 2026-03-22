@@ -3,6 +3,7 @@ import { checkURLScheme, saveCreds, toastError } from '../../utils/utils'
 import { useMisc, useSync } from '../../ContextProviders'
 import { invoke } from '@tauri-apps/api/core'
 import { login } from '../../sync/Gpodder'
+import gpodderLogo from '../../assets/gpodder.png'
 
 export function GpodderSettings() {
   const { t } = useTranslation()
@@ -11,7 +12,7 @@ export function GpodderSettings() {
 
   return (
     <div className="flex h-full w-full gap-2 p-1">
-      <img className="w-32 shrink-0 p-1" src="https://gpodder.net/static/gpoddernet_228.png" alt="Gpodder logo" />
+      <img className="w-32 shrink-0 p-1" src={gpodderLogo} alt="Gpodder logo" />
       <form
         className="flex w-full flex-col items-end gap-2"
         onSubmit={async (e) => {
