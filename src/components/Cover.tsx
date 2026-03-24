@@ -3,6 +3,13 @@ import { EpisodeData, PodcastData } from '..'
 import appIcon from '../../src-tauri/icons/icon.png'
 import { usePodcastSettings } from '../engines/Settings'
 
+export function proxyUrl(url: string | undefined): string | undefined {
+  if (!url) return url
+  if (url.startsWith('https://')) return url.replace('https://', 'imgproxy://')
+  if (url.startsWith('http://')) return url.replace('http://', 'imgproxy://')
+  return url
+}
+
 interface PodcastCoverProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   podcast: Partial<PodcastData>
 }
@@ -22,7 +29,7 @@ export function PodcastCover({ podcast, ...props }: PodcastCoverProps) {
 
   return (
     <img
-      src={coverUrl}
+      src={proxyUrl(coverUrl)}
       alt=""
       loading="lazy"
       decoding="async"
@@ -43,14 +50,14 @@ export function EpisodeCover({ episode, ...props }: EpisodeCoverProps) {
   return (
     <div className="flip">
       <div className="front">
-        <img src={episode.coverUrl} alt="" loading="lazy" decoding="async" onError={() => setError(true)} {...props} />
+        <img src={proxyUrl(episode.coverUrl)} alt="" loading="lazy" decoding="async" onError={() => setError(true)} {...props} />
       </div>
       <div className="back">
         {episode.podcast?.coverUrl ? (
           <PodcastCover podcast={episode.podcast!} {...props} />
         ) : (
           <img
-            src={episode.coverUrl}
+            src={proxyUrl(episode.coverUrl)}
             alt=""
             loading="lazy"
             decoding="async"

@@ -7,6 +7,7 @@ use rand::RngCore;
 use std::fs::File;
 use std::io::Write;
 use tauri::{command, Emitter, Manager, Window};
+use tauri::http::Response as TauriResponse;
 use tauri_plugin_log::{Target, TargetKind, RotationStrategy};
 use tauri_plugin_sql::{Migration, MigrationKind};
 
@@ -228,6 +229,58 @@ fn main() {
     ];
 
     tauri::Builder::default()
+        .register_asynchronous_uri_scheme_protocol("imgproxy", |_ctx, request, responder| {
+            tauri::async_runtime::spawn(async move {
+                // URL format: imgproxy://host/path
+                let uri = request.uri().to_string();
+                let https_url = uri.replacen("imgproxy://", "https://", 1);
+
+                let result = reqwest::Client::builder()
+                    .user_agent("")
+                    .build()
+                    .unwrap()
+                    .get(&https_url)
+                    .send()
+                    .await;
+
+                match result {
+                    Ok(response) => {
+                        let content_type = response
+                            .headers()
+                            .get("content-type")
+                            .and_then(|v| v.to_str().ok())
+                            .unwrap_or("image/png")
+                            .to_string();
+                        match response.bytes().await {
+                            Ok(bytes) => {
+                                responder.respond(
+                                    TauriResponse::builder()
+                                        .header("Content-Type", content_type)
+                                        .body(bytes.to_vec())
+                                        .unwrap(),
+                                );
+                            }
+                            Err(_) => {
+                                responder.respond(
+                                    TauriResponse::builder()
+                                        .status(502)
+                                        .body(Vec::new())
+                                        .unwrap(),
+                                );
+                            }
+                        }
+                    }
+                    Err(_) => {
+                        responder.respond(
+                            TauriResponse::builder()
+                                .status(502)
+                                .body(Vec::new())
+                                .unwrap(),
+                        );
+                    }
+                }
+            });
+        })
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
