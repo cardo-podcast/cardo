@@ -7,6 +7,16 @@
   "rules": {
     "react-hooks/exhaustive-deps": 0,
     "react-refresh/only-export-components": "warn",
-    "import/no-empty-named-blocks": "error"
-  }
+    "import/no-empty-named-blocks": "error",
+    "eol-last": "error"
+  },
+  "overrides": [
+    {
+      "files": ["*.json"],
+      "extends": ["plugin:jsonc/recommended-with-json"],
+      "rules": {
+        "eol-last": "error"
+      }
+    }
+  ]
 }

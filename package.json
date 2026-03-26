@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "tauri": "dotenv -- tauri",
     "analyze": "vite-bundle-visualizer",
-    "lint": "eslint src/",
+    "lint": "eslint src/ resources/",
     "prettier": "prettier --write './src/**/*.{js,jsx,mjs,cjs,ts,tsx,json}'"
   },
   "dependencies": {
@@ -49,8 +49,9 @@
     "@vitejs/plugin-react": "^5.1.2",
     "autoprefixer": "^10.4.23",
     "dotenv-cli": "^11.0.0",
-    "eslint": "^8.57.1",
+    "eslint": "8.57.1",
     "eslint-config-react-app": "^7.0.1",
+    "eslint-plugin-jsonc": "^2.21.1",
     "eslint-plugin-react-refresh": "^0.4.26",
     "prettier": "^3.8.0",
     "prettier-plugin-tailwindcss": "^0.7.2",
