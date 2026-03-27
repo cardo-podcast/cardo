@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { secondsToStr, strToSeconds } from '../utils/utils'
-import { DndContext, Modifier, useDraggable } from '@dnd-kit/core'
 
 export enum SwitchState {
   False,
@@ -143,37 +142,6 @@ export function TimeInput({ value, onChange }: { value: number; onChange: (t: nu
   )
 }
 
-function RangeBall({ position, className = '' }: { position: number; className?: string }) {
-  const { setNodeRef, attributes, listeners } = useDraggable({ id: 'RangeBall' })
-
-  return (
-    <div
-      ref={setNodeRef}
-      className={`absolute left-0 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary-3 ${className}`}
-      {...listeners}
-      {...attributes}
-      style={{ left: `${position}%` }}
-    />
-  )
-}
-
-const restrictToParentElement: Modifier = ({ containerNodeRect, draggingNodeRect, transform }) => {
-  if (!draggingNodeRect || !containerNodeRect) {
-    return transform
-  }
-
-  // ball is visually centered, but value is get from the left side of the ball
-  const leftSidePosition = draggingNodeRect.left + transform.x
-
-  if (leftSidePosition <= containerNodeRect.left) {
-    transform.x = containerNodeRect.left - draggingNodeRect.left
-  } else if (leftSidePosition >= containerNodeRect.left + containerNodeRect.width) {
-    transform.x = containerNodeRect.left + containerNodeRect.width - draggingNodeRect.left
-  }
-
-  return transform
-}
-
 export function RangeInput({
   min,
   max,
@@ -192,12 +160,8 @@ export function RangeInput({
   className?: string
 }) {
   const barRef = useRef<HTMLDivElement>(null)
-
-  const barWidth = barRef.current?.clientWidth ?? 0
-  const barOffsetLeft = barRef.current?.offsetLeft ?? 0
   const [position, setPosition] = useState(0) // % of bar width
   const [dragging, setDragging] = useState(false)
-  const [startDraggingPos, setStartDraggingPos] = useState(0)
 
   useEffect(() => {
     if (max - min > 0 && !dragging) {
@@ -215,8 +179,8 @@ export function RangeInput({
     }
   }
 
-  function change(position: number) {
-    let newValue = (position * (max - min)) / 100
+  function change(pos: number) {
+    let newValue = (pos * (max - min)) / 100
 
     if (step && step > 0) {
       newValue = Math.floor(newValue / step) * step
@@ -225,45 +189,46 @@ export function RangeInput({
     onChange(newValue)
   }
 
+  function getPositionFromPointer(clientX: number) {
+    if (!barRef.current) return position
+    const rect = barRef.current.getBoundingClientRect()
+    return Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100))
+  }
+
   return (
-    <div className="group container flex w-full items-center py-1">
-      {' '}
+    <div className="group flex w-full items-center py-1">
       {/* hover window is a bit higher than the bar */}
       <div
         ref={barRef}
         className={`relative flex h-1 rounded-md bg-primary-7 ${className}`}
         onMouseMove={(e) => {
-          const progress = ((e.clientX - barOffsetLeft) / barWidth) * (max - min)
+          if (dragging) return
+          if (!barRef.current) return
+          const rect = barRef.current.getBoundingClientRect()
+          const progress = ((e.clientX - rect.left) / rect.width) * (max - min)
           setTitle(Math.max(min, Math.min(progress, max)))
         }}
-        onClick={(e) => {
-          const progress = ((e.clientX - barOffsetLeft) / barWidth) * (max - min)
-          const newPosition = (progress / (max - min)) * 100
-          change(newPosition)
+        onPointerDown={(e) => {
+          setDragging(true)
+          e.currentTarget.setPointerCapture(e.pointerId)
+          const newPos = getPositionFromPointer(e.clientX)
+          setPosition(newPos)
+          change(newPos)
+        }}
+        onPointerMove={(e) => {
+          if (!dragging) return
+          const newPos = getPositionFromPointer(e.clientX)
+          setPosition(newPos)
+          change(newPos)
+        }}
+        onPointerUp={() => {
+          setDragging(false)
         }}
       >
-        <DndContext
-          onDragStart={() => {
-            setDragging(true)
-            setStartDraggingPos(position)
-          }}
-          onDragMove={(e) => {
-            const newPosition = startDraggingPos + (e.delta.x / barWidth) * 100
-            setPosition(newPosition)
-            change(newPosition)
-          }}
-          onDragEnd={(e) => {
-            setDragging(false)
-            const newPosition = startDraggingPos + (e.delta.x / barWidth) * 100
-            change(newPosition)
-          }}
-          modifiers={[restrictToParentElement]}
-        >
-          <RangeBall
-            position={position}
-            className={`${!dragging && 'opacity-0'} transition-opacity group-hover:opacity-100`}
-          />
-        </DndContext>
+        <div
+          className={`absolute left-0 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary-3 ${!dragging && 'opacity-0'} transition-opacity group-hover:opacity-100`}
+          style={{ left: `${position}%` }}
+        />
         <div className="h-full rounded-md bg-accent-6" style={{ width: `${position}%` }} /> {/* progrss is colored */}
       </div>
     </div>
