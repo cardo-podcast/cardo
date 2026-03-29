@@ -18,7 +18,9 @@ function EpisodePreview() {
   const navigate = useNavigate()
   const subscriptions = useSubscriptions()
   const { t } = useTranslation()
-  const [podcastFetched, setPodcastFetched] = useState(false)
+  const [podcastData, setPodcastData] = useState<EpisodeData['podcast']>(episode.podcast)
+  const podcastFetched = podcastData?.description != null
+  const enrichedEpisode = { ...episode, podcast: podcastData }
   const {
     reprState,
     inQueue,
@@ -34,27 +36,15 @@ function EpisodePreview() {
     pause,
   } = useEpisode(episode)
 
-  const fetchPodcastData = async (episode: EpisodeData) => {
-    if (episode.podcast?.description) {
-      // suposing that if we have the description we will have everything
-      setPodcastFetched(true)
-      return
-    } // complete podcast data has been passed with episode
+  useEffect(() => {
+    if (podcastData?.description) return
 
-    const subscription = await subscriptions.get(episode.podcastUrl)
-
-    if (subscription !== undefined) {
-      episode.podcast = subscription
-    } else {
-      episode.podcast = await parsePodcastDetails(episode.podcastUrl)
+    const fetchPodcastData = async () => {
+      const subscription = await subscriptions.get(episode.podcastUrl)
+      setPodcastData(subscription ?? await parsePodcastDetails(episode.podcastUrl))
     }
 
-    setPodcastFetched(true)
-  }
-
-  useEffect(() => {
-    // asynchronously fetch podcast data to allow loadig podcast page clicking on cover
-    fetchPodcastData(episode)
+    fetchPodcastData()
   }, [])
 
   function copyEpisodeSrc() {
@@ -79,13 +69,13 @@ function EpisodePreview() {
         >
           <EpisodeCover
             className="rounded-md"
-            episode={episode}
-            title={podcastFetched ? t('open_podcast') + ' ' + episode.podcast?.podcastName : ''}
+            episode={enrichedEpisode}
+            title={podcastFetched ? t('open_podcast') + ' ' + podcastData?.podcastName : ''}
             onClick={() => {
-              podcastFetched && // buton didn't work if podcast isn't loaded yet
+              podcastFetched &&
                 navigate('/preview', {
                   state: {
-                    podcast: episode.podcast,
+                    podcast: podcastData,
                   },
                 })
             }}

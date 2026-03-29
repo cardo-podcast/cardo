@@ -1,5 +1,5 @@
 import EpisodeCard from '../components/EpisodeCard'
-import { EpisodeData } from '..'
+import { PodcastData } from '..'
 import { capitalize, parsePodcastDetails, removeDownloadedEpisode } from '../utils/utils'
 import { useNavigate } from 'react-router-dom'
 import { Suspense, useEffect, useState } from 'react'
@@ -13,21 +13,14 @@ export default function DownloadsPage() {
   const history = useHistory()
   const { t } = useTranslation()
   const [downloadsInfo, setDownloadsInfo] = useState('')
-
-  const fetchPodcastData = async (episode: EpisodeData) => {
-    const subscription = await subscriptions.get(episode.podcastUrl)
-
-    if (subscription !== undefined) {
-      episode.podcast = subscription
-    } else {
-      episode.podcast = await parsePodcastDetails(episode.podcastUrl)
-    }
-  }
+  const [podcastMap, setPodcastMap] = useState<Record<string, PodcastData>>({})
 
   useEffect(() => {
-    // asynchronously fetch podcast data to allow loadig podcast page clicking on cover
-    downloads.map((episode) => {
-      fetchPodcastData(episode)
+    // asynchronously fetch podcast data to allow loading podcast page clicking on cover
+    downloads.forEach(async (episode) => {
+      if (podcastMap[episode.podcastUrl]) return
+      const podcast = await subscriptions.get(episode.podcastUrl) ?? await parsePodcastDetails(episode.podcastUrl)
+      setPodcastMap((prev) => ({ ...prev, [episode.podcastUrl]: podcast }))
     })
 
     //sum items and total time
@@ -86,22 +79,25 @@ export default function DownloadsPage() {
       {downloads.length > 0 ? (
         <>
           <div className="grid content-start">
-            {downloads.map((episode) => (
-              <Suspense key={episode.id} fallback={<div className="h-20 w-full bg-primary-8" />}>
-                <EpisodeCard
-                  episode={episode}
-                  className="border-b border-primary-8 hover:bg-primary-8"
-                  onImageClick={(e) => {
-                    e.stopPropagation()
-                    navigate('/preview', {
-                      state: {
-                        podcast: episode.podcast,
-                      },
-                    })
-                  }}
-                />
-              </Suspense>
-            ))}
+            {downloads.map((episode) => {
+              const enriched = { ...episode, podcast: podcastMap[episode.podcastUrl] ?? episode.podcast }
+              return (
+                <Suspense key={episode.id} fallback={<div className="h-20 w-full bg-primary-8" />}>
+                  <EpisodeCard
+                    episode={enriched}
+                    className="border-b border-primary-8 hover:bg-primary-8"
+                    onImageClick={(e) => {
+                      e.stopPropagation()
+                      navigate('/preview', {
+                        state: {
+                          podcast: enriched.podcast,
+                        },
+                      })
+                    }}
+                  />
+                </Suspense>
+              )
+            })}
           </div>
         </>
       ) : (

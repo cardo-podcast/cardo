@@ -55,7 +55,8 @@ function SortButton({
 
 function PodcastPreview() {
   const location = useLocation()
-  const podcast = location.state.podcast as PodcastData
+  const locationPodcast = location.state.podcast as PodcastData
+  const [podcast, setPodcast] = useState<PodcastData>(locationPodcast)
 
   const [episodes, setEpisodes] = useState<EpisodeData[]>([])
   const [downloading, setDownloading] = useState(false)
@@ -111,7 +112,7 @@ function PodcastPreview() {
       setDownloading(true)
       try {
         const [episodes, podcastDetails] = await parseXML(podcast.feedUrl)
-        podcast.description = podcastDetails.description
+        setPodcast((prev) => ({ ...prev, description: podcastDetails.description }))
         setDownloading(false)
         return episodes
       } catch (e) {
@@ -135,8 +136,6 @@ function PodcastPreview() {
     if (isSubscribed) {
       subscriptionsEpisodes.save(episodes)
     }
-
-    location.state['currentPodcastEpisodes'] = episodes
 
     return episodes
   }
@@ -186,12 +185,13 @@ function PodcastPreview() {
   }, [podcast.feedUrl, JSON.stringify(podcastSettings)])
 
   useEffect(() => {
+    setPodcast(locationPodcast)
     setTweakMenu(undefined)
 
     if (scrollRef.current) {
       scrollRef.current.scrollTo({ top: 0, behavior: 'instant' })
     }
-  }, [podcast.feedUrl])
+  }, [locationPodcast.feedUrl])
 
   useEffect(() => {
     if (!scrollRef.current) return
@@ -229,8 +229,11 @@ function PodcastPreview() {
     })
   }
 
+  useEffect(() => {
+    if (!podcast.feedUrl) toastError(t('please_indicate_url'))
+  }, [podcast.feedUrl])
+
   if (!podcast.feedUrl) {
-    toastError("Feed URL couldn't be empty") // this should never happen, just to avoid weird behaviour in case of a bug
     return <></>
   }
 
@@ -240,8 +243,7 @@ function PodcastPreview() {
         onSubmit={(e) => {
           const input: HTMLInputElement = e.currentTarget.url
 
-          podcast.coverUrl = podcast.coverUrlLarge = input.value
-
+          setPodcast((prev) => ({ ...prev, coverUrl: input.value, coverUrlLarge: input.value }))
           updatePodcastSettings({ coverUrl: input.value })
         }}
       >
@@ -396,7 +398,8 @@ function PodcastPreview() {
                       await subscriptions.remove(podcast.feedUrl)
                     } else {
                       loggedInSync && sync({ add: [podcast.feedUrl] })
-                      podcast.id = await subscriptions.add(podcast)
+                      const id = await subscriptions.add(podcast)
+                      setPodcast((prev) => ({ ...prev, id }))
                       await subscriptionsEpisodes.save(episodes)
                     }
                   }}

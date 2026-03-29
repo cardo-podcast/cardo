@@ -1,6 +1,6 @@
 import EpisodeCard from '../components/EpisodeCard'
 import SortEpisodeGrip from '../components/SortEpisodeGrip'
-import { EpisodeData } from '..'
+import { PodcastData } from '..'
 import { DndContext, DragEndEvent } from '@dnd-kit/core'
 import { SortableContext } from '@dnd-kit/sortable'
 import { capitalize, parsePodcastDetails } from '../utils/utils'
@@ -16,6 +16,7 @@ export default function QueuePage() {
   const history = useHistory()
   const { t } = useTranslation()
   const [queueInfo, setQueueInfo] = useState('')
+  const [podcastMap, setPodcastMap] = useState<Record<string, PodcastData>>({})
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
@@ -28,19 +29,13 @@ export default function QueuePage() {
     move(activePosition, overPosition)
   }
 
-  const fetchPodcastData = async (episode: EpisodeData) => {
-    const subscription = await subscriptions.get(episode.podcastUrl)
-
-    if (subscription !== undefined) {
-      episode.podcast = subscription
-    } else {
-      episode.podcast = await parsePodcastDetails(episode.podcastUrl)
-    }
-  }
-
   useEffect(() => {
-    // asynchronously fetch podcast data to allow loadig podcast page clicking on cover
-    queue.map((episode) => fetchPodcastData(episode))
+    // asynchronously fetch podcast data to allow loading podcast page clicking on cover
+    queue.forEach(async (episode) => {
+      if (podcastMap[episode.podcastUrl]) return
+      const podcast = await subscriptions.get(episode.podcastUrl) ?? await parsePodcastDetails(episode.podcastUrl)
+      setPodcastMap((prev) => ({ ...prev, [episode.podcastUrl]: podcast }))
+    })
 
     //sum items and total time
     const items = queue.length
@@ -95,24 +90,27 @@ export default function QueuePage() {
           <DndContext onDragEnd={handleDragEnd}>
             <SortableContext items={queue.map((episode) => episode.id)}>
               <div className="grid content-start">
-                {queue.map((episode) => (
-                  <SortEpisodeGrip key={episode.id} id={episode.id}>
-                    <Suspense fallback={<div className="h-20 w-full bg-primary-8" />}>
-                      <EpisodeCard
-                        episode={episode}
-                        className="border-b border-primary-8 hover:bg-primary-8"
-                        onImageClick={(e) => {
-                          e.stopPropagation()
-                          navigate('/preview', {
-                            state: {
-                              podcast: episode.podcast,
-                            },
-                          })
-                        }}
-                      />
-                    </Suspense>
-                  </SortEpisodeGrip>
-                ))}
+                {queue.map((episode) => {
+                  const enriched = { ...episode, podcast: podcastMap[episode.podcastUrl] ?? episode.podcast }
+                  return (
+                    <SortEpisodeGrip key={episode.id} id={episode.id}>
+                      <Suspense fallback={<div className="h-20 w-full bg-primary-8" />}>
+                        <EpisodeCard
+                          episode={enriched}
+                          className="border-b border-primary-8 hover:bg-primary-8"
+                          onImageClick={(e) => {
+                            e.stopPropagation()
+                            navigate('/preview', {
+                              state: {
+                                podcast: enriched.podcast,
+                              },
+                            })
+                          }}
+                        />
+                      </Suspense>
+                    </SortEpisodeGrip>
+                  )
+                })}
               </div>
             </SortableContext>
           </DndContext>

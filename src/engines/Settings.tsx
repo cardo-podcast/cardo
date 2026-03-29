@@ -5,6 +5,7 @@ import { RecursivePartial, Settings, SortCriterion, TailwindBaseColor, ColorThem
 import { SwitchState } from '../components/Inputs'
 import { changeLanguage } from './translations'
 import merge from 'lodash/merge'
+import mergeWith from 'lodash/mergeWith'
 import debounce from 'lodash/debounce'
 import colors from 'tailwindcss/colors'
 import { DefaultTheme, DefaultThemes } from '../DefaultThemes'
@@ -183,10 +184,13 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   }, [loaded])
 
   const updateSettings = (newSettings: RecursivePartial<Settings>) => {
-    let settingsClone = { ...settings }
-    merge(settingsClone, newSettings)
-
-    setSettings(settingsClone)
+    setSettings((prev) => {
+      const clone = { ...prev }
+      mergeWith(clone, newSettings, (_objValue, srcValue) => {
+        if (Array.isArray(srcValue)) return srcValue
+      })
+      return clone
+    })
   }
 
   const debouncedWrite = useRef(

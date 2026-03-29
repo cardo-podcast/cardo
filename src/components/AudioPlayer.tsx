@@ -198,8 +198,7 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.playbackRate = playbackRate
-      settings.playbackRate = playbackRate
-      updateSettings({ playback: settings })
+      updateSettings({ playback: { playbackRate } })
     }
   }, [playbackRate])
 
@@ -250,12 +249,16 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
               className={`w-8 rounded-md bg-primary-7 p-1 hover:bg-primary-6 disabled:bg-primary-8`}
               disabled={playbackRate === preset}
               title={t('right_click_remove_preset')}
-              onContextMenu={() => {
-                const deleteIndex = settings.playbackRatePresets.indexOf(preset)
-                settings.playbackRatePresets.splice(deleteIndex, 1)
-                updateSettings({ playback: { playbackRatePresets: settings.playbackRatePresets } })
+              onContextMenu={(e) => {
+                e.preventDefault()
+                let removed = false
+                updateSettings({ playback: { playbackRatePresets: settings.playbackRatePresets.filter((p) => {
+                  if (!removed && p === preset) { removed = true; return false }
+                  return true
+                }) } })
               }}
-              onClick={() => {
+              onClick={(e) => {
+                if (e.button !== 0) return
                 setPlaybackRate(preset)
               }}
             >
@@ -268,9 +271,7 @@ function SpeedButton({ audioRef }: { audioRef: RefObject<HTMLAudioElement> }) {
             disabled={settings.playbackRatePresets.includes(playbackRate)}
             title={t('add')}
             onClick={() => {
-              settings.playbackRatePresets.push(playbackRate)
-              settings.playbackRatePresets.sort((a, b) => a - b)
-              updateSettings({ playback: { playbackRatePresets: settings.playbackRatePresets } })
+              updateSettings({ playback: { playbackRatePresets: [...settings.playbackRatePresets, playbackRate].sort((a, b) => a - b) } })
             }}
           >
             +
