@@ -28,7 +28,13 @@ runs:
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+        sudo apt install -y libappindicator3-dev \
+        librsvg2-dev \
+        patchelf \
+        libwebkit2gtk-4.1-dev \
+        libjavascriptcoregtk-4.1-dev \
+        gir1.2-javascriptcoregtk-4.1 \
+        gir1.2-webkit2-4.1
 
     - name: install frontend dependencies
       shell: bash
