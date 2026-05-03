@@ -94,6 +94,7 @@ export interface Settings {
   ui: {
     showPinWindowButton: boolean
     collapsedLeftMenu: boolean
+    leftMenuWidth: number
   }
 }
 
