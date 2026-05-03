@@ -5,8 +5,13 @@ import SubscriptionCard from './SubscriptionCard'
 import { useSettings } from '../engines/Settings'
 import { useModalBanner } from './ModalBanner'
 import { parsePodcastDetails, toastError } from '../utils/utils'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useSubscriptions, useSubscriptionsEpisodes } from '../ContextProviders'
+
+const COLLAPSED_WIDTH = 64
+const COLLAPSE_THRESHOLD = 100
+const MIN_WIDTH = 180
+const MAX_WIDTH = 480
 
 function NewSubscriptionButton({ mini = false }: { mini?: boolean }) {
   const { t } = useTranslation()
@@ -85,18 +90,58 @@ function LeftMenu() {
   const { t } = useTranslation()
   const [
     {
-      ui: { collapsedLeftMenu },
+      ui: { collapsedLeftMenu, leftMenuWidth },
     },
     updateSettings,
   ] = useSettings()
+  const dragging = useRef(false)
+  const dragDirection = useRef<'left' | 'right'>('right')
+  const prevX = useRef(0)
+  const [liveWidth, setLiveWidth] = useState<number | null>(null)
+
+  const liveDragging = liveWidth !== null
+  const collapsed = liveDragging ? liveWidth! < COLLAPSE_THRESHOLD : collapsedLeftMenu
+  const displayWidth = collapsed ? COLLAPSED_WIDTH : (liveWidth ?? leftMenuWidth)
+
+  function onResizeStart(e: React.PointerEvent) {
+    e.preventDefault()
+    e.currentTarget.setPointerCapture(e.pointerId)
+    dragging.current = true
+    prevX.current = e.clientX
+    dragDirection.current = 'right'
+    document.body.style.cursor = 'col-resize'
+    setLiveWidth(e.clientX)
+  }
+
+  function onResizeMove(e: React.PointerEvent) {
+    if (!dragging.current) return
+    if (e.clientX !== prevX.current) {
+      dragDirection.current = e.clientX > prevX.current ? 'right' : 'left'
+      prevX.current = e.clientX
+    }
+    setLiveWidth(Math.min(MAX_WIDTH, e.clientX))
+  }
+
+  function onResizeEnd(e: React.PointerEvent) {
+    if (!dragging.current) return
+    dragging.current = false
+    document.body.style.cursor = ''
+    const newWidth = Math.min(MAX_WIDTH, e.clientX)
+    if (newWidth < COLLAPSE_THRESHOLD || (newWidth < MIN_WIDTH && dragDirection.current === 'left')) {
+      updateSettings({ ui: { collapsedLeftMenu: true } })
+    } else {
+      updateSettings({ ui: { collapsedLeftMenu: false, leftMenuWidth: Math.max(MIN_WIDTH, newWidth) } })
+    }
+    setLiveWidth(null)
+  }
 
   return (
-    <div className="relative flex">
+    <div className="relative flex" style={{ width: displayWidth }}>
       <div
-        className={`flex h-full flex-col overflow-x-hidden border-r border-primary-8 bg-primary-9 pt-4 ${collapsedLeftMenu ? 'w-16 p-0.5' : 'w-64 p-3 lg:w-80'} `}
+        className={`flex h-full w-full flex-col overflow-x-hidden border-r border-primary-8 bg-primary-9 pt-4 ${collapsed ? 'items-center p-0.5' : 'p-3'}`}
       >
         <div
-          className={`mb-6 flex flex-col font-light uppercase ${collapsedLeftMenu ? 'items-center gap-2' : 'gap-1'}`}
+          className={`mb-6 flex flex-col font-light uppercase ${collapsed ? 'items-center gap-2' : 'gap-1'}`}
         >
           <NavLink
             to="/"
@@ -105,7 +150,7 @@ function LeftMenu() {
             }
             title={t('home')}
           >
-            {collapsedLeftMenu ? <span className="w-6">{home}</span> : t('home')}
+            {collapsed ? <span className="w-6">{home}</span> : t('home')}
           </NavLink>
           <NavLink
             to="/settings"
@@ -114,7 +159,7 @@ function LeftMenu() {
             }
             title={t('settings')}
           >
-            {collapsedLeftMenu ? <span className="w-6">{settings}</span> : t('settings')}
+            {collapsed ? <span className="w-6">{settings}</span> : t('settings')}
           </NavLink>
           <NavLink
             to="/queue"
@@ -123,7 +168,7 @@ function LeftMenu() {
             }
             title={t('queue')}
           >
-            {collapsedLeftMenu ? <span className="w-6">{queue}</span> : t('queue')}
+            {collapsed ? <span className="w-6">{queue}</span> : t('queue')}
           </NavLink>
           <NavLink
             to="/downloads"
@@ -132,37 +177,37 @@ function LeftMenu() {
             }
             title={t('downloads')}
           >
-            {collapsedLeftMenu ? <span className="w-6">{download}</span> : t('downloads')}
+            {collapsed ? <span className="w-6">{download}</span> : t('downloads')}
           </NavLink>
         </div>
 
-        <div className={`mb-1 flex items-center gap-2 ${collapsedLeftMenu && 'justify-center'}`}>
-          {!collapsedLeftMenu && <h1 className="mb-0.5 uppercase">{t('subscriptions')}</h1>}
+        <div className={`mb-1 flex items-center gap-2 ${collapsed && 'justify-center'}`}>
+          {!collapsed && <h1 className="mb-0.5 uppercase">{t('subscriptions')}</h1>}
           <button
             className={`flex justify-center hover:text-accent-5 ${subscriptionsEpisodes.fetchingFeeds.length && 'animate-[spin_1.5s_linear_reverse_infinite]'}`}
             onClick={() => subscriptions.updateFeeds()}
             title={t('update_subs_feeds')}
           >
-            <span className={`${collapsedLeftMenu ? 'w-6' : 'w-5'}`}>{sync}</span>
+            <span className={`${collapsed ? 'w-6' : 'w-5'}`}>{sync}</span>
           </button>
         </div>
 
         <div className="flex flex-col gap-1 overflow-y-auto scroll-smooth">
           {subscriptions.subscriptions.map((subscription) => {
-            return <SubscriptionCard key={subscription.id} podcast={subscription} mini={collapsedLeftMenu} />
+            return <SubscriptionCard key={subscription.id} podcast={subscription} mini={collapsed} />
           })}
-          <NewSubscriptionButton mini={collapsedLeftMenu} />
+          <NewSubscriptionButton mini={collapsed} />
         </div>
       </div>
 
-      {/* FOLD MENU TOGGLE ON BORDER */}
+      {/* RESIZE HANDLE */}
       <div
-        id="folder"
         className="absolute right-0 my-auto h-full w-2 translate-x-1/2 cursor-w-resize bg-clip-content px-[3px] transition-colors hover:bg-accent-8"
-        title={collapsedLeftMenu ? t('double_click_expand') : t('double_click_collapse')}
-        onDoubleClick={() => {
-          updateSettings({ ui: { collapsedLeftMenu: !collapsedLeftMenu } })
-        }}
+        title={collapsed ? t('double_click_expand') : t('double_click_collapse')}
+        onPointerDown={onResizeStart}
+        onPointerMove={onResizeMove}
+        onPointerUp={onResizeEnd}
+        onDoubleClick={() => updateSettings({ ui: { collapsedLeftMenu: !collapsedLeftMenu } })}
       />
     </div>
   )

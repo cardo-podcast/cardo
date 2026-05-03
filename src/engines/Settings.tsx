@@ -150,6 +150,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     ui: {
       showPinWindowButton: false,
       collapsedLeftMenu: true,
+      leftMenuWidth: 256,
     },
   })
 
