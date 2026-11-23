@@ -1,16 +1,25 @@
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import * as icons from '../Icons'
 
-export default function EpisodeOverview({ children }: { children: ReactNode }) {
+export default function EpisodeOverview({ children, wrap = false }: { children: ReactNode; wrap?: boolean }) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [showButtons, setShowButtons] = useState(false)
 
   useEffect(() => {
-    if (!scrollRef.current) return
+    if (wrap || !scrollRef.current) return
 
     // only show buttons when the content is wider than the screen (without the padding)
     setShowButtons(scrollRef.current?.scrollWidth > scrollRef.current?.clientWidth)
-  }, [scrollRef.current?.clientWidth, scrollRef.current?.scrollWidth])
+  }, [wrap, scrollRef.current?.clientWidth, scrollRef.current?.scrollWidth])
+
+  if (wrap) {
+    // grid that fills the available width, adding rows as needed
+    return (
+      <div className="h-fit w-full p-2">
+        <div className="grid grid-cols-[repeat(auto-fill,6rem)] justify-between gap-2">{children}</div>
+      </div>
+    )
+  }
 
   const manageScroll = (value: number) => {
     if (!scrollRef.current) return
