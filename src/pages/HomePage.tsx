@@ -25,7 +25,7 @@ function HomePage() {
       {latestEpisodes.length > 0 && (
         <div>
           <h1 className="mb-1 uppercase">{t('news')}</h1>
-          <EpisodeOverview>
+          <EpisodeOverview wrap>
             {latestEpisodes.map((episode) => (
               <EpisodePreviewCard key={episode.id} episode={episode} />
             ))}
